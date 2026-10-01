@@ -1,0 +1,452 @@
+{
+  "welcomePage": {
+    "brand": "PreLife",
+    "navLabel": "\u018fsas naviqasiya",
+    "tabs": {
+      "welcome": "Xo\u015f g\u0259lmisiniz",
+      "home": "\u018fsas s\u0259hif\u0259"
+    },
+    "header": {
+      "menu": "Menyunu a\u00e7",
+      "close": "Menyunu ba\u011fla",
+      "language": "Dili d\u0259yi\u015fin",
+      "getStarted": "Ba\u015flay\u0131n",
+      "account": "Hesab",
+      "drawerSectionsLabel": "B\u00f6lm\u0259l\u0259r",
+      "drawerPlatformLabel": "Platforma",
+      "drawerSubscription": "Abun\u0259lik"
+    },
+    "hero": {
+      "ariaLabel": "PreLife platform baneri",
+      "eyebrow": "Bir platforma, d\u00f6rd d\u00fcnya",
+      "title": "\u0130dman. Qida. Zehin. Oxu.",
+      "subtitle": "PreLife idman\u0131, qidalanman\u0131, psixologiyan\u0131 v\u0259 kitablar\u0131 bir sakit sistemd\u0259 birl\u0259\u015fdirir \u2014 h\u0259r b\u00f6lm\u0259d\u0259 planlar, videolar, m\u00fct\u0259x\u0259ssisl\u0259r v\u0259 AI.",
+      "alt": "\u0130dman, yem\u0259k, meditasiya v\u0259 kitablar\u0131 birl\u0259\u015fdir\u0259n isti, a\u00e7\u0131q tonlu kompozisiya: \u015ftanga, tax\u0131l qabas\u0131, meditasiya ed\u0259n insan v\u0259 kitab d\u0259st\u0259si",
+      "seeAll": "B\u00f6lm\u0259l\u0259ri k\u0259\u015ff edin",
+      "chips": {
+        "psikoloji": "Psixologiya",
+        "kitab": "Kitablar",
+        "sport": "\u0130dman",
+        "diet": "Qidalanma"
+      }
+    },
+    "stats": {
+      "items": {
+        "exercises": {
+          "value": "40+",
+          "label": "kitabxanadak\u0131 h\u0259r\u0259k\u0259t"
+        },
+        "recipes": {
+          "value": "25+",
+          "label": "sa\u011flam resept"
+        },
+        "sessions": {
+          "value": "10+",
+          "label": "b\u0259l\u0259d\u00e7i sessiya"
+        },
+        "books": {
+          "value": "30+",
+          "label": "se\u00e7ilmi\u015f kitab"
+        }
+      }
+    },
+    "modules": {
+      "eyebrow": "D\u00f6rd sah\u0259, bir h\u0259yat",
+      "title": "B\u00f6y\u00fcm\u0259k \u00fc\u00e7\u00fcn laz\u0131m olan h\u0259r \u015fey",
+      "subtitle": "H\u0259r b\u00f6lm\u0259 \u00f6z\u00fcn\u0259m\u0259xsus tam bir d\u00fcnyad\u0131r. Birlikd\u0259 is\u0259 vahid h\u0259yat t\u0259rzi yarad\u0131rlar.",
+      "explore": "K\u0259\u015ff edin",
+      "cards": {
+        "psikoloji": {
+          "name": "Psixologiya",
+          "tagline": "Psixoloqlar, videolar, meditasiya v\u0259 AI"
+        },
+        "kitab": {
+          "name": "Kitablar",
+          "tagline": "Se\u00e7ilmi\u015f kitablar, kolleksiyalar v\u0259 AI se\u00e7iml\u0259ri"
+        },
+        "sport": {
+          "name": "\u0130dman",
+          "tagline": "\u0130dman zal\u0131, yoqa, pilates, m\u0259\u015fq\u00e7il\u0259r, videolar v\u0259 AI"
+        },
+        "diet": {
+          "name": "Qidalanma",
+          "tagline": "Planlar, dietoloqlar, videolar v\u0259 AI"
+        }
+      }
+    },
+    "reasons": {
+      "eyebrow": "Niy\u0259 PreLife",
+      "title": "Ki\u00e7ik add\u0131mlar, davaml\u0131 d\u0259yi\u015fiklik",
+      "items": {
+        "one": {
+          "label": "Struktur",
+          "title": "Xaos deyil, sistem",
+          "text": "Planlar, t\u0259r\u0259qqi add\u0131mlar\u0131 v\u0259 rutinl\u0259r yax\u015f\u0131 niyy\u0259tl\u0259ri t\u0259krarlanan h\u0259ft\u0259l\u0259r\u0259 \u00e7evirir \u2014 n\u00f6vb\u0259ti add\u0131m\u0131n\u0131z h\u0259mi\u015f\u0259 ayd\u0131nd\u0131r."
+        },
+        "two": {
+          "label": "Balans",
+          "title": "D\u00f6rd sah\u0259, bir h\u0259yat",
+          "text": "M\u0259\u015fq, qida, zehin v\u0259 oxu bir-birini g\u00fccl\u0259ndirir. PreLife onlar\u0131 d\u00f6rd t\u0259tbiq \u0259v\u0259zin\u0259 bir x\u0259rit\u0259d\u0259 saxlay\u0131r."
+        },
+        "three": {
+          "label": "Momentum",
+          "title": "G\u00f6r\u00fcn\u0259n t\u0259r\u0259qqi",
+          "text": "Tamamlanm\u0131\u015f sessiyalar, planla\u015fd\u0131r\u0131lm\u0131\u015f yem\u0259kl\u0259r v\u0259 oxunmu\u015f s\u0259hif\u0259l\u0259r s\u0259ssizc\u0259 toplan\u0131r \u2014 bir g\u00fcn d\u0259yi\u015fikliyi art\u0131q danmaq m\u00fcmk\u00fcn olmur."
+        }
+      }
+    },
+    "cta": {
+      "title": "Premium h\u0259yat\u0131n\u0131za bu g\u00fcn ba\u015flay\u0131n",
+      "text": "H\u0259l\u0259lik hesab laz\u0131m deyil \u2014 bir klikl\u0259 b\u00fct\u00fcn b\u00f6lm\u0259l\u0259r qar\u015f\u0131n\u0131zda a\u00e7\u0131l\u0131r.",
+      "start": "PreLife-\u0131 istifad\u0259 etm\u0259y\u0259 ba\u015flay\u0131n",
+      "note": "Erk\u0259n \u00e7\u0131x\u0131\u015f m\u00fcdd\u0259tind\u0259 pulsuzdur \u2014 abun\u0259lik (Abonelik) planlar\u0131 \u00f6d\u0259ni\u015fl\u0259rl\u0259 birlikd\u0259 g\u0259l\u0259c\u0259k."
+    },
+    "footer": {
+      "brand": "PreLife",
+      "tagline": "Premium h\u0259yat \u2014 g\u00fcnd\u0259lik bir add\u0131m.",
+      "rights": "\u00a9 2026 PreLife. B\u00fct\u00fcn h\u00fcquqlar qorunur.",
+      "design": "Dizayn sistemi"
+    }
+  },
+  "homePage": {
+    "title": "\u018fsas s\u0259hif\u0259",
+    "tagline": "H\u0259r g\u00fcn ba\u015flad\u0131\u011f\u0131n\u0131z yer.",
+    "header": {
+      "navLabel": "B\u00f6lm\u0259l\u0259r",
+      "language": "Dili d\u0259yi\u015fin"
+    },
+    "placeholder": "Tam ev paneli layih\u0259nin n\u00f6vb\u0259ti add\u0131m\u0131nda \u0259lav\u0259 olunacaq \u2014 indi ist\u0259nil\u0259n b\u00f6lm\u0259y\u0259 ke\u00e7in.",
+    "sectionsEyebrow": "B\u00f6lm\u0259l\u0259r",
+    "today": {
+      "eyebrow": "Bu g\u00fcn",
+      "open": "A\u00e7\u0131n",
+      "pick1": {
+        "title": "B\u00fct\u00fcn b\u0259d\u0259n g\u00fcc\u00fc \u2014 35 d\u0259q"
+      },
+      "pick2": {
+        "title": "Aral\u0131q d\u0259nizi tax\u0131l qabas\u0131"
+      },
+      "pick3": {
+        "title": "S\u0259h\u0259r sakitliyi \u2014 5 d\u0259q"
+      }
+    },
+    "subscription": {
+      "title": "PreLife Premium",
+      "text": "Bir planla b\u00fct\u00fcn b\u00f6lm\u0259l\u0259ri, AI v\u0259 video kitabxanalar\u0131n\u0131 a\u00e7\u0131n.",
+      "cta": "Planlara bax\u0131n"
+    }
+  },
+  "sections": {
+    "backHome": "\u018fsas s\u0259hif\u0259y\u0259 qay\u0131d\u0131n",
+    "eyebrow": "PreLife \u00b7 {section}",
+    "subTitle": "B\u00f6lm\u0259nin i\u00e7ind\u0259kil\u0259r",
+    "itemsTitle": "Haz\u0131rda se\u00e7ilmi\u015fl\u0259r",
+    "psikoloji": {
+      "name": "Psixologiya",
+      "heroTitle": "Daha sakit zehin, g\u00fcnd\u0259 bir sessiya.",
+      "heroText": "Etibarl\u0131 psixoloqlarla dan\u0131\u015f\u0131n, b\u0259l\u0259d\u00e7i meditasiyalar edin, videolardan \u00f6yr\u0259nin v\u0259 sessiyalar aras\u0131nda PreLife AI d\u0259st\u0259yi al\u0131n \u2014 daxili h\u0259yat\u0131n\u0131z \u00fc\u00e7\u00fcn h\u0259r \u015fey bir yerd\u0259.",
+      "ctaTitle": "Daxili i\u015finiz\u0259 ba\u015flay\u0131n",
+      "ctaText": "Bu g\u00fcn yaln\u0131z \u00fc\u00e7 d\u0259qiq\u0259lik sakitlikl\u0259 ba\u015flay\u0131n.",
+      "subs": {
+        "psikoloqlar": "Psixoloqlar",
+        "videolar": "Videolar",
+        "meditasyon": "Meditasiya",
+        "ai": "AI"
+      },
+      "items": {
+        "0": {
+          "title": "5 d\u0259qiq\u0259lik s\u0259h\u0259r sakitliyi",
+          "desc": "G\u00fcn\u0259 t\u0259l\u0259sm\u0259d\u0259n ba\u015flamaq \u00fc\u00e7\u00fcn q\u0131sa b\u0259l\u0259d\u00e7i meditasiya \u2014 b\u00fct\u00fcn g\u00fcn\u00fcn tonunu m\u00fc\u0259yy\u0259n edir."
+        },
+        "1": {
+          "title": "Aynur M\u0259mm\u0259dova",
+          "desc": "Klinik psixoloq, 12 illik t\u0259cr\u00fcb\u0259. Narahatl\u0131q, stress v\u0259 yand\u0131r\u0131lma \u00fc\u00e7\u00fcn onlayn sessiyalar."
+        },
+        "2": {
+          "title": "Yand\u0131r\u0131lman\u0131 anlamaq",
+          "desc": "Yand\u0131r\u0131lma nec\u0259 yaran\u0131r v\u0259 onu uzaq saxlayan ki\u00e7ik v\u0259rdi\u015fl\u0259r haqq\u0131nda d\u00f6rd hiss\u0259li video silsil\u0259si."
+        },
+        "3": {
+          "title": "PreLife AI-a sual verin",
+          "desc": "\u018fhval\u0131n\u0131z\u0131 soru\u015fan, m\u0259\u015fql\u0259r t\u0259klif ed\u0259n v\u0259 he\u00e7 vaxt m\u00fchakim\u0259 etm\u0259y\u0259n AI yolda\u015f."
+        }
+      }
+    },
+    "kitab": {
+      "name": "Kitablar",
+      "heroTitle": "B\u00f6y\u00fcm\u0259k \u00fc\u00e7\u00fcn oxuyun.",
+      "heroText": "H\u0259yat\u0131n h\u0259r m\u00f6vs\u00fcm\u00fcn\u0259 uy\u011fun kolleksiyalarla se\u00e7ilmi\u015f kitabxana \u2014 v\u0259 bu anda ya\u015fad\u0131qlar\u0131n\u0131za uy\u011fun AI se\u00e7iml\u0259ri.",
+      "ctaTitle": "N\u00f6vb\u0259ti f\u0259slinizi a\u00e7\u0131n",
+      "ctaText": "G\u00fcnd\u0259 bir s\u0259hif\u0259 bel\u0259 ili d\u0259yi\u015fir.",
+      "subs": {
+        "kitablar": "Kitablar",
+        "ai": "AI"
+      },
+      "items": {
+        "0": {
+          "title": "Atom v\u0259rdi\u015fl\u0259r",
+          "desc": "Ceyms Klir. Ki\u00e7ik d\u0259yi\u015fiklikl\u0259r, g\u00f6rk\u0259mli n\u0259tic\u0259l\u0259r \u2014 h\u0259r PreLife plan\u0131 \u00fc\u00e7\u00fcn v\u0259rdi\u015f yolda\u015f\u0131."
+        },
+        "1": {
+          "title": "Haz\u0131r\u0131n g\u00fcc\u00fc",
+          "desc": "Ekhart Tolle. M\u00f6vcudluq bir praktika kimi \u2014 meditasiya b\u00f6lm\u0259si il\u0259 t\u0259bii uy\u011funluq."
+        },
+        "2": {
+          "title": "D\u0259rin i\u015f",
+          "desc": "Kal Nyuport. Diqq\u0259tin payla\u015fd\u0131r\u0131ld\u0131\u011f\u0131 d\u00fcnyada fokus \u2014 sizi h\u0259qiq\u0259t\u0259n ir\u0259li aparan i\u015f \u00fc\u00e7\u00fcn."
+        },
+        "3": {
+          "title": "\u018fhval\u0131n\u0131za uy\u011fun AI se\u00e7iml\u0259ri",
+          "desc": "PreLife AI-a nec\u0259 hiss etdiyinizi deyin v\u0259 h\u0259yat\u0131n\u0131z\u0131n bu h\u0259ft\u0259sin\u0259 uy\u011fun \u00fc\u00e7 kitab al\u0131n."
+        }
+      }
+    },
+    "sport": {
+      "name": "\u0130dman",
+      "heroTitle": "H\u0259r g\u00fcn, \u00f6z \u00fcsulunuzla h\u0259r\u0259k\u0259t edin.",
+      "heroText": "GYM planlar\u0131, yoqa ax\u0131nlar\u0131, pilates d\u0259rsl\u0259ri, \u015f\u0259xsi m\u0259\u015fq\u00e7il\u0259r v\u0259 video m\u0259\u015fql\u0259r \u2014 PreLife AI h\u0259ft\u0259ni enerjiniz\u0259 uy\u011fun qurur.",
+      "ctaTitle": "\u0130lk m\u0259\u015fqiniz sizi g\u00f6zl\u0259yir",
+      "ctaText": "Ba\u015flamaq \u00fc\u00e7\u00fcn bu g\u00fcn otuz be\u015f d\u0259qiq\u0259 kifay\u0259tdir.",
+      "subs": {
+        "gym": "GYM",
+        "yoga": "Yoqa",
+        "plates": "Pilates",
+        "hocalar": "M\u0259\u015fq\u00e7il\u0259r",
+        "videolar": "Videolar",
+        "ai": "AI"
+      },
+      "items": {
+        "0": {
+          "title": "B\u00fct\u00fcn b\u0259d\u0259n g\u00fcc\u00fc",
+          "desc": "35 d\u0259qiq\u0259lik GYM sessiyas\u0131: be\u015f \u0259sas h\u0259r\u0259k\u0259t, \u00fc\u00e7 tur, bir d\u00fczg\u00fcn final."
+        },
+        "1": {
+          "title": "S\u0259h\u0259r yoqa ax\u0131n\u0131",
+          "desc": "G\u00fcn ba\u015flamadan on be\u015f sakit d\u0259qiq\u0259 \u2014 bel v\u0259 kal\u00e7an\u0131 oyadan ax\u0131n."
+        },
+        "2": {
+          "title": "Pilates n\u00fcv\u0259 \u0259saslar\u0131",
+          "desc": "Bir mat, iyirmi d\u0259qiq\u0259 v\u0259 d\u0259rin yan\u011f\u0131 \u2014 h\u0259r \u015feyin t\u0259m\u0259li."
+        },
+        "3": {
+          "title": "Elvin il\u0259 m\u0259\u015fq edin",
+          "desc": "\u015e\u0259xsi m\u0259\u015fq\u00e7i, g\u00fcc m\u00fct\u0259x\u0259ssisi. T\u0259qviminiz\u0259 h\u00f6rm\u0259t ed\u0259n proqramlar."
+        }
+      }
+    },
+    "diet": {
+      "name": "Qidalanma",
+      "heroTitle": "Sad\u0259c\u0259 yax\u015f\u0131 yeyin.",
+      "heroText": "B\u0259l\u0259d\u00e7i p\u0259r\u0259 planlar\u0131, d\u00fcr\u00fcst reseptl\u0259r, etibar etdiyiniz dietoloqlar v\u0259 yax\u015f\u0131 yem\u0259yi asanla\u015fd\u0131ran videolar \u2014 plan\u0131 t\u0259nziml\u0259m\u0259k \u00fc\u00e7\u00fcn AI il\u0259.",
+      "ctaTitle": "\u0130lk yem\u0259yinizi planla\u015fd\u0131r\u0131n",
+      "ctaText": "Bir tarazl\u0131q qab\u0131 \u00e7ox yax\u015f\u0131 bir ba\u015flan\u011f\u0131cd\u0131r.",
+      "subs": {
+        "diet": "Qidalanma",
+        "dietisyenler": "Dietoloqlar",
+        "videolar": "Videolar",
+        "ai": "AI"
+      },
+      "items": {
+        "0": {
+          "title": "Aral\u0131q d\u0259nizi tax\u0131l qabas\u0131",
+          "desc": "Ya\u015f\u0131l\u0131qlar, tax\u0131llar, zeytunlar v\u0259 limon sousu \u2014 ax\u015fam\u0131 sakit saxlayan nahar."
+        },
+        "1": {
+          "title": "Y\u00fcks\u0259k z\u00fclall\u0131 s\u0259h\u0259rl\u0259r",
+          "desc": "T\u0259xmin\u0259n 30 qram z\u00fclall\u0131 be\u015f s\u0259h\u0259r variant\u0131, ham\u0131s\u0131 on be\u015f d\u0259qiq\u0259d\u0259n az."
+        },
+        "2": {
+          "title": "Dietoloqla m\u0259sl\u0259h\u0259tl\u0259\u015fin",
+          "desc": "Leyla \u018fliyeva, RD. M\u0259\u015fql\u0259riniz\u0259 uy\u011fun, \u0259leyhin\u0259 deyil, \u015f\u0259xsi planlar."
+        },
+        "3": {
+          "title": "20 d\u0259qiq\u0259d\u0259 yem\u0259k haz\u0131rl\u0131\u011f\u0131",
+          "desc": "Bir al\u0131\u015f-veri\u015f torbas\u0131ndan \u00fc\u00e7 \u015fam yem\u0259yi \u2014 video b\u0259l\u0259d\u00e7i."
+        }
+      }
+    }
+  },
+  "subscription": {
+    "eyebrow": "Abun\u0259lik",
+    "title": "PreLife Premium",
+    "text": "Bir plan, b\u00fct\u00fcn b\u00f6lm\u0259l\u0259r \u2014 idman, psixologiya, kitab v\u0259 qidalanma, AI v\u0259 videolar daxil.",
+    "bestValue": "\u018fn s\u0259rf\u0259li",
+    "choose": "Plan\u0131 se\u00e7in",
+    "note": "\u00d6d\u0259ni\u015fl\u0259r yax\u0131n yenil\u0259m\u0259 il\u0259 g\u0259l\u0259c\u0259k \u2014 bu \u00f6n bax\u0131\u015fda he\u00e7 n\u0259 tutulmur.",
+    "plans": {
+      "monthly": {
+        "name": "Ayl\u0131q",
+        "price": "\u20bc9",
+        "per": "ayl\u0131q",
+        "desc": "H\u0259r \u015feyi s\u0131nay\u0131n, ist\u0259nil\u0259n vaxt l\u0259\u011fv edin.",
+        "features": {
+          "1": "B\u00fct\u00fcn d\u00f6rd b\u00f6lm\u0259",
+          "2": "PreLife AI daxildir",
+          "3": "Video kitabxanalar\u0131"
+        }
+      },
+      "yearly": {
+        "name": "\u0130llik",
+        "price": "\u20bc79",
+        "per": "illik",
+        "desc": "Ayl\u0131qla m\u00fcqayis\u0259d\u0259 iki ay pulsuz.",
+        "features": {
+          "1": "Ayl\u0131q plandak\u0131 h\u0259r \u015fey",
+          "2": "Prioritet AI cavablar\u0131",
+          "3": "Yeni funksiyalara erk\u0259n \u00e7\u0131x\u0131\u015f"
+        }
+      },
+      "family": {
+        "name": "Ail\u0259",
+        "price": "\u20bc14",
+        "per": "ayl\u0131q",
+        "desc": "D\u00f6rd \u00fczv\u0259 q\u0259d\u0259r, bir hesab-faktura.",
+        "features": {
+          "1": "\u0130llik plandak\u0131 h\u0259r \u015fey",
+          "2": "D\u00f6rd \u00fczv profili",
+          "3": "Ortaq kitab kolleksiyas\u0131"
+        }
+      }
+    }
+  },
+  "uiPage": {
+    "eyebrow": "Dizayn sistemi",
+    "title": "\u0130nterfeys elementl\u0259ri",
+    "intro": "PreLife-\u0131n \u00fcmumi tikinti bloklar\u0131 \u2014 r\u0259ngl\u0259r, tipoqrafiya, idar\u0259l\u0259r, kartlar v\u0259 v\u0259ziyy\u0259tl\u0259r bir yerd\u0259, ham\u0131s\u0131 i\u015f\u0131ql\u0131 t\u0259k tonlu capstone dilin\u0259 uy\u011fun.",
+    "sections": {
+      "colors": "R\u0259ng sistemi",
+      "colorsDesc": "B\u00fct\u00fcn platforma \u00fc\u00e7\u00fcn bir sakit i\u015f\u0131ql\u0131 ton, h\u0259r b\u00f6lm\u0259 \u00f6z vur\u011fusunu da\u015f\u0131y\u0131r.",
+      "typography": "Tipoqrafiya",
+      "typographyDesc": "H\u0259r yerd\u0259 Geist \u2014 etiketl\u0259r \u00fc\u00e7\u00fcn aral\u0131ql\u0131 b\u00f6y\u00fck h\u0259rfl\u0259r, ba\u015fl\u0131qlar \u00fc\u00e7\u00fcn s\u0131x qal\u0131n.",
+      "buttons": "D\u00fcym\u0259l\u0259r",
+      "buttonsDesc": "H\u0259r yerd\u0259 pill formal\u0131 \u2014 \u0259sas h\u0259r\u0259k\u0259t h\u0259mi\u015f\u0259 tam m\u00fcr\u0259kk\u0259b pill-dir.",
+      "badges": "Ni\u015fanlar v\u0259 \u00e7ipl\u0259r",
+      "badgesDesc": "B\u00f6lm\u0259 \u00e7ipl\u0259ri capstone vur\u011fular\u0131n\u0131 da\u015f\u0131y\u0131r; status pill\u0259ri sakit qal\u0131r.",
+      "forms": "Form idar\u0259l\u0259ri",
+      "formsDesc": "I\u015f\u0131ql\u0131 tonda sakit inputlar, nazik s\u0259rh\u0259dl\u0259r, yum\u015faq fokus halqalar\u0131.",
+      "cards": "Kartlar",
+      "cardsDesc": "Ka\u011f\u0131z tonunda yumru kartlar \u2014 r\u0259ngli ikon \u00e7ipl\u0259ri v\u0259 ayd\u0131n iyerarxiya.",
+      "avatars": "Avatarlar",
+      "avatarsDesc": "B\u00f6lm\u0259 tonu \u00fcz\u0259rind\u0259 ba\u015f h\u0259rfl\u0259r \u2014 sakit v\u0259 ard\u0131c\u0131l.",
+      "tabs": "Tablar",
+      "tabsDesc": "Ultrahuman ruhunda pill tablar \u2014 aktiv tab b\u0259rk m\u00fcr\u0259kk\u0259b pill-dir.",
+      "feedback": "\u018fks \u0259laq\u0259 v\u0259 v\u0259ziyy\u0259tl\u0259r",
+      "feedbackDesc": "Tonu sakit saxlayan ir\u0259lil\u0259yi\u015f, y\u00fckl\u0259m\u0259 v\u0259 mesajlar."
+    },
+    "colors": {
+      "core": "\u018fsas tonlar",
+      "accents": "B\u00f6lm\u0259 vur\u011fular\u0131",
+      "toneNames": {
+        "background": "Fon",
+        "card": "Kart",
+        "ink": "M\u00fcr\u0259kk\u0259b",
+        "muted": "S\u00f6n\u00fck",
+        "border": "S\u0259rh\u0259d"
+      },
+      "accentUse": "Vur\u011fu",
+      "tintUse": "Ton"
+    },
+    "typography": {
+      "display": "Displey",
+      "heading": "Ba\u015fl\u0131q",
+      "subheading": "Alt ba\u015fl\u0131q",
+      "body": "M\u0259tn",
+      "caption": "Alt yaz\u0131",
+      "label": "Etiket (aral\u0131ql\u0131 b\u00f6y\u00fck h\u0259rfl\u0259r)"
+    },
+    "buttons": {
+      "variants": "Variantlar",
+      "save": "D\u0259yi\u015fiklikl\u0259ri yadda saxla",
+      "sizes": "\u00d6l\u00e7\u00fcl\u0259r",
+      "withIcon": "\u0130kon il\u0259",
+      "play": "M\u0259\u015fqi oynat",
+      "iconOnly": "\u0130kon d\u00fcym\u0259l\u0259ri",
+      "disabled": "Deaktiv"
+    },
+    "badges": {
+      "sectionChips": "B\u00f6lm\u0259 \u00e7ipl\u0259ri",
+      "status": "Status pill\u0259ri",
+      "live": "Canl\u0131",
+      "new": "Yeni",
+      "soon": "Tezlikl\u0259",
+      "filters": "Filtr \u00e7ipl\u0259ri"
+    },
+    "forms": {
+      "labels": "Inputlar",
+      "name": "Tam ad",
+      "namePlaceholder": "Ays\u0259l M\u0259mm\u0259dova",
+      "email": "E-po\u00e7t",
+      "emailPlaceholder": "you@prelife.net",
+      "search": "Axtar\u0131\u015f",
+      "searchPlaceholder": "M\u0259\u015fql\u0259r, kitablar, reseptl\u0259r axtar...",
+      "message": "Mesaj",
+      "messagePlaceholder": "M\u0259\u015fq\u00e7in\u0259 qeyd yaz...",
+      "select": "\u00c7\u0259tinlik",
+      "selectEasy": "Asan",
+      "selectMedium": "Orta",
+      "selectHard": "\u00c7\u0259tin",
+      "checkboxes": "Checkboxlar",
+      "notifyEmail": "E-po\u00e7t bildiri\u015fl\u0259ri",
+      "notifyPush": "Push bildiri\u015fl\u0259ri",
+      "radios": "Radio qrupu",
+      "planFree": "Pulsuz plan",
+      "planPremium": "PreLife Premium",
+      "switches": "Switchl\u0259r",
+      "switchDaily": "G\u00fcnd\u0259lik xat\u0131rlatma",
+      "switchDailyDesc": "Bug\u00fcnk\u00fc m\u0259\u015fqi se\u00e7m\u0259k \u00fc\u00e7\u00fcn saat 9:00-da yum\u015faq bir siqnal.",
+      "switchAI": "PreLife AI",
+      "switchAIDesc": "B\u00fct\u00fcn b\u00f6lm\u0259l\u0259rd\u0259 AI se\u00e7iml\u0259ri v\u0259 \u0259hval yoxlamalar\u0131.",
+      "slider": "S\u00fcr\u00fc\u015fd\u00fcr\u00fcn",
+      "sliderLabel": "M\u0259\u015fq m\u00fcdd\u0259ti",
+      "sliderValue": "45",
+      "sliderUnit": "d\u0259q"
+    },
+    "cards": {
+      "stat": "Stat kart\u0131",
+      "sectionCard": "B\u00f6lm\u0259 kart\u0131",
+      "expertCard": "M\u00fct\u0259x\u0259ssis kart\u0131",
+      "expertRole": "Klinik psixoloq",
+      "actionCard": "\u018fm\u0259liyyat kart\u0131",
+      "open": "A\u00e7"
+    },
+    "avatars": {
+      "sizes": "\u00d6l\u00e7\u00fcl\u0259r",
+      "group": "Qrup",
+      "person1": "Ays\u0259l M\u0259mm\u0259dova",
+      "person2": "Nihat Quliyev",
+      "person3": "\u015e\u0259fa R\u0259himli",
+      "person4": "Elvin H\u0259s\u0259nli",
+      "more": "+8"
+    },
+    "tabs": {
+      "overview": "\u0130cmal",
+      "sessions": "M\u0259\u015fql\u0259r",
+      "videos": "Videolar",
+      "ai": "AI",
+      "overviewText": "G\u00fcn\u00fcn\u00fcz\u00fcn sakit g\u00f6r\u00fcn\u00fc\u015f\u00fc \u2014 idman, yem\u0259kl\u0259r, zehin v\u0259 oxu bir zolaqda.",
+      "sessionsText": "Sizin \u00fc\u00e7\u00fcn se\u00e7ilmi\u015f b\u0259l\u0259d\u00e7i m\u0259\u015fql\u0259r \u2014 be\u015f sakit d\u0259qiq\u0259d\u0259n tam m\u0259\u015fql\u0259r\u0259.",
+      "videosText": "H\u0259r b\u00f6lm\u0259d\u0259 video kitabxanalar\u0131 \u2014 reseptl\u0259rd\u0259n texnika analizl\u0259rin\u0259.",
+      "aiText": "PreLife AI yoxlay\u0131r, t\u0259klif edir v\u0259 he\u00e7 vaxt m\u00fchakim\u0259 etmir."
+    },
+    "feedback": {
+      "progress": "\u0130r\u0259lil\u0259yi\u015f",
+      "progressLabel": "H\u0259ft\u0259lik h\u0259d\u0259f",
+      "progressValue": "72%",
+      "skeleton": "Skelet",
+      "alerts": "X\u0259b\u0259rdarl\u0131qlar",
+      "alertTitle": "\u00d6d\u0259ni\u015fl\u0259r sonra g\u0259l\u0259c\u0259k",
+      "alertText": "Abun\u0259 planlar\u0131 (Abonelik) \u00f6d\u0259ni\u015fl\u0259rl\u0259 birlikd\u0259 g\u0259lir \u2014 erk\u0259n giri\u015f d\u00f6vr\u00fcnd\u0259 h\u0259r \u015fey pulsuzdur.",
+      "warnTitle": "Yava\u015f ba\u011flant\u0131",
+      "warnText": "Onlayn olduqda ir\u0259lil\u0259yi\u015finiz sinxronla\u015facaq.",
+      "spinner": "Y\u00fckl\u0259nir"
+    }
+  },
+  "Metadata": {
+    "welcomeTitle": "Xo\u015f g\u0259lmisiniz",
+    "welcomeDescription": "PreLife il\u0259 tan\u0131\u015f olun \u2014 psixologiya, idman, kitab v\u0259 qidalanma bir platformada; h\u0259r b\u00f6lm\u0259d\u0259 m\u00fct\u0259x\u0259ssisl\u0259r, videolar v\u0259 AI.",
+    "homeTitle": "\u018fsas s\u0259hif\u0259",
+    "homeDescription": "PreLife-da h\u0259r g\u00fcn ba\u015flad\u0131\u011f\u0131n\u0131z yer.",
+    "uiTitle": "\u0130nterfeys elementl\u0259ri",
+    "uiDescription": "PreLife-\u0131n \u00fcmumi interfeys bloklar\u0131 \u2014 r\u0259ngl\u0259r, tipoqrafiya, d\u00fcym\u0259l\u0259r, formlar, kartlar v\u0259 v\u0259ziyy\u0259tl\u0259r."
+  }
+}

@@ -1,0 +1,103 @@
+/* Welcome/Home page animations — CSS-only (locked stack: no animation libs).
+   Keyframes + helpers only. No colors here (token rule, spec §7). */
+
+@keyframes pl-kenburns {
+  from {
+    transform: scale(1.04) translateX(0);
+  }
+  to {
+    transform: scale(1.14) translateX(-1.5%);
+  }
+}
+
+@keyframes pl-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pl-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pl-glow-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-6%, 8%) scale(1.12);
+  }
+}
+
+.pl-kenburns {
+  /* Continuous gentle drift (Ultrahuman-style life, single artwork) */
+  animation: pl-kenburns 18s ease-in-out infinite alternate;
+}
+
+.pl-slide-up {
+  opacity: 0;
+  animation: pl-slide-up 0.7s cubic-bezier(0.21, 1, 0.32, 1) forwards;
+}
+
+.pl-fade-in {
+  opacity: 0;
+  animation: pl-fade-in 0.9s ease-out forwards;
+}
+
+.pl-glow {
+  animation: pl-glow-drift 9s ease-in-out infinite;
+}
+
+.pl-d1 {
+  animation-delay: 0.05s;
+}
+.pl-d2 {
+  animation-delay: 0.15s;
+}
+.pl-d3 {
+  animation-delay: 0.25s;
+}
+.pl-d4 {
+  animation-delay: 0.35s;
+}
+.pl-d5 {
+  animation-delay: 0.45s;
+}
+
+@keyframes pl-drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.uh-drawer {
+  animation: pl-drawer-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-kenburns,
+  .pl-slide-up,
+  .pl-fade-in,
+  .pl-glow {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .uh-drawer {
+    animation: none;
+  }
+}
