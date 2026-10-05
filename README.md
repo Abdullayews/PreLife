@@ -50,10 +50,10 @@ out the site.
 
 | Layer | Tools |
 |---|---|
-| Framework | Next.js 16.4 (App Router) · React 19.2 · TypeScript 5 |
+| Framework | Next.js 16.4 (App Router) · React 19.3 · TypeScript 6 |
 | UI | Tailwind CSS 4 · shadcn-style components · Lucide icons · Geist font |
 | i18n | next-intl — `az` / `en` / `ru` message catalogs + build/parity script |
-| Quality | ESLint 9 |
+| Quality | ESLint 10 |
 | Runtime | Node ≥ 24 |
 
 ## 📁 Repository structure
