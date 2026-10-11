@@ -33,25 +33,28 @@ three locales — and fails on any mismatch.
 
 ## ✨ Modules
 
-| Module | Focus | Route |
-|---|---|---|
-| 🥗 **Diet** | Nutrition & meal planning | `/diet` |
-| 🏋️ **Gym** | Workouts & training plans | `/gym` |
-| 📚 **Library** | Reading list & knowledge tracking | `/library` |
-| 🧘 **Meditation** | Mindfulness & focus sessions | `/meditation` |
+| Module | Focus | Route | Theme |
+|---|---|---|---|
+| 🏋️ **Gym** | Training plans, exercises, partner gyms | `/gym` | Ember on Bone |
+| 🥗 **Diet** | Nutrition, recipes, collections | `/diet` | Golden Harvest |
+| 🧘 **Meditation** | Sessions, programs, benefits | `/meditation` | Lavender Haze |
+| 📚 **Library** | Collections, featured books, perks | `/library` | Paper & Teal |
 
-Each module is a page under `src/app/[locale]/<module>` rendered by a
-shared section view — new modules drop in cleanly, and the shell handles
-localization, navigation and theming. The public funnel — `/welcome`
-(landing) and `/home` (dashboard) — plus `/subscription` (plans) round
-out the site.
+Each module is a full premium page under `src/app/[locale]/<module>` —
+photo hero, marquee band, feature grids, plans/sessions, member stories
+and a closing CTA — with its own light/dark palette (`.pl-theme-*` in
+`globals.css`) and content data in `src/lib/content/`. One animated
+glass-pill nav travels across the whole site: it morphs into a floating
+pill on scroll and picks up the current module's accent automatically.
+The public funnel — `/welcome` (landing) and `/home` (dashboard) — plus
+`/subscription` (plans) round out the site.
 
 ## 🛠️ Tech stack
 
 | Layer | Tools |
 |---|---|
 | Framework | Next.js 16.4 (App Router) · React 19.3 · TypeScript 6 |
-| UI | Tailwind CSS 4 · shadcn-style components · Lucide icons · Geist font |
+| UI | Tailwind CSS 4 · shadcn-style components · Lucide icons · Geist + Montserrat · dark mode |
 | i18n | next-intl — `az` / `en` / `ru` message catalogs + build/parity script |
 | Quality | ESLint 10 |
 | Runtime | Node ≥ 24 |
@@ -64,9 +67,10 @@ PreLife/
 ├── public/              # static assets (banner, logo, robots)
 ├── scripts/             # message sources + build/parity script + push helper
 ├── src/
-│   ├── app/[locale]/    # localized routes: welcome · home · diet · gym · library · meditation · subscription · ui
-│   ├── components/      # shell + section components (+ shadcn-style ui kit)
+│   ├── app/[locale]/    # localized routes: welcome · home · gym · diet · library · meditation · subscription · ui
+│   ├── components/      # site nav + theme toggle + explore strip + shells (+ shadcn-style ui kit)
 │   ├── i18n/            # routing & request config
+│   ├── lib/content/     # per-module page content (plans, exercises, stories…)
 │   └── proxy.ts         # next-intl middleware (locale routing)
 ├── next.config.ts
 └── package.json

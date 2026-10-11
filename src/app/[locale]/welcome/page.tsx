@@ -3,11 +3,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent } from "@/components/ui/card";
-import { WelcomeHeader } from "@/components/welcome/header";
 import { Spotlight } from "@/components/welcome/spotlight";
 import { StartCta } from "@/components/welcome/start-cta";
 import { FlagCheck } from "@/components/welcome/flag-check";
-import { WelcomeFooter } from "@/components/welcome/footer";
 import { capstoneSections } from "@/lib/capstone";
 
 /* Capstone doc order: Psikoloji, Kitab, Spor, Diet */
@@ -40,11 +38,10 @@ export default async function WelcomePage({
   return (
     <>
       <FlagCheck />
-      <WelcomeHeader />
-      {/* Fixed Ultrahuman-style bar (57px) */}
-      <main className="flex flex-1 flex-col pt-[57px]">
+      {/* Unified glass-pill site nav lives in the [locale] layout. */}
+      <div className="flex flex-1 flex-col">
         {/* Hero banner — ani.pm-sized single artwork, Ultrahuman-style motion */}
-        <section className="mx-auto w-full max-w-6xl px-4 pt-6 sm:pt-10 md:px-8">
+        <section className="mx-auto w-full max-w-6xl px-4 pt-8 sm:pt-12 md:px-8">
           <Spotlight />
         </section>
 
@@ -180,8 +177,7 @@ export default async function WelcomePage({
             </div>
           </div>
         </section>
-      </main>
-      <WelcomeFooter />
+      </div>
     </>
   );
 }

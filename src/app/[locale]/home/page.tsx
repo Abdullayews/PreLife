@@ -4,9 +4,7 @@ import { ArrowRight, Crown } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { HomeHeader } from "@/components/home/header";
 import { HomeGuard } from "@/components/welcome/home-guard";
-import { WelcomeFooter } from "@/components/welcome/footer";
 import { capstoneSections, getCapstoneSection } from "@/lib/capstone";
 
 const sections = capstoneSections;
@@ -47,7 +45,7 @@ export default async function HomePage({
   return (
     <>
       <HomeGuard />
-      <HomeHeader />
+      {/* Unified glass-pill site nav lives in the [locale] layout. */}
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-12 md:px-8 md:py-16">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           {t("tagline")}
@@ -173,7 +171,6 @@ export default async function HomePage({
           </Card>
         </section>
       </main>
-      <WelcomeFooter />
     </>
   );
 }

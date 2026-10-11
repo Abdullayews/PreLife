@@ -2,8 +2,6 @@ import type { CSSProperties, ReactNode } from "react";
 import { getTranslations } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { HomeHeader } from "@/components/home/header";
-import { WelcomeFooter } from "@/components/welcome/footer";
 import "../../app/[locale]/welcome/welcome-theme.css";
 
 type PageShellProps = {
@@ -47,7 +45,6 @@ export async function PageShell({ pageId, accent, children }: PageShellProps) {
       style={theme}
       className="flex flex-1 flex-col bg-background font-sans text-foreground"
     >
-      <HomeHeader />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-8 md:py-12">
         <Link
           href="/home"
@@ -58,7 +55,6 @@ export async function PageShell({ pageId, accent, children }: PageShellProps) {
         </Link>
         {children}
       </main>
-      <WelcomeFooter />
     </div>
   );
 }

@@ -120,3 +120,380 @@
     @apply bg-background text-foreground;
   }
 }
+/* ==== PreLife v3: shared premium helpers + site nav theming ==== */
+
+/* Display face shared by the site nav wordmark and every module hero. */
+.pl-display {
+  font-family: "Montserrat", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@keyframes pl-rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.pl-reveal { opacity: 1; }
+.pl-hero-ghost:hover { background-color: var(--on-hero-fill-strong) !important; }
+
+@keyframes pl-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.pl-marquee-track { animation: pl-marquee 38s linear infinite; }
+.pl-marquee:hover .pl-marquee-track { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-marquee-track { animation: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .pl-reveal {
+      animation: pl-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 24%;
+    }
+  }
+}
+
+/*
+ * Site nav (floating glass pill) theming. The SAME nav travels with every
+ * page - only its accent and glass tint follow the module you are in.
+ * Module pages mark themselves via data-module on their wrapper, so
+ * body:has() can retint the nav without swapping the component.
+ */
+body {
+  --site-accent: oklch(0.205 0 0);
+  --site-accent-soft: rgba(20, 16, 12, 0.06);
+  --nav-glass-bg: rgba(255, 255, 255, 0.74);
+  --nav-glass-line: rgba(20, 16, 12, 0.12);
+  --nav-glass-ink: var(--foreground);
+  --nav-glass-muted: var(--muted-foreground);
+  --nav-glass-hover: rgba(20, 16, 12, 0.06);
+  --nav-glass-panel: rgba(255, 255, 255, 0.95);
+  --nav-glass-shadow: 0 18px 50px -18px rgba(20, 16, 12, 0.30);
+}
+
+/* Gym - light "Ember on Bone" glass (matches the light hero). */
+body:has(> main > [data-module="gym"]) {
+  --site-accent: #E4572E;
+  --site-accent-soft: rgba(228, 87, 46, 0.13);
+  --nav-glass-bg: rgba(250, 245, 238, 0.78);
+  --nav-glass-line: rgba(36, 22, 17, 0.12);
+  --nav-glass-hover: rgba(36, 22, 17, 0.06);
+  --nav-glass-panel: rgba(250, 245, 238, 0.97);
+  --nav-glass-shadow: 0 18px 50px -18px rgba(36, 22, 17, 0.30);
+}
+
+/* Diet - Golden Harvest. */
+body:has(> main > [data-module="diet"]) {
+  --site-accent: #D97706;
+  --site-accent-soft: rgba(217, 119, 6, 0.13);
+  --nav-glass-bg: rgba(250, 246, 237, 0.78);
+  --nav-glass-line: rgba(36, 23, 8, 0.12);
+  --nav-glass-hover: rgba(36, 23, 8, 0.06);
+  --nav-glass-panel: rgba(250, 246, 237, 0.97);
+  --nav-glass-shadow: 0 18px 50px -18px rgba(36, 23, 8, 0.30);
+}
+
+/* Meditation - Lavender Haze. */
+body:has(> main > [data-module="meditation"]) {
+  --site-accent: #7C3AED;
+  --site-accent-soft: rgba(124, 58, 237, 0.12);
+  --nav-glass-bg: rgba(247, 245, 252, 0.78);
+  --nav-glass-line: rgba(30, 22, 51, 0.12);
+  --nav-glass-hover: rgba(30, 22, 51, 0.06);
+  --nav-glass-panel: rgba(247, 245, 252, 0.97);
+  --nav-glass-shadow: 0 18px 50px -18px rgba(30, 22, 51, 0.30);
+}
+
+/* Library - Paper & Teal. */
+body:has(> main > [data-module="library"]) {
+  --site-accent: #0D9488;
+  --site-accent-soft: rgba(13, 148, 136, 0.12);
+  --nav-glass-bg: rgba(248, 245, 239, 0.78);
+  --nav-glass-line: rgba(23, 36, 34, 0.12);
+  --nav-glass-hover: rgba(23, 36, 34, 0.06);
+  --nav-glass-panel: rgba(248, 245, 239, 0.97);
+  --nav-glass-shadow: 0 18px 50px -18px rgba(23, 36, 34, 0.30);
+}
+
+/*
+ * Landing (no data-module) in dark mode: accent becomes bone so the
+ * wordmark / active chips stay visible on the dark shell.
+ */
+html.dark body:not(:has(> main > [data-module])) {
+  --site-accent: #F2EDE4;
+  --site-accent-soft: rgba(242, 237, 228, 0.14);
+}
+
+/*
+ * One dark glass for the nav across all pages in dark mode. Placed AFTER
+ * the light body:has() blocks: same specificity, later rule wins, while
+ * --site-accent (set only in those earlier blocks) keeps its module hue.
+ */
+html.dark body {
+  --nav-glass-bg: rgba(22, 17, 14, 0.78);
+  --nav-glass-line: rgba(244, 239, 231, 0.14);
+  --nav-glass-ink: #F2EDE4;
+  --nav-glass-muted: rgba(242, 237, 228, 0.66);
+  --nav-glass-hover: rgba(244, 239, 231, 0.08);
+  --nav-glass-panel: rgba(22, 17, 14, 0.97);
+  --nav-glass-shadow: 0 18px 50px -12px rgba(0, 0, 0, 0.60);
+}
+
+/* Theme toggle icon visibility (hydration-safe, CSS-driven). */
+html:not(.dark) .pl-icon-moon { display: none; }
+html.dark .pl-icon-sun { display: none; }
+
+/* Nav "Start" button: white on every module accent; on the dark landing
+   shell the accent turns bone, so the label flips to espresso. */
+.pl-nav-start { color: #FFFFFF; }
+html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611; }
+
+/*
+ * Module themes as classes (not inline styles) so `.dark` overrides can
+ * win the cascade. Values are the v3 palettes; dark variants keep each
+ * accent hue and only re-balance surfaces.
+ */
+
+/* GYM - "Ember on Bone" (light) / "Ember Night" (dark). */
+.pl-theme-gym {
+  --primary: #E4572E;
+  --primary-foreground: #FFFFFF;
+  --ring: #E4572E;
+  --background: #FAF5EE;
+  --foreground: #241611;
+  --card: #FFFFFF;
+  --card-foreground: #241611;
+  --popover: #FFFFFF;
+  --popover-foreground: #241611;
+  --secondary: #F2E8DA;
+  --secondary-foreground: #4C3826;
+  --muted: #F2E8DA;
+  --muted-foreground: #8E7B69;
+  --accent: #F6EBDC;
+  --accent-foreground: #241611;
+  --border: #E9DCC9;
+  --input: #E9DCC9;
+  --gym-ink: #241611;
+  --gym-elevated: #F4EDE0;
+  --gym-line: rgba(36, 22, 17, 0.10);
+  --gym-wine: #722F37;
+  --gym-wine-deep: #40191F;
+  --gym-ember: #E4572E;
+  --gym-ember-soft: rgba(228, 87, 46, 0.12);
+  --gym-gold: #B4832A;
+  --gym-bone: #F4EDE3;
+  --on-hero: #241611;
+  --on-hero-muted: rgba(36, 22, 17, 0.74);
+  --on-hero-border: rgba(36, 22, 17, 0.22);
+  --on-hero-fill: rgba(255, 255, 255, 0.48);
+  --on-hero-fill-strong: rgba(255, 255, 255, 0.68);
+}
+
+.dark .pl-theme-gym {
+  --primary: #E4572E;
+  --primary-foreground: #FFFFFF;
+  --background: #15100E;
+  --foreground: #F2E9DD;
+  --card: #1E1714;
+  --card-foreground: #F2E9DD;
+  --popover: #1E1714;
+  --popover-foreground: #F2E9DD;
+  --secondary: #241B17;
+  --secondary-foreground: #EADFCF;
+  --muted: #241B17;
+  --muted-foreground: #A99A88;
+  --accent: #2A201B;
+  --accent-foreground: #F2E9DD;
+  --border: rgba(242, 233, 221, 0.12);
+  --input: rgba(242, 233, 221, 0.12);
+  --gym-ink: #F2E9DD;
+  --gym-elevated: #1F1814;
+  --gym-line: rgba(242, 233, 221, 0.10);
+  --gym-ember-soft: rgba(228, 87, 46, 0.20);
+  --gym-gold: #D9A441;
+  --gym-bone: #F4EDE3;
+}
+
+/* DIET - "Golden Harvest" (light) / "Amber Night" (dark). */
+.pl-theme-diet {
+  --primary: #D97706;
+  --primary-foreground: #FFFFFF;
+  --ring: #D97706;
+  --background: #FAF6ED;
+  --foreground: #241708;
+  --card: #FFFFFF;
+  --card-foreground: #241708;
+  --popover: #FFFFFF;
+  --popover-foreground: #241708;
+  --secondary: #F1E7D2;
+  --secondary-foreground: #4A3819;
+  --muted: #F1E7D2;
+  --muted-foreground: #8A795C;
+  --accent: #F3E9D2;
+  --accent-foreground: #241708;
+  --border: #E5DAC2;
+  --input: #E5DAC2;
+  --diet-ink: #241708;
+  --diet-elevated: #F3EDDC;
+  --diet-line: rgba(36, 23, 8, 0.10);
+  --diet-amber: #D97706;
+  --diet-amber-deep: #92400E;
+  --diet-amber-soft: rgba(217, 119, 6, 0.12);
+  --diet-honey: #B45309;
+  --diet-gold: #D9A441;
+  --diet-leaf: #5F7A4E;
+  --diet-leaf-soft: rgba(95, 122, 78, 0.14);
+  --on-hero: #241708;
+  --on-hero-muted: rgba(36, 23, 8, 0.74);
+  --on-hero-border: rgba(36, 23, 8, 0.22);
+  --on-hero-fill: rgba(255, 255, 255, 0.48);
+  --on-hero-fill-strong: rgba(255, 255, 255, 0.68);
+}
+
+.dark .pl-theme-diet {
+  --primary: #D97706;
+  --primary-foreground: #FFFFFF;
+  --background: #191310;
+  --foreground: #F3EADC;
+  --card: #221B15;
+  --card-foreground: #F3EADC;
+  --popover: #221B15;
+  --popover-foreground: #F3EADC;
+  --secondary: #2A211A;
+  --secondary-foreground: #EADFCB;
+  --muted: #2A211A;
+  --muted-foreground: #A7987F;
+  --accent: #2C231B;
+  --accent-foreground: #F3EADC;
+  --border: rgba(243, 234, 220, 0.12);
+  --input: rgba(243, 234, 220, 0.12);
+  --diet-ink: #F3EADC;
+  --diet-elevated: #241D17;
+  --diet-line: rgba(243, 234, 220, 0.10);
+  --diet-amber-soft: rgba(217, 119, 6, 0.20);
+  --diet-leaf: #8CAF7E;
+  --diet-leaf-soft: rgba(140, 175, 126, 0.16);
+  --diet-gold: #D9A441;
+}
+
+/* MEDITATION - "Lavender Haze" (light) / "Violet Night" (dark). */
+.pl-theme-meditation {
+  --primary: #7C3AED;
+  --primary-foreground: #FFFFFF;
+  --ring: #7C3AED;
+  --background: #F7F5FC;
+  --foreground: #1E1633;
+  --card: #FFFFFF;
+  --card-foreground: #1E1633;
+  --popover: #FFFFFF;
+  --popover-foreground: #1E1633;
+  --secondary: #ECE7F8;
+  --secondary-foreground: #372860;
+  --muted: #ECE7F8;
+  --muted-foreground: #7D7492;
+  --accent: #EDE8FA;
+  --accent-foreground: #1E1633;
+  --border: #DDD5EE;
+  --input: #DDD5EE;
+  --med-ink: #1E1633;
+  --med-elevated: #EFEBF8;
+  --med-line: rgba(30, 22, 51, 0.10);
+  --med-violet: #7C3AED;
+  --med-violet-deep: #4C1D95;
+  --med-violet-soft: rgba(124, 58, 237, 0.12);
+  --med-lilac: #A78BFA;
+  --med-gold: #B4832A;
+  --on-hero: #1E1633;
+  --on-hero-muted: rgba(30, 22, 51, 0.74);
+  --on-hero-border: rgba(30, 22, 51, 0.22);
+  --on-hero-fill: rgba(255, 255, 255, 0.48);
+  --on-hero-fill-strong: rgba(255, 255, 255, 0.68);
+}
+
+.dark .pl-theme-meditation {
+  --primary: #8B5CF6;
+  --primary-foreground: #FFFFFF;
+  --ring: #8B5CF6;
+  --background: #141021;
+  --foreground: #EDE9F7;
+  --card: #1D1830;
+  --card-foreground: #EDE9F7;
+  --popover: #1D1830;
+  --popover-foreground: #EDE9F7;
+  --secondary: #251E3D;
+  --secondary-foreground: #DCD5F0;
+  --muted: #251E3D;
+  --muted-foreground: #9D94B8;
+  --accent: #271F42;
+  --accent-foreground: #EDE9F7;
+  --border: rgba(237, 233, 247, 0.12);
+  --input: rgba(237, 233, 247, 0.12);
+  --med-ink: #EDE9F7;
+  --med-elevated: #1F1936;
+  --med-line: rgba(237, 233, 247, 0.10);
+  --med-violet: #8B5CF6;
+  --med-violet-soft: rgba(139, 92, 246, 0.20);
+  --med-gold: #D9A441;
+}
+
+/* LIBRARY - "Paper & Teal" (light) / "Pine Night" (dark). */
+.pl-theme-library {
+  --primary: #0D9488;
+  --primary-foreground: #FFFFFF;
+  --ring: #0D9488;
+  --background: #F8F5EF;
+  --foreground: #172422;
+  --card: #FFFFFF;
+  --card-foreground: #172422;
+  --popover: #FFFFFF;
+  --popover-foreground: #172422;
+  --secondary: #EAE6DA;
+  --secondary-foreground: #2C3B36;
+  --muted: #EAE6DA;
+  --muted-foreground: #75726A;
+  --accent: #E9EFE7;
+  --accent-foreground: #172422;
+  --border: #DCD6C6;
+  --input: #DCD6C6;
+  --lib-ink: #172422;
+  --lib-elevated: #F0EBE1;
+  --lib-line: rgba(23, 36, 34, 0.10);
+  --lib-teal: #0D9488;
+  --lib-pine: #115E59;
+  --lib-teal-soft: rgba(13, 148, 136, 0.12);
+  --lib-sea: #14B8A6;
+  --lib-gold: #B4832A;
+  --on-hero: #172422;
+  --on-hero-muted: rgba(23, 36, 34, 0.74);
+  --on-hero-border: rgba(23, 36, 34, 0.22);
+  --on-hero-fill: rgba(255, 255, 255, 0.48);
+  --on-hero-fill-strong: rgba(255, 255, 255, 0.68);
+}
+
+.dark .pl-theme-library {
+  --primary: #14B8A6;
+  --primary-foreground: #FFFFFF;
+  --ring: #14B8A6;
+  --background: #131B19;
+  --foreground: #E8EEEA;
+  --card: #1B2422;
+  --card-foreground: #E8EEEA;
+  --popover: #1B2422;
+  --popover-foreground: #E8EEEA;
+  --secondary: #222D2A;
+  --secondary-foreground: #D9E2DC;
+  --muted: #222D2A;
+  --muted-foreground: #97A39C;
+  --accent: #22302C;
+  --accent-foreground: #E8EEEA;
+  --border: rgba(232, 238, 234, 0.12);
+  --input: rgba(232, 238, 234, 0.12);
+  --lib-ink: #E8EEEA;
+  --lib-elevated: #1D2724;
+  --lib-line: rgba(232, 238, 234, 0.10);
+  --lib-teal: #14B8A6;
+  --lib-teal-soft: rgba(20, 184, 166, 0.20);
+  --lib-sea: #2DD4BF;
+  --lib-gold: #D9A441;
+}
