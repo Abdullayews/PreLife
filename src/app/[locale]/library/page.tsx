@@ -50,7 +50,7 @@ const trackDotColors: Record<LibraryTrackId, string> = {
   chapter: "var(--lib-teal)",
   summary: "var(--lib-sea)",
   notes: "var(--lib-gold)",
-  free: "rgba(117, 114, 106, 0.85)",
+  free: "var(--lib-dot-free)",
 };
 
 function Eyebrow({ children }: { children: string }) {
@@ -106,21 +106,13 @@ export default async function LibraryPage({ params }: PageProps) {
           className="absolute inset-0 -z-20 bg-cover bg-[center_45%]"
           style={{ backgroundImage: `url(${libraryHeroImage})` }}
         />
+        {/* Scrims are shared classes (.pl-hero-*) fed by --hero-* tokens,
+            so the whole hero re-tints when the dark toggle flips .dark. */}
+        <div aria-hidden className="pl-hero-side absolute inset-0 -z-10" />
+        <div aria-hidden className="pl-hero-fade absolute inset-0 -z-10" />
         <div
           aria-hidden
-          className="absolute inset-0 -z-10"
-          style={{
-            backgroundImage:
-              "linear-gradient(90deg, rgba(248, 245, 239, 0.82) 0%, rgba(248, 245, 239, 0) 58%), linear-gradient(to top, #F8F5EF 0%, rgba(248, 245, 239, 0.88) 24%, rgba(248, 245, 239, 0.50) 56%, rgba(248, 245, 239, 0.64) 100%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 -z-10 h-[45%]"
-          style={{
-            backgroundImage:
-              "radial-gradient(55% 90% at 14% 100%, rgba(13, 148, 136, 0.16) 0%, rgba(13, 148, 136, 0) 70%)",
-          }}
+          className="pl-hero-glow absolute inset-x-0 bottom-0 -z-10 h-[45%]"
         />
         <div className="mx-auto flex min-h-[88svh] max-w-6xl flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
           <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em]">

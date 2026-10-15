@@ -43,11 +43,16 @@ three locales — and fails on any mismatch.
 Each module is a full premium page under `src/app/[locale]/<module>` —
 photo hero, marquee band, feature grids, plans/sessions, member stories
 and a closing CTA — with its own light/dark palette (`.pl-theme-*` in
-`globals.css`) and content data in `src/lib/content/`. One animated
-glass-pill nav travels across the whole site: it morphs into a floating
-pill on scroll and picks up the current module's accent automatically.
-The public funnel — `/welcome` (landing) and `/home` (dashboard) — plus
-`/subscription` (plans) round out the site.
+`globals.css`) and content data in `src/lib/content/`. The public funnel
+— `/welcome` (landing), `/home` (dashboard) and `/subscription` (plans)
+— shares the `.pl-theme-welcome` shell palette. Every palette is applied
+as a **class** (never an inline style — inline styles outrank the `.dark`
+overrides and would freeze a page in light mode), and each has a dark
+variant: hero photo scrims and hero ink come from `--hero-*` /
+`--on-hero-*` tokens, so the whole page re-tints when the nav's theme
+toggle flips `.dark` on `<html>`. One animated glass-pill nav travels
+across the whole site: it morphs into a floating pill on scroll and
+picks up the current module's accent automatically.
 
 ## 🛠️ Tech stack
 

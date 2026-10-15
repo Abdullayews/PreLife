@@ -78,38 +78,43 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/*
+ * Dark base: "Espresso Night" — the same warm bone/espresso family the
+ * dark nav glass uses (rgba(22,17,14,…)), so every un-themed surface
+ * (body edges, /ui showcase, fallbacks) matches the brand in dark mode.
+ */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --background: #16110E;
+  --foreground: #F2EDE4;
+  --card: #1E1813;
+  --card-foreground: #F2EDE4;
+  --popover: #201A15;
+  --popover-foreground: #F2EDE4;
+  --primary: #F2EDE4;
+  --primary-foreground: #241611;
+  --secondary: #241D17;
+  --secondary-foreground: #E8E0D2;
+  --muted: #241D17;
+  --muted-foreground: #A99D8C;
+  --accent: #2A2119;
+  --accent-foreground: #F2EDE4;
+  --destructive: #E0524D;
+  --border: rgba(242, 237, 228, 0.12);
+  --input: rgba(242, 237, 228, 0.16);
+  --ring: rgba(242, 237, 228, 0.45);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: #1E1813;
+  --sidebar-foreground: #F2EDE4;
+  --sidebar-primary: #E4572E;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #2A2119;
+  --sidebar-accent-foreground: #F2EDE4;
+  --sidebar-border: rgba(242, 237, 228, 0.12);
+  --sidebar-ring: rgba(242, 237, 228, 0.45);
 }
 
 @layer base {
@@ -288,6 +293,16 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --on-hero-border: rgba(36, 22, 17, 0.22);
   --on-hero-fill: rgba(255, 255, 255, 0.48);
   --on-hero-fill-strong: rgba(255, 255, 255, 0.68);
+  /* Hero photo scrims (light "Ember on Bone" veils) — flip in dark below. */
+  --hero-veil: rgba(250, 245, 238, 0.80);
+  --hero-base: #FAF5EE;
+  --hero-veil-strong: rgba(250, 245, 238, 0.88);
+  --hero-veil-soft: rgba(250, 245, 238, 0.42);
+  --hero-veil-mid: rgba(250, 245, 238, 0.60);
+  --hero-glow: rgba(228, 87, 46, 0.24);
+  /* Schedule legend dots (neutral tones need per-mode values). */
+  --gym-dot-mobility: rgba(140, 123, 105, 0.55);
+  --gym-dot-open: rgba(168, 155, 140, 0.85);
 }
 
 .dark .pl-theme-gym {
@@ -313,6 +328,20 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --gym-ember-soft: rgba(228, 87, 46, 0.20);
   --gym-gold: #D9A441;
   --gym-bone: #F4EDE3;
+  /* "Ember Night" hero: bone ink on espresso veils. */
+  --on-hero: #F2E9DD;
+  --on-hero-muted: rgba(242, 233, 221, 0.78);
+  --on-hero-border: rgba(242, 233, 221, 0.26);
+  --on-hero-fill: rgba(21, 16, 14, 0.45);
+  --on-hero-fill-strong: rgba(21, 16, 14, 0.66);
+  --hero-veil: rgba(21, 16, 14, 0.82);
+  --hero-base: #15100E;
+  --hero-veil-strong: rgba(21, 16, 14, 0.90);
+  --hero-veil-soft: rgba(21, 16, 14, 0.46);
+  --hero-veil-mid: rgba(21, 16, 14, 0.64);
+  --hero-glow: rgba(228, 87, 46, 0.30);
+  --gym-dot-mobility: rgba(244, 237, 227, 0.50);
+  --gym-dot-open: rgba(200, 186, 170, 0.90);
 }
 
 /* DIET - "Golden Harvest" (light) / "Amber Night" (dark). */
@@ -349,6 +378,14 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --on-hero-border: rgba(36, 23, 8, 0.22);
   --on-hero-fill: rgba(255, 255, 255, 0.48);
   --on-hero-fill-strong: rgba(255, 255, 255, 0.68);
+  /* Hero photo scrims (light "Golden Harvest" veils) — flip in dark below. */
+  --hero-veil: rgba(250, 246, 237, 0.78);
+  --hero-base: #FAF6ED;
+  --hero-veil-strong: rgba(250, 246, 237, 0.88);
+  --hero-veil-soft: rgba(250, 246, 237, 0.42);
+  --hero-veil-mid: rgba(250, 246, 237, 0.60);
+  --hero-glow: rgba(217, 119, 6, 0.16);
+  --diet-dot-chef: rgba(138, 121, 92, 0.85);
 }
 
 .dark .pl-theme-diet {
@@ -375,6 +412,19 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --diet-leaf: #8CAF7E;
   --diet-leaf-soft: rgba(140, 175, 126, 0.16);
   --diet-gold: #D9A441;
+  /* "Amber Night" hero: parchment ink on coffee veils. */
+  --on-hero: #F3EADC;
+  --on-hero-muted: rgba(243, 234, 220, 0.78);
+  --on-hero-border: rgba(243, 234, 220, 0.26);
+  --on-hero-fill: rgba(25, 19, 16, 0.45);
+  --on-hero-fill-strong: rgba(25, 19, 16, 0.66);
+  --hero-veil: rgba(25, 19, 16, 0.82);
+  --hero-base: #191310;
+  --hero-veil-strong: rgba(25, 19, 16, 0.90);
+  --hero-veil-soft: rgba(25, 19, 16, 0.46);
+  --hero-veil-mid: rgba(25, 19, 16, 0.64);
+  --hero-glow: rgba(217, 119, 6, 0.24);
+  --diet-dot-chef: rgba(196, 178, 141, 0.90);
 }
 
 /* MEDITATION - "Lavender Haze" (light) / "Violet Night" (dark). */
@@ -409,6 +459,14 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --on-hero-border: rgba(30, 22, 51, 0.22);
   --on-hero-fill: rgba(255, 255, 255, 0.48);
   --on-hero-fill-strong: rgba(255, 255, 255, 0.68);
+  /* Hero photo scrims (light "Lavender Haze" veils) — flip in dark below. */
+  --hero-veil: rgba(247, 245, 252, 0.78);
+  --hero-base: #F7F5FC;
+  --hero-veil-strong: rgba(247, 245, 252, 0.88);
+  --hero-veil-soft: rgba(247, 245, 252, 0.42);
+  --hero-veil-mid: rgba(247, 245, 252, 0.60);
+  --hero-glow: rgba(124, 58, 237, 0.16);
+  --med-dot-rest: rgba(139, 131, 166, 0.85);
 }
 
 .dark .pl-theme-meditation {
@@ -435,6 +493,19 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --med-violet: #8B5CF6;
   --med-violet-soft: rgba(139, 92, 246, 0.20);
   --med-gold: #D9A441;
+  /* "Violet Night" hero: lilac ink on midnight veils. */
+  --on-hero: #EDE9F7;
+  --on-hero-muted: rgba(237, 233, 247, 0.78);
+  --on-hero-border: rgba(237, 233, 247, 0.26);
+  --on-hero-fill: rgba(20, 16, 33, 0.45);
+  --on-hero-fill-strong: rgba(20, 16, 33, 0.66);
+  --hero-veil: rgba(20, 16, 33, 0.82);
+  --hero-base: #141021;
+  --hero-veil-strong: rgba(20, 16, 33, 0.90);
+  --hero-veil-soft: rgba(20, 16, 33, 0.46);
+  --hero-veil-mid: rgba(20, 16, 33, 0.64);
+  --hero-glow: rgba(139, 92, 246, 0.26);
+  --med-dot-rest: rgba(180, 172, 205, 0.90);
 }
 
 /* LIBRARY - "Paper & Teal" (light) / "Pine Night" (dark). */
@@ -469,6 +540,14 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --on-hero-border: rgba(23, 36, 34, 0.22);
   --on-hero-fill: rgba(255, 255, 255, 0.48);
   --on-hero-fill-strong: rgba(255, 255, 255, 0.68);
+  /* Hero photo scrims (light "Paper & Teal" veils) — flip in dark below. */
+  --hero-veil: rgba(248, 245, 239, 0.82);
+  --hero-base: #F8F5EF;
+  --hero-veil-strong: rgba(248, 245, 239, 0.88);
+  --hero-veil-soft: rgba(248, 245, 239, 0.50);
+  --hero-veil-mid: rgba(248, 245, 239, 0.64);
+  --hero-glow: rgba(13, 148, 136, 0.16);
+  --lib-dot-free: rgba(117, 114, 106, 0.85);
 }
 
 .dark .pl-theme-library {
@@ -496,4 +575,97 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --lib-teal-soft: rgba(20, 184, 166, 0.20);
   --lib-sea: #2DD4BF;
   --lib-gold: #D9A441;
+  /* "Pine Night" hero: mint ink on pine veils. */
+  --on-hero: #E8EEEA;
+  --on-hero-muted: rgba(232, 238, 234, 0.78);
+  --on-hero-border: rgba(232, 238, 234, 0.26);
+  --on-hero-fill: rgba(19, 27, 25, 0.45);
+  --on-hero-fill-strong: rgba(19, 27, 25, 0.66);
+  --hero-veil: rgba(19, 27, 25, 0.82);
+  --hero-base: #131B19;
+  --hero-veil-strong: rgba(19, 27, 25, 0.90);
+  --hero-veil-soft: rgba(19, 27, 25, 0.46);
+  --hero-veil-mid: rgba(19, 27, 25, 0.64);
+  --hero-glow: rgba(20, 184, 166, 0.22);
+  --lib-dot-free: rgba(190, 187, 178, 0.90);
+}
+
+/*
+ * WELCOME / HOME / SUBSCRIPTION shell - "Warm Bone" (light) shared by the
+ * public funnel. Class-based (NOT inline styles): inline style attributes
+ * outrank every selector, which would freeze these surfaces in light mode
+ * and break the dark toggle. Values mirror the previous inline theme 1:1;
+ * the dark variant is the "Espresso Night" base family.
+ */
+.pl-theme-welcome {
+  --background: #F6F3ED;
+  --foreground: #1F1D1A;
+  --card: #FCFBF8;
+  --card-foreground: #1F1D1A;
+  --popover: #FCFBF8;
+  --popover-foreground: #1F1D1A;
+  --primary: #1F1D1A;
+  --primary-foreground: #F6F3ED;
+  --secondary: #EBE7DE;
+  --secondary-foreground: #3A362F;
+  --muted: #EBE7DE;
+  --muted-foreground: #6E695E;
+  --accent: #E5E0D5;
+  --accent-foreground: #1F1D1A;
+  --destructive: #B3261E;
+  --border: rgba(31, 29, 26, 0.12);
+  --input: rgba(31, 29, 26, 0.16);
+  --ring: rgba(31, 29, 26, 0.4);
+  --on-accent: #FFFFFF;
+}
+
+.dark .pl-theme-welcome {
+  --background: #16110E;
+  --foreground: #F2EDE4;
+  --card: #1E1813;
+  --card-foreground: #F2EDE4;
+  --popover: #201A15;
+  --popover-foreground: #F2EDE4;
+  --primary: #F2EDE4;
+  --primary-foreground: #241611;
+  --secondary: #241D17;
+  --secondary-foreground: #E8E0D2;
+  --muted: #241D17;
+  --muted-foreground: #A99D8C;
+  --accent: #2A2119;
+  --accent-foreground: #F2EDE4;
+  --destructive: #E0524D;
+  --border: rgba(242, 237, 228, 0.12);
+  --input: rgba(242, 237, 228, 0.16);
+  --ring: rgba(242, 237, 228, 0.45);
+  --on-accent: #FFFFFF;
+}
+
+/*
+ * Shared hero photo scrims. Every module hero stacks three overlays over
+ * the same photo: a side veil (text side), a vertical fade (bottom ink
+ * anchor) and an accent glow. All values come from the per-module
+ * --hero-* / --on-hero-* tokens above, so the whole hero re-tints for
+ * dark mode without touching the page components.
+ */
+.pl-hero-side {
+  background-image: linear-gradient(90deg, var(--hero-veil) 0%, transparent 55%);
+}
+
+.pl-hero-fade {
+  background-image: linear-gradient(
+    to top,
+    var(--hero-base) 0%,
+    var(--hero-veil-strong) 24%,
+    var(--hero-veil-soft) 56%,
+    var(--hero-veil-mid) 100%
+  );
+}
+
+.pl-hero-glow {
+  background-image: radial-gradient(
+    55% 90% at 15% 100%,
+    var(--hero-glow) 0%,
+    transparent 70%
+  );
 }

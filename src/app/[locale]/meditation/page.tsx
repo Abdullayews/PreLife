@@ -50,7 +50,7 @@ const trackDotColors: Record<MeditationTrackId, string> = {
   breathe: "var(--med-violet)",
   focus: "var(--med-lilac)",
   sleep: "var(--med-violet-deep)",
-  rest: "rgba(139, 131, 166, 0.85)",
+  rest: "var(--med-dot-rest)",
 };
 
 function Eyebrow({ children }: { children: string }) {
@@ -106,21 +106,13 @@ export default async function MeditationPage({ params }: PageProps) {
           className="absolute inset-0 -z-20 bg-cover bg-[center_38%]"
           style={{ backgroundImage: `url(${meditationHeroImage})` }}
         />
+        {/* Scrims are shared classes (.pl-hero-*) fed by --hero-* tokens,
+            so the whole hero re-tints when the dark toggle flips .dark. */}
+        <div aria-hidden className="pl-hero-side absolute inset-0 -z-10" />
+        <div aria-hidden className="pl-hero-fade absolute inset-0 -z-10" />
         <div
           aria-hidden
-          className="absolute inset-0 -z-10"
-          style={{
-            backgroundImage:
-              "linear-gradient(90deg, rgba(247, 245, 252, 0.78) 0%, rgba(247, 245, 252, 0) 55%), linear-gradient(to top, #F7F5FC 0%, rgba(247, 245, 252, 0.88) 24%, rgba(247, 245, 252, 0.42) 56%, rgba(247, 245, 252, 0.60) 100%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 -z-10 h-[45%]"
-          style={{
-            backgroundImage:
-              "radial-gradient(55% 90% at 14% 100%, rgba(124, 58, 237, 0.16) 0%, rgba(124, 58, 237, 0) 70%)",
-          }}
+          className="pl-hero-glow absolute inset-x-0 bottom-0 -z-10 h-[45%]"
         />
         <div className="mx-auto flex min-h-[88svh] max-w-6xl flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
           <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em]">

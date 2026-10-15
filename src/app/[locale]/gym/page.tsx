@@ -44,8 +44,8 @@ const levelLabelKeys: Record<GymLevel, string> = {
 const classDotColors: Record<GymClassId, string> = {
   strength: "var(--gym-ember)",
   conditioning: "var(--gym-gold)",
-  mobility: "rgba(244, 237, 227, 0.55)",
-  open: "rgba(168, 155, 140, 0.85)",
+  mobility: "var(--gym-dot-mobility)",
+  open: "var(--gym-dot-open)",
 };
 
 function Eyebrow({ children }: { children: string }) {
@@ -101,21 +101,13 @@ export default async function GymPage({ params }: PageProps) {
           className="absolute inset-0 -z-20 bg-cover bg-[center_35%]"
           style={{ backgroundImage: `url(${gymHeroImage})` }}
         />
+        {/* Scrims are shared classes (.pl-hero-*) fed by --hero-* tokens,
+            so the whole hero re-tints when the dark toggle flips .dark. */}
+        <div aria-hidden className="pl-hero-side absolute inset-0 -z-10" />
+        <div aria-hidden className="pl-hero-fade absolute inset-0 -z-10" />
         <div
           aria-hidden
-          className="absolute inset-0 -z-10"
-          style={{
-            backgroundImage:
-              "linear-gradient(90deg, rgba(250, 245, 238, 0.80) 0%, rgba(250, 245, 238, 0) 55%), linear-gradient(to top, #FAF5EE 0%, rgba(250, 245, 238, 0.88) 24%, rgba(250, 245, 238, 0.42) 56%, rgba(250, 245, 238, 0.60) 100%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 -z-10 h-[45%]"
-          style={{
-            backgroundImage:
-              "radial-gradient(55% 90% at 16% 100%, rgba(228, 87, 46, 0.24) 0%, rgba(228, 87, 46, 0) 70%)",
-          }}
+          className="pl-hero-glow absolute inset-x-0 bottom-0 -z-10 h-[45%]"
         />
         <div className="mx-auto flex min-h-[88svh] max-w-6xl flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
           <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em]">
