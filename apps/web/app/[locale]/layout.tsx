@@ -1,7 +1,7 @@
-import {NextIntlClientProvider} from 'next-intl';
-import {routing} from '../../i18n/routing';
-import {notFound} from 'next/navigation';
+import {NextIntlClientProvider, hasLocale} from 'next-intl';
 import {setRequestLocale} from 'next-intl/server';
+import {notFound} from 'next/navigation';
+import {routing} from '../../i18n/routing';
 
 export default async function LocaleLayout({
   children,
@@ -11,7 +11,10 @@ export default async function LocaleLayout({
   params: Promise<{locale: string}>;
 }) {
   const {locale} = await params;
-  if (!routing.locales.includes(locale)) notFound();
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
   setRequestLocale(locale);
 
   return (
