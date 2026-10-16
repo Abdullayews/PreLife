@@ -8,8 +8,9 @@ import { StartCta } from "@/components/welcome/start-cta";
 import { FlagCheck } from "@/components/welcome/flag-check";
 import { capstoneSections } from "@/lib/capstone";
 
-/* Capstone doc order: Psikoloji, Kitab, Spor, Diet */
-const STAT_KEYS = ["sessions", "books", "exercises", "recipes"] as const;
+/* Display order (per product decision): Gym, Diet, Psychology, Books.
+   Stats strip mirrors the same order: exercises, recipes, sessions, books. */
+const STAT_KEYS = ["exercises", "recipes", "sessions", "books"] as const;
 const REASON_KEYS = ["one", "two", "three"] as const;
 const sections = capstoneSections;
 

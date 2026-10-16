@@ -19,7 +19,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
  * body:has([data-module=...]).
  *
  * Placement follows the current PreLife bar: hamburger + section links
- * LEFT (capstone order: Psikoloji, Kitab, Sport, Diet), wordmark CENTER,
+ * LEFT (display order: Gym, Diet, Psychology, Books), wordmark CENTER,
  * and the right cluster carries the language switcher, the dark/light
  * toggle, the account icon and the "Get started" pill (→ /home while the
  * real onboarding lands).
@@ -97,7 +97,7 @@ export function SiteNav() {
           className={cn(
             "relative mx-auto flex items-center justify-between gap-3 px-4 transition-all duration-300 md:px-6",
             scrolled
-              ? "mt-3 h-16 max-w-5xl rounded-full border shadow-[var(--nav-glass-shadow)] backdrop-blur-xl md:px-5"
+              ? "mt-3 h-16 max-w-5xl rounded-full border shadow-[var(--nav-glass-shadow)] backdrop-blur-[14.4px] md:px-5"
               : "h-20 max-w-6xl border-transparent",
           )}
           style={
@@ -205,7 +205,7 @@ export function SiteNav() {
 
       {menuOpen ? (
         <div
-          className="mx-4 mt-2 rounded-2xl border p-3 shadow-[var(--nav-glass-shadow)] backdrop-blur-xl md:hidden"
+          className="mx-4 mt-2 rounded-2xl border p-3 shadow-[var(--nav-glass-shadow)] backdrop-blur-[14.4px] md:hidden"
           style={{
             borderColor: "var(--nav-glass-line)",
             backgroundColor: "var(--nav-glass-panel)",

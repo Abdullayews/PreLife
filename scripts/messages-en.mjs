@@ -21,13 +21,13 @@ export const en = {
       eyebrow: "One platform, four worlds",
       title: "Train. Eat. Breathe. Read.",
       subtitle:
-        "PreLife brings sport, nutrition, psychology and books together in one calm system — with plans, videos, experts and AI in every section.",
-      alt: "A warm light-toned still life blending sport, food, meditation and books: a dumbbell, a grain bowl, a meditating figure and a stack of books",
+        "PreLife brings gym, nutrition, psychology and books together in one calm system — with plans, videos, experts and AI in every section.",
+      alt: "A warm light-toned still life blending gym, food, meditation and books: a dumbbell, a grain bowl, a meditating figure and a stack of books",
       seeAll: "Explore the sections",
       chips: {
         psikoloji: "Psychology",
         kitab: "Books",
-        sport: "Sport",
+        sport: "Gym",
         diet: "Diet",
       },
     },
@@ -55,7 +55,7 @@ export const en = {
           tagline: "Curated books, collections and AI picks",
         },
         sport: {
-          name: "Sport",
+          name: "Gym",
           tagline: "Gym, yoga, pilates, trainers, videos and AI",
         },
         diet: {
@@ -189,7 +189,7 @@ export const en = {
       },
     },
     sport: {
-      name: "Sport",
+      name: "Gym",
       heroTitle: "Move every day, your way.",
       heroText:
         "GYM plans, yoga flows, pilates classes, personal trainers and video workouts — with PreLife AI building the week around your energy.",
@@ -258,7 +258,7 @@ export const en = {
   subscription: {
     eyebrow: "Subscription",
     title: "PreLife Premium",
-    text: "One plan, every section — sport, psychology, books and diet, with AI and videos included.",
+    text: "One plan, every section — gym, diet, psychology and books, with AI and videos included.",
     bestValue: "Best value",
     choose: "Choose plan",
     note: "Payments (\u00D6deni\u015F) arrive in an upcoming update — nothing is charged in this preview.",
@@ -419,7 +419,7 @@ export const en = {
       videos: "Videos",
       ai: "AI",
       overviewText:
-        "One calm view of your day — sport, meals, mind and reading in a single strip.",
+        "One calm view of your day — gym, meals, mind and reading in a single strip.",
       sessionsText:
         "Guided sessions picked for you, from five quiet minutes to full workouts.",
       videosText:
@@ -443,7 +443,7 @@ export const en = {
   Metadata: {
     welcomeTitle: "Welcome",
     welcomeDescription:
-      "Meet PreLife — psychology, sport, books and diet in one platform, with experts, videos and AI in every section.",
+      "Meet PreLife — gym, diet, psychology and books in one platform, with experts, videos and AI in every section.",
     homeTitle: "Home",
     homeDescription: "Your everyday starting point in PreLife.",
     uiTitle: "UI elements",
@@ -465,9 +465,9 @@ export const en = {
     "moduleDesc_gym": "Training plans, exercise library, gyms.",
     "moduleName_diet": "Diet",
     "moduleDesc_diet": "Plan flow, recipes, collections.",
-    "moduleName_meditation": "Meditation",
+    "moduleName_meditation": "Psychology",
     "moduleDesc_meditation": "Sessions, programs, benefits.",
-    "moduleName_library": "Library",
+    "moduleName_library": "Books",
     "moduleDesc_library": "Collections, featured books, perks.",
     "navAriaLabel": "Site navigation",
     "navMenu": "Open menu",

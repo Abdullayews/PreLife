@@ -8,6 +8,11 @@ import { BookOpen, Brain, Dumbbell, Salad, type LucideIcon } from "lucide-react"
  *   Spor      (spor, GYM, yoga, plates, hocalar, ...)  -> /gym
  *   Diet      (diet, dietisyenler, videolar, AI)       -> /diet
  *
+ * Display order (per product decision): Gym, Diet, Psychology, Books —
+ * sport first, then diet, then psikoloji, then kitab. Every surface that
+ * lists the four sections (site nav row, hero chips, welcome/home cards)
+ * renders this array in order.
+ *
  * Palette (capstone color rules, light theme):
  *   Psikoloji  Dry Sage  (#7D8F6D)   [psikoloqlar: Dry Sage + Taupe]
  *   Kitab      Antique Brass (#8A6A45) [matched — capstone chip missing]
@@ -27,20 +32,6 @@ export type CapstoneSection = {
 
 export const capstoneSections: CapstoneSection[] = [
   {
-    id: "psikoloji",
-    href: "/meditation",
-    icon: Brain,
-    accent: "#7D8F6D",
-    tint: "#EEF1E7",
-  },
-  {
-    id: "kitab",
-    href: "/library",
-    icon: BookOpen,
-    accent: "#8A6A45",
-    tint: "#F3ECE0",
-  },
-  {
     id: "sport",
     href: "/gym",
     icon: Dumbbell,
@@ -53,6 +44,20 @@ export const capstoneSections: CapstoneSection[] = [
     icon: Salad,
     accent: "#5F7F52",
     tint: "#EAF0E4",
+  },
+  {
+    id: "psikoloji",
+    href: "/meditation",
+    icon: Brain,
+    accent: "#7D8F6D",
+    tint: "#EEF1E7",
+  },
+  {
+    id: "kitab",
+    href: "/library",
+    icon: BookOpen,
+    accent: "#8A6A45",
+    tint: "#F3ECE0",
   },
 ];
 

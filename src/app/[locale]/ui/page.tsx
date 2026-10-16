@@ -90,7 +90,7 @@ export default async function UiPage({
   const people = [1, 2, 3, 4].map((i) => t(`avatars.person${i}`) as string);
   const sport = capstoneSections.find((s) => s.id === "sport")!;
   const SportIcon = sport.icon;
-  const sage = capstoneSections[0];
+  const sage = capstoneSections.find((s) => s.id === "psikoloji")!;
 
   return (
     <PageShell pageId="ui">
