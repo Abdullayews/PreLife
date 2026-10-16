@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "next": "16.4.2",
+    "next-intl": "^4.14.9",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
@@ -22,5 +23,10 @@
     "eslint-config-next": "16.4.2",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "@parcel/watcher@2.6.0": true,
+    "@swc/core@1.16.18": true,
+    "unrs-resolver@1.12.2": true
   }
 }
