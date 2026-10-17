@@ -3,5 +3,51 @@
     "title": "Həyatınızı yaxşılaşdıran bütün alətlər bir yerdə",
     "subtitle": "Fitness, qidalanma, meditasiya və oxu — ehtiyacınız olandan başlayın.",
     "cta": "Pulsuz hesab yarat"
+  },
+  "nav": {
+    "home": "Baş səhifə",
+    "gym": "İdman",
+    "diet": "Pəhriz",
+    "meditation": "Meditasiya",
+    "library": "Kitabxana",
+    "language": "Dil"
+  },
+  "footer": {
+    "tagline": "Şəxsi inkişaf üçün çoxşaxəli platforma",
+    "rights": "© {year} PreLife. Bütün hüquqlar qorunur."
+  },
+  "landing": {
+    "modulesTitle": "Bir platforma — həyatın dörd sahəsi",
+    "modulesSubtitle": "Hər modulun öz sahədi var. Ehtiyacın olandan başla.",
+    "reasonsTitle": "Niyə PreLife?",
+    "reason1Title": "Hər şey bir yerdə",
+    "reason1Text": "İdman, qidalanma, meditasiya və oxu. Bir hesab, bir interfeys, bir abunə.",
+    "reason2Title": "Yalnız istifadə etdiyin üçün ödə",
+    "reason2Text": "Əyilən, modul-seçici abunə: yalnız həqiqətən ehtiyacın olan sahələri aktivləşdir.",
+    "reason3Title": "Hər modulda AI köməkçi",
+    "reason3Text": "Məlumatlarından öyrənən və sənə fərdi məsləhətlər verən şəxsi köməkçi."
+  },
+  "modules": {
+    "gym": "Təlim planları, məşq bələdçiləri və idman zalı kataloqu",
+    "diet": "Şəxsi pəhriz planı, reseptlər və gündəlik tövsiyələr",
+    "meditation": "Səsli seanslar və gündəlik praktikanın izlənməsi",
+    "library": "Seçilmiş kitablar və oxu tövsiyələri"
+  },
+  "modulePage": {
+    "comingSoon": "Bu modul hazırlanır",
+    "backHome": "Ana səhifəyə qayıt"
+  },
+  "notFound": {
+    "title": "Səhifə tapılmadı",
+    "description": "Axtardığınız səhifə mövcud deyil və ya köçürülüb.",
+    "backHome": "Ana səhifəyə qayıt"
+  },
+  "error": {
+    "title": "Bir xəta baş verdi",
+    "retry": "Yenidən cəhd et"
+  },
+  "Metadata": {
+    "title": "PreLife — Premium Life",
+    "description": "İdman, qidalanma, meditasiya və kitabxana — bir platformada."
   }
 }

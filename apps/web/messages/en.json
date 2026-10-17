@@ -3,5 +3,51 @@
     "title": "All of your life-improvement tools in one place",
     "subtitle": "Fitness, nutrition, meditation and reading — start with what you need.",
     "cta": "Create free account"
+  },
+  "nav": {
+    "home": "Home",
+    "gym": "Gym",
+    "diet": "Diet",
+    "meditation": "Meditation",
+    "library": "Library",
+    "language": "Language"
+  },
+  "footer": {
+    "tagline": "A multi-domain platform for personal development",
+    "rights": "© {year} PreLife. All rights reserved."
+  },
+  "landing": {
+    "modulesTitle": "One platform, four life domains",
+    "modulesSubtitle": "Each module has its own space. Start with the one you need.",
+    "reasonsTitle": "Why PreLife?",
+    "reason1Title": "Everything in one place",
+    "reason1Text": "Fitness, nutrition, meditation and reading. One account, one interface, one subscription.",
+    "reason2Title": "Pay only for what you use",
+    "reason2Text": "A flexible, module-selective subscription: activate only the areas you actually need.",
+    "reason3Title": "An AI assistant in every module",
+    "reason3Text": "A personal assistant that learns from your data and advises you individually."
+  },
+  "modules": {
+    "gym": "Training plans, exercise tutorials and a gym directory",
+    "diet": "A personal diet plan, recipes and daily suggestions",
+    "meditation": "Audio sessions and daily practice tracking",
+    "library": "Curated books and reading recommendations"
+  },
+  "modulePage": {
+    "comingSoon": "This module is under construction",
+    "backHome": "Back to home"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "backHome": "Back to home"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "retry": "Try again"
+  },
+  "Metadata": {
+    "title": "PreLife — Premium Life",
+    "description": "Fitness, nutrition, meditation and a library, in one platform."
   }
 }
