@@ -41,10 +41,8 @@ export default async function WelcomePage({
       <FlagCheck />
       {/* Unified glass-pill site nav lives in the [locale] layout. */}
       <div className="flex flex-1 flex-col">
-        {/* Hero banner — ani.pm-sized single artwork, Ultrahuman-style motion */}
-        <section className="mx-auto w-full max-w-6xl px-4 pt-8 sm:pt-12 md:px-8">
-          <Spotlight />
-        </section>
+        {/* Hero — full-bleed photo hero, the same scale as the module tabs */}
+        <Spotlight />
 
         {/* Stats strip */}
         <section className="mx-auto w-full max-w-6xl px-4 py-12 md:px-8 md:py-16">
@@ -149,16 +147,18 @@ export default async function WelcomePage({
               <div
                 key={s.id}
                 aria-hidden="true"
-                className="pl-glow absolute size-56 rounded-full opacity-30 blur-[90px]"
+                className="pl-glow absolute size-80 rounded-full opacity-25"
                 style={{
-                  backgroundColor: s.accent,
+                  /* Soft gradient glow — a blur(90px) filter would re-render
+                      every frame of the drift; a radial gradient is free. */
+                  background: `radial-gradient(circle, ${s.accent} 0%, transparent 70%)`,
                   ...(i === 0
-                    ? { top: "-4rem", left: "-4rem" }
+                    ? { top: "-5rem", left: "-5rem" }
                     : i === 1
-                      ? { bottom: "-4rem", left: "25%" }
+                      ? { bottom: "-5rem", left: "25%" }
                       : i === 2
-                        ? { top: "-4rem", right: "25%" }
-                        : { bottom: "-4rem", right: "-4rem" }),
+                        ? { top: "-5rem", right: "25%" }
+                        : { bottom: "-5rem", right: "-5rem" }),
                 }}
               />
             ))}

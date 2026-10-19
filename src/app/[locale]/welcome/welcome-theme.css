@@ -3,10 +3,10 @@
 
 @keyframes pl-kenburns {
   from {
-    transform: scale(1.04) translateX(0);
+    transform: translate3d(0, 0, 0) scale(1.04);
   }
   to {
-    transform: scale(1.14) translateX(-1.5%);
+    transform: translate3d(-1.2%, 0, 0) scale(1.1);
   }
 }
 
@@ -41,8 +41,12 @@
 }
 
 .pl-kenburns {
-  /* Continuous gentle drift (Ultrahuman-style life, single artwork) */
-  animation: pl-kenburns 18s ease-in-out infinite alternate;
+  /* GPU-promoted layer: the drift runs on the compositor (one raster,
+     no per-frame repaints), which is what keeps a slow zoom fluid.
+     Subtle range — Apple-style restraint, not a slideshow pan. */
+  will-change: transform;
+  backface-visibility: hidden;
+  animation: pl-kenburns 22s ease-in-out infinite alternate;
 }
 
 .pl-slide-up {

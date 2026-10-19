@@ -50,9 +50,13 @@ as a **class** (never an inline style — inline styles outrank the `.dark`
 overrides and would freeze a page in light mode), and each has a dark
 variant: hero photo scrims and hero ink come from `--hero-*` /
 `--on-hero-*` tokens, so the whole page re-tints when the nav's theme
-toggle flips `.dark` on `<html>`. One animated glass-pill nav travels
-across the whole site: it morphs into a floating pill on scroll and
-picks up the current module's accent automatically.
+toggle flips `.dark` on `<html>` — the `/welcome` landing opens with the
+same full-bleed photo-hero scale as the module pages. One glass-pill nav
+travels across the whole site with constant geometry (Apple-style): the
+pill never resizes on scroll — its frosted material simply fades in and
+picks up the current module's accent automatically. The glass is painted
+on a pseudo-element, so "transparent website" browser mods cannot strip
+it.
 
 ## 🛠️ Tech stack
 

@@ -11,9 +11,11 @@ import { ThemeToggle } from "@/components/theme-toggle";
 
 /**
  * PreLife site navigation — ONE floating glass pill for the whole site
- * (frontend v4 system). The bar starts full-width at the top of the page
- * and morphs into a floating frosted-glass pill once the page scrolls;
- * the same links travel with you across every page. The wordmark's
+ * (frontend v4 system, Apple-style). The pill keeps a constant geometry
+ * for the entire scroll; only its frosted material crossfades in once the
+ * page moves (.pl-glass-pill paints the glass on a ::before layer — see
+ * globals.css for why that also blocks transparent-website browser mods).
+ * The same links travel with you across every page, and the wordmark's
  * "Life" — and the little dot beside it — pick up the current module
  * accent through --site-accent, which globals.css maps per page via
  * body:has([data-module=...]).
@@ -93,21 +95,11 @@ export function SiteNav() {
   return (
     <nav aria-label={t("navAriaLabel")} className="sticky top-0 z-50">
       <div>
+        {/* Constant geometry, material crossfade — nothing here resizes or
+            relocates on scroll, so there is no layout animation to jank. */}
         <div
-          className={cn(
-            "relative mx-auto flex items-center justify-between gap-3 px-4 transition-all duration-300 md:px-6",
-            scrolled
-              ? "mt-3 h-16 max-w-5xl rounded-full border shadow-[var(--nav-glass-shadow)] backdrop-blur-[14.4px] md:px-5"
-              : "h-20 max-w-6xl border-transparent",
-          )}
-          style={
-            scrolled
-              ? {
-                  borderColor: "var(--nav-glass-line)",
-                  backgroundColor: "var(--nav-glass-bg)",
-                }
-              : undefined
-          }
+          data-glass={scrolled ? "on" : "off"}
+          className="pl-glass-pill mx-auto mt-3 flex h-16 max-w-5xl items-center justify-between gap-3 rounded-full px-4 md:px-5"
         >
           <div className="flex items-center gap-1">
             <button
@@ -195,7 +187,6 @@ export function SiteNav() {
             <Link
               href="/home"
               className="pl-nav-start hidden h-10 items-center rounded-full px-5 text-sm font-semibold transition-opacity hover:opacity-90 md:inline-flex"
-              style={{ backgroundColor: "var(--site-accent)" }}
             >
               {tw("header.getStarted")}
             </Link>
@@ -204,13 +195,7 @@ export function SiteNav() {
       </div>
 
       {menuOpen ? (
-        <div
-          className="mx-4 mt-2 rounded-2xl border p-3 shadow-[var(--nav-glass-shadow)] backdrop-blur-[14.4px] md:hidden"
-          style={{
-            borderColor: "var(--nav-glass-line)",
-            backgroundColor: "var(--nav-glass-panel)",
-          }}
-        >
+        <div className="pl-glass-panel mx-4 mt-2 rounded-2xl p-3 md:hidden">
           <p
             className="px-3 pb-2 pt-1 text-[11px] font-medium uppercase tracking-[0.14em]"
             style={{ color: "var(--nav-glass-muted)" }}
@@ -288,7 +273,6 @@ export function SiteNav() {
               href="/home"
               onClick={() => setMenuOpen(false)}
               className="pl-nav-start inline-flex h-10 items-center rounded-full px-5 text-sm font-semibold"
-              style={{ backgroundColor: "var(--site-accent)" }}
             >
               {tw("header.getStarted")}
             </Link>

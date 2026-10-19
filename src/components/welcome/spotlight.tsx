@@ -6,80 +6,113 @@ import { StartCta } from "@/components/welcome/start-cta";
 import { capstoneSections } from "@/lib/capstone";
 
 /**
- * ani.pm-style spotlight banner (single artwork, compact height) with
- * Ultrahuman-style motion: slow Ken Burns drift + staggered text reveals.
- * CSS keyframes live in welcome-theme.css (no animation libraries).
+ * Landing hero — the SAME full-bleed photo scale as the module tabs
+ * (min-h-[88svh], edge-to-edge). The artwork drifts with a slow,
+ * GPU-composited Ken Burns zoom; scrims and ink come from the shared
+ * --hero-* / --on-hero-* tokens (.pl-theme-welcome defines the Warm Bone /
+ * Espresso Night pair), so the whole hero re-tints when the theme toggle
+ * flips .dark. Chips and the ghost button use opaque token fills instead
+ * of backdrop-blur: stacking a blur over a moving photo forces a
+ * re-filter every frame (that was the zoom's lag).
  */
 export async function Spotlight() {
   const t = await getTranslations("welcomePage.hero");
 
   return (
-    <section aria-label={t("ariaLabel")} className="relative">
-      <div className="relative h-[480px] overflow-hidden rounded-3xl border sm:h-[500px] lg:h-[560px]">
-        {/* Artwork: one pic with the main functions, slow Ken Burns drift */}
+    <section
+      aria-label={t("ariaLabel")}
+      className="relative isolate overflow-hidden"
+    >
+      {/* Artwork: one pic with the main functions, slow Ken Burns drift */}
+      <div className="absolute inset-0 -z-20 overflow-hidden">
         <Image
           src="/img/banner.png"
           alt={t("alt")}
           fill
           priority
-          sizes="(min-width: 1152px) 1152px, 100vw"
+          sizes="100vw"
           className="object-cover pl-kenburns"
         />
+      </div>
 
-        {/* Readability scrims (token-based: flips with the light theme) */}
-        <div
-          className="absolute inset-0 z-10 bg-gradient-to-r from-background/95 via-background/70 to-transparent"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute inset-0 z-10 bg-gradient-to-t from-background/95 via-background/35 to-background/20"
-          aria-hidden="true"
-        />
+      {/* Scrims are shared classes (.pl-hero-*) fed by --hero-* tokens,
+          so the whole hero re-tints when the dark toggle flips .dark —
+          the same system the module heroes use. */}
+      <div aria-hidden className="pl-hero-side absolute inset-0 -z-10" />
+      <div aria-hidden className="pl-hero-fade absolute inset-0 -z-10" />
+      <div
+        aria-hidden
+        className="pl-hero-glow absolute inset-x-0 bottom-0 -z-10 h-[45%]"
+      />
 
-        {/* Content: ani.pm spotlight stack (bottom-left) */}
-        <div className="relative z-20 flex h-full flex-col justify-end p-6 pb-11 sm:p-10 sm:pb-12 lg:p-14">
-          <p className="pl-slide-up pl-d1 text-xs font-semibold uppercase tracking-[0.2em] text-foreground/70">
-            {t("eyebrow")}
-          </p>
-          <h1 className="pl-slide-up pl-d2 mt-4 max-w-2xl text-3xl font-bold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
-            {t("title")}
-          </h1>
-          <p className="pl-slide-up pl-d3 mt-3 line-clamp-4 max-w-xl text-sm font-medium leading-relaxed text-foreground/90 sm:line-clamp-none sm:text-base">
-            {t("subtitle")}
-          </p>
+      {/* Content: module-hero stack (bottom-left) */}
+      <div className="mx-auto flex min-h-[88svh] w-full max-w-6xl flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
+        <p
+          className="pl-slide-up pl-d1 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em]"
+          style={{ color: "var(--on-hero-muted)" }}
+        >
+          <span
+            aria-hidden
+            className="h-px w-10 shrink-0"
+            style={{ backgroundColor: "var(--site-accent)" }}
+          />
+          {t("eyebrow")}
+        </p>
+        <h1
+          className="pl-slide-up pl-d2 pl-display mt-6 max-w-4xl text-5xl font-black leading-[0.98] tracking-[-0.03em] md:text-7xl lg:text-[5.25rem]"
+          style={{ color: "var(--on-hero)" }}
+        >
+          {t("title")}
+        </h1>
+        <p
+          className="pl-slide-up pl-d3 mt-6 max-w-xl text-base leading-relaxed md:text-lg"
+          style={{ color: "var(--on-hero-muted)" }}
+        >
+          {t("subtitle")}
+        </p>
 
-          {/* Function chips: the four capstone sections (ani.pm meta chips) */}
-          <div className="pl-slide-up pl-d4 mt-5 grid w-fit grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
-            {capstoneSections.map((s) => {
-              const Icon = s.icon;
-              return (
-                <Badge
-                  key={s.id}
-                  variant="secondary"
-                  className="gap-1.5 border border-border/60 bg-background/60 px-2.5 py-1 text-xs text-foreground/90 backdrop-blur-sm sm:px-3 sm:text-sm"
-                >
-                  <Icon
-                    className="size-3.5"
-                    style={{ color: s.accent }}
-                    aria-hidden="true"
-                  />
-                  {t(`chips.${s.id}`)}
-                </Badge>
-              );
-            })}
-          </div>
+        {/* Function chips: the four capstone sections — opaque token fills,
+            no backdrop-blur over the moving photo (see note above). */}
+        <div className="pl-slide-up pl-d4 mt-6 flex flex-wrap items-center gap-2">
+          {capstoneSections.map((s) => {
+            const Icon = s.icon;
+            return (
+              <Badge
+                key={s.id}
+                variant="secondary"
+                className="gap-1.5 px-2.5 py-1 text-xs sm:px-3 sm:text-sm"
+                style={{
+                  backgroundColor: "var(--on-hero-fill)",
+                  borderColor: "var(--on-hero-border)",
+                  color: "var(--on-hero)",
+                }}
+              >
+                <Icon
+                  className="size-3.5"
+                  style={{ color: s.accent }}
+                  aria-hidden="true"
+                />
+                {t(`chips.${s.id}`)}
+              </Badge>
+            );
+          })}
+        </div>
 
-          <div className="pl-slide-up pl-d5 mt-7 flex flex-wrap items-center gap-3">
-            <StartCta />
-            <Button
-              asChild
-              variant="ghost"
-              size="lg"
-              className="rounded-full border border-border/70 bg-background/70 text-foreground backdrop-blur-sm hover:bg-background/90"
-            >
-              <a href="#modules">{t("seeAll")}</a>
-            </Button>
-          </div>
+        <div className="pl-slide-up pl-d5 mt-9 flex flex-wrap items-center gap-3">
+          <StartCta className="h-12 rounded-full px-8 text-base font-semibold hover:brightness-110" />
+          <Button
+            asChild
+            variant="ghost"
+            size="lg"
+            className="pl-hero-ghost h-12 rounded-full border px-7 text-base font-medium transition-colors"
+            style={{
+              borderColor: "var(--on-hero-border)",
+              backgroundColor: "var(--on-hero-fill)",
+              color: "var(--on-hero)",
+            }}
+          >
+            <a href="#modules">{t("seeAll")}</a>
+          </Button>
         </div>
       </div>
     </section>
