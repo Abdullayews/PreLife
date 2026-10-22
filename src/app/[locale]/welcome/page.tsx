@@ -140,9 +140,11 @@ export default async function WelcomePage({
           </div>
         </section>
 
-        {/* Get started band — Ultrahuman-style dark contrast card */}
+        {/* Get started band — Ultrahuman-style contrast card. Always dark:
+            .pl-contrast-band tokens keep the ink surface in both modes
+            (bg-foreground would flip to a bright slab in dark mode). */}
         <section id="get-started" className="scroll-mt-24 px-4 py-16 md:px-8">
-          <div className="relative mx-auto max-w-6xl overflow-hidden rounded-3xl bg-foreground p-8 text-center text-background md:p-14">
+          <div className="pl-contrast-band relative mx-auto max-w-6xl overflow-hidden rounded-3xl p-8 text-center md:p-14">
             {sections.map((s, i) => (
               <div
                 key={s.id}
@@ -166,13 +168,19 @@ export default async function WelcomePage({
               <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
                 {t("cta.title")}
               </h2>
-              <p className="mx-auto mt-3 max-w-md text-background/75">
+              <p className="mx-auto mt-3 max-w-md text-(--contrast-ink-soft)">
                 {t("cta.text")}
               </p>
               <div className="mt-8 flex justify-center">
-                <StartCta variant="secondary" />
+                {/* Bone pill on the ink band in BOTH modes — the themed
+                    secondary surface would sink into the dark band. The
+                    explicit hover bg cancels the variant's hover tint. */}
+                <StartCta
+                  variant="secondary"
+                  className="h-12 rounded-full bg-(--contrast-ink) px-8 text-base font-semibold text-(--contrast-bg) hover:bg-(--contrast-ink) hover:brightness-110"
+                />
               </div>
-              <p className="mt-4 text-xs text-background/60">
+              <p className="mt-4 text-xs text-(--contrast-ink-faint)">
                 {t("cta.note")}
               </p>
             </div>

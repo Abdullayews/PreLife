@@ -51,11 +51,13 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-svh flex-col bg-background font-sans text-foreground antialiased">
-        {/* Dark / light mode: apply the saved choice before first paint. */}
+        {/* Dark / light mode: apply the saved choice before first paint.
+            First visit follows the OS appearance (prefers-color-scheme);
+            any manual toggle is persisted and always wins afterwards. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(localStorage.getItem('pl-theme')==='dark'){document.documentElement.classList.add('dark');}}catch(e){}",
+              "try{var s=localStorage.getItem('pl-theme');if(s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}",
           }}
         />
         {/* Display typeface shared by the site nav and every module hero

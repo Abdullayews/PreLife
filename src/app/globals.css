@@ -44,6 +44,9 @@
 }
 
 :root {
+  /* Follow the active theme into native UI: scrollbars, form controls
+     and the browser chrome render light here, dark under .dark below. */
+  color-scheme: light;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -84,6 +87,7 @@
  * (body edges, /ui showcase, fallbacks) matches the brand in dark mode.
  */
 .dark {
+  color-scheme: dark;
   --background: #16110E;
   --foreground: #F2EDE4;
   --card: #1E1813;
@@ -700,6 +704,14 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --on-hero-border: rgba(31, 29, 26, 0.22);
   --on-hero-fill: rgba(255, 255, 255, 0.52);
   --on-hero-fill-strong: rgba(255, 255, 255, 0.72);
+  /* Always-dark contrast band ("Get started" card): ink in light mode.
+     Deliberately NOT bg-foreground — foreground flips to bone in dark
+     mode, which would turn the band into a bright slab. Dark raises the
+     band one step above the page espresso so it still reads as a card. */
+  --contrast-bg: #1F1D1A;
+  --contrast-ink: #F6F3ED;
+  --contrast-ink-soft: rgba(246, 243, 237, 0.78);
+  --contrast-ink-faint: rgba(246, 243, 237, 0.62);
 }
 
 .dark .pl-theme-welcome {
@@ -734,6 +746,22 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --on-hero-border: rgba(242, 237, 228, 0.26);
   --on-hero-fill: rgba(22, 17, 14, 0.45);
   --on-hero-fill-strong: rgba(22, 17, 14, 0.66);
+  /* Contrast band keeps its ink identity in the dark: elevated espresso
+     surface, bone ink — never the inverted bone slab. */
+  --contrast-bg: #262019;
+  --contrast-ink: #F2EDE4;
+  --contrast-ink-soft: rgba(242, 237, 228, 0.80);
+  --contrast-ink-faint: rgba(242, 237, 228, 0.64);
+}
+
+/*
+ * The welcome "Get started" card: an Ultrahuman-style band that is dark
+ * in BOTH modes (see tokens above). Utilities below keep the JSX free of
+ * long arbitrary-value class lists.
+ */
+.pl-contrast-band {
+  background-color: var(--contrast-bg);
+  color: var(--contrast-ink);
 }
 
 /*

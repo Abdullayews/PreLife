@@ -18,6 +18,10 @@ import { BookOpen, Brain, Dumbbell, Salad, type LucideIcon } from "lucide-react"
  *   Kitab      Antique Brass (#8A6A45) [matched — capstone chip missing]
  *   Spor       Merlot (#7B2D3B) + Bone tint [GYM: Bone + Merlot]
  *   Diet       Pistachio (#5F7F52)   [matched — capstone gave no colors]
+ * Tints are the accent at 10% alpha (same convention as the module
+ * "explore" chips), NOT opaque light hexes — an opaque bone chip glows
+ * like a sticker in dark mode, while accent+alpha re-balances on both
+ * the light and the espresso surfaces.
  * Abonelik is not a content card: it is referenced in the CTA band note.
  */
 export type CapstoneId = "psikoloji" | "kitab" | "sport" | "diet";
@@ -36,28 +40,28 @@ export const capstoneSections: CapstoneSection[] = [
     href: "/gym",
     icon: Dumbbell,
     accent: "#7B2D3B",
-    tint: "#F1EDE3",
+    tint: "#7B2D3B1A",
   },
   {
     id: "diet",
     href: "/diet",
     icon: Salad,
     accent: "#5F7F52",
-    tint: "#EAF0E4",
+    tint: "#5F7F521A",
   },
   {
     id: "psikoloji",
     href: "/meditation",
     icon: Brain,
     accent: "#7D8F6D",
-    tint: "#EEF1E7",
+    tint: "#7D8F6D1A",
   },
   {
     id: "kitab",
     href: "/library",
     icon: BookOpen,
     accent: "#8A6A45",
-    tint: "#F3ECE0",
+    tint: "#8A6A451A",
   },
 ];
 

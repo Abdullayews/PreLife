@@ -51,7 +51,12 @@ overrides and would freeze a page in light mode), and each has a dark
 variant: hero photo scrims and hero ink come from `--hero-*` /
 `--on-hero-*` tokens, so the whole page re-tints when the nav's theme
 toggle flips `.dark` on `<html>` — the `/welcome` landing opens with the
-same full-bleed photo-hero scale as the module pages. One glass-pill nav
+same full-bleed photo-hero scale as the module pages. The first visit
+follows the OS appearance (`prefers-color-scheme`); a manual toggle is
+persisted in `localStorage` and always wins afterwards. Native UI
+(scrollbars, form controls) follows the active mode via `color-scheme`,
+and the "Get started" band stays ink-dark in both modes via
+`--contrast-*` tokens. One glass-pill nav
 travels across the whole site with constant geometry (Apple-style): the
 pill never resizes on scroll — its frosted material simply fades in and
 picks up the current module's accent automatically. The glass is painted
