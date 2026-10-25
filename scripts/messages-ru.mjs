@@ -478,7 +478,10 @@ export const ru = {
     "navLanguage": "Сменить язык",
     "navStart": "Начать",
     "navThemeToggle": "Переключить тёмный / светлый режим",
-    "navHome": "PreLife — главная"
+    "navHome": "PreLife — главная",
+    "galleryLabel": "Фотографии в шапке",
+    "galleryPrev": "Предыдущее фото",
+    "galleryNext": "Следующее фото"
   },
   "gymHome": {
     "metaTitle": "Тренировки",

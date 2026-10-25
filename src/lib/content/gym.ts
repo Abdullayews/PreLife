@@ -77,6 +77,20 @@ const unsplash = (id: string, width: number) =>
 
 export const gymHeroImage = unsplash("1534438327276-14e5300c3a48", 2400);
 
+/* Hero gallery frames (BetterMe-style switcher): the moody gym interior
+   first, then the dumbbell rack and the rope-training close-up. The old
+   single hero stays exported as frame one. */
+export const gymHeroImages: string[] = [
+  gymHeroImage,
+  unsplash("1517836357463-d25dfeac3438", 2400),
+  unsplash("1541534741688-6078c6bfb5c5", 2400),
+];
+export const gymHeroImagePositions: string[] = [
+  "center 35%",
+  "center 45%",
+  "center 40%",
+];
+
 export const gymPlans: GymPlan[] = [
   {
     id: "foundation",

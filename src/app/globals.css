@@ -279,16 +279,18 @@ html.dark .pl-icon-sun { display: none; }
 html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611; }
 
 /*
- * Nav material as a ::before layer, not element styling. Two reasons:
- *   1. Browser mods that force transparent page backgrounds (e.g. Zen's
- *      transparent-website extensions) inject rules like
- *      `* { background: transparent !important }`. The universal selector
- *      matches elements only — never pseudo-elements — so the frosted
- *      material cannot be stripped. Same look, un-strippable.
- *   2. Apple-style constant geometry: the pill never resizes or moves.
- *      Only the material crossfades in on scroll (paint-only color
- *      transitions — no layout animation, no per-frame re-blur from a
- *      resizing backdrop).
+ * Nav material as a ::before layer, not element styling. Browser mods
+ * that force transparent page backgrounds (e.g. Zen's transparent-website
+ * extensions) inject rules like `* { background: transparent !important }`.
+ * The universal selector matches elements only — never pseudo-elements —
+ * so the frosted material cannot be stripped. Same look, un-strippable.
+ *
+ * Geometry: the bar starts full-width (h-20 / max-w-6xl) at the top and
+ * morphs into the smaller floating pill (h-16 / max-w-5xl + mt-3) on
+ * scroll. The height/max-width/margin/padding morph runs on the element
+ * (short 0.45s Apple-curve transition, once per scroll direction) while
+ * the frosted material crossfades on the ::before layer — the blur radius
+ * itself never changes, only the blurred rect does.
  */
 .pl-glass-pill,
 .pl-glass-panel {
@@ -297,6 +299,13 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
   --glass-line: transparent;
   --glass-shadow: 0 18px 50px -18px rgba(0, 0, 0, 0);
   --glass-blur: blur(0px) saturate(1);
+}
+.pl-glass-pill {
+  transition:
+    height 0.45s var(--pl-ease),
+    max-width 0.45s var(--pl-ease),
+    margin-top 0.45s var(--pl-ease),
+    padding 0.45s var(--pl-ease);
 }
 .pl-glass-pill[data-glass="on"],
 .pl-glass-panel {
@@ -326,6 +335,75 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
     border-color 0.45s var(--pl-ease),
     box-shadow 0.45s var(--pl-ease),
     backdrop-filter 0.45s var(--pl-ease);
+}
+
+/*
+ * Hero photo layers — the module heroes' picture switcher. Only opacity
+ * and transform animate (GPU-composited): a crossfade plus a slow 1.06→1
+ * scale settle, the iOS wallpaper transition feel. No filters animate, so
+ * there is nothing to re-blur per frame.
+ */
+.pl-hero-pic {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(1.06);
+  background-size: cover;
+  background-position: var(--pic-pos, center);
+  transition:
+    opacity 0.7s var(--pl-ease),
+    transform 1.4s var(--pl-ease);
+}
+.pl-hero-pic[data-active="true"] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/*
+ * "Liquid glass" for the hero switcher controls (BetterMe-store-style
+ * circular arrows + dot pill). Same un-strippable ::before paint as the
+ * nav pill: frosted fill, saturation boost, a crisp inner edge and a
+ * specular top highlight — the Apple liquid-glass recipe, tuned per mode.
+ * These sit over (mostly) still photos, so the backdrop cost is bounded.
+ */
+:root {
+  --liquid-fill: rgba(255, 255, 255, 0.55);
+  --liquid-line: rgba(255, 255, 255, 0.6);
+  --liquid-spec: rgba(255, 255, 255, 0.9);
+}
+html.dark {
+  --liquid-fill: rgba(22, 17, 14, 0.55);
+  --liquid-line: rgba(242, 237, 228, 0.28);
+  --liquid-spec: rgba(242, 237, 228, 0.32);
+}
+.pl-liquid {
+  position: relative;
+  isolation: isolate;
+}
+.pl-liquid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-color: var(--liquid-fill);
+  box-shadow:
+    inset 0 1px 0 var(--liquid-spec),
+    inset 0 0 0 1px var(--liquid-line),
+    0 12px 32px -12px rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-hero-pic,
+  .pl-glass-pill {
+    transition: none;
+  }
+  .pl-glass-pill::before,
+  .pl-glass-panel::before {
+    transition: none;
+  }
 }
 
 /*

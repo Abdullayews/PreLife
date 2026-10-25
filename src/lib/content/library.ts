@@ -77,6 +77,19 @@ const unsplash = (id: string, width: number) =>
 
 export const libraryHeroImage = unsplash("1507842217343-583bb7270b66", 2400);
 
+/* Hero gallery frames: the warm reading-hall shelves, then the library
+   aisle and the opened-book close-up. */
+export const libraryHeroImages: string[] = [
+  libraryHeroImage,
+  unsplash("1481627834876-b7833e8f5570", 2400),
+  unsplash("1524995997946-a1c2e315a42f", 2400),
+];
+export const libraryHeroImagePositions: string[] = [
+  "center 45%",
+  "center 42%",
+  "center 50%",
+];
+
 export const libraryCollections: LibraryCollection[] = [
   {
     id: "foundations",

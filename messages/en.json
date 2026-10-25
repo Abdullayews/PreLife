@@ -473,7 +473,10 @@
     "navLanguage": "Change language",
     "navStart": "Get started",
     "navThemeToggle": "Toggle dark / light mode",
-    "navHome": "PreLife \u2014 home"
+    "navHome": "PreLife \u2014 home",
+    "galleryLabel": "Hero photos",
+    "galleryPrev": "Previous photo",
+    "galleryNext": "Next photo"
   },
   "gymHome": {
     "metaTitle": "Gym",

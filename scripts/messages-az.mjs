@@ -477,7 +477,10 @@ export const az = {
     "navLanguage": "Dili dəyiş",
     "navStart": "Başla",
     "navThemeToggle": "Tünd / işıq rejimini dəyiş",
-    "navHome": "PreLife — ana səhifə"
+    "navHome": "PreLife — ana səhifə",
+    "galleryLabel": "Hero şəkilləri",
+    "galleryPrev": "Əvvəlki şəkil",
+    "galleryNext": "Növbəti şəkil"
   },
   "gymHome": {
     "metaTitle": "Gym",

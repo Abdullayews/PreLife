@@ -10,9 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ExploreModules } from "@/components/explore-modules";
+import { HeroGallery } from "@/components/sections/hero-gallery";
 import {
   meditationFeatures,
-  meditationHeroImage,
+  meditationHeroImages,
+  meditationHeroImagePositions,
   meditationMentors,
   meditationPrograms,
   meditationSchedule,
@@ -85,6 +87,7 @@ export default async function MeditationPage({ params }: PageProps) {
   setRequestLocale(locale);
 
   const t = await getTranslations({ locale, namespace: "meditationHome" });
+  const tc = await getTranslations({ locale, namespace: "moduleCommon" });
 
   const heroStats = [
     { value: t("heroStatSessionsValue"), label: t("heroStatSessionsLabel") },
@@ -101,10 +104,14 @@ export default async function MeditationPage({ params }: PageProps) {
     <>
       {/* Hero */}
       <section id="top" className="relative isolate overflow-hidden">
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-20 bg-cover bg-[center_38%]"
-          style={{ backgroundImage: `url(${meditationHeroImage})` }}
+        {/* Hero gallery — BetterMe-style picture switcher (liquid-glass
+            controls live inside the component; scrims still paint above) */}
+        <HeroGallery
+          images={meditationHeroImages}
+          positions={meditationHeroImagePositions}
+          label={tc("galleryLabel")}
+          prevLabel={tc("galleryPrev")}
+          nextLabel={tc("galleryNext")}
         />
         {/* Scrims are shared classes (.pl-hero-*) fed by --hero-* tokens,
             so the whole hero re-tints when the dark toggle flips .dark. */}
@@ -114,7 +121,7 @@ export default async function MeditationPage({ params }: PageProps) {
           aria-hidden
           className="pl-hero-glow absolute inset-x-0 bottom-0 -z-10 h-[45%]"
         />
-        <div className="mx-auto flex min-h-[88svh] max-w-6xl flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
+        <div className="mx-auto flex min-h-[88svh] max-w-6xl flex-col justify-end px-4 pb-24 pt-28 md:px-6 md:pb-32">
           <p className="flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em]">
             <span
               aria-hidden

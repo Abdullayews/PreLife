@@ -11,14 +11,15 @@ import { ThemeToggle } from "@/components/theme-toggle";
 
 /**
  * PreLife site navigation — ONE floating glass pill for the whole site
- * (frontend v4 system, Apple-style). The pill keeps a constant geometry
- * for the entire scroll; only its frosted material crossfades in once the
- * page moves (.pl-glass-pill paints the glass on a ::before layer — see
- * globals.css for why that also blocks transparent-website browser mods).
- * The same links travel with you across every page, and the wordmark's
- * "Life" — and the little dot beside it — pick up the current module
- * accent through --site-accent, which globals.css maps per page via
- * body:has([data-module=...]).
+ * (frontend v4 system, Apple-style). At the top of the page the bar is
+ * full-width (h-20, max-w-6xl, no chrome); once the page scrolls it
+ * morphs — with a 0.45s Apple-curve animation — into the smaller floating
+ * frosted-glass pill (h-16, max-w-5xl + mt-3). The material itself is
+ * painted on a ::before layer (.pl-glass-pill in globals.css), which also
+ * blocks transparent-website browser mods. The same links travel with you
+ * across every page, and the wordmark's "Life" — and the little dot beside
+ * it — pick up the current module accent through --site-accent, which
+ * globals.css maps per page via body:has([data-module=...]).
  *
  * Placement follows the current PreLife bar: hamburger + section links
  * LEFT (display order: Gym, Diet, Psychology, Books), wordmark CENTER,
@@ -95,11 +96,17 @@ export function SiteNav() {
   return (
     <nav aria-label={t("navAriaLabel")} className="sticky top-0 z-50">
       <div>
-        {/* Constant geometry, material crossfade — nothing here resizes or
-            relocates on scroll, so there is no layout animation to jank. */}
+        {/* Full-width bar at the top → morphs into the smaller floating
+            glass pill on scroll (geometry transition on the element,
+            material crossfade on the ::before layer). */}
         <div
           data-glass={scrolled ? "on" : "off"}
-          className="pl-glass-pill mx-auto mt-3 flex h-16 max-w-5xl items-center justify-between gap-3 rounded-full px-4 md:px-5"
+          className={cn(
+            "pl-glass-pill mx-auto flex items-center justify-between gap-3 rounded-full px-4",
+            scrolled
+              ? "mt-3 h-16 max-w-5xl md:px-5"
+              : "h-20 max-w-6xl md:px-6",
+          )}
         >
           <div className="flex items-center gap-1">
             <button

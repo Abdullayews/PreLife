@@ -76,6 +76,19 @@ const unsplash = (id: string, width: number) =>
 
 export const meditationHeroImage = unsplash("1506126613408-eca07ce68773", 2400);
 
+/* Hero gallery frames: the signature lakeside meditation, then the
+   dawn-lit session and the waterside close-up. */
+export const meditationHeroImages: string[] = [
+  meditationHeroImage,
+  unsplash("1545205597-3d9d02c29597", 2400),
+  unsplash("1499209974431-9dddcece7f88", 2400),
+];
+export const meditationHeroImagePositions: string[] = [
+  "center 38%",
+  "center 45%",
+  "center 40%",
+];
+
 export const meditationPrograms: MeditationProgram[] = [
   {
     id: "foundations",

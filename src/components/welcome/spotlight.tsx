@@ -45,8 +45,9 @@ export async function Spotlight() {
         className="pl-hero-glow absolute inset-x-0 bottom-0 -z-10 h-[45%]"
       />
 
-      {/* Content: module-hero stack (bottom-left) */}
-      <div className="mx-auto flex min-h-[88svh] w-full max-w-6xl flex-col justify-end px-4 pb-14 pt-28 md:px-6 md:pb-20">
+      {/* Content: module-hero stack (bottom-left, lifted off the bottom
+          edge — pb-24/pb-32 keeps the copy clear of the fold) */}
+      <div className="mx-auto flex min-h-[88svh] w-full max-w-6xl flex-col justify-end px-4 pb-24 pt-28 md:px-6 md:pb-32">
         <p
           className="pl-slide-up pl-d1 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em]"
           style={{ color: "var(--on-hero-muted)" }}

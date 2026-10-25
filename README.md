@@ -41,8 +41,10 @@ three locales — and fails on any mismatch.
 | 📚 **Library** | Collections, featured books, perks | `/library` | Paper & Teal |
 
 Each module is a full premium page under `src/app/[locale]/<module>` —
-photo hero, marquee band, feature grids, plans/sessions, member stories
-and a closing CTA — with its own light/dark palette (`.pl-theme-*` in
+switchable photo hero (BetterMe-style gallery: three frames per module,
+liquid-glass arrow/dot controls, 7s auto-advance), marquee band, feature
+grids, plans/sessions, member stories and a closing CTA — with its own
+light/dark palette (`.pl-theme-*` in
 `globals.css`) and content data in `src/lib/content/`. The public funnel
 — `/welcome` (landing), `/home` (dashboard) and `/subscription` (plans)
 — shares the `.pl-theme-welcome` shell palette. Every palette is applied
@@ -57,9 +59,10 @@ persisted in `localStorage` and always wins afterwards. Native UI
 (scrollbars, form controls) follows the active mode via `color-scheme`,
 and the "Get started" band stays ink-dark in both modes via
 `--contrast-*` tokens. One glass-pill nav
-travels across the whole site with constant geometry (Apple-style): the
-pill never resizes on scroll — its frosted material simply fades in and
-picks up the current module's accent automatically. The glass is painted
+travels across the whole site: it starts full-width at the top of the
+page and morphs — 0.45s Apple curve — into the smaller floating pill
+(h-20 → h-16) once the page scrolls, picking up the current module's
+accent automatically. The glass is painted
 on a pseudo-element, so "transparent website" browser mods cannot strip
 it.
 

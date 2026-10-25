@@ -75,6 +75,19 @@ const unsplash = (id: string, width: number) =>
 
 export const dietHeroImage = unsplash("1512621776951-a57141f2eefd", 2400);
 
+/* Hero gallery frames: the signature salad bowl, then the full healthy
+   table and the plated dish close-up. */
+export const dietHeroImages: string[] = [
+  dietHeroImage,
+  unsplash("1490645935967-10de6ba17061", 2400),
+  unsplash("1504674900247-0877df9cc836", 2400),
+];
+export const dietHeroImagePositions: string[] = [
+  "center 62%",
+  "center 50%",
+  "center 45%",
+];
+
 export const dietPlans: DietPlan[] = [
   {
     id: "balance",
