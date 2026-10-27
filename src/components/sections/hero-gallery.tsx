@@ -2,19 +2,22 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /**
- * Module hero picture switcher (BetterMe-store-style). The hero photo
- * becomes a small gallery: stacked .pl-hero-pic layers crossfade (plus a
- * slow scale settle — see globals.css; only opacity/transform animate, so
- * nothing re-filters per frame), and a cluster of liquid-glass controls
- * sits at the hero's bottom-right: two circular arrows flanking a dot
- * pill. Auto-advances every 7s; hovering the controls or pressing one
+ * Hero picture switcher (BetterMe-store-style). The hero photo becomes a
+ * small gallery: stacked .pl-hero-pic layers crossfade (plus a slow scale
+ * settle — see globals.css; only opacity/transform animate, so nothing
+ * re-filters per frame), and a cluster of liquid-glass controls sits at
+ * the hero's bottom-right: two circular arrows flanking a dot pill.
+ * Auto-advances every 7s; hovering the controls or pressing one
  * pauses/restarts the cycle. prefers-reduced-motion disables autoplay.
  *
  * Rendered inside the hero <section> (relative isolate): the photo stack
  * is absolutely positioned behind the scrims (-z-20), the controls above
- * them, aligned with the content column's padding.
+ * them. The default anchor is bottom-right; the welcome hero re-anchors
+ * the cluster via controlsClassName (top-right on mobile, where its
+ * liquid-glass copy panel owns the bottom of the fold).
  */
 type HeroGalleryProps = {
   /** Photo URLs (first is the initial frame). */
@@ -25,6 +28,8 @@ type HeroGalleryProps = {
   label: string;
   prevLabel: string;
   nextLabel: string;
+  /** Override the switcher cluster's anchor classes. */
+  controlsClassName?: string;
 };
 
 const AUTO_ADVANCE_MS = 7000;
@@ -35,6 +40,7 @@ export function HeroGallery({
   label,
   prevLabel,
   nextLabel,
+  controlsClassName = "absolute bottom-8 right-4 md:right-6",
 }: HeroGalleryProps) {
   const [index, setIndex] = useState(0);
   const [manualTick, setManualTick] = useState(0);
@@ -81,7 +87,10 @@ export function HeroGallery({
         aria-label={label}
         onPointerEnter={() => setHovering(true)}
         onPointerLeave={() => setHovering(false)}
-        className="absolute bottom-8 right-4 z-10 flex items-center gap-2.5 md:right-6"
+        className={cn(
+          "z-10 flex items-center gap-2.5",
+          controlsClassName,
+        )}
       >
         <button
           type="button"

@@ -75,8 +75,11 @@ export default async function LocaleLayout({
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap"
         />
         <NextIntlClientProvider>
+          {/* Fixed shrink bar (see site-nav): main pads its height so the
+              first fold starts under the full-bleed bar, exactly like the
+              old Ultrahuman welcome header. */}
           <SiteNav />
-          <main className="flex flex-1 flex-col">{children}</main>
+          <main className="flex flex-1 flex-col pt-16">{children}</main>
           <WelcomeFooter />
         </NextIntlClientProvider>
       </body>

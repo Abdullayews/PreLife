@@ -22,7 +22,6 @@ export const en = {
       title: "Train. Eat. Breathe. Read.",
       subtitle:
         "PreLife brings gym, nutrition, psychology and books together in one calm system — with plans, videos, experts and AI in every section.",
-      alt: "A warm light-toned still life blending gym, food, meditation and books: a dumbbell, a grain bowl, a meditating figure and a stack of books",
       seeAll: "Explore the sections",
       chips: {
         psikoloji: "Psychology",

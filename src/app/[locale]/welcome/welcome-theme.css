@@ -1,15 +1,6 @@
 /* Welcome/Home page animations — CSS-only (locked stack: no animation libs).
    Keyframes + helpers only. No colors here (token rule, spec §7). */
 
-@keyframes pl-kenburns {
-  from {
-    transform: translate3d(0, 0, 0) scale(1.04);
-  }
-  to {
-    transform: translate3d(-1.2%, 0, 0) scale(1.1);
-  }
-}
-
 @keyframes pl-slide-up {
   from {
     opacity: 0;
@@ -38,15 +29,6 @@
   50% {
     transform: translate(-6%, 8%) scale(1.12);
   }
-}
-
-.pl-kenburns {
-  /* GPU-promoted layer: the drift runs on the compositor (one raster,
-     no per-frame repaints), which is what keeps a slow zoom fluid.
-     Subtle range — Apple-style restraint, not a slideshow pan. */
-  will-change: transform;
-  backface-visibility: hidden;
-  animation: pl-kenburns 22s ease-in-out infinite alternate;
 }
 
 .pl-slide-up {
@@ -80,7 +62,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pl-kenburns,
   .pl-slide-up,
   .pl-fade-in,
   .pl-glow {

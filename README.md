@@ -53,16 +53,22 @@ overrides and would freeze a page in light mode), and each has a dark
 variant: hero photo scrims and hero ink come from `--hero-*` /
 `--on-hero-*` tokens, so the whole page re-tints when the nav's theme
 toggle flips `.dark` on `<html>` — the `/welcome` landing opens with the
-same full-bleed photo-hero scale as the module pages. The first visit
+same full-bleed photo-hero scale as the module pages: a BetterMe-store-
+style picture switcher that cycles the four module worlds (banner still
+life → gym → diet → psychology → books) behind the Warm Bone / Espresso
+Night scrims, with the headline riding in a liquid-glass panel anchored
+bottom-left and lifted clear of the fold's bottom edge. The first visit
 follows the OS appearance (`prefers-color-scheme`); a manual toggle is
 persisted in `localStorage` and always wins afterwards. Native UI
 (scrollbars, form controls) follows the active mode via `color-scheme`,
 and the "Get started" band stays ink-dark in both modes via
-`--contrast-*` tokens. One glass-pill nav
-travels across the whole site: it starts full-width at the top of the
-page and morphs — 0.45s Apple curve — into the smaller floating pill
-(h-20 → h-16) once the page scrolls, picking up the current module's
-accent automatically. The glass is painted
+`--contrast-*` tokens. One nav bar
+travels across the whole site wearing the original Ultrahuman shrink:
+full-bleed solid strip at the top of the page (edge-to-edge, painted in
+`--nav-solid` so it disappears into each page's background) that
+contracts — 0.5s, the measured Ultrahuman curve, via an animated wrapper
+padding — into the smaller floating glass pill once the page scrolls,
+picking up the current module's accent automatically. The glass is painted
 on a pseudo-element, so "transparent website" browser mods cannot strip
 it.
 

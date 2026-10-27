@@ -10,22 +10,25 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 /**
- * PreLife site navigation — ONE floating glass pill for the whole site
- * (frontend v4 system, Apple-style). At the top of the page the bar is
- * full-width (h-20, max-w-6xl, no chrome); once the page scrolls it
- * morphs — with a 0.45s Apple-curve animation — into the smaller floating
- * frosted-glass pill (h-16, max-w-5xl + mt-3). The material itself is
- * painted on a ::before layer (.pl-glass-pill in globals.css), which also
- * blocks transparent-website browser mods. The same links travel with you
- * across every page, and the wordmark's "Life" — and the little dot beside
- * it — pick up the current module accent through --site-accent, which
- * globals.css maps per page via body:has([data-module=...]).
+ * PreLife site navigation — ONE bar for the whole site (frontend v4
+ * system, Apple-style), wearing the ORIGINAL Ultrahuman shrink animation:
+ * at the top of the page it is a full-bleed solid strip (h-16, edge-to-
+ * edge, square corners, painted in --nav-solid so it disappears into the
+ * page background); once the page scrolls past 24px the wrapper's padding
+ * animates to (max(0.75rem,5vw), pt-3) while the bar morphs into a
+ * smaller floating frosted-glass pill — the bar visibly contracts while
+ * keeping its height. The material itself is painted on a ::before layer
+ * (.pl-glass-pill in globals.css), which also blocks transparent-website
+ * browser mods. The same links travel with you across every page, and the
+ * wordmark's "Life" — and the little dot beside it — pick up the current
+ * module accent through --site-accent, which globals.css maps per page via
+ * body:has([data-module=...]).
  *
- * Placement follows the current PreLife bar: hamburger + section links
- * LEFT (display order: Gym, Diet, Psychology, Books), wordmark CENTER,
- * and the right cluster carries the language switcher, the dark/light
- * toggle, the account icon and the "Get started" pill (→ /home while the
- * real onboarding lands).
+ * Layout follows the Ultrahuman bar: hamburger + section links LEFT
+ * (display order: Gym, Diet, Psychology, Books), wordmark CENTER (absolute,
+ * viewport-centered), and the right cluster carries the language switcher,
+ * the dark/light toggle, the account icon and the "Get started" pill
+ * (→ /home while the real onboarding lands).
  */
 
 function LocaleSwitch({ className }: { className?: string }) {
@@ -94,18 +97,22 @@ export function SiteNav() {
   }
 
   return (
-    <nav aria-label={t("navAriaLabel")} className="sticky top-0 z-50">
-      <div>
-        {/* Full-width bar at the top → morphs into the smaller floating
-            glass pill on scroll (geometry transition on the element,
-            material crossfade on the ::before layer). */}
+    <nav aria-label={t("navAriaLabel")} className="fixed inset-x-0 top-0 z-50">
+      {/* The old Ultrahuman shrink: the wrapper's padding (0 at the top of
+          the page → max(0.75rem,5vw) + pt-3 when scrolled) is what pulls
+          the full-bleed bar inward; the bar itself only trades its square
+          corners and solid fill for the glass pill material. */}
+      <div
+        className={cn(
+          "pl-nav-shrink",
+          scrolled ? "px-[max(0.75rem,5vw)] pt-3" : "px-0 pt-0",
+        )}
+      >
         <div
           data-glass={scrolled ? "on" : "off"}
           className={cn(
-            "pl-glass-pill mx-auto flex items-center justify-between gap-3 rounded-full px-4",
-            scrolled
-              ? "mt-3 h-16 max-w-5xl md:px-5"
-              : "h-20 max-w-6xl md:px-6",
+            "pl-glass-pill flex h-16 items-center justify-between gap-3 px-4 md:px-6",
+            scrolled ? "rounded-full" : "rounded-none",
           )}
         >
           <div className="flex items-center gap-1">

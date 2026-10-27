@@ -22,7 +22,6 @@ export const az = {
       title: "İdman. Qida. Zehin. Oxu.",
       subtitle:
         "PreLife idmanı, qidalanmanı, psixologiyanı və kitabları bir sakit sistemdə birləşdirir — hər bölmədə planlar, videolar, mütəxəssislər və AI.",
-      alt: "İdman, yemək, meditasiya və kitabları birləşdirən isti, açıq tonlu kompozisiya: ştanga, taxıl qabası, meditasiya edən insan və kitab dəstəsi",
       seeAll: "Bölmələri kəşf edin",
       chips: {
         psikoloji: "Psixologiya",
