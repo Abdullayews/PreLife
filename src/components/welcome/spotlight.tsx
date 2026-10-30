@@ -14,15 +14,13 @@ import { libraryHeroImage } from "@/lib/content/library";
  * switcher (min-h-[88svh], the same scale as the module tabs): the four
  * module worlds rotate behind the Warm Bone / Espresso Night scrims, so
  * "One platform, four worlds" is literally what the background cycles
- * through. The copy rides in a liquid-glass panel (.pl-liquid-panel —
- * frosted fill, saturation boost, specular inner edge) anchored
- * bottom-LEFT and lifted clear of the fold's bottom edge (pb-8/pb-12 —
- * never flush), mirroring the store hero's headline placement. The
- * switcher's liquid-glass arrows + dot pill sit at the bottom-right on
- * desktop and re-anchor top-right on mobile, where the panel owns the
- * bottom of the fold. Scrims and ink come from the shared --hero-* /
- * --on-hero-* tokens (.pl-theme-welcome), so the whole hero re-tints
- * when the theme toggle flips .dark.
+ * through. The copy sits straight on the scrimmed photo — no panel, no
+ * border, just the words — anchored to the LEFT EDGE of the fold (the
+ * full-bleed gutters, not the centered 6xl column the sections below
+ * use) and lifted clear of the bottom band where the switcher's centered
+ * dot pill lives (pb-16 — never flush with the bottom). Scrims and ink
+ * come from the shared --hero-* / --on-hero-* tokens (.pl-theme-welcome),
+ * so the whole hero re-tints when the theme toggle flips .dark.
  */
 
 /* Frame one is the four-worlds still life (the landing banner); then one
@@ -45,14 +43,12 @@ export async function Spotlight() {
       aria-label={t("ariaLabel")}
       className="relative isolate overflow-hidden"
     >
-      {/* Picture switcher — the four worlds rotate behind the scrims */}
+      {/* Picture switcher — the four worlds rotate behind the scrims.
+          Dots-only liquid pill, centered on the fold's bottom band. */}
       <HeroGallery
         images={HERO_FRAMES.map((frame) => frame.src)}
         positions={HERO_FRAMES.map((frame) => frame.position)}
         label={tc("galleryLabel")}
-        prevLabel={tc("galleryPrev")}
-        nextLabel={tc("galleryNext")}
-        controlsClassName="absolute right-4 top-28 md:top-auto md:bottom-8 md:right-6"
       />
 
       {/* Scrims are shared classes (.pl-hero-*) fed by --hero-* tokens,
@@ -65,10 +61,11 @@ export async function Spotlight() {
         className="pl-hero-glow absolute inset-x-0 bottom-0 -z-10 h-[45%]"
       />
 
-      {/* Copy: liquid-glass panel bottom-left, lifted off the fold's
-          bottom edge (pb-8 / md:pb-12) — never flush with the bottom. */}
-      <div className="mx-auto flex min-h-[88svh] w-full max-w-6xl flex-col justify-end px-4 pb-8 pt-28 md:px-6 md:pb-12">
-        <div className="pl-liquid-panel pl-slide-up max-w-xl rounded-[28px] p-6 md:p-9">
+      {/* Copy: no panel — the words sit straight on the scrimmed photo,
+          anchored to the fold's LEFT edge and lifted clear of the bottom
+          band the centered dot pill lives in (pb-16 — never flush). */}
+      <div className="flex min-h-[88svh] w-full flex-col justify-end px-5 pb-16 pt-28 sm:px-8 md:px-12">
+        <div className="pl-slide-up max-w-xl">
           <p
             className="pl-slide-up pl-d2 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em]"
             style={{ color: "var(--on-hero-muted)" }}

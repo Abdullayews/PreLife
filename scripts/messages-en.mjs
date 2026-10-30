@@ -476,8 +476,6 @@ export const en = {
     "navThemeToggle": "Toggle dark / light mode",
     "navHome": "PreLife — home",
     "galleryLabel": "Hero photos",
-    "galleryPrev": "Previous photo",
-    "galleryNext": "Next photo"
   },
   "gymHome": {
     "metaTitle": "Gym",

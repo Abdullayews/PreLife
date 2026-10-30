@@ -42,7 +42,8 @@ three locales — and fails on any mismatch.
 
 Each module is a full premium page under `src/app/[locale]/<module>` —
 switchable photo hero (BetterMe-style gallery: three frames per module,
-liquid-glass arrow/dot controls, 7s auto-advance), marquee band, feature
+liquid-glass dot pill centered on the fold's bottom edge, 30s auto-
+advance), marquee band, feature
 grids, plans/sessions, member stories and a closing CTA — with its own
 light/dark palette (`.pl-theme-*` in
 `globals.css`) and content data in `src/lib/content/`. The public funnel
@@ -56,8 +57,11 @@ toggle flips `.dark` on `<html>` — the `/welcome` landing opens with the
 same full-bleed photo-hero scale as the module pages: a BetterMe-store-
 style picture switcher that cycles the four module worlds (banner still
 life → gym → diet → psychology → books) behind the Warm Bone / Espresso
-Night scrims, with the headline riding in a liquid-glass panel anchored
-bottom-left and lifted clear of the fold's bottom edge. The first visit
+Night scrims, with frames cross-dissolving (the incoming photo is raised
+and fades in over the outgoing one — no blink, no dip) every 30 seconds.
+The headline block sits straight on the scrimmed photo — no panel, no
+border — anchored to the fold's left edge and lifted clear of the
+centered dot pill on the bottom band. The first visit
 follows the OS appearance (`prefers-color-scheme`); a manual toggle is
 persisted in `localStorage` and always wins afterwards. Native UI
 (scrollbars, form controls) follows the active mode via `color-scheme`,

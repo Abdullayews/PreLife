@@ -478,8 +478,6 @@ export const az = {
     "navThemeToggle": "Tünd / işıq rejimini dəyiş",
     "navHome": "PreLife — ana səhifə",
     "galleryLabel": "Hero şəkilləri",
-    "galleryPrev": "Əvvəlki şəkil",
-    "galleryNext": "Növbəti şəkil"
   },
   "gymHome": {
     "metaTitle": "Gym",

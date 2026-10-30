@@ -367,29 +367,40 @@ html.dark body:not(:has(> main > [data-module])) .pl-nav-start { color: #241611;
 
 /*
  * Hero photo layers — the module heroes' picture switcher. Only opacity
- * and transform animate (GPU-composited): a crossfade plus a slow 1.06→1
- * scale settle, the iOS wallpaper transition feel. No filters animate, so
- * there is nothing to re-blur per frame.
+ * and transform animate (GPU-composited): the incoming frame is RAISED
+ * (z-index) and dissolves in over the outgoing one, which holds its
+ * opacity for a beat and then clears underneath — a true cross-dissolve
+ * with no dip through the scrim and no blink to the page base. The
+ * incoming frame also settles from 1.09 to 1 (a slow Ken Burns breath).
+ * No filters animate, so there is nothing to re-blur per frame.
  */
 .pl-hero-pic {
   position: absolute;
   inset: 0;
+  z-index: 0;
   opacity: 0;
-  transform: scale(1.06);
+  transform: scale(1.09);
   background-size: cover;
   background-position: var(--pic-pos, center);
   transition:
-    opacity 0.7s var(--pl-ease),
-    transform 1.4s var(--pl-ease);
+    opacity 0.9s var(--pl-ease),
+    transform 2.6s var(--pl-ease);
+}
+/* Leaving frame: keep painting for a moment while the raised incoming
+   frame dissolves over it, then fade out beneath (opacity delayed,
+   transform immediate). */
+.pl-hero-pic:not([data-active="true"]) {
+  transition-delay: 0.5s, 0s;
 }
 .pl-hero-pic[data-active="true"] {
+  z-index: 1;
   opacity: 1;
   transform: scale(1);
 }
 
 /*
- * "Liquid glass" for the hero switcher controls (BetterMe-store-style
- * circular arrows + dot pill). Same un-strippable ::before paint as the
+ * "Liquid glass" for the hero switcher controls (BetterMe-store-style dot
+ * pill). Same un-strippable ::before paint as the
  * nav pill: frosted fill, saturation boost, a crisp inner edge and a
  * specular top highlight — the Apple liquid-glass recipe, tuned per mode.
  * These sit over (mostly) still photos, so the backdrop cost is bounded.
@@ -421,38 +432,6 @@ html.dark {
     0 12px 32px -12px rgba(0, 0, 0, 0.35);
   -webkit-backdrop-filter: blur(18px) saturate(1.6);
   backdrop-filter: blur(18px) saturate(1.6);
-}
-
-/*
- * Large liquid-glass panel — the welcome hero's copy card (BetterMe-store
- * hero feel). Same un-strippable ::before recipe as the control pills,
- * scaled up: a denser frosted fill (paragraph ink needs more backing than
- * an icon) and a deeper, softer drop shadow. It rests over the hero's
- * still photos, so the backdrop cost stays bounded.
- */
-:root {
-  --liquid-panel-fill: rgba(255, 255, 255, 0.60);
-}
-html.dark {
-  --liquid-panel-fill: rgba(20, 16, 13, 0.64);
-}
-.pl-liquid-panel {
-  position: relative;
-  isolation: isolate;
-}
-.pl-liquid-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background-color: var(--liquid-panel-fill);
-  box-shadow:
-    inset 0 1px 0 var(--liquid-spec),
-    inset 0 0 0 1px var(--liquid-line),
-    0 28px 64px -24px rgba(0, 0, 0, 0.38);
-  -webkit-backdrop-filter: blur(22px) saturate(1.5);
-  backdrop-filter: blur(22px) saturate(1.5);
 }
 
 @media (prefers-reduced-motion: reduce) {

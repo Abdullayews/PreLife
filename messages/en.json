@@ -473,9 +473,7 @@
     "navStart": "Get started",
     "navThemeToggle": "Toggle dark / light mode",
     "navHome": "PreLife \u2014 home",
-    "galleryLabel": "Hero photos",
-    "galleryPrev": "Previous photo",
-    "galleryNext": "Next photo"
+    "galleryLabel": "Hero photos"
   },
   "gymHome": {
     "metaTitle": "Gym",

@@ -110,8 +110,6 @@ export default async function LibraryPage({ params }: PageProps) {
           images={libraryHeroImages}
           positions={libraryHeroImagePositions}
           label={tc("galleryLabel")}
-          prevLabel={tc("galleryPrev")}
-          nextLabel={tc("galleryNext")}
         />
         {/* Scrims are shared classes (.pl-hero-*) fed by --hero-* tokens,
             so the whole hero re-tints when the dark toggle flips .dark. */}
