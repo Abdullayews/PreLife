@@ -42,7 +42,6 @@ yarn-error.log*
 next-env.d.ts
 local-*
 .claude
-.z-ai-config
 *.log
 dev.log
 dev.out.log
@@ -52,3 +51,22 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# local runtime artifacts — not part of the app
+/bun.lock
+/Caddyfile
+/.zscripts/
+/db/
+/download/
+/prelife-preview/
+/tests/
+/examples/
+/mini-services/
+/tool-results/
+/upload/
+
+# local working notes — kept out of the repo
+/refs/
+/scripts/qa/
+/worklog.md
+/scripts/gh_check.py
