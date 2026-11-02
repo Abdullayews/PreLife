@@ -88,13 +88,12 @@ export const en = {
       title: "Start living your premium life",
       text: "No account needed yet — one click and every section opens in front of you.",
       start: "Start using PreLife",
-      note: "Free during early access — subscription plans (Abonelik) arrive with payments.",
+      note: "Free during early access — subscription plans arrive with payments.",
     },
     footer: {
       brand: "PreLife",
       tagline: "A premium life, one day at a time.",
       rights: "\u00A9 2026 PreLife. All rights reserved.",
-      design: "Design system",
     },
   },
   homePage: {
@@ -433,7 +432,7 @@ export const en = {
       alerts: "Alerts",
       alertTitle: "Payments arrive later",
       alertText:
-        "Subscription plans (Abonelik) are coming with payments — everything is free during early access.",
+        "Subscription plans are coming with payments — everything is free during early access.",
       warnTitle: "Slow connection",
       warnText: "Your progress syncs once you are back online.",
       spinner: "Loading",

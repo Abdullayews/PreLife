@@ -168,6 +168,15 @@
       animation-timeline: view();
       animation-range: entry 5% cover 24%;
     }
+    /* Stagger — shifts a reveal's range so a row of cards cascades
+       left→right instead of moving as one block. animation-delay would
+       be wrong here: against a scroll-driven timeline a time delay is
+       meaningless, so the offset lives in the range itself. Pair with
+       .pl-reveal (d1 = leftmost/first, d4 = last). */
+    .pl-reveal-d1 { animation-range: entry 5% cover 28%; }
+    .pl-reveal-d2 { animation-range: entry 8% cover 36%; }
+    .pl-reveal-d3 { animation-range: entry 11% cover 44%; }
+    .pl-reveal-d4 { animation-range: entry 14% cover 52%; }
   }
 }
 

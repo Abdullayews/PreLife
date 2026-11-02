@@ -98,13 +98,12 @@
       "title": "Start living your premium life",
       "text": "No account needed yet \u2014 one click and every section opens in front of you.",
       "start": "Start using PreLife",
-      "note": "Free during early access \u2014 subscription plans (Abonelik) arrive with payments."
+      "note": "Free during early access \u2014 subscription plans arrive with payments."
     },
     "footer": {
       "brand": "PreLife",
       "tagline": "A premium life, one day at a time.",
-      "rights": "\u00a9 2026 PreLife. All rights reserved.",
-      "design": "Design system"
+      "rights": "\u00a9 2026 PreLife. All rights reserved."
     }
   },
   "homePage": {
@@ -434,7 +433,7 @@
       "skeleton": "Skeleton",
       "alerts": "Alerts",
       "alertTitle": "Payments arrive later",
-      "alertText": "Subscription plans (Abonelik) are coming with payments \u2014 everything is free during early access.",
+      "alertText": "Subscription plans are coming with payments \u2014 everything is free during early access.",
       "warnTitle": "Slow connection",
       "warnText": "Your progress syncs once you are back online.",
       "spinner": "Loading"

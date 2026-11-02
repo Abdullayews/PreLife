@@ -88,13 +88,12 @@ export const az = {
       title: "Premium həyatınıza bu gün başlayın",
       text: "Hələlik hesab lazım deyil — bir kliklə bütün bölmələr qarşınızda açılır.",
       start: "PreLife-ı istifadə etməyə başlayın",
-      note: "Erkən çıxış müddətində pulsuzdur — abunəlik (Abonelik) planları ödənişlərlə birlikdə gələcək.",
+      note: "Erkən çıxış müddətində pulsuzdur — abunəlik planları ödənişlərlə birlikdə gələcək.",
     },
     footer: {
       brand: "PreLife",
       tagline: "Premium həyat — gündəlik bir addım.",
       rights: "\u00A9 2026 PreLife. Bütün hüquqlar qorunur.",
-      design: "Dizayn sistemi",
     },
   },
   homePage: {
@@ -435,7 +434,7 @@ export const az = {
       alerts: "Xəbərdarlıqlar",
       alertTitle: "Ödənişlər sonra gələcək",
       alertText:
-        "Abunə planları (Abonelik) ödənişlərlə birlikdə gəlir — erkən giriş dövründə hər şey pulsuzdur.",
+        "Abunə planları ödənişlərlə birlikdə gəlir — erkən giriş dövründə hər şey pulsuzdur.",
       warnTitle: "Yavaş bağlantı",
       warnText: "Onlayn olduqda irəliləyişiniz sinxronlaşacaq.",
       spinner: "Yüklənir",

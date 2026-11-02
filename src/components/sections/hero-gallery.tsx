@@ -74,8 +74,9 @@ export function HeroGallery({
       </div>
 
       {/* Liquid-glass dot pill — the switcher's only control, centered at
-          the bottom edge of the fold. Each dot is a generously sized hit
-          target; the active dot stretches into a small bar. */}
+          the bottom edge of the fold. Each dot is a 32px hit target
+          (past WCAG 2.5.8's 24px minimum, on the 4px grid); the active
+          dot stretches into a small bar. */}
       <div
         role="group"
         aria-label={label}
@@ -96,7 +97,7 @@ export function HeroGallery({
                 }}
                 aria-label={`${label} ${i + 1}/${count}`}
                 aria-current={active}
-                className="grid size-7 place-items-center rounded-full transition-transform duration-300 hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--site-accent)"
+                className="grid size-8 place-items-center rounded-full transition-transform duration-300 hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--site-accent)"
               >
                 <span
                   aria-hidden

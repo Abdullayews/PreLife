@@ -60,8 +60,18 @@ life → gym → diet → psychology → books) behind the Warm Bone / Espresso
 Night scrims, with frames cross-dissolving (the incoming photo is raised
 and fades in over the outgoing one — no blink, no dip) every 30 seconds.
 The headline block sits straight on the scrimmed photo — no panel, no
-border — anchored to the fold's left edge and lifted clear of the
-centered dot pill on the bottom band. The first visit
+border — anchored to the same left gutter the nav bar's content uses
+(one shared chrome edge), `text-balance`d, and lifted clear of the
+centered dot pill on the bottom band. Sections, the "Get started"
+card and the footer all ride ONE container (`max-w-6xl` + page
+gutters) so every left edge below the fold lines up; controls sit on
+a 4px grid (nav links h-9, lang/theme/account h-10, hero chips
+h-7→h-8, 32px gallery dots — past WCAG 2.5.8's 24px minimum); body
+copy uses integer line heights (no sub-pixel drift), and the stats /
+cards / reasons / CTA sections rise in with CSS scroll-driven
+reveals (`.pl-reveal`, staggered via `animation-range` offsets —
+no JS, disabled under `prefers-reduced-motion`, exactly like the
+module pages). The first visit
 follows the OS appearance (`prefers-color-scheme`); a manual toggle is
 persisted in `localStorage` and always wins afterwards. Native UI
 (scrollbars, form controls) follows the active mode via `color-scheme`,
@@ -72,9 +82,12 @@ full-bleed solid strip at the top of the page (edge-to-edge, painted in
 `--nav-solid` so it disappears into each page's background) that
 contracts — 0.5s, the measured Ultrahuman curve, via an animated wrapper
 padding — into the smaller floating glass pill once the page scrolls,
-picking up the current module's accent automatically. The glass is painted
-on a pseudo-element, so "transparent website" browser mods cannot strip
-it.
+picking up the current module's accent automatically. The section
+links, account icon and "Get started" pill join the bar at `lg`
+(1024px) — below that the bar runs hamburger + language + theme so
+the viewport-centered wordmark always has clear track. The glass is
+painted on a pseudo-element, so "transparent website" browser mods
+cannot strip it.
 
 ## 🛠️ Tech stack
 

@@ -98,13 +98,12 @@
       "title": "Premium h\u0259yat\u0131n\u0131za bu g\u00fcn ba\u015flay\u0131n",
       "text": "H\u0259l\u0259lik hesab laz\u0131m deyil \u2014 bir klikl\u0259 b\u00fct\u00fcn b\u00f6lm\u0259l\u0259r qar\u015f\u0131n\u0131zda a\u00e7\u0131l\u0131r.",
       "start": "PreLife-\u0131 istifad\u0259 etm\u0259y\u0259 ba\u015flay\u0131n",
-      "note": "Erk\u0259n \u00e7\u0131x\u0131\u015f m\u00fcdd\u0259tind\u0259 pulsuzdur \u2014 abun\u0259lik (Abonelik) planlar\u0131 \u00f6d\u0259ni\u015fl\u0259rl\u0259 birlikd\u0259 g\u0259l\u0259c\u0259k."
+      "note": "Erk\u0259n \u00e7\u0131x\u0131\u015f m\u00fcdd\u0259tind\u0259 pulsuzdur \u2014 abun\u0259lik planlar\u0131 \u00f6d\u0259ni\u015fl\u0259rl\u0259 birlikd\u0259 g\u0259l\u0259c\u0259k."
     },
     "footer": {
       "brand": "PreLife",
       "tagline": "Premium h\u0259yat \u2014 g\u00fcnd\u0259lik bir add\u0131m.",
-      "rights": "\u00a9 2026 PreLife. B\u00fct\u00fcn h\u00fcquqlar qorunur.",
-      "design": "Dizayn sistemi"
+      "rights": "\u00a9 2026 PreLife. B\u00fct\u00fcn h\u00fcquqlar qorunur."
     }
   },
   "homePage": {
@@ -434,7 +433,7 @@
       "skeleton": "Skelet",
       "alerts": "X\u0259b\u0259rdarl\u0131qlar",
       "alertTitle": "\u00d6d\u0259ni\u015fl\u0259r sonra g\u0259l\u0259c\u0259k",
-      "alertText": "Abun\u0259 planlar\u0131 (Abonelik) \u00f6d\u0259ni\u015fl\u0259rl\u0259 birlikd\u0259 g\u0259lir \u2014 erk\u0259n giri\u015f d\u00f6vr\u00fcnd\u0259 h\u0259r \u015fey pulsuzdur.",
+      "alertText": "Abun\u0259 planlar\u0131 \u00f6d\u0259ni\u015fl\u0259rl\u0259 birlikd\u0259 g\u0259lir \u2014 erk\u0259n giri\u015f d\u00f6vr\u00fcnd\u0259 h\u0259r \u015fey pulsuzdur.",
       "warnTitle": "Yava\u015f ba\u011flant\u0131",
       "warnText": "Onlayn olduqda ir\u0259lil\u0259yi\u015finiz sinxronla\u015facaq.",
       "spinner": "Y\u00fckl\u0259nir"

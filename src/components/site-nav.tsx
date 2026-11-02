@@ -29,6 +29,13 @@ import { ThemeToggle } from "@/components/theme-toggle";
  * viewport-centered), and the right cluster carries the language switcher,
  * the dark/light toggle, the account icon and the "Get started" pill
  * (→ /home while the real onboarding lands).
+ *
+ * Breakpoints: the centered wordmark needs ~860px of clear track, so the
+ * section links, the account icon and the "Get started" pill only join
+ * the bar at lg (1024px) — between sm and lg the bar runs hamburger +
+ * lang + theme only, which is what the centered logo needs to breathe.
+ * All bar controls sit on the 4px grid: links h-9, lang switch h-10,
+ * theme/account/CTA h-10.
  */
 
 function LocaleSwitch({ className }: { className?: string }) {
@@ -43,7 +50,7 @@ function LocaleSwitch({ className }: { className?: string }) {
       role="group"
       aria-label={tw("header.language")}
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-full border p-1",
+        "inline-flex h-10 items-center gap-0.5 rounded-full border px-1",
         className,
       )}
       style={{ borderColor: "var(--nav-glass-line)" }}
@@ -57,7 +64,7 @@ function LocaleSwitch({ className }: { className?: string }) {
             onClick={() => router.replace(pathname, { locale: loc })}
             aria-pressed={active}
             className={cn(
-              "h-7 rounded-full px-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors",
+              "flex h-8 items-center rounded-full px-2.5 text-[11px] font-bold uppercase tracking-wider transition-colors",
               active && "shadow-sm",
             )}
             style={
@@ -121,7 +128,7 @@ export function SiteNav() {
               onClick={() => setMenuOpen((open) => !open)}
               aria-expanded={menuOpen}
               aria-label={menuOpen ? t("navClose") : t("navMenu")}
-              className="inline-flex size-10 items-center justify-center rounded-full transition-colors hover:bg-[var(--nav-glass-hover)] md:hidden"
+              className="inline-flex size-10 items-center justify-center rounded-full transition-colors hover:bg-[var(--nav-glass-hover)] lg:hidden"
               style={{ color: "var(--nav-glass-ink)" }}
             >
               {menuOpen ? (
@@ -130,7 +137,7 @@ export function SiteNav() {
                 <Menu aria-hidden className="size-5" />
               )}
             </button>
-            <ul className="hidden items-center gap-1 md:flex">
+            <ul className="hidden items-center gap-1 lg:flex">
               {capstoneSections.map((section) => {
                 const active = isActive(section.href);
                 return (
@@ -139,7 +146,7 @@ export function SiteNav() {
                       href={section.href}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "rounded-full px-3.5 py-2 text-[15px] transition-colors",
+                        "flex h-9 items-center rounded-full px-3.5 text-[15px] transition-colors",
                         active && "font-semibold",
                       )}
                       style={
@@ -188,7 +195,7 @@ export function SiteNav() {
             <Link
               href="/home"
               aria-label={tw("header.account")}
-              className="hidden size-10 items-center justify-center rounded-full border transition-colors hover:bg-[var(--nav-glass-hover)] sm:inline-flex"
+              className="hidden size-10 items-center justify-center rounded-full border transition-colors hover:bg-[var(--nav-glass-hover)] lg:inline-flex"
               style={{
                 borderColor: "var(--nav-glass-line)",
                 color: "var(--nav-glass-ink)",
@@ -200,7 +207,7 @@ export function SiteNav() {
                 real onboarding/account flow replaces this in a later phase. */}
             <Link
               href="/home"
-              className="pl-nav-start hidden h-10 items-center rounded-full px-5 text-sm font-semibold transition-opacity hover:opacity-90 md:inline-flex"
+              className="pl-nav-start hidden h-10 items-center rounded-full px-5 text-sm font-semibold transition-opacity hover:opacity-90 lg:inline-flex"
             >
               {tw("header.getStarted")}
             </Link>
@@ -209,7 +216,7 @@ export function SiteNav() {
       </div>
 
       {menuOpen ? (
-        <div className="pl-glass-panel mx-4 mt-2 rounded-2xl p-3 md:hidden">
+        <div className="pl-glass-panel mx-4 mt-2 rounded-2xl p-3 lg:hidden">
           <p
             className="px-3 pb-2 pt-1 text-[11px] font-medium uppercase tracking-[0.14em]"
             style={{ color: "var(--nav-glass-muted)" }}

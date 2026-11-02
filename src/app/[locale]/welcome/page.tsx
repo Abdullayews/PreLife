@@ -44,11 +44,15 @@ export default async function WelcomePage({
         {/* Hero — full-bleed photo hero, the same scale as the module tabs */}
         <Spotlight />
 
-        {/* Stats strip */}
+        {/* Stats strip — reveals stagger left→right as the row enters
+            (scroll-driven, CSS-only; see .pl-reveal in globals.css). */}
         <section className="mx-auto w-full max-w-6xl px-4 py-12 md:px-8 md:py-16">
           <ul className="grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
-            {STAT_KEYS.map((key) => (
-              <li key={key}>
+            {STAT_KEYS.map((key, i) => (
+              <li
+                key={key}
+                className={`pl-reveal pl-reveal-d${i + 1}`}
+              >
                 <p className="text-2xl font-bold tracking-tight md:text-4xl">
                   {t(`stats.items.${key}.value`)}
                 </p>
@@ -73,10 +77,13 @@ export default async function WelcomePage({
               {t("modules.subtitle")}
             </p>
             <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {sections.map((s) => {
+              {sections.map((s, i) => {
                 const Icon = s.icon;
                 return (
-                  <li key={s.id} className="h-full">
+                  <li
+                    key={s.id}
+                    className={`pl-reveal pl-reveal-d${i + 1} h-full`}
+                  >
                     <Card className="group h-full gap-4 py-6 transition-colors hover:border-foreground/25">
                       <CardContent className="flex h-full flex-col">
                         <span
@@ -91,7 +98,7 @@ export default async function WelcomePage({
                         <h3 className="mt-4 font-semibold">
                           {t(`modules.cards.${s.id}.name`)}
                         </h3>
-                        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
+                        <p className="mt-1.5 text-sm leading-6 text-muted-foreground">
                           {t(`modules.cards.${s.id}.tagline`)}
                         </p>
                         <Link
@@ -124,14 +131,14 @@ export default async function WelcomePage({
             </h2>
             <ul className="mt-10 grid gap-8 md:grid-cols-3 md:gap-10">
               {REASON_KEYS.map((key) => (
-                <li key={key} className="border-t border-border pt-6">
+                <li key={key} className="pl-reveal border-t border-border pt-6">
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                     {t(`reasons.items.${key}.label`)}
                   </p>
                   <h3 className="mt-3 text-lg font-semibold">
                     {t(`reasons.items.${key}.title`)}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
                     {t(`reasons.items.${key}.text`)}
                   </p>
                 </li>
@@ -142,47 +149,52 @@ export default async function WelcomePage({
 
         {/* Get started band — Ultrahuman-style contrast card. Always dark:
             .pl-contrast-band tokens keep the ink surface in both modes
-            (bg-foreground would flip to a bright slab in dark mode). */}
-        <section id="get-started" className="scroll-mt-24 px-4 py-16 md:px-8">
-          <div className="pl-contrast-band relative mx-auto max-w-6xl overflow-hidden rounded-3xl p-8 text-center md:p-14">
-            {sections.map((s, i) => (
-              <div
-                key={s.id}
-                aria-hidden="true"
-                className="pl-glow absolute size-80 rounded-full opacity-25"
-                style={{
-                  /* Soft gradient glow — a blur(90px) filter would re-render
-                      every frame of the drift; a radial gradient is free. */
-                  background: `radial-gradient(circle, ${s.accent} 0%, transparent 70%)`,
-                  ...(i === 0
-                    ? { top: "-5rem", left: "-5rem" }
-                    : i === 1
-                      ? { bottom: "-5rem", left: "25%" }
-                      : i === 2
-                        ? { top: "-5rem", right: "25%" }
-                        : { bottom: "-5rem", right: "-5rem" }),
-                }}
-              />
-            ))}
-            <div className="relative">
-              <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
-                {t("cta.title")}
-              </h2>
-              <p className="mx-auto mt-3 max-w-md text-(--contrast-ink-soft)">
-                {t("cta.text")}
-              </p>
-              <div className="mt-8 flex justify-center">
-                {/* Bone pill on the ink band in BOTH modes — the themed
-                    secondary surface would sink into the dark band. The
-                    explicit hover bg cancels the variant's hover tint. */}
-                <StartCta
-                  variant="secondary"
-                  className="h-12 rounded-full bg-(--contrast-ink) px-8 text-base font-semibold text-(--contrast-bg) hover:bg-(--contrast-ink) hover:brightness-110"
+            (bg-foreground would flip to a bright slab in dark mode). The
+            card rides the SAME container as the sections above (max-w-6xl
+            + page gutters) so its left edge lines up with their content,
+            and reveals as it enters the viewport. */}
+        <section id="get-started" className="scroll-mt-24">
+          <div className="mx-auto w-full max-w-6xl px-4 py-16 md:px-8">
+              <div className="pl-contrast-band pl-reveal relative overflow-hidden rounded-3xl p-8 text-center md:p-14">
+              {sections.map((s, i) => (
+                <div
+                  key={s.id}
+                  aria-hidden="true"
+                  className="pl-glow absolute size-80 rounded-full opacity-25"
+                  style={{
+                    /* Soft gradient glow — a blur(90px) filter would re-render
+                        every frame of the drift; a radial gradient is free. */
+                    background: `radial-gradient(circle, ${s.accent} 0%, transparent 70%)`,
+                    ...(i === 0
+                      ? { top: "-5rem", left: "-5rem" }
+                      : i === 1
+                        ? { bottom: "-5rem", left: "25%" }
+                        : i === 2
+                          ? { top: "-5rem", right: "25%" }
+                          : { bottom: "-5rem", right: "-5rem" }),
+                  }}
                 />
+              ))}
+              <div className="relative">
+                <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
+                  {t("cta.title")}
+                </h2>
+                <p className="mx-auto mt-3 max-w-md text-(--contrast-ink-soft)">
+                  {t("cta.text")}
+                </p>
+                <div className="mt-8 flex justify-center">
+                  {/* Bone pill on the ink band in BOTH modes — the themed
+                      secondary surface would sink into the dark band. The
+                      explicit hover bg cancels the variant's hover tint. */}
+                  <StartCta
+                    variant="secondary"
+                    className="h-12 min-w-56 rounded-full bg-(--contrast-ink) px-8 text-base font-semibold text-(--contrast-bg) hover:bg-(--contrast-ink) hover:brightness-110"
+                  />
+                </div>
+                <p className="mt-4 text-xs text-(--contrast-ink-faint)">
+                  {t("cta.note")}
+                </p>
               </div>
-              <p className="mt-4 text-xs text-(--contrast-ink-faint)">
-                {t("cta.note")}
-              </p>
             </div>
           </div>
         </section>

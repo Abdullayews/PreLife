@@ -15,12 +15,13 @@ import { libraryHeroImage } from "@/lib/content/library";
  * module worlds rotate behind the Warm Bone / Espresso Night scrims, so
  * "One platform, four worlds" is literally what the background cycles
  * through. The copy sits straight on the scrimmed photo — no panel, no
- * border, just the words — anchored to the LEFT EDGE of the fold (the
- * full-bleed gutters, not the centered 6xl column the sections below
- * use) and lifted clear of the bottom band where the switcher's centered
- * dot pill lives (pb-16 — never flush with the bottom). Scrims and ink
- * come from the shared --hero-* / --on-hero-* tokens (.pl-theme-welcome),
- * so the whole hero re-tints when the theme toggle flips .dark.
+ * border, just the words — anchored to the SAME left edge the nav bar's
+ * content uses (px-4 / sm:px-6, one chrome gutter shared by both) and
+ * lifted clear of the bottom band where the switcher's centered dot pill
+ * lives (pb-24 while the CTA row can wrap below xl, pb-16 from xl up —
+ * never flush). Scrims and ink come from the shared --hero-* /
+ * --on-hero-* tokens (.pl-theme-welcome), so the whole hero re-tints
+ * when the theme toggle flips .dark.
  */
 
 /* Frame one is the four-worlds still life (the landing banner); then one
@@ -62,10 +63,10 @@ export async function Spotlight() {
       />
 
       {/* Copy: no panel — the words sit straight on the scrimmed photo,
-          anchored to the fold's LEFT edge and lifted clear of the bottom
-          band the centered dot pill lives in (pb-16 — never flush). */}
-      <div className="flex min-h-[88svh] w-full flex-col justify-end px-5 pb-16 pt-28 sm:px-8 md:px-12">
-        <div className="pl-slide-up max-w-xl">
+          aligned to the nav bar's left edge (one chrome gutter) and lifted
+          clear of the bottom band the centered dot pill lives in. */}
+      <div className="flex min-h-[88svh] w-full flex-col justify-end px-4 pb-24 pt-28 md:px-6 xl:pb-16">
+        <div className="max-w-xl">
           <p
             className="pl-slide-up pl-d2 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.3em]"
             style={{ color: "var(--on-hero-muted)" }}
@@ -78,13 +79,13 @@ export async function Spotlight() {
             {t("eyebrow")}
           </p>
           <h1
-            className="pl-display pl-slide-up pl-d3 mt-4 text-4xl font-black leading-[1.02] tracking-[-0.02em] sm:text-5xl md:text-6xl"
+            className="pl-display pl-slide-up pl-d3 mt-4 text-balance text-4xl font-black leading-10 tracking-[-0.02em] sm:text-5xl sm:leading-[52px] md:text-6xl md:leading-[64px]"
             style={{ color: "var(--on-hero)" }}
           >
             {t("title")}
           </h1>
           <p
-            className="pl-slide-up pl-d4 mt-4 max-w-md text-sm leading-relaxed md:text-base"
+            className="pl-slide-up pl-d4 mt-4 max-w-md text-sm leading-6 md:text-base md:leading-relaxed"
             style={{ color: "var(--on-hero-muted)" }}
           >
             {t("subtitle")}
@@ -99,7 +100,7 @@ export async function Spotlight() {
                 <Badge
                   key={s.id}
                   variant="secondary"
-                  className="gap-1.5 px-2.5 py-1 text-xs sm:px-3 sm:text-sm"
+                  className="h-7 gap-1.5 px-3 text-xs sm:h-8 sm:text-sm"
                   style={{
                     backgroundColor: "var(--on-hero-fill)",
                     borderColor: "var(--on-hero-border)",
@@ -117,13 +118,15 @@ export async function Spotlight() {
             })}
           </div>
 
+          {/* CTAs share one even width (min-w-56) so the pair reads as a
+              matched set when they stack on narrow screens. */}
           <div className="pl-slide-up pl-d5 mt-7 flex flex-wrap items-center gap-3">
-            <StartCta className="h-12 rounded-full px-8 text-base font-semibold hover:brightness-110" />
+            <StartCta className="h-12 min-w-56 rounded-full px-8 text-base font-semibold hover:brightness-110" />
             <Button
               asChild
               variant="ghost"
               size="lg"
-              className="pl-hero-ghost h-12 rounded-full border px-7 text-base font-medium transition-colors"
+              className="pl-hero-ghost h-12 min-w-56 rounded-full border px-7 text-base font-medium transition-colors"
               style={{
                 borderColor: "var(--on-hero-border)",
                 backgroundColor: "var(--on-hero-fill)",
