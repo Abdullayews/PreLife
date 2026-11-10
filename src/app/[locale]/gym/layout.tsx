@@ -32,7 +32,7 @@ export default function GymLayout({ children }: { children: ReactNode }) {
       data-module="gym"
       className="pl-theme-gym flex flex-1 flex-col bg-background text-foreground"
     >
-      {/* The shared site nav (components/site-nav.tsx) serves gym too -
+      {/* The shared site nav (components/Nav.tsx) serves gym too -
           globals.css retints its glass via body:has(). */}
       <style>{gymStyles}</style>
       {children}

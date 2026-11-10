@@ -1,18 +1,24 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { WorldPage } from "@/components/WorldPage";
-import { worlds } from "@/lib/worlds";
+import { UnderConstruction } from "@/components/UnderConstruction";
+import { requireUser } from "@/lib/auth";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: worlds.meditation.ns });
+  const t = await getTranslations({ locale, namespace: "meditationHome" });
   return { title: t("metaTitle"), description: t("metaDescription") };
 }
 
-export default async function Page({ params }: Props) {
+export default async function MeditationPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <WorldPage slug="meditation" locale={locale} />;
+  await requireUser(locale, "/meditation");
+
+  return (
+    <div data-world="meditation" className="world page">
+      <UnderConstruction locale={locale} />
+    </div>
+  );
 }

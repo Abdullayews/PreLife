@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowRight, Crown } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { RequireActive } from "@/components/Funnel";
 import { sections, sectionById, type SectionId } from "@/lib/shell";
+import { requireUser } from "@/lib/auth";
 
 type Props = { params: Promise<{ locale: string }> };
 const PICKS: { key: string; section: SectionId }[] = [
@@ -21,12 +21,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  // Server-side guard: no account → login page, never the home menu.
+  await requireUser(locale, "/home");
   const t = await getTranslations({ locale, namespace: "homePage" });
   const tm = await getTranslations({ locale, namespace: "welcomePage.modules" });
 
   return (
     <div data-world="shell" className="world page">
-      <RequireActive />
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow">{t("tagline")}</p>

@@ -3,9 +3,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Gallery } from "@/components/Gallery";
-import { SkipIfActive, StartButton } from "@/components/Funnel";
+import { StartButton } from "@/components/StartButton";
 import { sections } from "@/lib/shell";
 import { landingFrames } from "@/lib/worlds";
+import { getSessionUser } from "@/lib/auth";
 
 type Props = { params: Promise<{ locale: string }> };
 const STATS = ["exercises", "recipes", "sessions", "books"] as const;
@@ -22,11 +23,11 @@ export default async function WelcomePage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "welcomePage" });
   const tc = await getTranslations({ locale, namespace: "moduleCommon" });
+  // Signed-in visitors are welcome here too — no forced redirect anymore.
+  const user = await getSessionUser();
 
   return (
     <div data-world="shell" className="world">
-      <SkipIfActive />
-
       <section className="hero" aria-label={t("hero.ariaLabel")}>
         <Gallery images={landingFrames.map((f) => f.src)} positions={landingFrames.map((f) => f.pos)} label={tc("galleryLabel")} />
         <div className="hero-scrim" aria-hidden />
@@ -36,7 +37,7 @@ export default async function WelcomePage({ params }: Props) {
             <h1 className="display rise d1">{t("hero.title")}</h1>
             <p className="lede rise d2">{t("hero.subtitle")}</p>
             <div className="actions rise d3">
-              <StartButton className="btn btn-lg" />
+              <StartButton className="btn btn-lg" signedIn={!!user} />
               <a className="btn btn-lg btn-ghost" href="#modules">{t("hero.seeAll")}</a>
             </div>
             <ul className="chips rise d3">
@@ -108,7 +109,7 @@ export default async function WelcomePage({ params }: Props) {
           <div className="cta rv">
             <h2 className="h2">{t("cta.title")}</h2>
             <p>{t("cta.text")}</p>
-            <StartButton className="btn btn-lg btn-light" />
+            <StartButton className="btn btn-lg btn-light" signedIn={!!user} />
             <small>{t("cta.note")}</small>
           </div>
         </div>

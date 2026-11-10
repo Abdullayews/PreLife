@@ -1,18 +1,24 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { WorldPage } from "@/components/WorldPage";
-import { worlds } from "@/lib/worlds";
+import { UnderConstruction } from "@/components/UnderConstruction";
+import { requireUser } from "@/lib/auth";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: worlds.diet.ns });
+  const t = await getTranslations({ locale, namespace: "dietHome" });
   return { title: t("metaTitle"), description: t("metaDescription") };
 }
 
-export default async function Page({ params }: Props) {
+export default async function DietPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <WorldPage slug="diet" locale={locale} />;
+  await requireUser(locale, "/diet");
+
+  return (
+    <div data-world="diet" className="world page">
+      <UnderConstruction locale={locale} />
+    </div>
+  );
 }
