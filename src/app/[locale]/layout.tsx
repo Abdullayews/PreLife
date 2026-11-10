@@ -3,9 +3,12 @@ import type { ReactNode } from "react";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { routing } from "@/i18n/routing";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
+import { CookieConsent } from "@/components/CookieConsent";
+import { getSessionUser } from "@/lib/auth";
 import { THEME_KEY } from "@/lib/shell";
 import "../globals.css";
 
@@ -18,8 +21,11 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-/** First visit follows the OS; a saved manual choice always wins. Runs before paint. */
-const themeScript = `try{var s=localStorage.getItem('${THEME_KEY}');if(s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}`;
+/** White is the default; only an explicit saved "dark" choice applies dark
+ *  mode. Runs before paint, and the toggle persists every manual change. */
+const themeScript = `try{if(localStorage.getItem('${THEME_KEY}')==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
+
+const CONSENT_COOKIE = "pl_cookies";
 
 export default async function LocaleLayout({
   children, params,
@@ -27,12 +33,16 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
 
+  const [user, cookieStore, all] = await Promise.all([getSessionUser(), cookies(), getMessages()]);
+
   // Only the namespaces client components read are shipped to the browser.
-  const all = await getMessages();
   const client = {
     moduleCommon: all.moduleCommon,
     welcomePage: all.welcomePage,
     sections: all.sections,
+    authPage: all.authPage,
+    accountMenu: all.accountMenu,
+    cookieBar: all.cookieBar,
   };
 
   return (
@@ -42,9 +52,10 @@ export default async function LocaleLayout({
       </head>
       <body>
         <NextIntlClientProvider messages={client}>
-          <Nav />
+          <Nav user={user ? { name: user.name, email: user.email } : null} />
           <main>{children}</main>
           <Footer />
+          <CookieConsent initialAccepted={cookieStore.get(CONSENT_COOKIE)?.value === "1"} />
         </NextIntlClientProvider>
       </body>
     </html>

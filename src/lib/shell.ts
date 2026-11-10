@@ -26,6 +26,5 @@ export const sections: readonly Section[] = [
 export const sectionById = (id: SectionId) => sections.find((s) => s.id === id)!;
 export const sectionBySlug = (slug: WorldSlug) => sections.find((s) => s.slug === slug)!;
 
-/** Browser-storage keys — kept identical to the previous build. */
-export const ACCOUNT_FLAG = "prelife.account-active";
+/** Browser-storage keys. */
 export const THEME_KEY = "pl-theme";

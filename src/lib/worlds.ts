@@ -7,10 +7,9 @@ import {
 
 /**
  * One typed description per content "world" (gym, diet, meditation, library).
- * All four routes render through the same <WorldPage>; this file holds only
- * structure, numbers, schedule matrices and media. Every visible string is a
- * key into the world's message namespace (messages/*.json) — nothing is
- * written here.
+ * This file holds only structure, numbers, schedule matrices and media.
+ * Every visible string is a key into the world's message namespace
+ * (messages/*.json) — nothing is written here.
  */
 export type WorldSlug = "gym" | "diet" | "meditation" | "library";
 export type Level = "beginner" | "intermediate" | "advanced";

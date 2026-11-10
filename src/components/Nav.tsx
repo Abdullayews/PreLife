@@ -2,26 +2,21 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Menu, User, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { sections } from "@/lib/shell";
 import { ThemeToggle } from "./ThemeToggle";
+import { UserMenu, type MenuUser } from "./UserMenu";
 
 /**
- * PreLife site navigation — the ORIGINAL Ultrahuman shrink bar, wearing
- * the rewrite's palette. At the top of the page it is a full-bleed solid
- * strip (4rem, edge-to-edge, square corners, painted in --bg so it
- * disappears into the page); once the page scrolls past 24px the
- * wrapper's padding animates to (max(0.75rem,5vw) / pt-3) while the bar
- * morphs into a smaller floating frosted-glass pill. The material itself
- * is painted on a ::before layer (see globals.css).
- *
- * Layout follows the Ultrahuman bar: burger + section links LEFT (Gym,
- * Diet, Psychology, Books), wordmark CENTER (absolute, pill-centered),
- * and the right cluster carries the language switcher (sm+), the
- * dark/light toggle, the account icon and the "Get started" pill (lg+).
- * All bar controls sit on the 4px grid: links h-9, controls h-10.
+ * PreLife site navigation — the Ultrahuman shrink bar.
+ * Layout: burger LEFT (below xl), wordmark CENTER, and on the RIGHT TOP
+ * every main tab gets its own button (Gym, Diet, Psychology, Books,
+ * Subscription) — clicking one switches the UI to that main page.
+ * The right cluster also carries the language segment (xl+), the theme
+ * toggle, and either the account menu (signed in) or Sign in / Get
+ * started (signed out).
  */
 
 function LocaleSwitch({ className = "" }: { className?: string }) {
@@ -45,10 +40,11 @@ function LocaleSwitch({ className = "" }: { className?: string }) {
   );
 }
 
-export function Nav() {
+export function Nav({ user }: { user: MenuUser | null }) {
   const t = useTranslations("moduleCommon");
   const th = useTranslations("welcomePage");
   const ts = useTranslations("sections");
+  const ta = useTranslations("accountMenu");
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -63,12 +59,14 @@ export function Nav() {
 
   const on = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
+  // Every main tab in display order — gym first, matching the welcome page.
+  const tabs = [
+    ...sections.map((s) => ({ href: s.href as string, label: ts(`${s.id}.name`) })),
+    { href: "/subscription", label: th("header.drawerSubscription") },
+  ];
+
   return (
     <header className="nav" data-scrolled={scrolled}>
-      {/* The Ultrahuman shrink: the wrapper's padding (0 at the top of
-          the page → max(0.75rem,5vw) + pt-3 when scrolled) is what pulls
-          the full-bleed bar inward; the bar itself only trades its square
-          corners and solid fill for the glass pill material. */}
       <div className="nav-shrink">
         <div className="nav-pill">
           <div className="nav-side">
@@ -81,32 +79,37 @@ export function Nav() {
             >
               {open ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
             </button>
-            <ul className="nav-links">
-              {sections.map((s) => (
-                <li key={s.id}>
-                  <Link href={s.href} aria-current={on(s.href) ? "page" : undefined}>
-                    {ts(`${s.id}.name`)}
+            <Link href={user ? "/home" : "/welcome"} aria-label={t("navHome")} className="brand">
+              Pre<em>Life</em>
+            </Link>
+          </div>
+
+          <div className="nav-tools">
+            <ul className="nav-tabs">
+              {tabs.map((tab) => (
+                <li key={tab.href}>
+                  <Link href={tab.href} aria-current={on(tab.href) ? "page" : undefined}>
+                    {tab.label}
                   </Link>
                 </li>
               ))}
             </ul>
-          </div>
 
-          <Link href="/welcome" aria-label={t("navHome")} className="brand">
-            Pre<em>Life</em>
-          </Link>
-
-          <div className="nav-tools">
-            <LocaleSwitch className="hide-sm" />
+            <LocaleSwitch className="nav-lang" />
             <ThemeToggle />
-            <Link href="/home" aria-label={th("header.account")} className="icon-btn nav-account hide-md">
-              <User size={18} strokeWidth={1.5} aria-hidden />
-            </Link>
-            {/* TEST-ONLY (per user): Get started opens Home directly — the
-                real onboarding/account flow replaces this in a later phase. */}
-            <Link href="/home" className="nav-start hide-md">
-              {th("header.getStarted")}
-            </Link>
+
+            {user ? (
+              <UserMenu user={user} />
+            ) : (
+              <>
+                <Link href="/login" className="nav-signin">
+                  {ta("signIn")}
+                </Link>
+                <Link href="/signup" className="nav-start hide-md">
+                  {th("header.getStarted")}
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -115,10 +118,15 @@ export function Nav() {
         <div className="nav-panel">
           <p className="eyebrow">{th("header.drawerSectionsLabel")}</p>
           <ul className="panel-links">
-            {sections.map((s) => (
-              <li key={s.id}>
-                <Link href={s.href} aria-current={on(s.href) ? "page" : undefined}>
-                  {ts(`${s.id}.name`)}
+            <li>
+              <Link href="/home" aria-current={on("/home") ? "page" : undefined}>
+                {th("tabs.home")}
+              </Link>
+            </li>
+            {tabs.map((tab) => (
+              <li key={tab.href}>
+                <Link href={tab.href} aria-current={on(tab.href) ? "page" : undefined}>
+                  {tab.label}
                 </Link>
               </li>
             ))}
@@ -126,21 +134,23 @@ export function Nav() {
           <p className="eyebrow panel-sep">{th("header.drawerPlatformLabel")}</p>
           <ul className="panel-links">
             <li>
-              <Link href="/home" aria-current={on("/home") ? "page" : undefined}>
-                {th("tabs.home")}
-              </Link>
+              <Link href="/terms">{ta("terms")}</Link>
             </li>
             <li>
-              <Link href="/subscription" aria-current={on("/subscription") ? "page" : undefined}>
-                {th("header.drawerSubscription")}
-              </Link>
+              <Link href="/rules">{ta("rules")}</Link>
             </li>
           </ul>
           <div className="panel-row">
             <LocaleSwitch />
-            <Link href="/home" onClick={() => setOpen(false)} className="nav-start">
-              {th("header.getStarted")}
-            </Link>
+            {user ? (
+              <Link href="/home" onClick={() => setOpen(false)} className="nav-start">
+                {th("tabs.home")}
+              </Link>
+            ) : (
+              <Link href="/signup" onClick={() => setOpen(false)} className="nav-start">
+                {th("header.getStarted")}
+              </Link>
+            )}
           </div>
         </div>
       )}
