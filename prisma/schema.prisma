@@ -1,13 +1,15 @@
-// This is your Prisma schema file,
-// learn about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma 7 schema. The connection URL lives in prisma.config.ts (CLI)
+// and in the PrismaClient adapter (runtime, src/lib/db.ts) — the schema
+// only declares the provider. Client code is generated to
+// src/generated/prisma by `bun run db:push` / `bun run db:generate`.
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
 }
 
 model User {
