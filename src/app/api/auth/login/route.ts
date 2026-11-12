@@ -27,7 +27,8 @@ export async function POST(req: Request) {
       secure: process.env.NODE_ENV === "production",
     });
     return res;
-  } catch {
+  } catch (err) {
+    console.error("[login]", err);
     return NextResponse.json({ error: "generic" }, { status: 500 });
   }
 }

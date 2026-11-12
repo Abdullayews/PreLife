@@ -2,10 +2,13 @@
   "name": "prelife",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20.19"
+  },
   "scripts": {
     "dev": "next dev -p 3000 2>&1 | tee dev.log",
-    "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
-    "start": "NODE_ENV=production bun .next/standalone/server.js 2>&1 | tee server.log",
+    "build": "prisma generate && next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
+    "start": "prisma db push && NODE_ENV=production HOSTNAME=0.0.0.0 node .next/standalone/server.js",
     "lint": "eslint .",
     "db:push": "prisma db push --accept-data-loss && prisma generate",
     "db:generate": "prisma generate",
@@ -13,29 +16,29 @@
     "db:reset": "prisma migrate reset"
   },
   "dependencies": {
-    "@prisma/adapter-better-sqlite3": "^7.10.1",
+    "@prisma/adapter-better-sqlite3": "7.10.1",
     "@prisma/client": "7.10.1",
-    "lucide-react": "1.72.0",
-    "next": "16.4.6",
-    "next-intl": "4.15.1",
-    "react": "19.3.1",
-    "react-dom": "19.3.1"
-  },
-  "devDependencies": {
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "dotenv": "18.0.10",
-    "eslint": "10.14.0",
-    "eslint-config-next": "16.4.6",
+    "lucide-react": "1.72.0",
+    "next": "16.4.6",
+    "next-intl": "4.15.1",
     "prisma": "7.10.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "typescript": "5.9.3"
   },
-  "trustedDependencies": [
-    "@parcel/watcher",
-    "@prisma/engines",
-    "@swc/core",
-    "better-sqlite3",
-    "prisma",
-    "unrs-resolver"
-  ]
+  "devDependencies": {
+    "eslint": "10.14.0",
+    "eslint-config-next": "16.4.6"
+  },
+  "allowScripts": {
+    "better-sqlite3": true,
+    "@prisma/engines": true,
+    "@parcel/watcher": true,
+    "@swc/core": true,
+    "prisma": true,
+    "unrs-resolver": true
+  }
 }

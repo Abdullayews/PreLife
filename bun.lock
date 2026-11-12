@@ -5,33 +5,25 @@
     "": {
       "name": "nextjs_tailwind_shadcn_ts",
       "dependencies": {
-        "@prisma/adapter-better-sqlite3": "^7.10.1",
+        "@prisma/adapter-better-sqlite3": "7.10.1",
         "@prisma/client": "7.10.1",
-        "lucide-react": "1.72.0",
-        "next": "16.4.6",
-        "next-intl": "4.15.1",
-        "react": "19.3.1",
-        "react-dom": "19.3.1",
-      },
-      "devDependencies": {
         "@types/react": "19.3.0",
         "@types/react-dom": "19.3.0",
         "dotenv": "18.0.10",
+        "lucide-react": "1.72.0",
+        "next": "16.4.6",
+        "next-intl": "4.15.1",
+        "prisma": "7.10.1",
+        "react": "19.3.1",
+        "react-dom": "19.3.1",
+        "typescript": "5.9.3",
+      },
+      "devDependencies": {
         "eslint": "10.14.0",
         "eslint-config-next": "16.4.6",
-        "prisma": "7.10.1",
-        "typescript": "5.9.3",
       },
     },
   },
-  "trustedDependencies": [
-    "unrs-resolver",
-    "better-sqlite3",
-    "@prisma/engines",
-    "prisma",
-    "@swc/core",
-    "@parcel/watcher",
-  ],
   "packages": {
     "@babel/code-frame": ["@babel/code-frame@7.28.6", "https://registry.npmjs.com/@babel/code-frame/-/code-frame-7.28.6.tgz", { "dependencies": { "@babel/helper-validator-identifier": "^7.28.5", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-JYgintcMjRiCvS8mMECzaEn+m3PfoQiyqukOMCCVQtoJGYJw8j/8LBJEiqkHLkfwCcs74E3pbAUFNg7d9VNJ+Q=="],
 
