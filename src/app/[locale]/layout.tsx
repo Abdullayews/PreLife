@@ -15,6 +15,7 @@ import "../globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://prelife.net"),
   title: { default: "PreLife", template: "%s | PreLife" },
+  icons: { icon: "/logo.svg" },
 };
 
 export function generateStaticParams() {

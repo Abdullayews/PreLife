@@ -1,26 +1,41 @@
-# PreLife (frontend rewrite)
+# PreLife
 
-Rewrite of https://github.com/Abdullayews/PreLife at commit `9be5d29`
-("fix: pixel-audit pass — nav track, one grid, integer rhythm").
+Next.js rewrite of https://github.com/Abdullayews/PreLife — one product, four
+worlds: **Gym, Diet, Psychology, Books** (+ Subscription).
 
-Preserved: routes (`/[locale]/{welcome,home,gym,diet,meditation,library,subscription,ui}`,
-locales `az` / `en` / `ru`, default `en`), `messages/*.json` rendered verbatim, per-module
-day/night theming, photo hero galleries (dots only, 30 s autoplay, crossfade),
-CSS-only motion with `prefers-reduced-motion` handling, storage keys
-(`pl-theme`, `prelife.account-active`) and the welcome → home funnel stub.
+## Routes
 
-Rebuilt: layout, components and visual design.
+Locales `az` / `en` / `ru` (default `en`), prefixed: `/en/…`.
 
-- No Tailwind / Radix / shadcn: one hand-written stylesheet (`src/app/globals.css`).
-- Dependencies: next, react, next-intl, lucide-react.
-- One `WorldPage` template renders all four modules from `src/lib/worlds.ts`.
-- Client bundle receives only the message namespaces it uses.
+| Surface | Route | Access |
+| --- | --- | --- |
+| Marketing home | `/welcome` | public |
+| Section pages | `/welcome/gym`, `/welcome/diet`, `/welcome/psychology`, `/welcome/books` | public |
+| App home | `/home` | sign-in required |
+| App sections | `/gym`, `/diet`, `/meditation`, `/library` | sign-in required (content to be written) |
+| Subscription | `/subscription` | sign-in required |
+| Auth | `/login`, `/signup` | public |
+| Legal | `/terms`, `/rules` | public |
+
+
+## Stack
+
+- Next.js 16 (App Router) + React 19 + TypeScript
+- next-intl for routing/translations (`messages/*.json`)
+- Prisma + SQLite (single `User` model, cookie sessions)
+- One hand-written design system (`src/app/globals.css`) — per-module palettes
+  via `data-world`, dark mode via `.dark` on `<html>`
+- One `WorldPage` template renders all four public section pages from
+  `src/lib/worlds.ts`; the client bundle receives only the message namespaces
+  it uses
+
+## Develop
 
 ```
-npm install
-npm run dev        # http://localhost:3000
-npm run build && npm start
+bun install                # or npm install
+cp .env.example .env       # SQLite file lives in db/
+bun run db:push            # create the database
+bun run dev                # http://localhost:3000
 ```
 
-Not carried over: `scripts/build-messages.mjs` and the per-locale message generators.
-`messages/*.json` are copied as generated; re-add the scripts if you still edit copy through them.
+`/` redirects to `/welcome` in the default locale.
