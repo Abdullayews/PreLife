@@ -42,9 +42,10 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
     };
   }, [accepted]);
 
-  // Keep the locale cookie in sync for consented visitors who arrive on a
-  // different language than the one remembered (e.g. following a shared
-  // /ru link) — their latest visited language is the one that sticks.
+  // Keep the locale cookie persistent for consented visitors. next-intl's
+  // middleware re-syncs NEXT_LOCALE as a *session* cookie whenever the URL
+  // locale differs from the stored one (e.g. opening a shared /az link),
+  // which would silently downgrade the remembered choice.
   useEffect(() => {
     if (accepted) persistLocale(locale);
   }, [accepted, locale]);
