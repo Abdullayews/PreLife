@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { worlds } from "@/lib/worlds";
+import { worlds, type WorldSlug } from "@/lib/worlds";
 import { sections } from "@/lib/shell";
 import { WorldPage } from "@/components/WorldPage";
 

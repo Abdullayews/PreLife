@@ -89,6 +89,10 @@ export async function requireUser(locale: string, next?: string): Promise<Sessio
   const user = await getSessionUser();
   if (!user) {
     redirect({ href: next ? `/login?next=${encodeURIComponent(next)}` : "/login", locale });
+    // redirect() throws NEXT_REDIRECT in server components, so `user` is
+    // never null past this point. The assertion only satisfies plain tsc,
+    // which resolves next-intl's *client* redirect type (void, not never).
+    throw new Error("unreachable");
   }
   return user;
 }
