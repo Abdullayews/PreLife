@@ -70,3 +70,6 @@ server.log
 /scripts/qa/
 /worklog.md
 /scripts/gh_check.py
+# runtime state (seeded idempotently at runtime)
+db/*.db
+.zscripts/dev.pid

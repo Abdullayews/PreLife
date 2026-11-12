@@ -132,7 +132,9 @@ export function Nav({ user }: { user: MenuUser | null }) {
             </>
           ) : (
             <>
-              {/* ── Welcome bar (previous version): links LEFT, wordmark CENTER ── */}
+              {/* ── Welcome bar (previous version): links LEFT, wordmark CENTER.
+                  The section links open the PUBLIC marketing pages under
+                  /welcome/<slug> — no account needed. ── */}
               <div className="nav-side">
                 <button
                   type="button"
@@ -146,7 +148,7 @@ export function Nav({ user }: { user: MenuUser | null }) {
                 <ul className="nav-links">
                   {sections.map((s) => (
                     <li key={s.id}>
-                      <Link href={s.href} aria-current={on(s.href) ? "page" : undefined}>
+                      <Link href={s.welcomeHref} aria-current={on(s.welcomeHref) ? "page" : undefined}>
                         {ts(`${s.id}.name`)}
                       </Link>
                     </li>
@@ -228,7 +230,7 @@ export function Nav({ user }: { user: MenuUser | null }) {
               <ul className="panel-links">
                 {sections.map((s) => (
                   <li key={s.id}>
-                    <Link href={s.href} aria-current={on(s.href) ? "page" : undefined}>
+                    <Link href={s.welcomeHref} aria-current={on(s.welcomeHref) ? "page" : undefined}>
                       {ts(`${s.id}.name`)}
                     </Link>
                   </li>
