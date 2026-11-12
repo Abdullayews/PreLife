@@ -43,7 +43,7 @@ export default async function WelcomePage({ params }: Props) {
             <ul className="chips rise d3">
               {sections.map((s) => (
                 <li key={s.id}>
-                  <Link href={s.href}><s.icon size={14} aria-hidden />{t(`hero.chips.${s.id}`)}</Link>
+                  <Link href={s.welcomeHref}><s.icon size={14} aria-hidden />{t(`hero.chips.${s.id}`)}</Link>
                 </li>
               ))}
             </ul>
@@ -74,7 +74,7 @@ export default async function WelcomePage({ params }: Props) {
           <ul className="cards4">
             {sections.map((s) => (
               <li key={s.id} className="rv">
-                <Link href={s.href} className="card" style={{ "--c": s.color } as React.CSSProperties}>
+                <Link href={s.welcomeHref} className="card" style={{ "--c": s.color } as React.CSSProperties}>
                   <span className="chip-ico tinted"><s.icon size={20} aria-hidden /></span>
                   <h3>{t(`modules.cards.${s.id}.name`)}</h3>
                   <p>{t(`modules.cards.${s.id}.tagline`)}</p>
