@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { THEME_KEY } from "@/lib/shell";
-import { acceptCookies, persistLocale } from "@/lib/consent";
+import { acceptCookies, persistLocale, setThemeChoice } from "@/lib/consent";
 
 /**
  * Cookie consent bar — fixed to the bottom of every page until the
@@ -42,10 +41,9 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
     };
   }, [accepted]);
 
-  // Keep the locale cookie persistent for consented visitors. next-intl's
-  // middleware re-syncs NEXT_LOCALE as a *session* cookie whenever the URL
-  // locale differs from the stored one (e.g. opening a shared /az link),
-  // which would silently downgrade the remembered choice.
+  // Keep the locale cookie in sync for consented visitors who arrive on a
+  // different language than the one remembered (e.g. following a shared
+  // /ru link) — their latest visited language is the one that sticks.
   useEffect(() => {
     if (accepted) persistLocale(locale);
   }, [accepted, locale]);
@@ -55,12 +53,9 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
   const accept = () => {
     try {
       acceptCookies();
-      // Promote this visit's choices to persistent storage.
-      try {
-        const dark = document.documentElement.classList.contains("dark");
-        localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
-        sessionStorage.removeItem(THEME_KEY);
-      } catch { /* storage unavailable */ }
+      // Promote this visit's choices to persistent storage. The consent
+      // cookie is set now, so setThemeChoice also writes localStorage.
+      setThemeChoice(document.documentElement.classList.contains("dark"));
       persistLocale(locale);
     } catch {
       /* storage unavailable — hide for this visit anyway */

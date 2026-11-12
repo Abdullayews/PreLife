@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { THEME_KEY } from "@/lib/shell";
+import { THEME_KEY, getVisitTheme } from "@/lib/consent";
 
 /**
  * Keeps the dark-mode class on <html> alive across React re-renders.
@@ -11,21 +11,25 @@ import { THEME_KEY } from "@/lib/shell";
  * whenever the root element re-renders — most visibly when the language
  * switches (the <html lang> attribute changes), which silently dropped
  * dark mode until the next full page load. The same technique next-themes
- * uses: watch the class list and restore the stored choice.
+ * uses: watch the class list and restore the chosen value.
  *
- * Never fights the toggle: on click, the class and the stored value are
- * updated together, so the observer always reads back a consistent state.
+ * Resolution order: the persistent tier (localStorage, written only
+ * after cookie consent) wins; otherwise the in-memory visit theme
+ * (pre-consent); otherwise leave the class untouched.
  */
 export function ThemeGuard() {
   useEffect(() => {
     const restore = () => {
       let stored: string | null = null;
       try {
-        stored = localStorage.getItem(THEME_KEY) || sessionStorage.getItem(THEME_KEY);
-      } catch { /* storage unavailable — leave the class as-is */ }
-      const dark = stored === "dark";
-      if (document.documentElement.classList.contains("dark") !== dark) {
-        document.documentElement.classList.toggle("dark", dark);
+        stored = localStorage.getItem(THEME_KEY);
+      } catch { /* storage unavailable — fall back to the memory tier */ }
+      const remembered = stored ?? getVisitTheme();
+      if (remembered !== null) {
+        const dark = remembered === "dark";
+        if (document.documentElement.classList.contains("dark") !== dark) {
+          document.documentElement.classList.toggle("dark", dark);
+        }
       }
     };
 

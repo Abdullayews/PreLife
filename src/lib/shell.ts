@@ -40,5 +40,6 @@ export const sectionBySlug = (slug: WorldSlug) => sections.find((s) => s.slug ==
 export const sectionByWelcomeSlug = (slug: WelcomeSlug) =>
   sections.find((s) => s.welcomeSlug === slug)!;
 
-/** Browser-storage keys. */
-export const THEME_KEY = "pl-theme";
+/** Browser-storage keys. The theme key is owned by lib/consent.ts (the
+ *  storage/persistence module) and re-exported here for convenience. */
+export { THEME_KEY } from "./consent";
