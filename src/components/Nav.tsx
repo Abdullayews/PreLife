@@ -47,9 +47,9 @@ function LocaleSwitch({ className = "" }: { className?: string }) {
           aria-pressed={loc === locale}
           onClick={() => {
             router.replace(pathname, { locale: loc });
-            // next-intl's own cookie sync is disabled (localeCookie:
-            // false), so nothing is stored before consent; after consent
-            // the choice is remembered as a persistent 1-year cookie.
+            // next-intl writes NEXT_LOCALE as a session cookie inside the
+            // call above; after consent we upgrade it to a persistent
+            // 1-year cookie so the choice survives browser restarts.
             if (hasConsent()) persistLocale(loc);
           }}
         >
