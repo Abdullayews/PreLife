@@ -39,10 +39,11 @@ export function acceptCookies(): void {
   document.cookie = `${CONSENT_COOKIE}=1; path=/; max-age=${PREF_MAX_AGE}; samesite=lax`;
 }
 
-/** Persist the language choice as a 1-year cookie. next-intl only ever
- * writes NEXT_LOCALE as a *session* cookie (both its client-side router
- * and its middleware), so post-consent persistence is our job. No-ops
- * without consent. */
+/** Persist the language choice as a 1-year cookie, read by src/proxy.ts
+ *  to redirect unprefixed visits to the remembered language. next-intl's
+ *  own cookie handling is disabled (localeCookie: false in the routing
+ *  config) so that nothing is stored before consent — this is the only
+ *  writer. No-ops without consent. */
 export function persistLocale(locale: string): void {
   if (!hasConsent()) return;
   document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${PREF_MAX_AGE}; samesite=lax`;
