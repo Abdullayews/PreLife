@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
@@ -14,6 +14,28 @@ const CONSENT_COOKIE = "pl_cookies";
 export function CookieConsent({ initialAccepted }: { initialAccepted: boolean }) {
   const t = useTranslations("cookieBar");
   const [accepted, setAccepted] = useState(initialAccepted);
+  const barRef = useRef<HTMLDivElement>(null);
+
+  // While the bar is up, reserve its height on <body> so the fixed banner
+  // can never cover page content — its height varies a lot between locales
+  // (Russian strings wrap to 2–3 lines on phones) and with the safe-area.
+  useEffect(() => {
+    if (accepted) return;
+    const bar = barRef.current;
+    if (!bar) return;
+    const reserve = () => {
+      document.body.style.paddingBottom = `${bar.offsetHeight + 12}px`;
+    };
+    reserve();
+    const ro = new ResizeObserver(reserve);
+    ro.observe(bar);
+    window.addEventListener("resize", reserve);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", reserve);
+      document.body.style.paddingBottom = "";
+    };
+  }, [accepted]);
 
   if (accepted) return null;
 
@@ -27,7 +49,7 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
   };
 
   return (
-    <div className="cookie-bar" role="region" aria-label={t("text")}>
+    <div ref={barRef} className="cookie-bar" role="region" aria-label={t("text")}>
       <div className="cookie-in">
         <p>
           {t("text")} <Link href="/terms">{t("learnMore")}</Link>
