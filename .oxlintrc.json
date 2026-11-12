@@ -1,0 +1,48 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "eslint",
+    "typescript",
+    "react",
+    "react-perf",
+    "import",
+    "jsx-a11y",
+    "nextjs",
+    "unicorn",
+    "promise",
+    "node",
+    "oxc"
+  ],
+  "env": {
+    "browser": true,
+    "builtin": true,
+    "node": true
+  },
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "nextjs/no-img-element": "off",
+    "react/set-state-in-effect": "off",
+    "jsx-a11y/prefer-tag-over-role": "warn",
+    "jsx-a11y/no-noninteractive-tabindex": "warn"
+  },
+  "ignorePatterns": [
+    "node_modules/**",
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "examples/**",
+    "skills/**",
+    "prelife-preview/**",
+    "refs/**",
+    "download/**",
+    "scripts/**",
+    "mini-services/**",
+    "src/generated/**",
+    ".zshots/**",
+    "db/**",
+    "dev.log"
+  ]
+}

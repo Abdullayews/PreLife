@@ -137,7 +137,7 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
       <section id="schedule" className="sec sec-tint">
         <div className="wrap">
           <Head n={++n} eyebrow={t("scheduleEyebrow")} title={t("scheduleTitle")} subtitle={t("scheduleSubtitle")} />
-          <div className="sched-wrap rv" tabIndex={0}>
+          <div className="sched-wrap rv" tabIndex={0} role="region" aria-label={t("scheduleTitle")}>
             <table className="sched">
               <thead>
                 <tr>
