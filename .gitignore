@@ -74,3 +74,4 @@ server.log
 # runtime state (seeded idempotently at runtime)
 db/*.db
 .zscripts/dev.pid
+.zshots/
