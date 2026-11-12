@@ -3,6 +3,7 @@
 import { Moon, Sun } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { THEME_KEY } from "@/lib/shell";
+import { hasConsent } from "@/lib/consent";
 
 export function ThemeToggle() {
   const t = useTranslations("moduleCommon");
@@ -14,7 +15,13 @@ export function ThemeToggle() {
       title={t("navThemeToggle")}
       onClick={() => {
         const dark = document.documentElement.classList.toggle("dark");
-        try { localStorage.setItem(THEME_KEY, dark ? "dark" : "light"); } catch { /* storage unavailable */ }
+        try {
+          // After cookie consent the choice persists across visits
+          // (localStorage); before consent it only lasts for the current
+          // visit (sessionStorage).
+          const store = hasConsent() ? localStorage : sessionStorage;
+          store.setItem(THEME_KEY, dark ? "dark" : "light");
+        } catch { /* storage unavailable */ }
       }}
     >
       <Sun aria-hidden className="ico-sun" size={18} />

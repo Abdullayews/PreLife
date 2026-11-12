@@ -1,18 +1,23 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-
-const CONSENT_COOKIE = "pl_cookies";
+import { THEME_KEY } from "@/lib/shell";
+import { acceptCookies, persistLocale } from "@/lib/consent";
 
 /**
  * Cookie consent bar — fixed to the bottom of every page until the
  * visitor accepts. Acceptance is stored in a cookie (read server-side
  * in the locale layout, so accepted visitors never see a flash).
+ *
+ * Accepting also promotes the preferences already chosen this visit
+ * (theme, language) from visit-scoped to persistent storage, and from
+ * then on every change is persisted — see lib/consent.ts.
  */
 export function CookieConsent({ initialAccepted }: { initialAccepted: boolean }) {
   const t = useTranslations("cookieBar");
+  const locale = useLocale();
   const [accepted, setAccepted] = useState(initialAccepted);
   const barRef = useRef<HTMLDivElement>(null);
 
@@ -37,11 +42,26 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
     };
   }, [accepted]);
 
+  // Keep the locale cookie persistent for consented visitors. next-intl's
+  // middleware re-syncs NEXT_LOCALE as a *session* cookie whenever the URL
+  // locale differs from the stored one (e.g. opening a shared /az link),
+  // which would silently downgrade the remembered choice.
+  useEffect(() => {
+    if (accepted) persistLocale(locale);
+  }, [accepted, locale]);
+
   if (accepted) return null;
 
   const accept = () => {
     try {
-      document.cookie = `${CONSENT_COOKIE}=1; path=/; max-age=31536000; samesite=lax`;
+      acceptCookies();
+      // Promote this visit's choices to persistent storage.
+      try {
+        const dark = document.documentElement.classList.contains("dark");
+        localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+        sessionStorage.removeItem(THEME_KEY);
+      } catch { /* storage unavailable */ }
+      persistLocale(locale);
     } catch {
       /* storage unavailable — hide for this visit anyway */
     }

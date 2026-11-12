@@ -8,8 +8,10 @@ import { routing } from "@/i18n/routing";
 import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ThemeGuard } from "@/components/ThemeGuard";
 import { getSessionUser } from "@/lib/auth";
 import { THEME_KEY } from "@/lib/shell";
+import { CONSENT_COOKIE } from "@/lib/consent";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -23,10 +25,10 @@ export function generateStaticParams() {
 }
 
 /** White is the default; only an explicit saved "dark" choice applies dark
- *  mode. Runs before paint, and the toggle persists every manual change. */
-const themeScript = `try{if(localStorage.getItem('${THEME_KEY}')==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
-
-const CONSENT_COOKIE = "pl_cookies";
+ *  mode. Runs before paint. The persistent tier (localStorage, written
+ *  after cookie consent) wins; sessionStorage is the pre-consent,
+ *  visit-scoped tier. */
+const themeScript = `try{var t=localStorage.getItem('${THEME_KEY}')||sessionStorage.getItem('${THEME_KEY}');if(t==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
 
 export default async function LocaleLayout({
   children, params,
@@ -54,6 +56,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={client}>
           <Nav user={user ? { name: user.name, email: user.email } : null} />
+          <ThemeGuard />
           <main>{children}</main>
           <Footer />
           <CookieConsent initialAccepted={cookieStore.get(CONSENT_COOKIE)?.value === "1"} />

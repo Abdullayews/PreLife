@@ -6,6 +6,7 @@ import { Menu, User, X } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { sections } from "@/lib/shell";
+import { hasConsent, persistLocale } from "@/lib/consent";
 import { ThemeToggle } from "./ThemeToggle";
 import { UserMenu, type MenuUser } from "./UserMenu";
 
@@ -44,7 +45,13 @@ function LocaleSwitch({ className = "" }: { className?: string }) {
           key={loc}
           type="button"
           aria-pressed={loc === locale}
-          onClick={() => router.replace(pathname, { locale: loc })}
+          onClick={() => {
+            router.replace(pathname, { locale: loc });
+            // next-intl writes NEXT_LOCALE as a session cookie inside the
+            // call above; after consent we upgrade it to a persistent
+            // 1-year cookie so the choice survives browser restarts.
+            if (hasConsent()) persistLocale(loc);
+          }}
         >
           {loc}
         </button>
