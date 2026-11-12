@@ -25,10 +25,9 @@ export function generateStaticParams() {
 }
 
 /** White is the default; only an explicit saved "dark" choice applies dark
- *  mode. Runs before paint. The persistent tier (localStorage, written
- *  after cookie consent) wins; sessionStorage is the pre-consent,
- *  visit-scoped tier. */
-const themeScript = `try{var t=localStorage.getItem('${THEME_KEY}')||sessionStorage.getItem('${THEME_KEY}');if(t==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
+ *  mode. Runs before paint. localStorage is written only after cookie
+ *  consent — before consent the theme lives in memory for the visit. */
+const themeScript = `try{if(localStorage.getItem('${THEME_KEY}')==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
 
 export default async function LocaleLayout({
   children, params,
