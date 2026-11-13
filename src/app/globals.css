@@ -343,6 +343,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .user-pop svg { color: var(--muted); }
 .user-pop a:hover svg, .user-pop button:hover svg { color: var(--accent); }
 .user-pop button:disabled { opacity: .6; cursor: wait; }
+.user-sep { height: 1px; margin: .4rem .7rem; border: 0; background: var(--line); }
 
 /* ── Auth pages (login / signup) ──────────────────────────────────────── */
 .auth-wrap { display: grid; justify-items: center; }
@@ -420,6 +421,89 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 /* ── Under construction + legal placeholders ──────────────────────────── */
 .uc { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: center; gap: 1.1rem; text-align: center; padding-block: 2rem; }
 .legal-body { color: var(--muted); font-size: 1.05rem; max-width: 40rem; }
+
+/* ── Settings / profile / help (account pages) ────────────────────────── */
+/* Settings shell: categories LEFT, content RIGHT — one column on
+   phones, where the category rail becomes a horizontal chip row. */
+.settings { display: grid; gap: 1.75rem; align-items: start; }
+@media (min-width: 48rem) {
+  .settings { grid-template-columns: 13.5rem minmax(0, 1fr); gap: 2.5rem; }
+}
+.set-nav { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .4rem; scrollbar-width: none; }
+.set-nav::-webkit-scrollbar { display: none; }
+@media (min-width: 48rem) {
+  .set-nav { flex-direction: column; gap: .25rem; overflow: visible; padding-bottom: 0; position: sticky; top: calc(var(--nav-h) + 1.5rem); }
+}
+.set-cat {
+  display: inline-flex; align-items: center; gap: .55rem; min-height: 2.75rem; padding-inline: 1rem;
+  border: 1px solid transparent; border-radius: 999px; background: transparent; color: var(--muted);
+  font-size: .875rem; font-weight: 600; white-space: nowrap; cursor: pointer;
+  transition: color .2s, background-color .2s, border-color .2s;
+}
+.set-cat svg { flex: none; }
+.set-cat:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.set-cat[aria-current="true"] { background: var(--raised); border-color: var(--line); color: var(--ink); box-shadow: var(--shadow-1); }
+.set-cat[aria-current="true"] svg { color: var(--accent); }
+
+.set-panel {
+  display: grid; gap: 1.1rem; padding: clamp(1.25rem, 3vw, 1.9rem);
+  background: var(--raised); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow-1);
+}
+.set-head { display: grid; gap: .3rem; }
+.set-head p { color: var(--muted); font-size: .9375rem; }
+.set-rows { display: grid; }
+.set-row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1.25rem;
+  padding-block: .95rem; border-bottom: 1px solid var(--line);
+}
+.set-row:last-child { border-bottom: 0; }
+.set-info { display: grid; gap: .2rem; min-width: 0; }
+.set-info b { font-size: .9375rem; }
+.set-info span { font-size: .8125rem; color: var(--muted); }
+.set-val { font-size: .9375rem; text-align: right; word-break: break-word; }
+.set-note {
+  display: flex; align-items: flex-start; gap: .6rem; padding: .75rem .95rem;
+  border: 1px dashed var(--line-strong); border-radius: 14px;
+  background: var(--tint); color: var(--muted); font-size: .8125rem;
+}
+.set-note svg { flex: none; margin-top: .1rem; }
+
+/* Toggle switch (role="switch") */
+.switch {
+  --w: 2.75rem; position: relative; flex: none; width: var(--w); height: 1.55rem;
+  border: 1px solid var(--line-strong); border-radius: 999px; cursor: pointer;
+  background: color-mix(in srgb, var(--ink) 10%, transparent);
+  transition: background-color .2s, border-color .2s;
+}
+.switch::after {
+  content: ""; position: absolute; top: 50%; left: .2rem; width: 1.15rem; height: 1.15rem;
+  border-radius: 50%; background: var(--surface); box-shadow: var(--shadow-1);
+  translate: 0 -50%; transition: left .2s var(--ease), background-color .2s;
+}
+.switch[aria-checked="true"] { background: var(--accent); border-color: transparent; }
+.switch[aria-checked="true"]::after { left: calc(100% - 1.35rem); background: var(--accent-ink); }
+
+/* Profile — one narrow panel under the page head */
+.profile-wrap { max-width: 46rem; }
+.profile-panel { gap: 1.35rem; }
+.profile-top { display: flex; align-items: center; gap: 1.1rem; }
+.profile-mail { color: var(--muted); font-size: .9rem; margin-top: .15rem; }
+.profile-actions { display: flex; flex-wrap: wrap; gap: .7rem; }
+
+/* Help — native accordion rows */
+.faq-list { display: grid; gap: .7rem; }
+.faq { background: var(--raised); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow-1); }
+.faq summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; font-size: .9375rem; list-style: none;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary svg { flex: none; color: var(--muted); transition: rotate .25s var(--ease); }
+.faq[open] summary svg { rotate: 180deg; }
+.faq p { padding: 0 1.25rem 1.1rem; color: var(--muted); font-size: .9375rem; max-width: 42rem; }
+@media (prefers-reduced-motion: reduce) {
+  .switch::after, .faq summary svg { transition: none; }
+}
 
 /* ── Hero + gallery ───────────────────────────────────────────────────── */
 .hero { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: min(86svh, 56rem); }

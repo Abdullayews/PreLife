@@ -2,12 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { ChevronDown, Crown, FileText, Home, LogOut, ScrollText } from "lucide-react";
+import { ChevronDown, CircleHelp, Crown, FileText, Home, LogOut, ScrollText, Settings, UserRound } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 
 export type MenuUser = { name: string | null; email: string };
 
-/** Basic account menu for signed-in visitors (avatar → dropdown). */
+/** Basic account menu for signed-in visitors (avatar → dropdown).
+ *  Three groups, separated by rules: personal (Profile / Settings /
+ *  Help), the app surface (Home / Subscription), legal (Terms / Rules)
+ *  and finally Log out. */
 export function UserMenu({ user }: { user: MenuUser }) {
   const t = useTranslations("accountMenu");
   const th = useTranslations("welcomePage");
@@ -70,18 +73,30 @@ export function UserMenu({ user }: { user: MenuUser }) {
             <b>{user.name ?? user.email}</b>
             <span>{user.email}</span>
           </p>
+          <Link role="menuitem" href="/profile" onClick={() => setOpen(false)}>
+            <UserRound size={15} aria-hidden />{t("profile")}
+          </Link>
+          <Link role="menuitem" href="/settings" onClick={() => setOpen(false)}>
+            <Settings size={15} aria-hidden />{t("settings")}
+          </Link>
+          <Link role="menuitem" href="/help" onClick={() => setOpen(false)}>
+            <CircleHelp size={15} aria-hidden />{t("help")}
+          </Link>
+          <hr className="user-sep" />
           <Link role="menuitem" href="/home" onClick={() => setOpen(false)}>
             <Home size={15} aria-hidden />{th("tabs.home")}
           </Link>
           <Link role="menuitem" href="/subscription" onClick={() => setOpen(false)}>
             <Crown size={15} aria-hidden />{t("subscription")}
           </Link>
+          <hr className="user-sep" />
           <Link role="menuitem" href="/terms" onClick={() => setOpen(false)}>
             <FileText size={15} aria-hidden />{t("terms")}
           </Link>
           <Link role="menuitem" href="/rules" onClick={() => setOpen(false)}>
             <ScrollText size={15} aria-hidden />{t("rules")}
           </Link>
+          <hr className="user-sep" />
           <button type="button" role="menuitem" onClick={logout} disabled={busy}>
             <LogOut size={15} aria-hidden />{t("logout")}
           </button>

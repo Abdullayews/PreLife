@@ -45,6 +45,7 @@ export default async function LocaleLayout({
     authPage: all.authPage,
     accountMenu: all.accountMenu,
     cookieBar: all.cookieBar,
+    settingsPage: all.settingsPage,
   };
 
   return (
