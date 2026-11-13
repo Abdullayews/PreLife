@@ -317,7 +317,10 @@
     "loginTitle": "Sign in",
     "signupTitle": "Create account",
     "termsTitle": "Terms",
-    "rulesTitle": "Rules"
+    "rulesTitle": "Rules",
+    "settingsTitle": "Settings",
+    "profileTitle": "Profile",
+    "helpTitle": "Help"
   },
   "moduleCommon": {
     "statOneLabel": "Item one",
@@ -835,6 +838,9 @@
   },
   "accountMenu": {
     "signedInAs": "Signed in as",
+    "profile": "Profile",
+    "settings": "Settings",
+    "help": "Help",
     "home": "Home",
     "subscription": "Subscription",
     "terms": "Terms",
@@ -860,5 +866,81 @@
   "rulesPage": {
     "title": "Rules",
     "placeholder": "hello, write this"
+  },
+  "settingsPage": {
+    "eyebrow": "Account",
+    "title": "Settings",
+    "subtitle": "A few base settings for now — more arrive as the platform grows.",
+    "navLabel": "Settings categories",
+    "cats": {
+      "account": "Account",
+      "appearance": "Appearance",
+      "language": "Language",
+      "notifications": "Notifications"
+    },
+    "account": {
+      "title": "Account",
+      "subtitle": "Your sign-in details.",
+      "name": "Name",
+      "email": "Email",
+      "plan": "Plan",
+      "planFree": "Free (demo)",
+      "note": "Editing your details arrives together with the full account system."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "How PreLife looks on this device.",
+      "theme": "Theme",
+      "themeHint": "Your choice is remembered after you accept cookies.",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "language": {
+      "title": "Language",
+      "subtitle": "Interface language — applies immediately.",
+      "hint": "Your choice is remembered after you accept cookies."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Choose what PreLife may notify you about.",
+      "reminders": "Workout reminders",
+      "remindersHint": "A nudge when a planned session is near.",
+      "digest": "Weekly digest",
+      "digestHint": "One summary of your week, every Sunday.",
+      "news": "Product news",
+      "newsHint": "New sections and features, about once a month.",
+      "note": "Temporary toggles — they will start persisting with the full notification system."
+    }
+  },
+  "profilePage": {
+    "eyebrow": "Account",
+    "title": "Profile",
+    "subtitle": "Your PreLife identity for now.",
+    "name": "Name",
+    "email": "Email",
+    "plan": "Plan",
+    "planFree": "Free (demo)",
+    "settings": "Open settings",
+    "subscription": "Subscription",
+    "note": "A fuller profile — goals, history, progress — arrives soon."
+  },
+  "helpPage": {
+    "eyebrow": "Support",
+    "title": "Help",
+    "subtitle": "Short answers to the questions we hear most.",
+    "faqTitle": "Frequently asked",
+    "contactTitle": "Still stuck?",
+    "contactText": "Write to us and we usually reply within a day.",
+    "contactCta": "hello@prelife.net",
+    "faq": {
+      "q1": "How do I start?",
+      "a1": "Create a free account, then open any of the four sections — gym, diet, psychology or books — straight from the home page.",
+      "q2": "Is PreLife free?",
+      "a2": "Yes, the current preview is completely free. Paid plans arrive with the full release.",
+      "q3": "Can I change the language?",
+      "a3": "Yes — switch between Azərbaycan, English and Русский from the top bar, or in Settings → Language.",
+      "q4": "How do I turn on dark mode?",
+      "a4": "Use the moon icon in the top bar, or Settings → Appearance."
+    }
   }
 }

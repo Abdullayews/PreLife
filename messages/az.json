@@ -317,7 +317,10 @@
     "loginTitle": "Daxil ol",
     "signupTitle": "Hesab yarat",
     "termsTitle": "Şərtlər",
-    "rulesTitle": "Qaydalar"
+    "rulesTitle": "Qaydalar",
+    "settingsTitle": "Ayarlar",
+    "profileTitle": "Profil",
+    "helpTitle": "Kömək"
   },
   "moduleCommon": {
     "statOneLabel": "Birinci",
@@ -835,6 +838,9 @@
   },
   "accountMenu": {
     "signedInAs": "Daxil olmusunuz",
+    "profile": "Profil",
+    "settings": "Ayarlar",
+    "help": "Kömək",
     "home": "Ana səhifə",
     "subscription": "Abunəlik",
     "terms": "Şərtlər",
@@ -860,5 +866,81 @@
   "rulesPage": {
     "title": "Qaydalar",
     "placeholder": "hello, write this"
+  },
+  "settingsPage": {
+    "eyebrow": "Hesab",
+    "title": "Ayarlar",
+    "subtitle": "Hazırda bir neçə əsas ayar — platforma böyüdükcə yeniləri gələcək.",
+    "navLabel": "Ayarlar kategoriyaları",
+    "cats": {
+      "account": "Hesab",
+      "appearance": "Görünüş",
+      "language": "Dil",
+      "notifications": "Bildirişlər"
+    },
+    "account": {
+      "title": "Hesab",
+      "subtitle": "Daxil olma məlumatlarınız.",
+      "name": "Ad",
+      "email": "E-poçt",
+      "plan": "Plan",
+      "planFree": "Pulsuz (demo)",
+      "note": "Məlumatların redaktəsi tam hesab sistemi ilə birlikdə gələcək."
+    },
+    "appearance": {
+      "title": "Görünüş",
+      "subtitle": "PreLife bu cihazda belə görünür.",
+      "theme": "Tema",
+      "themeHint": "Seçiminiz cookie-lər qəbul edildikdən sonra yadda saxlanılır.",
+      "light": "İşıqlı",
+      "dark": "Tünd"
+    },
+    "language": {
+      "title": "Dil",
+      "subtitle": "İnterfeys dili — dərhal tətbiq olunur.",
+      "hint": "Seçiminiz cookie-lər qəbul edildikdən sonra yadda saxlanılır."
+    },
+    "notifications": {
+      "title": "Bildirişlər",
+      "subtitle": "PreLife-un sizə nə barədə xəbər verə biləcəyini seçin.",
+      "reminders": "Məşq xatırlatmaları",
+      "remindersHint": "Planlaşdırılmış məşq yaxınlaşanda kiçik bir xəbərdarlıq.",
+      "digest": "Həftəlik icmal",
+      "digestHint": "Həftənizin bir icmalı, hər bazar günü.",
+      "news": "Məhsul xəbərləri",
+      "newsHint": "Yeni bölmələr və özəlliklər, təxminən ayda bir dəfə.",
+      "note": "Müvəqqəti düymələr — tam bildiriş sistemi ilə yadda saxlanmağa başlayacaqlar."
+    }
+  },
+  "profilePage": {
+    "eyebrow": "Hesab",
+    "title": "Profil",
+    "subtitle": "Hazırkı PreLife kimliyiniz.",
+    "name": "Ad",
+    "email": "E-poçt",
+    "plan": "Plan",
+    "planFree": "Pulsuz (demo)",
+    "settings": "Ayarları aç",
+    "subscription": "Abunəlik",
+    "note": "Daha dolğun profil — məqsədlər, tarixçə, irəliləyiş — tezliklə gəlir."
+  },
+  "helpPage": {
+    "eyebrow": "Dəstək",
+    "title": "Kömək",
+    "subtitle": "Ən çox verilən suallara qısa cavablar.",
+    "faqTitle": "Suallar",
+    "contactTitle": "Hələ də kömək lazımdır?",
+    "contactText": "Bizə yazın — adətən bir gündə cavab veririk.",
+    "contactCta": "hello@prelife.net",
+    "faq": {
+      "q1": "Necə başlamalıyam?",
+      "a1": "Pulsuz hesab yaradın, sonra ana səhifədən dörd bölmədən birini — idman, pəhriz, psixologiya və ya kitab — açın.",
+      "q2": "PreLife pulsuzdur?",
+      "a2": "Bəli, hazırkı versiya tam pulsuzdur. Ödənişli planlar tam buraxılışla gələcək.",
+      "q3": "Dili dəyişə bilərəm?",
+      "a3": "Bəli — yuxarı çubuqdan və ya Ayarlar → Dil bölməsindən Azərbaycan, İngilis və Rus dilləri arasında keçid edin.",
+      "q4": "Tünd rejimi necə açıram?",
+      "a4": "Yuxarı çubuqdakı ay simvolundan və ya Ayarlar → Görünüş bölməsindən istifadə edin."
+    }
   }
 }

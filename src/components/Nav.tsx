@@ -31,7 +31,7 @@ import { UserMenu, type MenuUser } from "./UserMenu";
  */
 
 /** Routes that belong to the logged-in app (the "main pages" experience). */
-const APP_HREFS = ["/home", "/gym", "/diet", "/meditation", "/library", "/subscription"];
+const APP_HREFS = ["/home", "/gym", "/diet", "/meditation", "/library", "/subscription", "/settings", "/profile", "/help"];
 
 function LocaleSwitch({ className = "" }: { className?: string }) {
   const t = useTranslations("welcomePage.header");
