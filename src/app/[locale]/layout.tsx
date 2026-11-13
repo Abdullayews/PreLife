@@ -53,7 +53,13 @@ export default async function LocaleLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>
+      {/* suppressHydrationWarning on <body>: the preview wrapper (and some
+          browser extensions) add classes like "vc-init" to <body> BEFORE
+          React hydrates. React then sees attributes it did not render and
+          throws a false-positive hydration mismatch. Suppression is scoped
+          to this element's attributes only (children unaffected) — the same
+          technique next-themes uses. */}
+      <body suppressHydrationWarning>
         <NextIntlClientProvider messages={client}>
           <Nav user={user ? { name: user.name, email: user.email } : null} />
           <ThemeGuard />
