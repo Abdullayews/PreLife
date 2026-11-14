@@ -9,6 +9,8 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ThemeGuard } from "@/components/ThemeGuard";
+import { SwRegister } from "@/components/SwRegister";
+import { ConnectionNotice } from "@/components/ConnectionNotice";
 import { getSessionUser } from "@/lib/auth";
 import { THEME_KEY } from "@/lib/shell";
 import { CONSENT_COOKIE } from "@/lib/consent";
@@ -46,6 +48,8 @@ export default async function LocaleLayout({
     accountMenu: all.accountMenu,
     cookieBar: all.cookieBar,
     settingsPage: all.settingsPage,
+    notFoundPage: all.notFoundPage,
+    connection: all.connection,
   };
 
   return (
@@ -63,6 +67,8 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={client}>
           <Nav user={user ? { name: user.name, email: user.email } : null} />
           <ThemeGuard />
+          <SwRegister />
+          <ConnectionNotice />
           <main>{children}</main>
           <Footer />
           <CookieConsent initialAccepted={cookieStore.get(CONSENT_COOKIE)?.value === "1"} />

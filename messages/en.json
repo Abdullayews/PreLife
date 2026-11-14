@@ -942,5 +942,16 @@
       "q4": "How do I turn on dark mode?",
       "a4": "Use the moon icon in the top bar, or Settings → Appearance."
     }
+  },
+  "notFoundPage": {
+    "eyebrow": "Error 404",
+    "title": "Page not found",
+    "text": "The address is right, but this page doesn't exist — it may have moved or been removed.",
+    "backHome": "Back to home"
+  },
+  "connection": {
+    "lost": "Your internet connection was lost",
+    "back": "Connection restored",
+    "dismiss": "Dismiss"
   }
 }

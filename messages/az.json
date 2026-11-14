@@ -942,5 +942,16 @@
       "q4": "Tünd rejimi necə açıram?",
       "a4": "Yuxarı çubuqdakı ay simvolundan və ya Ayarlar → Görünüş bölməsindən istifadə edin."
     }
+  },
+  "notFoundPage": {
+    "eyebrow": "Xəta 404",
+    "title": "Səhifə tapılmadı",
+    "text": "Ünvan doğrudur, amma belə bir səhifə yoxdur — ola bilsin köçürülüb və ya silinib.",
+    "backHome": "Ana səhifəyə qayıt"
+  },
+  "connection": {
+    "lost": "İnternet əlaqəniz kəsilib",
+    "back": "İnternet əlaqəsi bərpa olundu",
+    "dismiss": "Bağla"
   }
 }
