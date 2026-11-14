@@ -5,6 +5,13 @@ import { CONSENT_COOKIE, LOCALE_COOKIE } from "./lib/consent";
 
 const handleI18nRouting = createMiddleware(routing);
 
+/** Legacy welcome-tab slugs -> the unified section terms. Served as a
+ *  301 (permanent, method-preserving for GET pages) for every locale. */
+const LEGACY_WELCOME: Record<string, string> = {
+  psychology: "meditation",
+  books: "library",
+};
+
 /**
  * next-intl middleware with a pre-consent zero-storage guarantee.
  *
@@ -20,6 +27,16 @@ const handleI18nRouting = createMiddleware(routing);
  */
 export default function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+
+  // 301: /welcome/psychology -> /welcome/meditation, /welcome/books ->
+  // /welcome/library — in every locale (and unprefixed, where next-intl
+  // would otherwise add the locale first).
+  const legacyMatch = pathname.match(/^\/(?:([a-z]{2})\/)?welcome\/(psychology|books)\/?$/);
+  if (legacyMatch) {
+    const locale = legacyMatch[1] ?? routing.defaultLocale;
+    const to = new URL(`/${locale}/welcome/${LEGACY_WELCOME[legacyMatch[2]]}`, request.url);
+    return NextResponse.redirect(to, 301);
+  }
 
   const hasLocalePrefix = routing.locales.some(
     (locale) => pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),

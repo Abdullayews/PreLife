@@ -25,9 +25,9 @@ export const az = {
         subtitle: "PreLife idmanı, qidalanmanı, psixologiyanı və kitabları bir sakit sistemdə birləşdirir — hər bölmədə planlar, videolar, mütəxəssislər və AI.",
         seeAll: "Bölmələri kəşf edin",
         chips: {
-          psikoloji: "Psixologiya",
-          kitab: "Kitablar",
-          sport: "İdman",
+          meditation: "Psixologiya",
+          library: "Kitablar",
+          gym: "İdman",
           diet: "Qidalanma"
         }
       },
@@ -57,15 +57,15 @@ export const az = {
         subtitle: "Hər bölmə özünəməxsus tam bir dünyadır. Birlikdə isə vahid həyat tərzi yaradırlar.",
         explore: "Kəşf edin",
         cards: {
-          psikoloji: {
+          meditation: {
             name: "Psixologiya",
             tagline: "Psixoloqlar, videolar, meditasiya və AI"
           },
-          kitab: {
+          library: {
             name: "Kitablar",
             tagline: "Seçilmiş kitablar, kolleksiyalar və AI seçimləri"
           },
-          sport: {
+          gym: {
             name: "İdman",
             tagline: "İdman zalı, yoqa, pilates, məşqçilər, videolar və AI"
           },
@@ -141,7 +141,7 @@ export const az = {
       eyebrow: "PreLife · {section}",
       subTitle: "Bölmənin içindəkilər",
       itemsTitle: "Hazırda seçilmişlər",
-      psikoloji: {
+      meditation: {
         name: "Psixologiya",
         heroTitle: "Daha sakit zehin, gündə bir sessiya.",
         heroText: "Etibarlı psixoloqlarla danışın, bələdçi meditasiyalar edin, videolardan öyrənin və sessiyalar arasında PreLife AI dəstəyi alın — daxili həyatınız üçün hər şey bir yerdə.",
@@ -172,7 +172,7 @@ export const az = {
           }
         }
       },
-      kitab: {
+      library: {
         name: "Kitablar",
         heroTitle: "Böyümək üçün oxuyun.",
         heroText: "Həyatın hər mövsümünə uyğun kolleksiyalarla seçilmiş kitabxana — və bu anda yaşadıqlarınıza uyğun AI seçimləri.",
@@ -201,7 +201,7 @@ export const az = {
           }
         }
       },
-      sport: {
+      gym: {
         name: "İdman",
         heroTitle: "Hər gün, öz üsulunuzla hərəkət edin.",
         heroText: "GYM planları, yoqa axınları, pilates dərsləri, şəxsi məşqçilər və video məşqlər — PreLife AI həftəni enerjinizə uyğun qurur.",

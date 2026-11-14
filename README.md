@@ -10,12 +10,15 @@ Locales `az` / `en` / `ru` (default `en`), prefixed: `/en/…`.
 | Surface | Route | Access |
 | --- | --- | --- |
 | Marketing home | `/welcome` | public |
-| Section pages | `/welcome/gym`, `/welcome/diet`, `/welcome/psychology`, `/welcome/books` | public |
+| Section pages | `/welcome/gym`, `/welcome/diet`, `/welcome/meditation`, `/welcome/library` | public |
 | App home | `/home` | sign-in required |
 | App sections | `/gym`, `/diet`, `/meditation`, `/library` | sign-in required (content to be written) |
 | Subscription | `/subscription` | sign-in required |
 | Auth | `/login`, `/signup` | public |
 | Legal | `/terms`, `/rules` | public |
+
+Legacy addresses `/welcome/psychology` and `/welcome/books` 301-redirect to
+`/welcome/meditation` and `/welcome/library` (all locales, `src/proxy.ts`).
 
 A static demo account is seeded automatically: email `123`, password `123`.
 
