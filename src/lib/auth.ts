@@ -1,24 +1,34 @@
-import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "@/i18n/navigation";
 import { db } from "@/lib/db";
+import { defaultDeviceIcon, defaultDeviceName } from "@/lib/devices";
 
 /**
  * PreLife auth — server-side session cookie + scrypt password hashing.
- * The session token is a stateless HMAC-signed payload (uid + expiry);
- * no session table needed. Until real OAuth lands, one static demo
- * account exists: email "123", password "123".
+ *
+ * Sessions are DB-backed rows (Settings → Devices): the cookie carries a
+ * 256-bit random token, only its SHA-256 hash is stored. Expiry slides
+ * forward on activity, so an active visitor is never signed out
+ * automatically — the session lives a full year and renews itself.
+ * Until real OAuth lands, one static demo account exists: 123/123.
  */
 
-const SECRET = process.env.AUTH_SECRET ?? "prelife-dev-secret-change-me";
 export const SESSION_COOKIE = "pl_session";
-export const SESSION_TTL_S = 60 * 60 * 24 * 30; // 30 days
+export const SESSION_TTL_S = 60 * 60 * 24 * 365; // 1 year, sliding
+/** Sliding-renewal throttle: lastUsedAt/expiresAt are refreshed at most
+ *  once an hour, so most visits cost zero extra DB writes. */
+const RENEW_EVERY_MS = 60 * 60 * 1000;
 
 /** The static test account (per product decision — replaced by real auth later). */
 export const DEMO_EMAIL = "123";
 export const DEMO_PASSWORD = "123";
 
 export type SessionUser = { id: string; email: string; name: string | null };
+export type CurrentSession = {
+  session: { id: string; deviceName: string; deviceIcon: string };
+  user: SessionUser;
+};
 
 /* ── Passwords (scrypt, no external deps) ─────────────────────────────── */
 
@@ -36,28 +46,59 @@ export function verifyPassword(password: string, stored: string): boolean {
   return candidate.length === expected.length && timingSafeEqual(candidate, expected);
 }
 
-/* ── Session tokens (HMAC-SHA256, base64url payload) ──────────────────── */
+/* ── Sessions (random token, SHA-256 hash in the DB, sliding expiry) ──── */
 
-type SessionPayload = { uid: string; exp: number };
+const sha256 = (s: string) => createHash("sha256").update(s).digest("hex");
 
-export function createSessionToken(uid: string): string {
-  const payload = Buffer.from(JSON.stringify({ uid, exp: Date.now() + SESSION_TTL_S * 1000 })).toString("base64url");
-  const sig = createHmac("sha256", SECRET).update(payload).digest("base64url");
-  return `${payload}.${sig}`;
+/** Signs a device in: creates the Session row (default name/icon from the
+ *  User-Agent) and returns the token for the cookie. */
+export async function createSession(userId: string, userAgent: string | null): Promise<string> {
+  const token = randomBytes(32).toString("base64url");
+  await db.session.create({
+    data: {
+      userId,
+      tokenHash: sha256(token),
+      deviceName: defaultDeviceName(userAgent),
+      deviceIcon: defaultDeviceIcon(userAgent),
+      userAgent: userAgent ? userAgent.slice(0, 300) : null,
+      expiresAt: new Date(Date.now() + SESSION_TTL_S * 1000),
+    },
+  });
+  return token;
 }
 
-export function verifySessionToken(token: string | undefined | null): SessionPayload | null {
+/** Deletes the session a token points at (logout / device revoke). */
+export async function revokeSessionByToken(token: string): Promise<void> {
+  await db.session.deleteMany({ where: { tokenHash: sha256(token) } });
+}
+
+/** Validates the cookie token against the DB: rejects unknown/expired
+ *  sessions (deleting the dead row) and slides the expiry forward when
+ *  the throttle window has passed. */
+async function loadSession(token: string | undefined | null): Promise<CurrentSession | null> {
   if (!token) return null;
-  const [payload, sig] = token.split(".");
-  if (!payload || !sig) return null;
-  const expected = createHmac("sha256", SECRET).update(payload).digest("base64url");
-  const a = Buffer.from(sig);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
   try {
-    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString()) as SessionPayload;
-    if (!parsed?.uid || typeof parsed.exp !== "number" || parsed.exp < Date.now()) return null;
-    return parsed;
+    const row = await db.session.findUnique({
+      where: { tokenHash: sha256(token) },
+      include: { user: { select: { id: true, email: true, name: true } } },
+    });
+    if (!row) return null;
+    if (row.expiresAt.getTime() <= Date.now()) {
+      await db.session.delete({ where: { id: row.id } }).catch(() => {});
+      return null;
+    }
+    if (Date.now() - row.lastUsedAt.getTime() > RENEW_EVERY_MS) {
+      await db.session
+        .update({
+          where: { id: row.id },
+          data: { lastUsedAt: new Date(), expiresAt: new Date(Date.now() + SESSION_TTL_S * 1000) },
+        })
+        .catch(() => {});
+    }
+    return {
+      session: { id: row.id, deviceName: row.deviceName, deviceIcon: row.deviceIcon },
+      user: row.user,
+    };
   } catch {
     return null;
   }
@@ -67,17 +108,15 @@ export function verifySessionToken(token: string | undefined | null): SessionPay
 
 export async function getSessionUser(): Promise<SessionUser | null> {
   const store = await cookies();
-  const payload = verifySessionToken(store.get(SESSION_COOKIE)?.value);
-  if (!payload) return null;
-  try {
-    const user = await db.user.findUnique({
-      where: { id: payload.uid },
-      select: { id: true, email: true, name: true },
-    });
-    return user;
-  } catch {
-    return null;
-  }
+  const current = await loadSession(store.get(SESSION_COOKIE)?.value);
+  return current?.user ?? null;
+}
+
+/** The current session + user — used by the Devices API to mark "this
+ *  device" and to guard device rows against foreign users. */
+export async function getSession(): Promise<CurrentSession | null> {
+  const store = await cookies();
+  return loadSession(store.get(SESSION_COOKIE)?.value);
 }
 
 /**

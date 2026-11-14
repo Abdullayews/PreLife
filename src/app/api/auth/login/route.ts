@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createSessionToken, ensureDemoAccount, SESSION_COOKIE, SESSION_TTL_S, verifyPassword } from "@/lib/auth";
+import { createSession, ensureDemoAccount, SESSION_COOKIE, SESSION_TTL_S, verifyPassword } from "@/lib/auth";
 import { db } from "@/lib/db";
 
 /** POST /api/auth/login — { email, password } → session cookie + user. */
@@ -22,7 +22,9 @@ export async function POST(req: Request) {
     }
 
     const res = NextResponse.json({ user: { id: user.id, email: user.email, name: user.name } });
-    res.cookies.set(SESSION_COOKIE, createSessionToken(user.id), {
+    // One Session row per device (visible + manageable in Settings → Devices).
+    const token = await createSession(user.id, req.headers.get("user-agent"));
+    res.cookies.set(SESSION_COOKIE, token, {
       httpOnly: true,
       sameSite: "lax",
       path: "/",

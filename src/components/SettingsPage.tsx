@@ -1,26 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Bell, Info, Languages, Moon, Palette, Sun, UserRound } from "lucide-react";
+import {
+  Bell, Briefcase, Check, Gamepad2, Headphones, Home, Info, Languages, Laptop,
+  LogOut, Monitor, Moon, Palette, Pencil, Smartphone, Sun, Tablet, Tv, UserRound,
+  Watch, X, type LucideIcon,
+} from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { hasConsent, persistLocale, setThemeChoice } from "@/lib/consent";
+import { DEVICE_ICON_KEYS } from "@/lib/devices";
 
 /**
  * Settings — categories on the LEFT, their content on the RIGHT (one
  * visible panel at a time; on phones the category list becomes a
  * horizontal chip row above the panel).
  *
- * Base settings for now: account info (read-only), theme (light/dark,
- * follows the consent-aware persistence in lib/consent.ts), interface
- * language (az/en/ru) and three notification toggles (temporary —
- * persisted to localStorage only after cookie consent, exactly like
- * the theme).
+ * Base settings: account info (read-only), devices (active sessions with
+ * per-device name + icon), theme (light/dark, consent-aware persistence),
+ * interface language (az/en/ru) and three notification toggles.
  */
 
 const CATS = [
   { id: "account", icon: UserRound },
+  { id: "devices", icon: Monitor },
   { id: "appearance", icon: Palette },
   { id: "language", icon: Languages },
   { id: "notifications", icon: Bell },
@@ -36,6 +40,210 @@ type NotifyState = Record<NotifyKey, boolean>;
 const DEFAULT_NOTIFY: NotifyState = { reminders: true, digest: true, news: false };
 
 export type SettingsUser = { name: string | null; email: string };
+
+/* ── Devices (Settings → Devices) ──────────────────────────────────────── */
+
+const DEVICE_ICONS: Record<string, LucideIcon> = {
+  monitor: Monitor, laptop: Laptop, smartphone: Smartphone, tablet: Tablet,
+  watch: Watch, tv: Tv, gamepad: Gamepad2, headphones: Headphones,
+  briefcase: Briefcase, home: Home,
+};
+
+type Device = {
+  id: string;
+  name: string;
+  icon: string;
+  current: boolean;
+  createdAt: string;
+  lastUsedAt: string;
+};
+
+/** "5 dəqiqə əvvəl" / "5 minutes ago" — client-side relative time. */
+function relTime(iso: string, locale: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+  const abs = Math.abs(diff);
+  if (abs < 60_000) return rtf.format(0, "minute");
+  const min = Math.round(diff / 60_000);
+  if (abs < 3_600_000) return rtf.format(-min, "minute");
+  const hours = Math.round(min / 60);
+  if (abs < 86_400_000) return rtf.format(-hours, "hour");
+  const days = Math.round(hours / 24);
+  if (abs < 2_592_000_000) return rtf.format(-days, "day");
+  return rtf.format(-Math.round(days / 30), "month");
+}
+
+function DevicesPanel() {
+  const t = useTranslations("settingsPage.devices");
+  const locale = useLocale();
+  const router = useRouter();
+
+  const [devices, setDevices] = useState<Device[] | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editIcon, setEditIcon] = useState<string>("monitor");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/devices", { cache: "no-store" });
+      if (!res.ok) throw new Error();
+      const body = (await res.json()) as { devices: Device[] };
+      setDevices(body.devices);
+      setError(false);
+    } catch {
+      setDevices([]);
+      setError(true);
+    }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  const startEdit = (d: Device) => {
+    setEditingId(d.id);
+    setEditName(d.name);
+    setEditIcon(d.icon);
+  };
+
+  const saveEdit = async () => {
+    if (!editingId || busy) return;
+    setBusy(true);
+    setError(false);
+    try {
+      const res = await fetch(`/api/devices/${editingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: editName, icon: editIcon }),
+      });
+      if (!res.ok) throw new Error();
+      setEditingId(null);
+      await load();
+    } catch {
+      setError(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const revoke = async (d: Device) => {
+    if (busy) return;
+    setBusy(true);
+    setError(false);
+    try {
+      if (d.current) {
+        // Signing THIS device out — full logout, back to the welcome page.
+        await fetch("/api/auth/logout", { method: "POST" });
+        router.push("/welcome");
+        router.refresh();
+        return;
+      }
+      const res = await fetch(`/api/devices/${d.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      await load();
+    } catch {
+      setError(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="set-panel" aria-label={t("title")}>
+      <div className="set-head">
+        <h2 className="h3">{t("title")}</h2>
+        <p>{t("subtitle")}</p>
+      </div>
+
+      {error && <p className="field-error" role="alert">{t("error")}</p>}
+
+      <div className="device-list">
+        {devices === null ? (
+          <p className="device-meta" aria-busy="true">{t("loading")}</p>
+        ) : (
+          devices.map((d) =>
+            editingId === d.id ? (
+              <div key={d.id} className="device-edit">
+                <div className="field">
+                  <label htmlFor={`dev-name-${d.id}`}>{t("nameLabel")}</label>
+                  <input
+                    id={`dev-name-${d.id}`}
+                    type="text"
+                    value={editName}
+                    maxLength={40}
+                    placeholder={d.name}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") saveEdit(); if (e.key === "Escape") setEditingId(null); }}
+                  />
+                </div>
+                <div className="field">
+                  <span id={`dev-ico-${d.id}`} className="device-grid-label">{t("iconLabel")}</span>
+                  <div className="icon-grid" role="group" aria-labelledby={`dev-ico-${d.id}`}>
+                    {DEVICE_ICON_KEYS.map((key) => {
+                      const Icon = DEVICE_ICONS[key];
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          aria-pressed={editIcon === key}
+                          aria-label={t(`icons.${key}`)}
+                          title={t(`icons.${key}`)}
+                          onClick={() => setEditIcon(key)}
+                        >
+                          <Icon size={17} aria-hidden />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="device-edit-actions">
+                  <button type="button" className="btn btn-sm" onClick={saveEdit} disabled={busy || !editName.trim()}>
+                    <Check size={14} aria-hidden />{t("save")}
+                  </button>
+                  <button type="button" className="btn btn-sm btn-ghost" onClick={() => setEditingId(null)} disabled={busy}>
+                    <X size={14} aria-hidden />{t("cancel")}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div key={d.id} className="device">
+                <span className="device-ico" aria-hidden>
+                  {(() => { const Icon = DEVICE_ICONS[d.icon] ?? Monitor; return <Icon size={20} />; })()}
+                </span>
+                <div className="device-info">
+                  <span className="device-name">
+                    {d.name}
+                    {d.current && <span className="device-badge">{t("current")}</span>}
+                  </span>
+                  <span className="device-meta">{t("lastActive", { time: relTime(d.lastUsedAt, locale) })}</span>
+                </div>
+                <div className="device-actions">
+                  <button type="button" className="icon-btn" aria-label={t("edit")} title={t("edit")} onClick={() => startEdit(d)}>
+                    <Pencil size={15} aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    className="icon-btn"
+                    aria-label={d.current ? t("signOutCurrent") : t("signOut")}
+                    title={d.current ? t("signOutCurrent") : t("signOut")}
+                    onClick={() => revoke(d)}
+                    disabled={busy}
+                  >
+                    <LogOut size={15} aria-hidden />
+                  </button>
+                </div>
+              </div>
+            ),
+          )
+        )}
+      </div>
+
+      <p className="set-note"><Info size={15} aria-hidden />{t("note")}</p>
+    </section>
+  );
+}
+
+/* ── The settings shell ────────────────────────────────────────────────── */
 
 export function SettingsPage({ user }: { user: SettingsUser }) {
   const t = useTranslations("settingsPage");
@@ -129,6 +337,8 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
               <p className="set-note"><Info size={15} aria-hidden />{t("account.note")}</p>
             </section>
           )}
+
+          {cat === "devices" && <DevicesPanel />}
 
           {cat === "appearance" && (
             <section className="set-panel" aria-label={t("appearance.title")}>
