@@ -979,3 +979,36 @@ a.card:hover em svg { transform: translateX(3px); }
 .foot-links a:hover { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); }
 @media (min-width: 40rem) { .foot-in { flex-direction: row; } }
 
+
+/* ── B7: mobile density ─────────────────────────────────────────────────
+   The public world pages run ~9.5k px tall at 390px. Every rule below is
+   a mobile-scoped trim (padding/rhythm, never content) targeting ≥20%
+   shorter pages with zero horizontal overflow. Desktop (>48rem) is
+   untouched. Measured results in the report; the biggest single win is
+   structural (B5's places rail), not these paddings. */
+@media (max-width: 40rem) {
+  .sec { padding-block: 2.25rem; }                   /* was clamp floor 3.5rem */
+  .head { gap: .75rem; margin-bottom: 1.1rem; }      /* was 1rem / 2rem */
+  .hero { min-height: min(76svh, 56rem); }           /* was 86svh */
+  .hero-body { padding-top: 4.25rem; padding-bottom: 4.5rem; } /* was 6/6.25rem */
+  .hero-stats { padding-top: .9rem; }
+  .why li { padding-block: 1rem; }                   /* was 1.6rem */
+  .plan-img { aspect-ratio: 21 / 9; }                /* was 16/10 — cinematic strip */
+  .plan-body { gap: .6rem; padding: 1.05rem; }       /* was .7rem / 1.4rem */
+  .facts { gap: .3rem; margin-top: .4rem; padding-top: .75rem; }
+  .items { gap: .6rem; }
+  .item { padding: .75rem 1rem; }
+  .stories { gap: 1.5rem; }
+  .stories figure { gap: 1.1rem; }
+  .stories blockquote { font-size: 1.08rem; }
+  .place > div { gap: .6rem; padding: 1.1rem; }
+  .sched th, .sched td { padding: .65rem .6rem; }
+  .cell { padding: .4rem .35rem; }
+  .cta { padding-block: 2rem; gap: 1rem; }
+  .explore ul { gap: .75rem; margin-top: 1.5rem; }
+  .explore a { padding: 1rem; }
+  .foot-in { padding-block: 1.5rem; }
+}
+@media (max-width: 51.99rem) {
+  .marquee { padding-block: .9rem; }                 /* the band spans tablets too */
+}
