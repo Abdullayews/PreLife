@@ -95,6 +95,12 @@ body, [data-world] {
   --shadow-2: 0 2px 6px color-mix(in srgb, var(--ink) 14%, transparent), 0 20px 40px -12px color-mix(in srgb, var(--ink) 22%, transparent);
   --shadow-3: 0 4px 10px color-mix(in srgb, var(--ink) 20%, transparent), 0 28px 56px -16px color-mix(in srgb, var(--ink) 32%, transparent);
 }
+/* A4 (measured, per palette): in EVERY dark palette the layer chain stays
+   readable without leaning on shadows alone — raised vs bg 1.16–1.21:1,
+   raised vs tint 1.12–1.17:1, surface vs bg 1.06–1.07:1, each card also
+   carrying a 1px --line border; every dark text pair (ink/muted on
+   bg/surface/tint/raised/wash, accent-text, button labels, wash-ink on
+   wash-2, deep-ink on deep) re-measured ≥4.5:1 after the A1 hues. */
 html.dark body, html.dark [data-world] {
   --faint: color-mix(in srgb, var(--muted) 45%, var(--bg));
   --shadow-1: 0 1px 2px rgb(0 0 0 / .5), 0 6px 16px -4px rgb(0 0 0 / .45);
