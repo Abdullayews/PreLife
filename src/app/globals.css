@@ -28,22 +28,31 @@ html.dark body, html.dark [data-world="shell"] {
 }
 :is(body:has([data-world="gym"]), [data-world="gym"]) {
   --bg:#f5efe8; --surface:#fffaf5; --tint:#ece3d9; --ink:#231a17; --muted:#6f6058; --line:rgba(35,26,23,.14);
-  /* accent darkened #d9481f → #c3411c: white label now ≥4.5:1 incl. the
-     brightness(1.08) hover state (same ember hue, lower lightness only) */
-  --accent:#c3411c; --accent-ink:#fff; --accent-text:#b53c1a; --deep:#4a1d22; --deep-ink:#f7ece4; --raised:#fffdf9;
+  /* accent #c3411c → #a05c18 (A1): ember → burnt orange, hue 13°→30°.
+     The old hue sat 24° from the shell wine (rule needs ≥40° or ≥15pp
+     lightness); at hue 30° the pair clears 41°. White label ≥4.5:1 incl.
+     the brightness(1.08) hover state (5.22:1 / 4.87:1, measured). */
+  --accent:#a05c18; --accent-ink:#fff; --accent-text:#8a4d10; --deep:#4a1d22; --deep-ink:#f7ece4; --raised:#fffdf9;
 }
 html.dark :is(body:has([data-world="gym"]), [data-world="gym"]) {
   --bg:#14100e; --surface:#1c1613; --tint:#19130f; --ink:#f3e9e1; --muted:#b0a095; --line:rgba(243,233,225,.14);
-  --accent:#ff7a4d; --accent-ink:#2a0d04; --accent-text:var(--accent); --deep:#2a1114; --deep-ink:#f7ece4; --raised:#262017;
+  /* accent #ff7a4d → #ee6a41 (A1): keeps the true-orange hue (14°) but L
+     drops 65→59% so the pair vs the shell rose clears the 15pp lightness
+     band (15.7pp measured). Ink label 5.85:1 incl. hover. */
+  --accent:#ee6a41; --accent-ink:#2a0d04; --accent-text:var(--accent); --deep:#2a1114; --deep-ink:#f7ece4; --raised:#262017;
 }
 :is(body:has([data-world="diet"]), [data-world="diet"]) {
   --bg:#f6f2e4; --surface:#fffdf4; --tint:#ece6cf; --ink:#1f2616; --muted:#646a52; --line:rgba(31,38,22,.14);
-  /* accent darkened #b86f05 → #9d5f04 for ≥4.5:1 white label incl. hover */
-  --accent:#9d5f04; --accent-ink:#fff; --accent-text:#935904; --deep:#34431a; --deep-ink:#f5f1df; --raised:#fffef8;
+  /* accent #9d5f04 → #516f2e (A1): amber → olive (hue 88°, the family the
+     deep tone always had) — the old amber sat 22° from the gym ember.
+     White label 5.73:1 incl. hover (measured); --deep already olive. */
+  --accent:#516f2e; --accent-ink:#fff; --accent-text:#445c24; --deep:#34431a; --deep-ink:#f5f1df; --raised:#fffef8;
 }
 html.dark :is(body:has([data-world="diet"]), [data-world="diet"]) {
   --bg:#12140c; --surface:#191c10; --tint:#161910; --ink:#f0eedc; --muted:#a6a98f; --line:rgba(240,238,220,.14);
-  --accent:#f0a73a; --accent-ink:#2a1a00; --accent-text:var(--accent); --deep:#1e2610; --deep-ink:#f5f1df; --raised:#232715;
+  /* amber → olive (A1, dark side): hue 87°, L 52%; 96° from the shell
+     rose, 72° from the gym orange. Ink label 6.8:1 incl. hover. */
+  --accent:#8ab84f; --accent-ink:#1c2606; --accent-text:var(--accent); --deep:#1e2610; --deep-ink:#f5f1df; --raised:#232715;
 }
 :is(body:has([data-world="meditation"]), [data-world="meditation"]) {
   --bg:#f2eff8; --surface:#fbfaff; --tint:#e7e2f2; --ink:#1e1a2b; --muted:#625c78; --line:rgba(30,26,43,.14);
