@@ -724,7 +724,12 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .why p { color: var(--muted); max-width: 34rem; }
 @media (min-width: 48rem) {
   .why { grid-template-columns: repeat(4, 1fr); border-top: 0; gap: 2rem; }
-  .why li { border: 0; border-top: 2px solid var(--ink); padding: 1.25rem 0 0; }
+  /* B8: lis stretch to equal height in this grid; the DEFAULT
+     align-content (stretch) then grows every auto row equally in the
+     shorter items — the svg row got +8.53px and pushed its h3 down.
+     Start-packing keeps each row at content height: h3 tops now
+     match across the row (measured ≤1px, see report). */
+  .why li { border: 0; border-top: 2px solid var(--ink); padding: 1.25rem 0 0; align-content: start; }
 }
 @media (min-width: 64rem) {
   #why .wrap { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: clamp(2.5rem, 5vw, 5rem); align-items: start; }
