@@ -777,7 +777,23 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   .item .tag { grid-column: 1 / -1; justify-self: start; }
 }
 @media (min-width: 48rem) { .items { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 64rem) { .items { grid-template-columns: repeat(3, 1fr); } .item { grid-template-columns: auto 1fr; grid-template-rows: auto auto; align-items: start; } .item .tag { grid-column: 1 / -1; justify-self: start; } }
+/* B2: lg+ — cards give way to a LEDGER: one row per item, hairline
+   separators, reading across as name | target | level. The h3/p pair
+   already lives inside its own div, so the name/target split is a
+   two-track sub-grid there — li markup untouched. Cards stay below lg
+   (compact card on mobile per B7, 2-col at 48–64rem). */
+@media (min-width: 64rem) {
+  .items { grid-template-columns: minmax(0, 1fr); gap: 0; border-top: 1px solid var(--line); }
+  .item {
+    grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto;
+    column-gap: 1.25rem; align-items: center; padding: .95rem 0;
+    background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; box-shadow: none;
+  }
+  .item:last-child { border-bottom: 0; }
+  .item > div { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr); gap: 1.25rem; align-items: baseline; }
+  .item .tag { grid-column: auto; }
+  .item .chip-ico { width: 2.5rem; height: 2.5rem; border-radius: 12px; }
+}
 
 /* Schedule */
 .sched-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 20px; background: var(--raised); box-shadow: var(--shadow-1); -webkit-overflow-scrolling: touch; }
