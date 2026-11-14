@@ -931,7 +931,9 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   .place { flex: 0 0 min(75vw, 19rem); scroll-snap-align: start; }
 }
 .place { overflow: hidden; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); display: flex; flex-direction: column; }
-.place > img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: linear-gradient(135deg, var(--tint), var(--wash) 60%, var(--tint)); }
+.place > img { width: 100%; height: auto; /* D1 fix: the height attr is a presentational hint — without an author
+   height it pins the box to 600px and defeats aspect-ratio; auto restores
+   the ratio (measured 291x600 bug → 291x218) */ aspect-ratio: 4 / 3; object-fit: cover; background: linear-gradient(135deg, var(--tint), var(--wash) 60%, var(--tint)); }
 .place > div { display: grid; gap: .75rem; padding: 1.35rem; }
 .place-top { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
 .place h3 { font: 600 1.25rem/1.2 var(--font-display); }
