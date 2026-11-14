@@ -20,52 +20,60 @@ html.dark { color-scheme: dark; }
    cards; wash = accent container tier; shadows ink-tinted, two-part. */
 body, [data-world="shell"] {
   --bg:#f6f3ed; --surface:#fcfbf8; --tint:#efeae0; --ink:#1f1d1a; --muted:#6a655a; --line:rgba(31,29,26,.13);
-  --accent:#7b2d3b; --accent-ink:#fff; --deep:#2b1a1e; --deep-ink:#f6efe9; --raised:#fffefb;
+  --accent:#7b2d3b; --accent-ink:#fff; --accent-text:var(--accent); --deep:#2b1a1e; --deep-ink:#f6efe9; --raised:#fffefb;
 }
 html.dark body, html.dark [data-world="shell"] {
   --bg:#171412; --surface:#1f1b18; --tint:#1b1816; --ink:#f1ebe3; --muted:#a39b8f; --line:rgba(241,235,227,.14);
-  --accent:#e59aa6; --accent-ink:#2a0f15; --deep:#241619; --deep-ink:#f6efe9; --raised:#282219;
+  --accent:#e59aa6; --accent-ink:#2a0f15; --accent-text:var(--accent); --deep:#241619; --deep-ink:#f6efe9; --raised:#282219;
 }
 :is(body:has([data-world="gym"]), [data-world="gym"]) {
   --bg:#f5efe8; --surface:#fffaf5; --tint:#ece3d9; --ink:#231a17; --muted:#6f6058; --line:rgba(35,26,23,.14);
-  --accent:#d9481f; --accent-ink:#fff; --deep:#4a1d22; --deep-ink:#f7ece4; --raised:#fffdf9;
+  /* accent darkened #d9481f → #c3411c: white label now ≥4.5:1 incl. the
+     brightness(1.08) hover state (same ember hue, lower lightness only) */
+  --accent:#c3411c; --accent-ink:#fff; --accent-text:#b53c1a; --deep:#4a1d22; --deep-ink:#f7ece4; --raised:#fffdf9;
 }
 html.dark :is(body:has([data-world="gym"]), [data-world="gym"]) {
   --bg:#14100e; --surface:#1c1613; --tint:#19130f; --ink:#f3e9e1; --muted:#b0a095; --line:rgba(243,233,225,.14);
-  --accent:#ff7a4d; --accent-ink:#2a0d04; --deep:#2a1114; --deep-ink:#f7ece4; --raised:#262017;
+  --accent:#ff7a4d; --accent-ink:#2a0d04; --accent-text:var(--accent); --deep:#2a1114; --deep-ink:#f7ece4; --raised:#262017;
 }
 :is(body:has([data-world="diet"]), [data-world="diet"]) {
   --bg:#f6f2e4; --surface:#fffdf4; --tint:#ece6cf; --ink:#1f2616; --muted:#646a52; --line:rgba(31,38,22,.14);
-  --accent:#b86f05; --accent-ink:#fff; --deep:#34431a; --deep-ink:#f5f1df; --raised:#fffef8;
+  /* accent darkened #b86f05 → #9d5f04 for ≥4.5:1 white label incl. hover */
+  --accent:#9d5f04; --accent-ink:#fff; --accent-text:#935904; --deep:#34431a; --deep-ink:#f5f1df; --raised:#fffef8;
 }
 html.dark :is(body:has([data-world="diet"]), [data-world="diet"]) {
   --bg:#12140c; --surface:#191c10; --tint:#161910; --ink:#f0eedc; --muted:#a6a98f; --line:rgba(240,238,220,.14);
-  --accent:#f0a73a; --accent-ink:#2a1a00; --deep:#1e2610; --deep-ink:#f5f1df; --raised:#232715;
+  --accent:#f0a73a; --accent-ink:#2a1a00; --accent-text:var(--accent); --deep:#1e2610; --deep-ink:#f5f1df; --raised:#232715;
 }
 :is(body:has([data-world="meditation"]), [data-world="meditation"]) {
   --bg:#f2eff8; --surface:#fbfaff; --tint:#e7e2f2; --ink:#1e1a2b; --muted:#625c78; --line:rgba(30,26,43,.14);
-  --accent:#6a42cf; --accent-ink:#fff; --deep:#2c2250; --deep-ink:#efeafb; --raised:#fefeff;
+  --accent:#6a42cf; --accent-ink:#fff; --accent-text:var(--accent); --deep:#2c2250; --deep-ink:#efeafb; --raised:#fefeff;
 }
 html.dark :is(body:has([data-world="meditation"]), [data-world="meditation"]) {
   --bg:#110e1a; --surface:#181423; --tint:#151120; --ink:#ece8f8; --muted:#a69fbf; --line:rgba(236,232,248,.14);
-  --accent:#a98bff; --accent-ink:#1a0d3f; --deep:#1e1838; --deep-ink:#efeafb; --raised:#221c32;
+  --accent:#a98bff; --accent-ink:#1a0d3f; --accent-text:var(--accent); --deep:#1e1838; --deep-ink:#efeafb; --raised:#221c32;
 }
 :is(body:has([data-world="library"]), [data-world="library"]) {
   --bg:#f1f4f1; --surface:#fafcfa; --tint:#e2e9e5; --ink:#14211f; --muted:#56655f; --line:rgba(20,33,31,.14);
-  --accent:#0b7f73; --accent-ink:#fff; --deep:#0f3b38; --deep-ink:#e8f4f1; --raised:#fdfffd;
+  /* accent darkened #0b7f73 → #0b7a6f for ≥4.5:1 white label incl. hover */
+  --accent:#0b7a6f; --accent-ink:#fff; --accent-text:#0a7368; --deep:#0f3b38; --deep-ink:#e8f4f1; --raised:#fdfffd;
 }
 html.dark :is(body:has([data-world="library"]), [data-world="library"]) {
   --bg:#0b1413; --surface:#111c1a; --tint:#0e1816; --ink:#e6f1ee; --muted:#9bb0aa; --line:rgba(230,241,238,.14);
-  --accent:#3fd0c0; --accent-ink:#022a26; --deep:#0f2b29; --deep-ink:#e8f4f1; --raised:#1b2725;
+  --accent:#3fd0c0; --accent-ink:#022a26; --accent-text:var(--accent); --deep:#0f2b29; --deep-ink:#e8f4f1; --raised:#1b2725;
 }
 
 /* ── Derived tiers ──────────────────────────────────────────────────────
    wash/wash-2 = M3-style accent-container tones (quiet color zones,
    active states); wash-ink = dark accent-tinged text for small type on wash
    (Ruder: small light type can't carry color — darken it); faint = the tail
-   of the ink ramp (five grey values in play per view); line-strong = 3:1
-   control borders. Shadows: two-part (contact + ambient), tinted with the
-   world's own ink — never pure black (Atlassian/Fluent/Polaris values). */
+   of the ink ramp — DECORATIVE ONLY (hairlines, ghost numerals): it fails
+   4.5:1 as text, so every text slot uses --muted or darker; accent-text =
+   the accent at a lightness that passes 4.5:1 as small text on all four
+   surfaces (buttons keep the brighter --accent because white-on-accent is
+   a less strict target); line-strong = 3:1 control borders. Shadows:
+   two-part (contact + ambient), tinted with the world's own ink — never
+   pure black (Atlassian/Fluent/Polaris values). */
 body, [data-world] {
   --wash: color-mix(in srgb, var(--accent) 11%, var(--raised));
   --wash-2: color-mix(in srgb, var(--accent) 20%, var(--raised));
@@ -135,7 +143,7 @@ button { cursor: pointer; }
 .h3 { font: 600 1.25rem/1.25 var(--font-display); letter-spacing: -0.01em; }
 .lede { color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.15rem); max-width: 40rem; text-wrap: pretty; }
 .eyebrow { display: flex; align-items: center; gap: .75rem; font-size: .75rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
-.eyebrow b { color: var(--accent); font-variant-numeric: tabular-nums; }
+.eyebrow b { color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .eyebrow i { width: 2.5rem; height: 1px; background: var(--accent); flex: none; }
 small, .note { font-size: .8125rem; color: var(--muted); }
 .note { margin-top: 1.5rem; max-width: 40rem; }
@@ -161,7 +169,7 @@ small, .note { font-size: .8125rem; color: var(--muted); }
 .btn-lg { min-height: 3.25rem; padding-inline: clamp(1.1rem, 5vw, 2rem); font-size: 1rem; }
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn-ghost:hover { background: color-mix(in srgb, var(--ink) 7%, transparent); filter: none; }
-.btn-quiet { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.btn-quiet { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-text); }
 .btn-light { background: var(--deep-ink); color: var(--deep); }
 .icon-btn {
   display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 999px;
@@ -230,7 +238,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   transition: background-color .2s;
 }
 .nav-links a:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); }
-.nav-links a[aria-current="page"] { color: var(--accent); background: var(--wash); font-weight: 650; }
+.nav-links a[aria-current="page"] { color: var(--accent-text); background: var(--wash); font-weight: 650; }
 .nav-links a[aria-current="page"]::before { background: var(--accent); }
 
 /* APP surface: main tabs — every main page gets its own button on the
@@ -246,7 +254,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   transition: background-color .2s;
 }
 .nav-tabs a:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); }
-.nav-tabs a[aria-current="page"] { color: var(--accent); background: var(--wash); font-weight: 650; }
+.nav-tabs a[aria-current="page"] { color: var(--accent-text); background: var(--wash); font-weight: 650; }
 .nav-tabs a[aria-current="page"]::before { background: var(--accent); }
 
 /* Quiet text link for "Sign in" in the bar */
@@ -296,7 +304,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   transition: background-color .2s, color .2s;
 }
 .panel-links a:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
-.panel-links a[aria-current="page"] { color: var(--accent); font-weight: 650; }
+.panel-links a[aria-current="page"] { color: var(--accent-text); font-weight: 650; }
 .panel-links a[aria-current="page"]::before { background: var(--accent); }
 .panel-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--line); }
 /* Welcome surface: links join the bar at lg (burger/panel until lg).
@@ -362,7 +370,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   background: var(--surface); color: var(--ink); font-size: .9375rem;
   transition: border-color .2s, box-shadow .2s;
 }
-.field input::placeholder { color: var(--faint); }
+.field input::placeholder { color: var(--muted); }
 .field input:focus {
   outline: none; border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
@@ -372,7 +380,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   background: color-mix(in srgb, var(--accent) 12%, var(--raised));
   border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
 }
-.auth-or { display: flex; align-items: center; gap: .9rem; color: var(--faint); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; text-align: center; }
+.auth-or { display: flex; align-items: center; gap: .9rem; color: var(--muted); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; text-align: center; }
 .auth-or::before, .auth-or::after { content: ""; height: 1px; flex: 1; background: var(--line); }
 /* Narrow phones: Russian "ИЛИ ПРОДОЛЖИТЬ ЧЕРЕЗ" is long — tighten the
    tracking instead of letting it crowd the divider lines. */
@@ -388,7 +396,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 }
 .social-btn:hover { background: color-mix(in srgb, var(--ink) 5%, var(--surface)); border-color: var(--ink); }
 .auth-alt { font-size: .875rem; color: var(--muted); text-align: center; }
-.auth-alt a { color: var(--accent); font-weight: 650; }
+.auth-alt a { color: var(--accent-text); font-weight: 650; }
 .auth-alt a:hover { text-decoration: underline; }
 .auth-demo {
   padding: .6rem .85rem; border-radius: 12px; text-align: center;
@@ -569,7 +577,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .actions { display: flex; flex-wrap: wrap; gap: .75rem; }
 .hero-stats { display: grid; grid-auto-flow: column; gap: clamp(1.25rem, 3vw, 2.5rem); padding-left: 1.5rem; border-left: 1px solid var(--line); }
 .hero-stats dd { font: 600 clamp(1.9rem, 4vw, 2.75rem)/1 var(--font-display); }
-.hero-stats dt { margin-top: .35rem; max-width: 9rem; font-size: .8125rem; color: var(--faint); }
+.hero-stats dt { margin-top: .35rem; max-width: 9rem; font-size: .8125rem; color: var(--muted); }
 @media (max-width: 40rem) { .hero-stats { padding-left: 0; border-left: 0; padding-top: 1.25rem; border-top: 1px solid var(--line); width: 100%; grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); } }
 
 .gal-dots {
@@ -700,7 +708,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .place > div { display: grid; gap: .75rem; padding: 1.35rem; }
 .place-top { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
 .place h3 { font: 600 1.25rem/1.2 var(--font-display); }
-.score { display: inline-flex; align-items: center; gap: .3rem; font-weight: 700; font-size: .875rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+.score { display: inline-flex; align-items: center; gap: .3rem; font-weight: 700; font-size: .875rem; color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .place p { color: var(--muted); font-size: .9375rem; }
 @media (min-width: 52rem) { .places { grid-template-columns: repeat(3, 1fr); } }
 
@@ -722,7 +730,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .explore svg { color: var(--accent); }
 .explore b { font-size: 1.05rem; }
 .explore span { color: var(--muted); font-size: .9rem; }
-.explore em { display: inline-flex; align-items: center; gap: .3rem; margin-top: .6rem; font-style: normal; font-weight: 650; font-size: .875rem; color: var(--accent); }
+.explore em { display: inline-flex; align-items: center; gap: .3rem; margin-top: .6rem; font-style: normal; font-weight: 650; font-size: .875rem; color: var(--accent-text); }
 @media (min-width: 40rem) { .explore ul { grid-template-columns: repeat(3, 1fr); } }
 
 /* ── Shell pages ──────────────────────────────────────────────────────── */
@@ -768,7 +776,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .tier[data-featured] { border: 2px solid var(--accent); box-shadow: var(--shadow-2); }
 .tier > .tag { position: absolute; top: -.8rem; left: 50%; transform: translateX(-50%); }
 .price { font: 600 2.75rem/1 var(--font-display); margin-top: .5rem; }
-.per { color: var(--faint); font-size: .8125rem; margin-top: -.3rem; }
+.per { color: var(--muted); font-size: .8125rem; margin-top: -.3rem; }
 .tier > p:not(.price):not(.per) { color: var(--muted); font-size: .9375rem; }
 .checks { display: grid; gap: .6rem; margin: 1rem 0 1.5rem; text-align: left; font-size: .9375rem; }
 .checks li { display: flex; gap: .6rem; align-items: flex-start; }
