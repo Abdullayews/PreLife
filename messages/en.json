@@ -96,7 +96,7 @@
     },
     "cta": {
       "title": "Start living your premium life",
-      "text": "No account needed yet \u2014 one click and every section opens in front of you.",
+      "text": "Create a free account and every section opens in front of you.",
       "start": "Start using PreLife",
       "note": "Free during early access \u2014 subscription plans arrive with payments."
     },
@@ -307,145 +307,20 @@
       }
     }
   },
-  "uiPage": {
-    "eyebrow": "Design system",
-    "title": "UI elements",
-    "intro": "The general building blocks of PreLife \u2014 colors, typography, controls, cards and states in one place, all following the light single-tone capstone language.",
-    "sections": {
-      "colors": "Color system",
-      "colorsDesc": "One calm light tone across the platform, with each section carrying its own accent.",
-      "typography": "Typography",
-      "typographyDesc": "Geist everywhere \u2014 tracked caps for labels, tight bold for headlines.",
-      "buttons": "Buttons",
-      "buttonsDesc": "Pills throughout \u2014 the primary action is always a solid ink pill.",
-      "badges": "Badges & chips",
-      "badgesDesc": "Section chips carry the capstone accents; status pills stay quiet.",
-      "forms": "Form controls",
-      "formsDesc": "Calm inputs on the light tone, hairline borders, soft focus rings.",
-      "cards": "Cards",
-      "cardsDesc": "Rounded cards on the paper tone \u2014 tinted icon chips and clear hierarchy.",
-      "avatars": "Avatars",
-      "avatarsDesc": "Initials on the section tint \u2014 calm and consistent.",
-      "tabs": "Tabs",
-      "tabsDesc": "Pill tabs in the Ultrahuman spirit \u2014 the active tab is a solid ink pill.",
-      "feedback": "Feedback & states",
-      "feedbackDesc": "Progress, loading and messages that keep the tone quiet."
-    },
-    "colors": {
-      "core": "Core tones",
-      "accents": "Section accents",
-      "toneNames": {
-        "background": "Background",
-        "card": "Card",
-        "ink": "Ink",
-        "muted": "Muted",
-        "border": "Border"
-      },
-      "accentUse": "Accent",
-      "tintUse": "Tint"
-    },
-    "typography": {
-      "display": "Display",
-      "heading": "Heading",
-      "subheading": "Subheading",
-      "body": "Body",
-      "caption": "Caption",
-      "label": "Label (tracked caps)"
-    },
-    "buttons": {
-      "variants": "Variants",
-      "save": "Save changes",
-      "sizes": "Sizes",
-      "withIcon": "With icon",
-      "play": "Play session",
-      "iconOnly": "Icon buttons",
-      "disabled": "Disabled"
-    },
-    "badges": {
-      "sectionChips": "Section chips",
-      "status": "Status pills",
-      "live": "Live",
-      "new": "New",
-      "soon": "Coming soon",
-      "filters": "Filter chips"
-    },
-    "forms": {
-      "labels": "Inputs",
-      "name": "Full name",
-      "namePlaceholder": "Aysel Mammadova",
-      "email": "Email",
-      "emailPlaceholder": "you@prelife.net",
-      "search": "Search",
-      "searchPlaceholder": "Search sessions, books, recipes...",
-      "message": "Message",
-      "messagePlaceholder": "Write a note to your coach...",
-      "select": "Difficulty",
-      "selectEasy": "Easy",
-      "selectMedium": "Medium",
-      "selectHard": "Hard",
-      "checkboxes": "Checkboxes",
-      "notifyEmail": "Email notifications",
-      "notifyPush": "Push notifications",
-      "radios": "Radio group",
-      "planFree": "Free plan",
-      "planPremium": "PreLife Premium",
-      "switches": "Switches",
-      "switchDaily": "Daily reminder",
-      "switchDailyDesc": "A gentle nudge at 9:00 to pick today's session.",
-      "switchAI": "PreLife AI",
-      "switchAIDesc": "AI picks and mood check-ins across all sections.",
-      "slider": "Slider",
-      "sliderLabel": "Session length",
-      "sliderValue": "45",
-      "sliderUnit": "min"
-    },
-    "cards": {
-      "stat": "Stat card",
-      "sectionCard": "Section card",
-      "expertCard": "Expert card",
-      "expertRole": "Clinical psychologist",
-      "actionCard": "Action card",
-      "open": "Open"
-    },
-    "avatars": {
-      "sizes": "Sizes",
-      "group": "Group",
-      "person1": "Aysel Mammadova",
-      "person2": "Nihat Guliyev",
-      "person3": "Shafa Rahimli",
-      "person4": "Elvin Hasanli",
-      "more": "+8"
-    },
-    "tabs": {
-      "overview": "Overview",
-      "sessions": "Sessions",
-      "videos": "Videos",
-      "ai": "AI",
-      "overviewText": "One calm view of your day \u2014 gym, meals, mind and reading in a single strip.",
-      "sessionsText": "Guided sessions picked for you, from five quiet minutes to full workouts.",
-      "videosText": "Video libraries across every section, from recipes to technique breakdowns.",
-      "aiText": "PreLife AI checks in, suggests and never judges."
-    },
-    "feedback": {
-      "progress": "Progress",
-      "progressLabel": "Weekly goal",
-      "progressValue": "72%",
-      "skeleton": "Skeleton",
-      "alerts": "Alerts",
-      "alertTitle": "Payments arrive later",
-      "alertText": "Subscription plans are coming with payments \u2014 everything is free during early access.",
-      "warnTitle": "Slow connection",
-      "warnText": "Your progress syncs once you are back online.",
-      "spinner": "Loading"
-    }
-  },
   "Metadata": {
     "welcomeTitle": "Welcome",
     "welcomeDescription": "Meet PreLife \u2014 gym, diet, psychology and books in one platform, with experts, videos and AI in every section.",
     "homeTitle": "Home",
     "homeDescription": "Your everyday starting point in PreLife.",
     "uiTitle": "UI elements",
-    "uiDescription": "The general UI building blocks of PreLife \u2014 colors, typography, buttons, forms, cards and states."
+    "uiDescription": "The general UI building blocks of PreLife \u2014 colors, typography, buttons, forms, cards and states.",
+    "loginTitle": "Sign in",
+    "signupTitle": "Create account",
+    "termsTitle": "Terms",
+    "rulesTitle": "Rules",
+    "settingsTitle": "Settings",
+    "profileTitle": "Profile",
+    "helpTitle": "Help"
   },
   "moduleCommon": {
     "statOneLabel": "Item one",
@@ -596,7 +471,8 @@
     "ctaTitle": "Your first week is on us.",
     "ctaSubtitle": "Pick a plan, find your gym and let the work compound. Onboarding and week one are free \u2014 no card required.",
     "ctaButton": "Start training today",
-    "ctaNote": "Free onboarding session with every plan."
+    "ctaNote": "Free onboarding session with every plan.",
+    "baseNote": "This is the foundation of the new Gym \u2014 plan tracking, exercise videos and personal records arrive here soon."
   },
   "dietHome": {
     "metaTitle": "Diet",
@@ -711,7 +587,7 @@
     "ctaNote": "Free nutritionist consultation with every plan."
   },
   "meditationHome": {
-    "metaTitle": "Meditation",
+    "metaTitle": "Psychology",
     "metaDescription": "Guided meditation sessions, science-backed programs, certified mentors and a weekly rhythm for a quieter mind.",
     "heroEyebrow": "PreLife Meditation",
     "heroTitle": "Stillness, refined.",
@@ -822,7 +698,7 @@
     "ctaNote": "Free intro session with every program."
   },
   "libraryHome": {
-    "metaTitle": "Library",
+    "metaTitle": "Books",
     "metaDescription": "Curated book collections, fifteen-minute summaries, weekly reading plans and the finest partner reading rooms.",
     "heroEyebrow": "PreLife Library",
     "heroTitle": "Reading, refined.",
@@ -931,5 +807,156 @@
     "ctaSubtitle": "Pick a collection, join a circle and let the pages compound. Onboarding and month one are free \u2014 no card required.",
     "ctaButton": "Open your shelf",
     "ctaNote": "Free editor consultation with every collection."
+  },
+  "authPage": {
+    "loginTitle": "Welcome back",
+    "loginSubtitle": "Sign in to open your PreLife.",
+    "signupTitle": "Create your account",
+    "signupSubtitle": "One account for gym, diet, mind and books.",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+    "loginCta": "Sign in",
+    "signupCta": "Create account",
+    "orContinueWith": "or continue with",
+    "google": "Google",
+    "apple": "Apple",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "signUpLink": "Sign up",
+    "signInLink": "Sign in",
+    "backToWelcome": "Back to welcome",
+    "demoHint": "Testing the site? Sign in with email 123 and password 123.",
+    "socialSoonTitle": "{provider} sign-in",
+    "socialSoonDesc": "It will be available soon \u2014 for now, please use email and password.",
+    "errors": {
+      "missing_fields": "Please fill in all fields.",
+      "invalid_email": "Please enter a valid email address.",
+      "short_password": "Password must be at least 4 characters.",
+      "invalid_credentials": "Wrong email or password.",
+      "email_taken": "An account with this email already exists.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "accountMenu": {
+    "signedInAs": "Signed in as",
+    "profile": "Profile",
+    "settings": "Settings",
+    "help": "Help",
+    "home": "Home",
+    "subscription": "Subscription",
+    "terms": "Terms",
+    "rules": "Rules",
+    "logout": "Log out",
+    "signIn": "Sign in"
+  },
+  "cookieBar": {
+    "text": "We use cookies to keep you signed in and remember your choices.",
+    "accept": "Accept",
+    "learnMore": "Terms"
+  },
+  "underConstruction": {
+    "eyebrow": "Coming soon",
+    "title": "Under construction",
+    "text": "This section is being built right now. It opens soon.",
+    "backHome": "Back to home"
+  },
+  "termsPage": {
+    "title": "Terms",
+    "placeholder": "hello, write this"
+  },
+  "rulesPage": {
+    "title": "Rules",
+    "placeholder": "hello, write this"
+  },
+  "settingsPage": {
+    "eyebrow": "Account",
+    "title": "Settings",
+    "subtitle": "A few base settings for now \u2014 more arrive as the platform grows.",
+    "navLabel": "Settings categories",
+    "cats": {
+      "account": "Account",
+      "appearance": "Appearance",
+      "language": "Language",
+      "notifications": "Notifications"
+    },
+    "account": {
+      "title": "Account",
+      "subtitle": "Your sign-in details.",
+      "name": "Name",
+      "email": "Email",
+      "plan": "Plan",
+      "planFree": "Free (demo)",
+      "note": "Editing your details arrives together with the full account system."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "subtitle": "How PreLife looks on this device.",
+      "theme": "Theme",
+      "themeHint": "Your choice is remembered after you accept cookies.",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "language": {
+      "title": "Language",
+      "subtitle": "Interface language \u2014 applies immediately.",
+      "hint": "Your choice is remembered after you accept cookies."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Choose what PreLife may notify you about.",
+      "reminders": "Workout reminders",
+      "remindersHint": "A nudge when a planned session is near.",
+      "digest": "Weekly digest",
+      "digestHint": "One summary of your week, every Sunday.",
+      "news": "Product news",
+      "newsHint": "New sections and features, about once a month.",
+      "note": "Temporary toggles \u2014 they will start persisting with the full notification system."
+    }
+  },
+  "profilePage": {
+    "eyebrow": "Account",
+    "title": "Profile",
+    "subtitle": "Your PreLife identity for now.",
+    "name": "Name",
+    "email": "Email",
+    "plan": "Plan",
+    "planFree": "Free (demo)",
+    "settings": "Open settings",
+    "subscription": "Subscription",
+    "note": "A fuller profile \u2014 goals, history, progress \u2014 arrives soon."
+  },
+  "helpPage": {
+    "eyebrow": "Support",
+    "title": "Help",
+    "subtitle": "Short answers to the questions we hear most.",
+    "faqTitle": "Frequently asked",
+    "contactTitle": "Still stuck?",
+    "contactText": "Write to us and we usually reply within a day.",
+    "contactCta": "hello@prelife.net",
+    "faq": {
+      "q1": "How do I start?",
+      "a1": "Create a free account, then open any of the four sections \u2014 gym, diet, psychology or books \u2014 straight from the home page.",
+      "q2": "Is PreLife free?",
+      "a2": "Yes, the current preview is completely free. Paid plans arrive with the full release.",
+      "q3": "Can I change the language?",
+      "a3": "Yes \u2014 switch between Az\u0259rbaycan, English and \u0420\u0443\u0441\u0441\u043a\u0438\u0439 from the top bar, or in Settings \u2192 Language.",
+      "q4": "How do I turn on dark mode?",
+      "a4": "Use the moon icon in the top bar, or Settings \u2192 Appearance."
+    }
+  },
+  "notFoundPage": {
+    "eyebrow": "Error 404",
+    "title": "Page not found",
+    "text": "The address is right, but this page doesn't exist \u2014 it may have moved or been removed.",
+    "backHome": "Back to home"
+  },
+  "connection": {
+    "lost": "Your internet connection was lost",
+    "back": "Connection restored",
+    "dismiss": "Dismiss"
   }
 }
