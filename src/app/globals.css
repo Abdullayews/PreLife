@@ -76,10 +76,10 @@ html.dark :is(body:has([data-world="library"]), [data-world="library"]) {
    wash/wash-2 = M3-style accent-container tones (quiet color zones,
    active states); wash-ink = dark accent-tinged text for small type on wash
    (Ruder: small light type can't carry color — darken it); faint = the tail
-   of the ink ramp — DECORATIVE ONLY, ZERO CURRENT CONSUMERS (hairlines,
-   ghost numerals if ever needed): it fails 4.5:1 as text, so every text
-   slot uses --muted or darker, and placeholders sit at muted-on-surface
-   (≥4.5:1, measured per palette); accent-text =
+   of the ink ramp — DECORATIVE ONLY, never text (fails 4.5:1); its one
+   consumer is the .why counter numerals at lg+ (ghost numerals); every
+   text slot uses --muted or darker, and placeholders sit at
+   muted-on-surface (≥4.5:1, measured per palette); accent-text =
    the accent at a lightness that passes 4.5:1 as small text on all four
    surfaces (buttons keep the brighter --accent because white-on-accent is
    a less strict target); line-strong = 3:1 control borders. Shadows:
@@ -709,7 +709,14 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 /* ── Section scaffolding ──────────────────────────────────────────────── */
 .head { display: grid; gap: 1rem; margin-bottom: clamp(2rem, 5vw, 3.25rem); }
 
-/* Why */
+/* Why — three faces of one list:
+   <48rem  stacked rows (mobile, unchanged);
+   48–64rem four columns with ink rules (unchanged);
+   ≥64rem (B1) the section becomes an editorial spread — sticky heading
+   left, numbered ledger right. The numerals are CSS counters (pure
+   decoration, announced as nothing) in --faint, the ink-ramp tail that
+   exists exactly for ghost numerals. Grid rows are pinned explicitly so
+   ::before / svg / h3 / p each keep their own track. */
 .why { display: grid; gap: 0; border-top: 1px solid var(--line); }
 .why li { display: grid; gap: .6rem; padding: 1.6rem 0; border-bottom: 1px solid var(--line); }
 .why svg { color: var(--muted); }
@@ -718,6 +725,20 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 @media (min-width: 48rem) {
   .why { grid-template-columns: repeat(4, 1fr); border-top: 0; gap: 2rem; }
   .why li { border: 0; border-top: 2px solid var(--ink); padding: 1.25rem 0 0; }
+}
+@media (min-width: 64rem) {
+  #why .wrap { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: clamp(2.5rem, 5vw, 5rem); align-items: start; }
+  #why .head { position: sticky; top: calc(var(--nav-h) + 2rem); margin-bottom: 0; }
+  .why { border-top: 1px solid var(--line); counter-reset: why-n; grid-template-columns: minmax(0, 1fr); }
+  .why li { grid-template-columns: auto minmax(0, 1fr); column-gap: 1.5rem; row-gap: .5rem; align-content: start; border: 0; border-bottom: 1px solid var(--line); padding: 1.4rem 0; }
+  .why li:last-child { border-bottom: 0; }
+  .why li::before {
+    content: counter(why-n, decimal-leading-zero); counter-increment: why-n;
+    grid-column: 1; grid-row: 1 / span 3;
+    font: 600 2.6rem/1 var(--font-display); letter-spacing: -.02em;
+    color: var(--faint); align-self: start; padding-top: .1rem;
+  }
+  .why li > svg, .why li > h3, .why li > p { grid-column: 2; }
 }
 
 /* Plans — static cards, NOT links: no hover lift/shift (false
