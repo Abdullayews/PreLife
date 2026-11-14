@@ -501,6 +501,40 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .faq summary svg { flex: none; color: var(--muted); transition: rotate .25s var(--ease); }
 .faq[open] summary svg { rotate: 180deg; }
 .faq p { padding: 0 1.25rem 1.1rem; color: var(--muted); font-size: .9375rem; max-width: 42rem; }
+
+/* ── 404 (custom not-found) ────────────────────────────────────────────── */
+.nf { gap: 1.15rem; }
+.nf-ghost {
+  font: 600 clamp(5.5rem, 20vw, 11rem)/1 var(--font-display); letter-spacing: -.04em;
+  color: color-mix(in srgb, var(--accent) 15%, transparent); user-select: none;
+}
+
+/* ── Connection toasts (offline / restored) ────────────────────────────── */
+/* Fixed to the RIGHT corner below the nav. The "lost" variant persists
+   until the connection returns (or it is dismissed); the "back" variant
+   dismisses itself (handled in the component). */
+.conn-toast {
+  position: fixed; top: calc(var(--nav-h) + 1rem); right: max(1rem, env(safe-area-inset-right));
+  z-index: 58; display: flex; align-items: center; gap: .65rem;
+  max-width: min(23rem, calc(100vw - 2rem)); padding: .8rem 1rem;
+  background: var(--raised); border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: var(--shadow-3); animation: conn-in .35s var(--ease) both;
+}
+.conn-toast p { margin: 0; flex: 1; font-size: .875rem; font-weight: 600; }
+.conn-toast > svg { flex: none; }
+.conn-toast[data-kind="lost"] { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.conn-toast[data-kind="lost"] > svg { color: var(--accent); }
+.conn-toast[data-kind="back"] > svg { color: var(--ink); }
+.conn-toast button {
+  display: grid; place-items: center; width: 1.6rem; height: 1.6rem; flex: none;
+  border: 0; border-radius: 50%; background: none; color: var(--muted); cursor: pointer;
+  transition: background-color .15s, color .15s;
+}
+.conn-toast button:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--ink); }
+@keyframes conn-in { from { opacity: 0; translate: 1.25rem 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .conn-toast { animation: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   .switch::after, .faq summary svg { transition: none; }
 }
