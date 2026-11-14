@@ -96,7 +96,7 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
             {w.plans.map((p) => (
               <li key={p.id} className="plan rv" data-featured={p.featured ? "" : undefined}>
                 <div className="plan-img">
-                  <img src={p.image} alt="" loading="lazy" decoding="async" />
+                  <img src={p.image} alt="" width={800} height={500} loading="lazy" decoding="async" />
                   {p.featured && <span className="tag tag-solid">{t("plansMostPopular")}</span>}
                 </div>
                 <div className="plan-body">
@@ -201,7 +201,7 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
             <ul className="places">
               {w.places.map((p) => (
                 <li key={p.id} className="place rv">
-                  <img src={p.image} alt="" loading="lazy" decoding="async" />
+                  <img src={p.image} alt="" width={800} height={600} loading="lazy" decoding="async" />
                   <div>
                     <div className="place-top">
                       <h3>{t(p.nameKey)}</h3>
