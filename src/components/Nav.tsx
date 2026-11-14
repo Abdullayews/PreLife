@@ -11,20 +11,18 @@ import { ThemeToggle } from "./ThemeToggle";
 import { UserMenu, type MenuUser } from "./UserMenu";
 
 /**
- * One component, two bars — matched to the two halves of the site:
+ * One component, two bars — matched to the two halves of the site.
+ * Both surfaces share the SAME layout skeleton so switching between
+ * them never re-flows the bar: burger + wordmark LEFT, right cluster
+ * (language, theme, account / sign-in) RIGHT.
  *
- * • WELCOME surface (/welcome, /login, /signup, /terms, /rules) — the
- *   ORIGINAL Ultrahuman shrink bar: burger + section links LEFT, wordmark
- *   absolutely CENTERED, right cluster carries the language segment (sm+),
- *   the theme toggle, and either the account icon (signed in) or
- *   Sign in + Get started (signed out).
+ * • WELCOME surface (/welcome, /login, /signup, /terms, /rules): the
+ *   section links join the wordmark on the left at lg+ (burger/panel
+ *   below that) — the public marketing tabs, no account needed.
  *
- * • APP surface (/home, /gym, /diet, /meditation, /library, /subscription —
- *   the logged-in main pages): wordmark LEFT next to the burger, and on
- *   the RIGHT TOP every main tab gets its own button (Gym, Diet,
- *   Psychology, Books, Subscription) — clicking one switches the UI to
- *   that main page. The right cluster also carries the language segment
- *   (xl+), the theme toggle and the account menu.
+ * • APP surface (/home, /gym, /diet, /meditation, /library,
+ *   /subscription — the logged-in main pages): every main tab gets its
+ *   own button on the RIGHT TOP (lg+), language segment joins at xl+.
  *
  * Both share the same shrink behaviour: full-bleed solid strip at the top
  * of the page, floating frosted-glass pill past 24px of scroll.
@@ -139,9 +137,9 @@ export function Nav({ user }: { user: MenuUser | null }) {
             </>
           ) : (
             <>
-              {/* ── Welcome bar (previous version): links LEFT, wordmark CENTER.
-                  The section links open the PUBLIC marketing pages under
-                  /welcome/<slug> — no account needed. ── */}
+              {/* ── Welcome bar: brand LEFT beside the burger (same slot as
+                  the app bar), section links join it at lg+. They open the
+                  PUBLIC marketing pages under /welcome/<slug>. ── */}
               <div className="nav-side">
                 <button
                   type="button"
@@ -152,6 +150,9 @@ export function Nav({ user }: { user: MenuUser | null }) {
                 >
                   {open ? <X size={20} aria-hidden /> : <Menu size={20} aria-hidden />}
                 </button>
+                <Link href="/welcome" aria-label={t("navHome")} className="brand">
+                  Pre<em>Life</em>
+                </Link>
                 <ul className="nav-links">
                   {sections.map((s) => (
                     <li key={s.id}>
@@ -162,10 +163,6 @@ export function Nav({ user }: { user: MenuUser | null }) {
                   ))}
                 </ul>
               </div>
-
-              <Link href="/welcome" aria-label={t("navHome")} className="brand">
-                Pre<em>Life</em>
-              </Link>
 
               <div className="nav-tools">
                 <LocaleSwitch className="hide-sm" />
