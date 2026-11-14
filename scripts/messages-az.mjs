@@ -879,9 +879,38 @@ export const az = {
       navLabel: "Ayarlar kategoriyaları",
       cats: {
         account: "Hesab",
+        devices: "Cihazlar",
         appearance: "Görünüş",
         language: "Dil",
         notifications: "Bildirişlər"
+      },
+      devices: {
+        title: "Cihazlar",
+        subtitle: "Hesabınızın aktiv cihazları. Hər birinə xüsusi ad və ikon seçə bilərsiniz.",
+        current: "Bu cihaz",
+        lastActive: "Son aktiv: {time}",
+        edit: "Cihazı düzənlə",
+        signOut: "Bu cihazı çıxış etdir",
+        signOutCurrent: "Çıxış et",
+        nameLabel: "Cihazın adı",
+        iconLabel: "İkon",
+        save: "Yadda saxla",
+        cancel: "Ləğv et",
+        loading: "Cihazlar yüklənir…",
+        error: "Əməliyyat alınmadı. Yenidən cəhd edin.",
+        note: "Sessiyalar aktivlikdən asılı olaraq uzadılır — aktiv istifadəçi avtomatik çıxış edilmir. Tanımadığınız cihazı buradan çıxarın.",
+        icons: {
+          monitor: "Monitor",
+          laptop: "Noutbuk",
+          smartphone: "Telefon",
+          tablet: "Planşet",
+          watch: "Ağıllı saat",
+          tv: "TV",
+          gamepad: "Oyun konsolu",
+          headphones: "Qulaqlıq",
+          briefcase: "İş cihazı",
+          home: "Ev cihazı"
+        }
       },
       account: {
         title: "Hesab",

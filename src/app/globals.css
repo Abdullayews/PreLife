@@ -580,6 +580,44 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 }
 .set-note svg { flex: none; margin-top: .1rem; }
 
+/* ── Settings → Devices ──────────────────────────────────────────────── */
+.device-list { display: grid; }
+.device {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: .75rem 1.25rem; padding-block: .95rem; border-bottom: 1px solid var(--line);
+}
+.device:last-child { border-bottom: 0; }
+.device-ico {
+  display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; flex: none;
+  border-radius: var(--r-sm); background: color-mix(in srgb, var(--accent) 13%, transparent);
+  color: var(--muted);
+}
+.device-info { display: grid; gap: .2rem; min-width: 0; flex: 1; }
+.device-name { display: flex; align-items: center; gap: .5rem; font-size: .9375rem; font-weight: 650; color: var(--ink); overflow-wrap: anywhere; }
+.device-badge {
+  padding: .12rem .5rem; border-radius: 999px; background: var(--wash); color: var(--accent-text);
+  font-size: .6875rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+}
+.device-meta { font-size: .8125rem; color: var(--muted); }
+.device-actions { display: flex; gap: .4rem; flex: none; }
+/* Inline edit form: name field + icon grid + save/cancel */
+.device-edit { display: grid; gap: 1rem; padding-block: .95rem; border-bottom: 1px solid var(--line); }
+.device-edit:last-child { border-bottom: 0; }
+.device-edit .field { gap: .45rem; }
+.device-grid-label { font-size: .8125rem; font-weight: 650; color: var(--ink); }
+.icon-grid { display: flex; flex-wrap: wrap; gap: .5rem; }
+.icon-grid button {
+  display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0;
+  border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+  background: var(--surface); color: var(--muted); cursor: pointer;
+  transition: color .15s, background-color .15s, border-color .15s;
+}
+.icon-grid button:hover { color: var(--ink); border-color: var(--ink); }
+.icon-grid button[aria-pressed="true"] {
+  background: var(--wash); border-color: transparent; color: var(--accent-text);
+}
+.device-edit-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+
 /* Toggle switch (role="switch") */
 .switch {
   --w: 2.75rem; position: relative; flex: none; width: var(--w); height: 1.55rem;

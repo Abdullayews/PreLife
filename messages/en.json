@@ -877,9 +877,38 @@
     "navLabel": "Settings categories",
     "cats": {
       "account": "Account",
+      "devices": "Devices",
       "appearance": "Appearance",
       "language": "Language",
       "notifications": "Notifications"
+    },
+    "devices": {
+      "title": "Devices",
+      "subtitle": "The devices signed in to your account. Give each one its own name and icon.",
+      "current": "This device",
+      "lastActive": "Last active: {time}",
+      "edit": "Edit device",
+      "signOut": "Sign out this device",
+      "signOutCurrent": "Sign out",
+      "nameLabel": "Device name",
+      "iconLabel": "Icon",
+      "save": "Save",
+      "cancel": "Cancel",
+      "loading": "Loading devices\u2026",
+      "error": "That didn't work. Please try again.",
+      "note": "Sessions renew as you stay active \u2014 an active user is never signed out automatically. Remove any device you don't recognize.",
+      "icons": {
+        "monitor": "Monitor",
+        "laptop": "Laptop",
+        "smartphone": "Phone",
+        "tablet": "Tablet",
+        "watch": "Smartwatch",
+        "tv": "TV",
+        "gamepad": "Game console",
+        "headphones": "Headphones",
+        "briefcase": "Work device",
+        "home": "Home device"
+      }
     },
     "account": {
       "title": "Account",
