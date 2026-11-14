@@ -7,24 +7,31 @@ import { acceptCookies, persistLocale, setThemeChoice } from "@/lib/consent";
 
 /**
  * Cookie consent bar — fixed to the bottom of every page until the
- * visitor accepts. Acceptance is stored in a cookie (read server-side
+ * visitor answers. Acceptance is stored in a cookie (read server-side
  * in the locale layout, so accepted visitors never see a flash).
  *
  * Accepting also promotes the preferences already chosen this visit
  * (theme, language) from visit-scoped to persistent storage, and from
  * then on every change is persisted — see lib/consent.ts.
+ *
+ * REJECTING stores nothing at all — not even a “said no” cookie —
+ * because the pre-consent zero-storage promise forbids any write
+ * before acceptance. The bar is dismissed for THIS visit (in-memory
+ * state) and will reappear on the next one. That compromise is
+ * deliberate: it is the only behavior compatible with the promise.
  */
 export function CookieConsent({ initialAccepted }: { initialAccepted: boolean }) {
   const t = useTranslations("cookieBar");
   const locale = useLocale();
   const [accepted, setAccepted] = useState(initialAccepted);
+  const [rejected, setRejected] = useState(false); // this visit only — memory
   const barRef = useRef<HTMLDivElement>(null);
 
   // While the bar is up, reserve its height on <body> so the fixed banner
   // can never cover page content — its height varies a lot between locales
   // (Russian strings wrap to 2–3 lines on phones) and with the safe-area.
   useEffect(() => {
-    if (accepted) return;
+    if (accepted || rejected) return;
     const bar = barRef.current;
     if (!bar) return;
     const reserve = () => {
@@ -39,7 +46,7 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
       window.removeEventListener("resize", reserve);
       document.body.style.paddingBottom = "";
     };
-  }, [accepted]);
+  }, [accepted, rejected]);
 
   // Keep the locale cookie in sync for consented visitors who arrive on a
   // different language than the one remembered (e.g. following a shared
@@ -48,7 +55,7 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
     if (accepted) persistLocale(locale);
   }, [accepted, locale]);
 
-  if (accepted) return null;
+  if (accepted || rejected) return null;
 
   const accept = () => {
     try {
@@ -63,6 +70,12 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
     setAccepted(true);
   };
 
+  const reject = () => {
+    // Zero-storage rule: no cookie, no localStorage, no sessionStorage —
+    // the dismissal lives in React state and dies with the tab.
+    setRejected(true);
+  };
+
   return (
     <div ref={barRef} className="cookie-bar" role="region" aria-label={t("text")}>
       <div className="cookie-in">
@@ -72,6 +85,9 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
         <div className="cookie-actions">
           <button type="button" className="btn btn-sm" onClick={accept}>
             {t("accept")}
+          </button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={reject}>
+            {t("reject")}
           </button>
         </div>
       </div>

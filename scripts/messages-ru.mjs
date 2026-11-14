@@ -859,7 +859,8 @@ export const ru = {
     cookieBar: {
       text: "Мы используем cookie, чтобы сохранять ваш вход и запоминать выбор.",
       accept: "Принять",
-      learnMore: "Условия"
+      reject: "Только необходимые",
+      learnMore: "Подробнее о cookie"
     },
     underConstruction: {
       eyebrow: "Скоро",

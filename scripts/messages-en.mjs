@@ -859,7 +859,8 @@ export const en = {
     cookieBar: {
       text: "We use cookies to keep you signed in and remember your choices.",
       accept: "Accept",
-      learnMore: "Terms"
+      reject: "Necessary only",
+      learnMore: "Cookie details"
     },
     underConstruction: {
       eyebrow: "Coming soon",

@@ -444,7 +444,11 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 }
 .cookie-in p { flex: 1 1 16rem; margin: 0; font-size: .8125rem; color: var(--muted); }
 .cookie-in p a { color: var(--ink); font-weight: 650; text-decoration: underline; text-decoration-color: var(--accent); }
-.cookie-actions { display: flex; align-items: center; gap: .6rem; }
+.cookie-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+/* Equal weight for the two answers: same height, same flex base — the
+   filled Accept and the outlined Reject stretch to identical widths
+   (and stack full-width on the narrowest phones). */
+.cookie-actions .btn { flex: 1 1 9rem; }
 /* Compact on phones — the RU/AZ consent sentence wraps to 2–3 lines. */
 @media (max-width: 30rem) {
   .cookie-in { padding: .75rem .9rem; gap: .55rem .9rem; }
