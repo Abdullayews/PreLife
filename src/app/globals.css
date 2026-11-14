@@ -637,7 +637,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 
 /* ── Hero + gallery ───────────────────────────────────────────────────── */
 .hero { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; min-height: min(86svh, 56rem); }
-.gal { position: absolute; inset: 0; z-index: -2; background: var(--tint); }
+.gal { position: absolute; inset: 0; z-index: -2; /* D1: placeholder wash until photos arrive */ background: linear-gradient(135deg, var(--tint), var(--wash) 60%, var(--tint)); }
 .gal-pic {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, center);
   opacity: 0; z-index: 1; transition: opacity 0s linear 1.8s;
@@ -792,7 +792,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .plan[data-featured] { box-shadow: var(--shadow-2); }
 .plan[data-featured]::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 5px; background: var(--accent); }
 .plan .tag-solid { background: var(--ink); color: var(--bg); border-color: transparent; box-shadow: 0 0 0 1px color-mix(in srgb, var(--raised) 45%, transparent), var(--shadow-1); }
-.plan-img { position: relative; aspect-ratio: 16 / 10; background: var(--tint); }
+.plan-img { position: relative; aspect-ratio: 16 / 10; background: linear-gradient(135deg, var(--tint), var(--wash) 60%, var(--tint)); }
 .plan-img img { width: 100%; height: 100%; object-fit: cover; }
 .plan-img .tag { position: absolute; top: .85rem; left: .85rem; }
 .plan-body { display: grid; gap: .7rem; padding: 1.4rem; align-content: start; flex: 1; }
@@ -925,7 +925,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   .place { flex: 0 0 min(75vw, 19rem); scroll-snap-align: start; }
 }
 .place { overflow: hidden; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); display: flex; flex-direction: column; }
-.place > img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--tint); }
+.place > img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: linear-gradient(135deg, var(--tint), var(--wash) 60%, var(--tint)); }
 .place > div { display: grid; gap: .75rem; padding: 1.35rem; }
 .place-top { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
 .place h3 { font: 600 1.25rem/1.2 var(--font-display); }
