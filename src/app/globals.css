@@ -805,12 +805,32 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   .item .chip-ico { width: 2.5rem; height: 2.5rem; border-radius: 12px; }
 }
 
-/* Schedule */
+/* Schedule — B6: below 52rem the time column pins (sticky left) while
+   the week slides under it, and .sched-clip::after paints a right-edge
+   fade pinned OVER the scroller (the clip never scrolls, so the hint
+   stays put — an ::after on the scroller itself would scroll away).
+   The hairline seam marks the pinned column's edge. */
+.sched-clip { min-width: 0; }
 .sched-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 20px; background: var(--raised); box-shadow: var(--shadow-1); -webkit-overflow-scrolling: touch; }
+@media (max-width: 51.99rem) {
+  .sched-clip { position: relative; }
+  .sched-clip::after {
+    content: ""; position: absolute; top: 0; bottom: 0; right: 0; width: 2.25rem;
+    border-radius: 0 20px 20px 0;
+    background: linear-gradient(90deg, transparent, var(--raised) 70%);
+    pointer-events: none; z-index: 2;
+  }
+  .sched thead th:first-child, .sched th[scope="row"] {
+    position: sticky; left: 0; z-index: 1;
+    background: var(--raised);
+    box-shadow: inset -1px 0 0 var(--line);
+  }
+  .sched thead th:first-child { z-index: 2; }
+}
 .sched-wrap::-webkit-scrollbar { height: 8px; }
 .sched-wrap::-webkit-scrollbar-track { background: transparent; }
 .sched-wrap::-webkit-scrollbar-thumb { border-radius: 999px; background: color-mix(in srgb, var(--ink) 20%, transparent); }
-.sched { width: 100%; min-width: 46rem; border-collapse: collapse; font-size: .875rem; }
+.sched { width: 100%; min-width: 46rem; border-collapse: separate; border-spacing: 0; font-size: .875rem; } /* separate: collapsed borders break sticky-cell paint order (cells slide OVER the pinned column in Chromium) */
 .sched th, .sched td { padding: .8rem .65rem; text-align: center; border-bottom: 1px solid var(--line); }
 .sched thead th { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
 .sched tbody tr:last-child > * { border-bottom: 0; }

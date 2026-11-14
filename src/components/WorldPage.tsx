@@ -136,8 +136,13 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
       <section id="schedule" className="sec sec-tint">
         <div className="wrap">
           <Head n={++n} eyebrow={t("scheduleEyebrow")} title={t("scheduleTitle")} subtitle={t("scheduleSubtitle")} />
-          <div className="sched-wrap rv" tabIndex={0} role="region" aria-label={t("scheduleTitle")}>
-            <table className="sched">
+          {/* B6: .sched-clip is a non-scrolling parent — its ::after gradient
+              (mobile only) stays pinned over the scroller's right edge while
+              the week slides under it. The region contract on .sched-wrap is
+              unchanged. */}
+          <div className="sched-clip">
+            <div className="sched-wrap rv" tabIndex={0} role="region" aria-label={t("scheduleTitle")}>
+              <table className="sched">
               <thead>
                 <tr>
                   <th scope="col">{t("scheduleTime")}</th>
@@ -159,6 +164,7 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
           <p className="note">{t("scheduleRestNote")}</p>
         </div>
