@@ -860,7 +860,8 @@ export const az = {
     cookieBar: {
       text: "Sizi daxil saxlamaq və seçimlərinizi xatırlamaq üçün cookie-lərdən istifadə edirik.",
       accept: "Qəbul et",
-      learnMore: "Şərtlər"
+      reject: "Yalnız zəruri",
+      learnMore: "Cookie təfərrüatları"
     },
     underConstruction: {
       eyebrow: "Tezliklə",

@@ -858,7 +858,8 @@
   "cookieBar": {
     "text": "Sizi daxil saxlamaq v\u0259 se\u00e7iml\u0259rinizi xat\u0131rlamaq \u00fc\u00e7\u00fcn cookie-l\u0259rd\u0259n istifad\u0259 edirik.",
     "accept": "Q\u0259bul et",
-    "learnMore": "\u015e\u0259rtl\u0259r"
+    "reject": "Yaln\u0131z z\u0259ruri",
+    "learnMore": "Cookie t\u0259f\u0259rr\u00fcatlar\u0131"
   },
   "underConstruction": {
     "eyebrow": "Tezlikl\u0259",
