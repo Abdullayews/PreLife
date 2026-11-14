@@ -158,6 +158,13 @@ body {
 main { flex: 1; display: flex; flex-direction: column; }
 .world { flex: 1; background: var(--bg); color: var(--ink); }
 h1, h2, h3, p, ul, ol, dl, dd, figure, blockquote, table { margin: 0; padding: 0; }
+/* C3 — one wrapping policy everywhere: headings balance (the last line
+   never dangles a word), prose runs pretty. Element-level, so every
+   heading/paragraph/term inherits it without per-rule repetition;
+   nowrap contexts (tags, marquee, table row-heads) are unaffected —
+   text-wrap only softens WHERE wraps already happen. */
+h1, h2, h3, h4 { text-wrap: balance; }
+p, li, dd, dt, figcaption, small { text-wrap: pretty; }
 ul, ol { list-style: none; }
 img { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
