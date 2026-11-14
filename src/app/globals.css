@@ -76,8 +76,10 @@ html.dark :is(body:has([data-world="library"]), [data-world="library"]) {
    wash/wash-2 = M3-style accent-container tones (quiet color zones,
    active states); wash-ink = dark accent-tinged text for small type on wash
    (Ruder: small light type can't carry color — darken it); faint = the tail
-   of the ink ramp — DECORATIVE ONLY (hairlines, ghost numerals): it fails
-   4.5:1 as text, so every text slot uses --muted or darker; accent-text =
+   of the ink ramp — DECORATIVE ONLY, ZERO CURRENT CONSUMERS (hairlines,
+   ghost numerals if ever needed): it fails 4.5:1 as text, so every text
+   slot uses --muted or darker, and placeholders sit at muted-on-surface
+   (≥4.5:1, measured per palette); accent-text =
    the accent at a lightness that passes 4.5:1 as small text on all four
    surfaces (buttons keep the brighter --accent because white-on-accent is
    a less strict target); line-strong = 3:1 control borders. Shadows:
@@ -835,7 +837,10 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 a.card:hover { border-color: color-mix(in srgb, var(--c) 45%, var(--line)); transform: translateY(-3px); box-shadow: var(--shadow-2); }
 .card h3 { font: 600 1.2rem/1.25 var(--font-display); }
 .card p { color: var(--muted); font-size: .9375rem; }
-.card em { margin-top: auto; padding-top: .8rem; display: inline-flex; align-items: center; gap: .35rem; font-style: normal; font-weight: 650; font-size: .875rem; }
+/* A3: the card's action line joins the other small accent texts
+   (.eyebrow b, .score, .explore em, .auth-alt a) on --accent-text —
+   the accent lightness that holds ≥4.5:1 on every surface it meets. */
+.card em { margin-top: auto; padding-top: .8rem; display: inline-flex; align-items: center; gap: .35rem; font-style: normal; font-weight: 650; font-size: .875rem; color: var(--accent-text); }
 a.card:hover em svg { transform: translateX(3px); }
 .card em svg { transition: transform .25s var(--ease); }
 .card .chip-ico { background: color-mix(in srgb, var(--c) 13%, transparent); color: var(--c); }
