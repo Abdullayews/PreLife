@@ -7,9 +7,9 @@ import { requireUser } from "@/lib/auth";
 
 type Props = { params: Promise<{ locale: string }> };
 const PICKS: { key: string; section: SectionId }[] = [
-  { key: "pick1", section: "sport" },
+  { key: "pick1", section: "gym" },
   { key: "pick2", section: "diet" },
-  { key: "pick3", section: "psikoloji" },
+  { key: "pick3", section: "meditation" },
 ];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

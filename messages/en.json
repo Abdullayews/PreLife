@@ -23,9 +23,9 @@
       "subtitle": "PreLife brings gym, nutrition, psychology and books together in one calm system \u2014 with plans, videos, experts and AI in every section.",
       "seeAll": "Explore the sections",
       "chips": {
-        "psikoloji": "Psychology",
-        "kitab": "Books",
-        "sport": "Gym",
+        "meditation": "Psychology",
+        "library": "Books",
+        "gym": "Gym",
         "diet": "Diet"
       }
     },
@@ -55,15 +55,15 @@
       "subtitle": "Each section is a complete world of its own. Together, they form one lifestyle.",
       "explore": "Explore",
       "cards": {
-        "psikoloji": {
+        "meditation": {
           "name": "Psychology",
           "tagline": "Psychologists, videos, meditation and AI"
         },
-        "kitab": {
+        "library": {
           "name": "Books",
           "tagline": "Curated books, collections and AI picks"
         },
-        "sport": {
+        "gym": {
           "name": "Gym",
           "tagline": "Gym, yoga, pilates, trainers, videos and AI"
         },
@@ -139,7 +139,7 @@
     "eyebrow": "PreLife \u00b7 {section}",
     "subTitle": "Inside this section",
     "itemsTitle": "Featured right now",
-    "psikoloji": {
+    "meditation": {
       "name": "Psychology",
       "heroTitle": "A calmer mind, one session at a time.",
       "heroText": "Talk to trusted psychologists, follow guided meditation, learn from videos and let PreLife AI support you between sessions \u2014 everything for your inner life in one place.",
@@ -170,7 +170,7 @@
         }
       }
     },
-    "kitab": {
+    "library": {
       "name": "Books",
       "heroTitle": "Read to grow.",
       "heroText": "A curated library with collections for every season of life \u2014 and AI picks tuned to what you are living through right now.",
@@ -199,7 +199,7 @@
         }
       }
     },
-    "sport": {
+    "gym": {
       "name": "Gym",
       "heroTitle": "Move every day, your way.",
       "heroText": "GYM plans, yoga flows, pilates classes, personal trainers and video workouts \u2014 with PreLife AI building the week around your energy.",

@@ -23,9 +23,9 @@
       "subtitle": "PreLife idman\u0131, qidalanman\u0131, psixologiyan\u0131 v\u0259 kitablar\u0131 bir sakit sistemd\u0259 birl\u0259\u015fdirir \u2014 h\u0259r b\u00f6lm\u0259d\u0259 planlar, videolar, m\u00fct\u0259x\u0259ssisl\u0259r v\u0259 AI.",
       "seeAll": "B\u00f6lm\u0259l\u0259ri k\u0259\u015ff edin",
       "chips": {
-        "psikoloji": "Psixologiya",
-        "kitab": "Kitablar",
-        "sport": "\u0130dman",
+        "meditation": "Psixologiya",
+        "library": "Kitablar",
+        "gym": "\u0130dman",
         "diet": "Qidalanma"
       }
     },
@@ -55,15 +55,15 @@
       "subtitle": "H\u0259r b\u00f6lm\u0259 \u00f6z\u00fcn\u0259m\u0259xsus tam bir d\u00fcnyad\u0131r. Birlikd\u0259 is\u0259 vahid h\u0259yat t\u0259rzi yarad\u0131rlar.",
       "explore": "K\u0259\u015ff edin",
       "cards": {
-        "psikoloji": {
+        "meditation": {
           "name": "Psixologiya",
           "tagline": "Psixoloqlar, videolar, meditasiya v\u0259 AI"
         },
-        "kitab": {
+        "library": {
           "name": "Kitablar",
           "tagline": "Se\u00e7ilmi\u015f kitablar, kolleksiyalar v\u0259 AI se\u00e7iml\u0259ri"
         },
-        "sport": {
+        "gym": {
           "name": "\u0130dman",
           "tagline": "\u0130dman zal\u0131, yoqa, pilates, m\u0259\u015fq\u00e7il\u0259r, videolar v\u0259 AI"
         },
@@ -139,7 +139,7 @@
     "eyebrow": "PreLife \u00b7 {section}",
     "subTitle": "B\u00f6lm\u0259nin i\u00e7ind\u0259kil\u0259r",
     "itemsTitle": "Haz\u0131rda se\u00e7ilmi\u015fl\u0259r",
-    "psikoloji": {
+    "meditation": {
       "name": "Psixologiya",
       "heroTitle": "Daha sakit zehin, g\u00fcnd\u0259 bir sessiya.",
       "heroText": "Etibarl\u0131 psixoloqlarla dan\u0131\u015f\u0131n, b\u0259l\u0259d\u00e7i meditasiyalar edin, videolardan \u00f6yr\u0259nin v\u0259 sessiyalar aras\u0131nda PreLife AI d\u0259st\u0259yi al\u0131n \u2014 daxili h\u0259yat\u0131n\u0131z \u00fc\u00e7\u00fcn h\u0259r \u015fey bir yerd\u0259.",
@@ -170,7 +170,7 @@
         }
       }
     },
-    "kitab": {
+    "library": {
       "name": "Kitablar",
       "heroTitle": "B\u00f6y\u00fcm\u0259k \u00fc\u00e7\u00fcn oxuyun.",
       "heroText": "H\u0259yat\u0131n h\u0259r m\u00f6vs\u00fcm\u00fcn\u0259 uy\u011fun kolleksiyalarla se\u00e7ilmi\u015f kitabxana \u2014 v\u0259 bu anda ya\u015fad\u0131qlar\u0131n\u0131za uy\u011fun AI se\u00e7iml\u0259ri.",
@@ -199,7 +199,7 @@
         }
       }
     },
-    "sport": {
+    "gym": {
       "name": "\u0130dman",
       "heroTitle": "H\u0259r g\u00fcn, \u00f6z \u00fcsulunuzla h\u0259r\u0259k\u0259t edin.",
       "heroText": "GYM planlar\u0131, yoqa ax\u0131nlar\u0131, pilates d\u0259rsl\u0259ri, \u015f\u0259xsi m\u0259\u015fq\u00e7il\u0259r v\u0259 video m\u0259\u015fql\u0259r \u2014 PreLife AI h\u0259ft\u0259ni enerjiniz\u0259 uy\u011fun qurur.",

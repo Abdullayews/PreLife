@@ -25,9 +25,9 @@ export const en = {
         subtitle: "PreLife brings gym, nutrition, psychology and books together in one calm system — with plans, videos, experts and AI in every section.",
         seeAll: "Explore the sections",
         chips: {
-          psikoloji: "Psychology",
-          kitab: "Books",
-          sport: "Gym",
+          meditation: "Psychology",
+          library: "Books",
+          gym: "Gym",
           diet: "Diet"
         }
       },
@@ -57,15 +57,15 @@ export const en = {
         subtitle: "Each section is a complete world of its own. Together, they form one lifestyle.",
         explore: "Explore",
         cards: {
-          psikoloji: {
+          meditation: {
             name: "Psychology",
             tagline: "Psychologists, videos, meditation and AI"
           },
-          kitab: {
+          library: {
             name: "Books",
             tagline: "Curated books, collections and AI picks"
           },
-          sport: {
+          gym: {
             name: "Gym",
             tagline: "Gym, yoga, pilates, trainers, videos and AI"
           },
@@ -141,7 +141,7 @@ export const en = {
       eyebrow: "PreLife · {section}",
       subTitle: "Inside this section",
       itemsTitle: "Featured right now",
-      psikoloji: {
+      meditation: {
         name: "Psychology",
         heroTitle: "A calmer mind, one session at a time.",
         heroText: "Talk to trusted psychologists, follow guided meditation, learn from videos and let PreLife AI support you between sessions — everything for your inner life in one place.",
@@ -172,7 +172,7 @@ export const en = {
           }
         }
       },
-      kitab: {
+      library: {
         name: "Books",
         heroTitle: "Read to grow.",
         heroText: "A curated library with collections for every season of life — and AI picks tuned to what you are living through right now.",
@@ -201,7 +201,7 @@ export const en = {
           }
         }
       },
-      sport: {
+      gym: {
         name: "Gym",
         heroTitle: "Move every day, your way.",
         heroText: "GYM plans, yoga flows, pilates classes, personal trainers and video workouts — with PreLife AI building the week around your energy.",
