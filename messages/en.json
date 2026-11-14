@@ -347,11 +347,7 @@
     "navStart": "Get started",
     "navThemeToggle": "Toggle dark / light mode",
     "navHome": "PreLife \u2014 home",
-    "galleryLabel": "Hero photos",
-    "galleryPause": "Pause slideshow",
-    "galleryPlay": "Resume slideshow",
-    "marqueePause": "Pause scrolling text",
-    "marqueePlay": "Resume scrolling text"
+    "galleryLabel": "Hero photos"
   },
   "gymHome": {
     "metaTitle": "Gym",
@@ -821,6 +817,7 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "passwordPlaceholder": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+    "forgotPassword": "Forgot password?",
     "loginCta": "Sign in",
     "signupCta": "Create account",
     "orContinueWith": "or continue with",

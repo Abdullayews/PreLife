@@ -33,8 +33,6 @@ export default async function WelcomePage({ params }: Props) {
           images={landingFrames.map((f) => f.src)}
           positions={landingFrames.map((f) => f.pos)}
           label={tc("galleryLabel")}
-          pauseLabel={tc("galleryPause")}
-          playLabel={tc("galleryPlay")}
         />
         <div className="hero-scrim" aria-hidden />
         <div className="wrap hero-body">

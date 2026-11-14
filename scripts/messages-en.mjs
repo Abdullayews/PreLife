@@ -349,11 +349,7 @@ export const en = {
       navStart: "Get started",
       navThemeToggle: "Toggle dark / light mode",
       navHome: "PreLife — home",
-      galleryLabel: "Hero photos",
-      galleryPause: "Pause slideshow",
-      galleryPlay: "Resume slideshow",
-      marqueePause: "Pause scrolling text",
-      marqueePlay: "Resume scrolling text"
+      galleryLabel: "Hero photos"
     },
     gymHome: {
       metaTitle: "Gym",
@@ -823,6 +819,7 @@ export const en = {
       showPassword: "Show password",
       hidePassword: "Hide password",
       passwordPlaceholder: "••••••••",
+      forgotPassword: "Forgot password?",
       loginCta: "Sign in",
       signupCta: "Create account",
       orContinueWith: "or continue with",
