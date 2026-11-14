@@ -850,8 +850,22 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   }
 }
 
-/* Places */
+/* Places — B5: below 52rem the cards become a horizontal scroll-snap
+   rail (the .places-wrap region — keyboard-focusable like .sched-wrap);
+   at ≥52rem the three-column grid stands. Card width is capped so the
+   neighbouring cards always peek, signalling the scroll. */
+.places-wrap { min-width: 0; }
 .places { display: grid; gap: 1.25rem; }
+@media (max-width: 51.99rem) {
+  .places-wrap {
+    overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    padding-bottom: .5rem; scrollbar-width: thin;
+  }
+  .places-wrap:focus-visible { outline-offset: 4px; }
+  .places { display: flex; gap: 1rem; }
+  .place { flex: 0 0 min(75vw, 19rem); scroll-snap-align: start; }
+}
 .place { overflow: hidden; background: var(--raised); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow-1); display: flex; flex-direction: column; }
 .place > img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--tint); }
 .place > div { display: grid; gap: .75rem; padding: 1.35rem; }

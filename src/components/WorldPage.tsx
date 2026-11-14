@@ -188,25 +188,30 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
       <section id={w.ids.places} className="sec sec-tint">
         <div className="wrap">
           <Head n={++n} eyebrow={t(`${w.prefix.places}Eyebrow`)} title={t(`${w.prefix.places}Title`)} subtitle={t(`${w.prefix.places}Subtitle`)} />
-          <ul className="places">
-            {w.places.map((p) => (
-              <li key={p.id} className="place rv">
-                <img src={p.image} alt="" loading="lazy" decoding="async" />
-                <div>
-                  <div className="place-top">
-                    <h3>{t(p.nameKey)}</h3>
-                    <span className="score" role="img" aria-label={t(`${w.prefix.places}RatingA11y`, { score: p.rating })}>
-                      <Star size={14} fill="currentColor" aria-hidden />{p.rating.toFixed(1)}
-                    </span>
+          {/* B5: scrollable region below 52rem — same contract as .sched-wrap:
+              tabIndex + role=region + the section's own translated title as
+              the aria-label (no new message keys). */}
+          <div className="places-wrap" tabIndex={0} role="region" aria-label={t(`${w.prefix.places}Title`)}>
+            <ul className="places">
+              {w.places.map((p) => (
+                <li key={p.id} className="place rv">
+                  <img src={p.image} alt="" loading="lazy" decoding="async" />
+                  <div>
+                    <div className="place-top">
+                      <h3>{t(p.nameKey)}</h3>
+                      <span className="score" role="img" aria-label={t(`${w.prefix.places}RatingA11y`, { score: p.rating })}>
+                        <Star size={14} fill="currentColor" aria-hidden />{p.rating.toFixed(1)}
+                      </span>
+                    </div>
+                    <p>{t(p.descKey)}</p>
+                    <ul className="chips">
+                      {p.featureKeys.map((k) => <li key={k}>{t(k)}</li>)}
+                    </ul>
                   </div>
-                  <p>{t(p.descKey)}</p>
-                  <ul className="chips">
-                    {p.featureKeys.map((k) => <li key={k}>{t(k)}</li>)}
-                  </ul>
-                </div>
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
