@@ -11,6 +11,17 @@
      and 50% circles). 12 (inputs, notes, chips), 16 (menus, toasts, rows),
      22 (cards, panels), 32 (the big CTA/auth surfaces). */
   --r-sm: 12px; --r-md: 16px; --r-lg: 22px; --r-xl: 32px;
+  /* C2 — type scale: display tiers for headings/lede/eyebrow. The floor
+     of the whole scale is 12px (.75rem) — verified: no rule sets a
+     smaller font-size (smallest: eyebrow, .seg button, .tag, sched head,
+     auth-or, user-label — all exactly 12px). */
+  --step-display: clamp(2.6rem, 8.2vw, 5.4rem);
+  --step-display-sm: clamp(2.2rem, 5.5vw, 3.6rem);
+  --step-h2: clamp(1.8rem, 4vw, 2.75rem);
+  --step-h3: 1.25rem;
+  --step-lede: clamp(1rem, 1.6vw, 1.15rem);
+  --step-small: .8125rem;
+  --step-eyebrow: .75rem;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --nav-ease: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
@@ -164,15 +175,15 @@ button { cursor: pointer; }
 @media (max-width: 63.99rem) { .hide-md { display: none !important; } }
 
 /* ── Type ─────────────────────────────────────────────────────────────── */
-.display { font: 600 clamp(2.6rem, 8.2vw, 5.4rem)/0.98 var(--font-display); letter-spacing: -0.025em; text-wrap: balance; }
-.display.sm { font-size: clamp(2.2rem, 5.5vw, 3.6rem); }
-.h2 { font: 600 clamp(1.8rem, 4vw, 2.75rem)/1.08 var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
-.h3 { font: 600 1.25rem/1.25 var(--font-display); letter-spacing: -0.01em; }
-.lede { color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.15rem); max-width: 40rem; text-wrap: pretty; }
-.eyebrow { display: flex; align-items: center; gap: .75rem; font-size: .75rem; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+.display { font: 600 var(--step-display)/0.98 var(--font-display); letter-spacing: -0.025em; text-wrap: balance; }
+.display.sm { font-size: var(--step-display-sm); }
+.h2 { font: 600 var(--step-h2)/1.08 var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
+.h3 { font: 600 var(--step-h3)/1.25 var(--font-display); letter-spacing: -0.01em; }
+.lede { color: var(--muted); font-size: var(--step-lede); max-width: 40rem; text-wrap: pretty; }
+.eyebrow { display: flex; align-items: center; gap: .75rem; font-size: var(--step-eyebrow); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); } /* C2: tracking .22em → .16em (12px floor kept) */
 .eyebrow b { color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .eyebrow i { width: 2.5rem; height: 1px; background: var(--muted); flex: none; }
-small, .note { font-size: .8125rem; color: var(--muted); }
+small, .note { font-size: var(--step-small); color: var(--muted); }
 .note { margin-top: 1.5rem; max-width: 40rem; }
 .note.center { margin-inline: auto; }
 
