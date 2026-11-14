@@ -179,7 +179,7 @@ small, .note { font-size: .8125rem; color: var(--muted); }
 .ico-moon { display: none; } .ico-sun { display: block; }
 html.dark .ico-moon { display: block; } html.dark .ico-sun { display: none; }
 .seg { display: inline-flex; align-items: center; gap: 2px; height: 2.5rem; padding-inline: .25rem; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); }
-.seg button { height: 2rem; padding-inline: .625rem; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: .6875rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; transition: color .2s, background-color .2s; }
+.seg button { height: 2rem; padding-inline: .625rem; border: 0; border-radius: 999px; background: transparent; color: var(--muted); font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; transition: color .2s, background-color .2s; }
 .seg button:hover { color: var(--ink); }
 .seg button[aria-pressed="true"], .seg button[aria-selected="true"] { background: var(--wash-2); color: var(--wash-ink); box-shadow: var(--shadow-1); }
 .tag { display: inline-block; padding: .2rem .65rem; border: 1px solid var(--line); border-radius: 999px; font-size: .75rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
@@ -191,6 +191,19 @@ html.dark .ico-moon { display: block; } html.dark .ico-sun { display: none; }
 html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .filter { padding: .35rem .8rem; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--raised); font-size: .8125rem; }
 .filter[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: transparent; }
+/* Touch targets (WCAG 2.5.8): on coarse pointers every compact control
+   grows to a ≥44px hit area; fine-pointer layout stays untouched. The
+   nav keeps its 4rem height — the grown controls still fit inside it. */
+@media (pointer: coarse) {
+  .icon-btn { width: 2.75rem; height: 2.75rem; }
+  .btn-sm { min-height: 2.75rem; }
+  .seg { height: auto; padding-block: .1875rem; }
+  .seg button { height: 2.75rem; min-width: 2.75rem; }
+  .user-btn { position: relative; }
+  .user-btn::after { content: ""; position: absolute; inset: -4px; }
+  .conn-toast button { position: relative; width: 2.25rem; height: 2.25rem; }
+  .conn-toast button::after { content: ""; position: absolute; inset: -4px; }
+}
 .chip-ico { display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: 14px; background: color-mix(in srgb, var(--accent) 13%, transparent); color: var(--accent); flex: none; }
 .chip-ico.tinted { --c: var(--c, var(--accent)); }
 .chip-ico.solid { background: var(--ink); color: var(--bg); }
@@ -383,9 +396,10 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .auth-or { display: flex; align-items: center; gap: .9rem; color: var(--muted); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; text-align: center; }
 .auth-or::before, .auth-or::after { content: ""; height: 1px; flex: 1; background: var(--line); }
 /* Narrow phones: Russian "ИЛИ ПРОДОЛЖИТЬ ЧЕРЕЗ" is long — tighten the
-   tracking instead of letting it crowd the divider lines. */
+   tracking instead of letting it crowd the divider lines. (.75rem is the
+   floor for any control-adjacent text; it still fits at 360px.) */
 @media (max-width: 26rem) {
-  .auth-or { font-size: .6875rem; letter-spacing: .07em; gap: .6rem; }
+  .auth-or { font-size: .75rem; letter-spacing: .07em; gap: .6rem; }
 }
 .auth-social { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
 .social-btn {
@@ -586,7 +600,11 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   background: color-mix(in srgb, var(--raised) 62%, transparent); border: 1px solid var(--line);
   backdrop-filter: blur(14px) saturate(1.5); -webkit-backdrop-filter: blur(14px) saturate(1.5);
 }
-.gal-dots button { display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 0; background: none; border-radius: 999px; }
+.gal-dots button { position: relative; display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 0; background: none; border-radius: 999px; }
+/* Visible dot stays 8px, but the tappable area is padded to 44×44px
+   (32px + 12px of invisible ::after). Adjacent areas overlap in the
+   2px gaps — the later sibling wins there, as with any dot row. */
+.gal-dots button::after { content: ""; position: absolute; inset: -6px; }
 .gal-dots span { display: block; width: .5rem; height: .5rem; border-radius: 999px; background: color-mix(in srgb, var(--ink) 38%, transparent); transition: width .35s var(--ease), background-color .3s; }
 .gal-dots [aria-current="true"] span { width: 1.6rem; background: var(--accent); }
 .gal-dots button:hover span { background: color-mix(in srgb, var(--ink) 65%, transparent); }
