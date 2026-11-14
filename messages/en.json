@@ -20,7 +20,7 @@
       "ariaLabel": "PreLife platform banner",
       "eyebrow": "One platform, four worlds",
       "title": "Train. Eat. Breathe. Read.",
-      "subtitle": "PreLife brings gym, nutrition, psychology and books together in one calm system — with plans, videos, experts and AI in every section.",
+      "subtitle": "PreLife brings gym, nutrition, psychology and books together in one calm system \u2014 with plans, videos, experts and AI in every section.",
       "seeAll": "Explore the sections",
       "chips": {
         "psikoloji": "Psychology",
@@ -80,7 +80,7 @@
         "one": {
           "label": "Structure",
           "title": "A system, not chaos",
-          "text": "Plans, progressions and routines turn good intentions into repeatable weeks — you always know your next step."
+          "text": "Plans, progressions and routines turn good intentions into repeatable weeks \u2014 you always know your next step."
         },
         "two": {
           "label": "Balance",
@@ -90,20 +90,20 @@
         "three": {
           "label": "Momentum",
           "title": "Progress you can see",
-          "text": "Sessions finished, meals planned and pages read add up quietly — until one day the change is undeniable."
+          "text": "Sessions finished, meals planned and pages read add up quietly \u2014 until one day the change is undeniable."
         }
       }
     },
     "cta": {
       "title": "Start living your premium life",
-      "text": "Create a free account and every section opens in front of you.",
+      "text": "No account needed yet \u2014 one click and every section opens in front of you.",
       "start": "Start using PreLife",
-      "note": "Free during early access — subscription plans arrive with payments."
+      "note": "Free during early access \u2014 subscription plans arrive with payments."
     },
     "footer": {
       "brand": "PreLife",
       "tagline": "A premium life, one day at a time.",
-      "rights": "© 2026 PreLife. All rights reserved."
+      "rights": "\u00a9 2026 PreLife. All rights reserved."
     }
   },
   "homePage": {
@@ -113,19 +113,19 @@
       "navLabel": "Sections",
       "language": "Change language"
     },
-    "placeholder": "The full home dashboard lands in the next step of this build — for now, jump into any section.",
+    "placeholder": "The full home dashboard lands in the next step of this build \u2014 for now, jump into any section.",
     "sectionsEyebrow": "Sections",
     "today": {
       "eyebrow": "Today",
       "open": "Open",
       "pick1": {
-        "title": "Full-body strength — 35 min"
+        "title": "Full-body strength \u2014 35 min"
       },
       "pick2": {
         "title": "Mediterranean grain bowl"
       },
       "pick3": {
-        "title": "Morning calm — 5 min"
+        "title": "Morning calm \u2014 5 min"
       }
     },
     "subscription": {
@@ -136,13 +136,13 @@
   },
   "sections": {
     "backHome": "Back to Home",
-    "eyebrow": "PreLife · {section}",
+    "eyebrow": "PreLife \u00b7 {section}",
     "subTitle": "Inside this section",
     "itemsTitle": "Featured right now",
     "psikoloji": {
       "name": "Psychology",
       "heroTitle": "A calmer mind, one session at a time.",
-      "heroText": "Talk to trusted psychologists, follow guided meditation, learn from videos and let PreLife AI support you between sessions — everything for your inner life in one place.",
+      "heroText": "Talk to trusted psychologists, follow guided meditation, learn from videos and let PreLife AI support you between sessions \u2014 everything for your inner life in one place.",
       "ctaTitle": "Begin your inner work",
       "ctaText": "Start with three quiet minutes today.",
       "subs": {
@@ -154,7 +154,7 @@
       "items": {
         "0": {
           "title": "5-minute morning calm",
-          "desc": "A short guided meditation to start the day without rush — it sets the tone for everything that follows."
+          "desc": "A short guided meditation to start the day without rush \u2014 it sets the tone for everything that follows."
         },
         "1": {
           "title": "Aynur Mammadova",
@@ -173,7 +173,7 @@
     "kitab": {
       "name": "Books",
       "heroTitle": "Read to grow.",
-      "heroText": "A curated library with collections for every season of life — and AI picks tuned to what you are living through right now.",
+      "heroText": "A curated library with collections for every season of life \u2014 and AI picks tuned to what you are living through right now.",
       "ctaTitle": "Open your next chapter",
       "ctaText": "One page a day already changes the year.",
       "subs": {
@@ -183,11 +183,11 @@
       "items": {
         "0": {
           "title": "Atomic Habits",
-          "desc": "James Clear. Small changes, remarkable results — the habit-building companion for every PreLife plan."
+          "desc": "James Clear. Small changes, remarkable results \u2014 the habit-building companion for every PreLife plan."
         },
         "1": {
           "title": "The Power of Now",
-          "desc": "Eckhart Tolle. Presence as a practice — a natural pair with the meditation section."
+          "desc": "Eckhart Tolle. Presence as a practice \u2014 a natural pair with the meditation section."
         },
         "2": {
           "title": "Deep Work",
@@ -202,7 +202,7 @@
     "sport": {
       "name": "Gym",
       "heroTitle": "Move every day, your way.",
-      "heroText": "GYM plans, yoga flows, pilates classes, personal trainers and video workouts — with PreLife AI building the week around your energy.",
+      "heroText": "GYM plans, yoga flows, pilates classes, personal trainers and video workouts \u2014 with PreLife AI building the week around your energy.",
       "ctaTitle": "Your first workout is waiting",
       "ctaText": "Thirty-five minutes today is enough to start.",
       "subs": {
@@ -224,7 +224,7 @@
         },
         "2": {
           "title": "Pilates core basics",
-          "desc": "A mat, twenty minutes and a deep burn — the foundation for everything else."
+          "desc": "A mat, twenty minutes and a deep burn \u2014 the foundation for everything else."
         },
         "3": {
           "title": "Train with Elvin",
@@ -235,7 +235,7 @@
     "diet": {
       "name": "Diet",
       "heroTitle": "Eat well, simply.",
-      "heroText": "Guided diet plans, honest recipes, dietitians you can trust and videos that make good food feel easy — with AI to adjust the plan.",
+      "heroText": "Guided diet plans, honest recipes, dietitians you can trust and videos that make good food feel easy \u2014 with AI to adjust the plan.",
       "ctaTitle": "Plan your first meal",
       "ctaText": "One balanced bowl is a very good start.",
       "subs": {
@@ -247,7 +247,7 @@
       "items": {
         "0": {
           "title": "Mediterranean grain bowl",
-          "desc": "Greens, grains, olives and a lemon dressing — a lunch that keeps the afternoon calm."
+          "desc": "Greens, grains, olives and a lemon dressing \u2014 a lunch that keeps the afternoon calm."
         },
         "1": {
           "title": "High-protein breakfasts",
@@ -267,14 +267,14 @@
   "subscription": {
     "eyebrow": "Subscription",
     "title": "PreLife Premium",
-    "text": "One plan, every section — gym, diet, psychology and books, with AI and videos included.",
+    "text": "One plan, every section \u2014 gym, diet, psychology and books, with AI and videos included.",
     "bestValue": "Best value",
     "choose": "Choose plan",
-    "note": "Payments (Ödeniş) arrive in an upcoming update — nothing is charged in this preview.",
+    "note": "Payments (\u00d6deni\u015f) arrive in an upcoming update \u2014 nothing is charged in this preview.",
     "plans": {
       "monthly": {
         "name": "Monthly",
-        "price": "₼9",
+        "price": "\u20bc9",
         "per": "per month",
         "desc": "Try everything, cancel anytime.",
         "features": {
@@ -285,7 +285,7 @@
       },
       "yearly": {
         "name": "Yearly",
-        "price": "₼79",
+        "price": "\u20bc79",
         "per": "per year",
         "desc": "Two months free compared to monthly.",
         "features": {
@@ -296,7 +296,7 @@
       },
       "family": {
         "name": "Family",
-        "price": "₼14",
+        "price": "\u20bc14",
         "per": "per month",
         "desc": "Up to four members, one bill.",
         "features": {
@@ -307,20 +307,145 @@
       }
     }
   },
+  "uiPage": {
+    "eyebrow": "Design system",
+    "title": "UI elements",
+    "intro": "The general building blocks of PreLife \u2014 colors, typography, controls, cards and states in one place, all following the light single-tone capstone language.",
+    "sections": {
+      "colors": "Color system",
+      "colorsDesc": "One calm light tone across the platform, with each section carrying its own accent.",
+      "typography": "Typography",
+      "typographyDesc": "Geist everywhere \u2014 tracked caps for labels, tight bold for headlines.",
+      "buttons": "Buttons",
+      "buttonsDesc": "Pills throughout \u2014 the primary action is always a solid ink pill.",
+      "badges": "Badges & chips",
+      "badgesDesc": "Section chips carry the capstone accents; status pills stay quiet.",
+      "forms": "Form controls",
+      "formsDesc": "Calm inputs on the light tone, hairline borders, soft focus rings.",
+      "cards": "Cards",
+      "cardsDesc": "Rounded cards on the paper tone \u2014 tinted icon chips and clear hierarchy.",
+      "avatars": "Avatars",
+      "avatarsDesc": "Initials on the section tint \u2014 calm and consistent.",
+      "tabs": "Tabs",
+      "tabsDesc": "Pill tabs in the Ultrahuman spirit \u2014 the active tab is a solid ink pill.",
+      "feedback": "Feedback & states",
+      "feedbackDesc": "Progress, loading and messages that keep the tone quiet."
+    },
+    "colors": {
+      "core": "Core tones",
+      "accents": "Section accents",
+      "toneNames": {
+        "background": "Background",
+        "card": "Card",
+        "ink": "Ink",
+        "muted": "Muted",
+        "border": "Border"
+      },
+      "accentUse": "Accent",
+      "tintUse": "Tint"
+    },
+    "typography": {
+      "display": "Display",
+      "heading": "Heading",
+      "subheading": "Subheading",
+      "body": "Body",
+      "caption": "Caption",
+      "label": "Label (tracked caps)"
+    },
+    "buttons": {
+      "variants": "Variants",
+      "save": "Save changes",
+      "sizes": "Sizes",
+      "withIcon": "With icon",
+      "play": "Play session",
+      "iconOnly": "Icon buttons",
+      "disabled": "Disabled"
+    },
+    "badges": {
+      "sectionChips": "Section chips",
+      "status": "Status pills",
+      "live": "Live",
+      "new": "New",
+      "soon": "Coming soon",
+      "filters": "Filter chips"
+    },
+    "forms": {
+      "labels": "Inputs",
+      "name": "Full name",
+      "namePlaceholder": "Aysel Mammadova",
+      "email": "Email",
+      "emailPlaceholder": "you@prelife.net",
+      "search": "Search",
+      "searchPlaceholder": "Search sessions, books, recipes...",
+      "message": "Message",
+      "messagePlaceholder": "Write a note to your coach...",
+      "select": "Difficulty",
+      "selectEasy": "Easy",
+      "selectMedium": "Medium",
+      "selectHard": "Hard",
+      "checkboxes": "Checkboxes",
+      "notifyEmail": "Email notifications",
+      "notifyPush": "Push notifications",
+      "radios": "Radio group",
+      "planFree": "Free plan",
+      "planPremium": "PreLife Premium",
+      "switches": "Switches",
+      "switchDaily": "Daily reminder",
+      "switchDailyDesc": "A gentle nudge at 9:00 to pick today's session.",
+      "switchAI": "PreLife AI",
+      "switchAIDesc": "AI picks and mood check-ins across all sections.",
+      "slider": "Slider",
+      "sliderLabel": "Session length",
+      "sliderValue": "45",
+      "sliderUnit": "min"
+    },
+    "cards": {
+      "stat": "Stat card",
+      "sectionCard": "Section card",
+      "expertCard": "Expert card",
+      "expertRole": "Clinical psychologist",
+      "actionCard": "Action card",
+      "open": "Open"
+    },
+    "avatars": {
+      "sizes": "Sizes",
+      "group": "Group",
+      "person1": "Aysel Mammadova",
+      "person2": "Nihat Guliyev",
+      "person3": "Shafa Rahimli",
+      "person4": "Elvin Hasanli",
+      "more": "+8"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "sessions": "Sessions",
+      "videos": "Videos",
+      "ai": "AI",
+      "overviewText": "One calm view of your day \u2014 gym, meals, mind and reading in a single strip.",
+      "sessionsText": "Guided sessions picked for you, from five quiet minutes to full workouts.",
+      "videosText": "Video libraries across every section, from recipes to technique breakdowns.",
+      "aiText": "PreLife AI checks in, suggests and never judges."
+    },
+    "feedback": {
+      "progress": "Progress",
+      "progressLabel": "Weekly goal",
+      "progressValue": "72%",
+      "skeleton": "Skeleton",
+      "alerts": "Alerts",
+      "alertTitle": "Payments arrive later",
+      "alertText": "Subscription plans are coming with payments \u2014 everything is free during early access.",
+      "warnTitle": "Slow connection",
+      "warnText": "Your progress syncs once you are back online.",
+      "spinner": "Loading"
+    }
+  },
   "Metadata": {
     "welcomeTitle": "Welcome",
-    "welcomeDescription": "Meet PreLife — gym, diet, psychology and books in one platform, with experts, videos and AI in every section.",
+    "welcomeDescription": "Meet PreLife \u2014 gym, diet, psychology and books in one platform, with experts, videos and AI in every section.",
     "homeTitle": "Home",
     "homeDescription": "Your everyday starting point in PreLife.",
     "uiTitle": "UI elements",
-    "uiDescription": "The general UI building blocks of PreLife — colors, typography, buttons, forms, cards and states.",
-    "loginTitle": "Sign in",
-    "signupTitle": "Create account",
-    "termsTitle": "Terms",
-    "rulesTitle": "Rules",
-    "settingsTitle": "Settings",
-    "profileTitle": "Profile",
-    "helpTitle": "Help"
+    "uiDescription": "The general UI building blocks of PreLife \u2014 colors, typography, buttons, forms, cards and states."
   },
   "moduleCommon": {
     "statOneLabel": "Item one",
@@ -346,8 +471,12 @@
     "navLanguage": "Change language",
     "navStart": "Get started",
     "navThemeToggle": "Toggle dark / light mode",
-    "navHome": "PreLife — home",
-    "galleryLabel": "Hero photos"
+    "navHome": "PreLife \u2014 home",
+    "galleryLabel": "Hero photos",
+    "galleryPause": "Pause slideshow",
+    "galleryPlay": "Resume slideshow",
+    "marqueePause": "Pause scrolling text",
+    "marqueePlay": "Resume scrolling text"
   },
   "gymHome": {
     "metaTitle": "Gym",
@@ -363,7 +492,7 @@
     "navLanguage": "Change language",
     "heroEyebrow": "PreLife Gym",
     "heroTitle": "Strength, refined.",
-    "heroSubtitle": "Coach-built training plans, a precise exercise library and the finest partner gyms — composed into one premium training experience.",
+    "heroSubtitle": "Coach-built training plans, a precise exercise library and the finest partner gyms \u2014 composed into one premium training experience.",
     "heroCtaPrimary": "Explore plans",
     "heroCtaSecondary": "Find a gym",
     "heroRating": "4.9 average member rating",
@@ -373,12 +502,12 @@
     "heroStatExercisesLabel": "Exercises",
     "heroStatGymsValue": "50+",
     "heroStatGymsLabel": "Partner gyms",
-    "marqueeItems": "Strength • Discipline • Power • Mobility • Recovery • Community",
+    "marqueeItems": "Strength \u2022 Discipline \u2022 Power \u2022 Mobility \u2022 Recovery \u2022 Community",
     "whyEyebrow": "Why PreLife Gym",
     "whyTitle": "Everything a serious session needs",
-    "whySubtitle": "Training, recovery and nutrition composed as one system — not three separate apps.",
+    "whySubtitle": "Training, recovery and nutrition composed as one system \u2014 not three separate apps.",
     "why1Title": "Adaptive programs",
-    "why1Desc": "Every plan adjusts to your level, schedule and equipment — week by week.",
+    "why1Desc": "Every plan adjusts to your level, schedule and equipment \u2014 week by week.",
     "why2Title": "Verified technique",
     "why2Desc": "A movement library reviewed by certified strength coaches, with clear execution cues.",
     "why3Title": "Recovery built in",
@@ -387,7 +516,7 @@
     "why4Desc": "Macro targets that follow your training phase, so the kitchen matches the gym.",
     "plansEyebrow": "Training plans",
     "plansTitle": "Programs with a point of view",
-    "plansSubtitle": "Every plan is periodized by coaches — progressive, measurable and honest about the work it takes.",
+    "plansSubtitle": "Every plan is periodized by coaches \u2014 progressive, measurable and honest about the work it takes.",
     "plansMetaWeeks": "{count}-week plan",
     "plansMetaDays": "{count} days/week",
     "plansMetaKcal": "~{count} kcal/session",
@@ -418,7 +547,7 @@
     "exFarmerTarget": "Grip & Core",
     "scheduleEyebrow": "Weekly schedule",
     "scheduleTitle": "This week on the floor",
-    "scheduleSubtitle": "Drop-in classes are included with every plan — just pick a slot and show up.",
+    "scheduleSubtitle": "Drop-in classes are included with every plan \u2014 just pick a slot and show up.",
     "scheduleTime": "Time",
     "scheduleDayMon": "Mon",
     "scheduleDayTue": "Tue",
@@ -433,21 +562,21 @@
     "scheduleClassConditioning": "Conditioning",
     "scheduleClassMobility": "Mobility & Core",
     "scheduleClassOpen": "Open Floor",
-    "scheduleRestNote": "Sunday is recovery day — guided mobility flows live in the Meditation module.",
+    "scheduleRestNote": "Sunday is recovery day \u2014 guided mobility flows live in the Meditation module.",
     "storiesEyebrow": "Member stories",
     "storiesTitle": "Results that keep people showing up",
-    "stories1Quote": "The hypertrophy plan finally made training feel structured. Twelve weeks in, my numbers moved — and so did my habits.",
+    "stories1Quote": "The hypertrophy plan finally made training feel structured. Twelve weeks in, my numbers moved \u2014 and so did my habits.",
     "stories1Name": "Aysel R.",
     "stories1Role": "Hypertrophy track, member since 2024",
     "stories2Quote": "Technique notes are short and exact. My deadlift stopped hurting my back and started moving real weight.",
     "stories2Name": "Elvin M.",
     "stories2Role": "Powerlifting track, member since 2023",
-    "stories3Quote": "I train at 07:00 before work. The schedule keeps me honest — and the morning crew keeps me accountable.",
+    "stories3Quote": "I train at 07:00 before work. The schedule keeps me honest \u2014 and the morning crew keeps me accountable.",
     "stories3Name": "Murad S.",
     "stories3Role": "Morning crew, member since 2025",
     "gymsEyebrow": "Partner gyms",
     "gymsTitle": "Train in the best rooms",
-    "gymsSubtitle": "A hand-picked directory of partner gyms — equipment, atmosphere and standards worth your session.",
+    "gymsSubtitle": "A hand-picked directory of partner gyms \u2014 equipment, atmosphere and standards worth your session.",
     "gymsRatingA11y": "Rated {score} out of 5",
     "venueIronName": "Iron House",
     "venueIronDesc": "A 24/7 strength floor with a full free-weight arsenal and a calm, focused crowd.",
@@ -465,17 +594,16 @@
     "featCoaching": "Coaching support",
     "featRecovery": "Recovery zone",
     "ctaTitle": "Your first week is on us.",
-    "ctaSubtitle": "Pick a plan, find your gym and let the work compound. Onboarding and week one are free — no card required.",
+    "ctaSubtitle": "Pick a plan, find your gym and let the work compound. Onboarding and week one are free \u2014 no card required.",
     "ctaButton": "Start training today",
-    "ctaNote": "Free onboarding session with every plan.",
-    "baseNote": "This is the foundation of the new Gym — plan tracking, exercise videos and personal records arrive here soon."
+    "ctaNote": "Free onboarding session with every plan."
   },
   "dietHome": {
     "metaTitle": "Diet",
     "metaDescription": "Nutritionist-built meal plans, a chef-crafted recipe library, weekly meal schedules and the finest partner markets and studios.",
     "heroEyebrow": "PreLife Diet",
     "heroTitle": "Nutrition, refined.",
-    "heroSubtitle": "Nutritionist-built meal plans, a chef-crafted recipe library and the finest partner markets — composed into one premium nutrition experience.",
+    "heroSubtitle": "Nutritionist-built meal plans, a chef-crafted recipe library and the finest partner markets \u2014 composed into one premium nutrition experience.",
     "heroCtaPrimary": "Explore plans",
     "heroCtaSecondary": "Find a market",
     "heroRating": "4.9 average member rating",
@@ -485,21 +613,21 @@
     "heroStatExpertsLabel": "Nutritionists",
     "heroStatVenuesValue": "50+",
     "heroStatVenuesLabel": "Partner venues",
-    "marqueeItems": "Protein • Balance • Seasonal • Hydration • Portion • Rhythm",
+    "marqueeItems": "Protein \u2022 Balance \u2022 Seasonal \u2022 Hydration \u2022 Portion \u2022 Rhythm",
     "whyEyebrow": "Why PreLife Diet",
     "whyTitle": "Eating well, minus the noise",
-    "whySubtitle": "Plans, recipes and shopping composed as one system — so the kitchen finally matches your goals.",
+    "whySubtitle": "Plans, recipes and shopping composed as one system \u2014 so the kitchen finally matches your goals.",
     "why1Title": "Personal macro targets",
-    "why1Desc": "Your plan sets protein, carbs and fats for your body and goal — then keeps them honest week by week.",
+    "why1Desc": "Your plan sets protein, carbs and fats for your body and goal \u2014 then keeps them honest week by week.",
     "why2Title": "Seasonal and local",
     "why2Desc": "Recipes follow the market calendar, so every plate is built on produce at its peak.",
     "why3Title": "Chef-crafted recipes",
-    "why3Desc": "Every dish is tested by chefs and reviewed by nutritionists — flavor first, numbers close behind.",
+    "why3Desc": "Every dish is tested by chefs and reviewed by nutritionists \u2014 flavor first, numbers close behind.",
     "why4Title": "Habits that stick",
-    "why4Desc": "Gentle weekly practices — hydration, portions, mindful eating — turn a plan into a lifestyle.",
+    "why4Desc": "Gentle weekly practices \u2014 hydration, portions, mindful eating \u2014 turn a plan into a lifestyle.",
     "plansEyebrow": "Nutrition plans",
     "plansTitle": "Programs with a point of view",
-    "plansSubtitle": "Every plan is built by nutritionists — balanced, measurable and honest about the routine it asks of you.",
+    "plansSubtitle": "Every plan is built by nutritionists \u2014 balanced, measurable and honest about the routine it asks of you.",
     "plansMetaMeals": "{count} meals/day",
     "plansMetaWeeks": "{count}-week plan",
     "plansMetaKcal": "~{count} kcal/day",
@@ -515,7 +643,7 @@
     "planPerformanceDesc": "Five precision meals timed around training, for athletes who count everything.",
     "recipesEyebrow": "Recipe library",
     "recipesTitle": "Cook something worth repeating",
-    "recipesSubtitle": "Crisp, tested recipes with full macros — from ten-minute bowls to weekend projects.",
+    "recipesSubtitle": "Crisp, tested recipes with full macros \u2014 from ten-minute bowls to weekend projects.",
     "recBowlName": "Protein Power Bowl",
     "recBowlTarget": "Post-workout recovery",
     "recSaladName": "Market Salad",
@@ -530,7 +658,7 @@
     "recChefTarget": "Weekend project",
     "scheduleEyebrow": "Weekly menu",
     "scheduleTitle": "This week on the table",
-    "scheduleSubtitle": "Every plan ships with a ready weekly menu — swap, repeat or shop it as-is.",
+    "scheduleSubtitle": "Every plan ships with a ready weekly menu \u2014 swap, repeat or shop it as-is.",
     "scheduleTime": "Time",
     "scheduleDayMon": "Mon",
     "scheduleDayTue": "Tue",
@@ -546,10 +674,10 @@
     "scheduleMealPlant": "Plant-based",
     "scheduleMealLight": "Light & fresh",
     "scheduleMealChef": "Chef's choice",
-    "scheduleRestNote": "Sunday is a free table — family dinner, no tracking, no guilt.",
+    "scheduleRestNote": "Sunday is a free table \u2014 family dinner, no tracking, no guilt.",
     "storiesEyebrow": "Member stories",
     "storiesTitle": "Results you can taste",
-    "stories1Quote": "The Lean Protocol finally made food feel structured. Eight weeks in, my energy is steady all day — and the recipes are actually good.",
+    "stories1Quote": "The Lean Protocol finally made food feel structured. Eight weeks in, my energy is steady all day \u2014 and the recipes are actually good.",
     "stories1Name": "Leyla A.",
     "stories1Role": "Lean Protocol, member since 2024",
     "stories2Quote": "Macro targets without preaching. I shop the weekly menu on Saturday and stop thinking about food all week.",
@@ -560,12 +688,12 @@
     "stories3Role": "Family plan, member since 2023",
     "venuesEyebrow": "Partner venues",
     "venuesTitle": "Shop and dine at the best tables",
-    "venuesSubtitle": "A hand-picked directory of partner markets, kitchens and bars — standards worth your appetite.",
+    "venuesSubtitle": "A hand-picked directory of partner markets, kitchens and bars \u2014 standards worth your appetite.",
     "venuesRatingA11y": "Rated {score} out of 5",
     "venueMarketName": "Green Market Hall",
     "venueMarketDesc": "An organic market hall with seasonal boxes and produce picked the same morning.",
     "venueKitchenName": "Fit Kitchen Studio",
-    "venueKitchenDesc": "Daily meal-prep with your exact macros on the label — order Sunday, eat all week.",
+    "venueKitchenDesc": "Daily meal-prep with your exact macros on the label \u2014 order Sunday, eat all week.",
     "venueBarName": "Nourish Bar",
     "venueBarDesc": "Cold-pressed juices, vegan bowls and an in-house nutritionist every evening.",
     "featOrganic": "Organic certified",
@@ -578,16 +706,16 @@
     "featVegan": "Vegan options",
     "featNutritionist": "Nutritionist on site",
     "ctaTitle": "Your first meal plan is on us.",
-    "ctaSubtitle": "Pick a plan, shop the menu and let good food compound. Onboarding and week one are free — no card required.",
+    "ctaSubtitle": "Pick a plan, shop the menu and let good food compound. Onboarding and week one are free \u2014 no card required.",
     "ctaButton": "Start eating well",
     "ctaNote": "Free nutritionist consultation with every plan."
   },
   "meditationHome": {
-    "metaTitle": "Psychology",
+    "metaTitle": "Meditation",
     "metaDescription": "Guided meditation sessions, science-backed programs, certified mentors and a weekly rhythm for a quieter mind.",
     "heroEyebrow": "PreLife Meditation",
     "heroTitle": "Stillness, refined.",
-    "heroSubtitle": "Guided sessions, science-backed programs and certified mentors — composed into one premium practice for a quieter mind.",
+    "heroSubtitle": "Guided sessions, science-backed programs and certified mentors \u2014 composed into one premium practice for a quieter mind.",
     "heroCtaPrimary": "Explore programs",
     "heroCtaSecondary": "Meet the mentors",
     "heroRating": "4.9 average member rating",
@@ -597,21 +725,21 @@
     "heroStatMentorsLabel": "Certified mentors",
     "heroStatSleepValue": "50+",
     "heroStatSleepLabel": "Sleep stories",
-    "marqueeItems": "Breath • Stillness • Focus • Sleep • Calm • Presence",
+    "marqueeItems": "Breath \u2022 Stillness \u2022 Focus \u2022 Sleep \u2022 Calm \u2022 Presence",
     "whyEyebrow": "Why PreLife Meditation",
     "whyTitle": "A quieter mind, on schedule",
-    "whySubtitle": "Practice, sleep and insight composed as one system — five minutes or a full evening, always guided.",
+    "whySubtitle": "Practice, sleep and insight composed as one system \u2014 five minutes or a full evening, always guided.",
     "why1Title": "Science-backed practice",
-    "why1Desc": "Every program stands on published research in attention, stress and sleep — reviewed by clinical advisors.",
+    "why1Desc": "Every program stands on published research in attention, stress and sleep \u2014 reviewed by clinical advisors.",
     "why2Title": "Five to twenty minutes",
     "why2Desc": "Sessions sized for real days: a breath before the meeting, a body scan after work.",
     "why3Title": "Sleep, taken seriously",
     "why3Desc": "Wind-downs, sleep stories and a fourteen-evening reset for the nights that resist.",
     "why4Title": "Progress you can see",
-    "why4Desc": "Streaks, calm minutes and gentle weekly insights — encouragement, never judgment.",
+    "why4Desc": "Streaks, calm minutes and gentle weekly insights \u2014 encouragement, never judgment.",
     "plansEyebrow": "Programs",
     "plansTitle": "Paths with a point of view",
-    "plansSubtitle": "Every program is structured day by day — short sessions, honest progress and no mysticism.",
+    "plansSubtitle": "Every program is structured day by day \u2014 short sessions, honest progress and no mysticism.",
     "plansMetaMinutes": "{count} min/day",
     "plansMetaDays": "{count}-day program",
     "plansMetaSessions": "{count} sessions/week",
@@ -620,7 +748,7 @@
     "levelIntermediate": "Intermediate",
     "levelAdvanced": "Advanced",
     "planFoundationsName": "Foundations of Calm",
-    "planFoundationsDesc": "Seven days to learn the mechanics of attention — ten minutes every morning.",
+    "planFoundationsDesc": "Seven days to learn the mechanics of attention \u2014 ten minutes every morning.",
     "planFocusName": "Deep Focus",
     "planFocusDesc": "A three-week training block for sustained attention at work and in practice.",
     "planSleepName": "Sleep Reset",
@@ -642,7 +770,7 @@
     "sesEveningTarget": "Sleep preparation",
     "scheduleEyebrow": "Weekly rhythm",
     "scheduleTitle": "This week in practice",
-    "scheduleSubtitle": "Live sessions are included with every program — just pick a slot and sit down.",
+    "scheduleSubtitle": "Live sessions are included with every program \u2014 just pick a slot and sit down.",
     "scheduleTime": "Time",
     "scheduleDayMon": "Mon",
     "scheduleDayTue": "Tue",
@@ -657,24 +785,24 @@
     "scheduleTrackFocus": "Focus",
     "scheduleTrackSleep": "Sleep",
     "scheduleTrackRest": "Open rest",
-    "scheduleRestNote": "Sunday is silence day — one long open sit, no guidance, no timer.",
+    "scheduleRestNote": "Sunday is silence day \u2014 one long open sit, no guidance, no timer.",
     "storiesEyebrow": "Member stories",
     "storiesTitle": "Calm that keeps people coming back",
     "stories1Quote": "Deep Focus carried me through a brutal quarter. Twenty-one days in, my attention stopped leaking everywhere.",
     "stories1Name": "Nargiz B.",
     "stories1Role": "Deep Focus, member since 2024",
-    "stories2Quote": "The Sleep Reset ended a decade of 2 a.m. staring. Fourteen evenings — I sleep like it was always easy.",
+    "stories2Quote": "The Sleep Reset ended a decade of 2 a.m. staring. Fourteen evenings \u2014 I sleep like it was always easy.",
     "stories2Name": "Tahir I.",
     "stories2Role": "Sleep Reset, member since 2025",
-    "stories3Quote": "I sit at 07:00 with the live morning session. The rhythm holds me — and the mentors hold the quality.",
+    "stories3Quote": "I sit at 07:00 with the live morning session. The rhythm holds me \u2014 and the mentors hold the quality.",
     "stories3Name": "Khadija G.",
     "stories3Role": "Morning practice, member since 2023",
     "mentorsEyebrow": "Certified mentors",
     "mentorsTitle": "Learn from steady hands",
-    "mentorsSubtitle": "A hand-picked circle of mentors — training, temperament and standards worth your practice.",
+    "mentorsSubtitle": "A hand-picked circle of mentors \u2014 training, temperament and standards worth your practice.",
     "mentorsRatingA11y": "Rated {score} out of 5",
     "mentorLeylaName": "Leyla Maharramova",
-    "mentorLeylaDesc": "An MBSR teacher with a decade of group practice — calm, precise, quietly funny.",
+    "mentorLeylaDesc": "An MBSR teacher with a decade of group practice \u2014 calm, precise, quietly funny.",
     "mentorSamirName": "Samir Aliyev",
     "mentorSamirDesc": "Breathwork specialist for athletes and founders; sessions built around real schedules.",
     "mentorAidaName": "Dr. Aida Karimova",
@@ -689,16 +817,16 @@
     "featTrauma": "Trauma-informed",
     "featTeens": "Teen programs",
     "ctaTitle": "Your first week is on us.",
-    "ctaSubtitle": "Pick a program, meet a mentor and let the practice compound. Onboarding and week one are free — no card required.",
+    "ctaSubtitle": "Pick a program, meet a mentor and let the practice compound. Onboarding and week one are free \u2014 no card required.",
     "ctaButton": "Start meditating",
     "ctaNote": "Free intro session with every program."
   },
   "libraryHome": {
-    "metaTitle": "Books",
+    "metaTitle": "Library",
     "metaDescription": "Curated book collections, fifteen-minute summaries, weekly reading plans and the finest partner reading rooms.",
     "heroEyebrow": "PreLife Library",
     "heroTitle": "Reading, refined.",
-    "heroSubtitle": "Curated collections, fifteen-minute summaries and reading circles — composed into one premium reading experience.",
+    "heroSubtitle": "Curated collections, fifteen-minute summaries and reading circles \u2014 composed into one premium reading experience.",
     "heroCtaPrimary": "Explore collections",
     "heroCtaSecondary": "Find a reading room",
     "heroRating": "4.9 average member rating",
@@ -708,21 +836,21 @@
     "heroStatCollectionsLabel": "Collections",
     "heroStatSummariesValue": "15 min",
     "heroStatSummariesLabel": "Per summary",
-    "marqueeItems": "Reading • Reflection • Practice • Discussion • Collection • Growth",
+    "marqueeItems": "Reading \u2022 Reflection \u2022 Practice \u2022 Discussion \u2022 Collection \u2022 Growth",
     "whyEyebrow": "Why PreLife Library",
     "whyTitle": "Read what matters, leave the rest",
-    "whySubtitle": "Collections, summaries and discussion composed as one system — a reading life that survives real weeks.",
+    "whySubtitle": "Collections, summaries and discussion composed as one system \u2014 a reading life that survives real weeks.",
     "why1Title": "Curated by editors",
-    "why1Desc": "Every title is chosen by working editors and readers — no algorithms, no padding.",
+    "why1Desc": "Every title is chosen by working editors and readers \u2014 no algorithms, no padding.",
     "why2Title": "Fifteen-minute summaries",
     "why2Desc": "Sharp summaries for every book, so a commute counts as reading when it must.",
     "why3Title": "Reading circles",
-    "why3Desc": "Small weekly groups with a moderator — books discussed, not just finished.",
+    "why3Desc": "Small weekly groups with a moderator \u2014 books discussed, not just finished.",
     "why4Title": "A shelf that grows",
     "why4Desc": "Notes, highlights and a personal shelf that remembers every line worth keeping.",
     "plansEyebrow": "Collections",
     "plansTitle": "Shelves with a point of view",
-    "plansSubtitle": "Every collection is sequenced by editors — progressive, connected and honest about the attention it asks.",
+    "plansSubtitle": "Every collection is sequenced by editors \u2014 progressive, connected and honest about the attention it asks.",
     "plansMetaMinutes": "{count} min/day",
     "plansMetaWeeks": "{count}-week journey",
     "plansMetaBooks": "{count} books",
@@ -733,27 +861,27 @@
     "colFoundationsName": "Foundations",
     "colFoundationsDesc": "Twenty-four books that build the base: attention, habits, money and meaning.",
     "colMindName": "Mind & Behavior",
-    "colMindDesc": "Thirty-two titles on how we think, decide and fool ourselves — psychology with teeth.",
+    "colMindDesc": "Thirty-two titles on how we think, decide and fool ourselves \u2014 psychology with teeth.",
     "colLeadershipName": "Leadership & Craft",
     "colLeadershipDesc": "Twenty-eight books on leading teams and mastering a craft, from daily practice up.",
     "booksEyebrow": "Featured books",
     "booksTitle": "Start with the essentials",
     "booksSubtitle": "Crisp, editor-verified notes for the titles that anchor every serious shelf.",
     "bookDeepWorkName": "Deep Work",
-    "bookDeepWorkTarget": "Cal Newport — Focus",
+    "bookDeepWorkTarget": "Cal Newport \u2014 Focus",
     "bookHabitsName": "Atomic Habits",
-    "bookHabitsTarget": "James Clear — Behavior design",
+    "bookHabitsTarget": "James Clear \u2014 Behavior design",
     "bookMeaningName": "Search for Meaning",
-    "bookMeaningTarget": "Viktor Frankl — Resilience",
+    "bookMeaningTarget": "Viktor Frankl \u2014 Resilience",
     "bookThinkingName": "Thinking, Fast and Slow",
-    "bookThinkingTarget": "Daniel Kahneman — Decisions",
+    "bookThinkingTarget": "Daniel Kahneman \u2014 Decisions",
     "bookMeditationsName": "Meditations",
-    "bookMeditationsTarget": "Marcus Aurelius — Stoic practice",
+    "bookMeditationsTarget": "Marcus Aurelius \u2014 Stoic practice",
     "bookFlowName": "Flow",
-    "bookFlowTarget": "Mihaly Csikszentmihalyi — Engagement",
+    "bookFlowTarget": "Mihaly Csikszentmihalyi \u2014 Engagement",
     "scheduleEyebrow": "Weekly reading plan",
     "scheduleTitle": "This week on the shelf",
-    "scheduleSubtitle": "Reading plans ship with every collection — twenty minutes a slot, honest pages.",
+    "scheduleSubtitle": "Reading plans ship with every collection \u2014 twenty minutes a slot, honest pages.",
     "scheduleTime": "Time",
     "scheduleDayMon": "Mon",
     "scheduleDayTue": "Tue",
@@ -768,191 +896,40 @@
     "scheduleTrackSummary": "Summary",
     "scheduleTrackNotes": "Notes",
     "scheduleTrackFree": "Free read",
-    "scheduleRestNote": "Sunday is a slow-page day — reread a favorite chapter, expect nothing new.",
+    "scheduleRestNote": "Sunday is a slow-page day \u2014 reread a favorite chapter, expect nothing new.",
     "storiesEyebrow": "Reader stories",
     "storiesTitle": "Shelves that changed real weeks",
-    "stories1Quote": "The Mind & Behavior circle got me reading again after five years. Thirty-two books in — I argue better and sleep fine.",
+    "stories1Quote": "The Mind & Behavior circle got me reading again after five years. Thirty-two books in \u2014 I argue better and sleep fine.",
     "stories1Name": "Zohra A.",
     "stories1Role": "Mind & Behavior, member since 2024",
     "stories2Quote": "Summaries on the commute, chapters at night. Twelve weeks and my shelf finally looks like a reader's.",
     "stories2Name": "Rashad G.",
     "stories2Role": "Foundations, member since 2025",
-    "stories3Quote": "The moderation is the magic. Our circle argues about one chapter a week — and I remember all of them.",
+    "stories3Quote": "The moderation is the magic. Our circle argues about one chapter a week \u2014 and I remember all of them.",
     "stories3Name": "Emil A.",
     "stories3Role": "Reading circle, member since 2023",
     "venuesEyebrow": "Partner reading rooms",
     "venuesTitle": "Read in the best rooms",
-    "venuesSubtitle": "A hand-picked directory of partner libraries and book houses — light, silence and standards worth your hours.",
+    "venuesSubtitle": "A hand-picked directory of partner libraries and book houses \u2014 light, silence and standards worth your hours.",
     "venuesRatingA11y": "Rated {score} out of 5",
     "venueNizamiName": "Nizami Book House",
     "venueNizamiDesc": "A heritage book house with rare editions, deep shelves and honest silence.",
     "venuePaperCupName": "Paper & Cup",
-    "venuePaperCupDesc": "A bright book café — good coffee, weekly author nights and room to spread out.",
+    "venuePaperCupDesc": "A bright book caf\u00e9 \u2014 good coffee, weekly author nights and room to spread out.",
     "venueRoomName": "City Reading Room",
     "venueRoomDesc": "A classic reading room with member desks, a kids corner and a digital archive.",
     "featLending": "Lending",
     "featRare": "Rare editions",
     "featQuiet": "Silence policy",
-    "featCafe": "Café",
+    "featCafe": "Caf\u00e9",
     "featWifi": "Reading hall",
     "featEvents": "Author events",
     "featMembers": "Member discounts",
     "featKids": "Kids corner",
     "featDigital": "Digital archive",
     "ctaTitle": "Your first month is on us.",
-    "ctaSubtitle": "Pick a collection, join a circle and let the pages compound. Onboarding and month one are free — no card required.",
+    "ctaSubtitle": "Pick a collection, join a circle and let the pages compound. Onboarding and month one are free \u2014 no card required.",
     "ctaButton": "Open your shelf",
     "ctaNote": "Free editor consultation with every collection."
-  },
-  "authPage": {
-    "loginTitle": "Welcome back",
-    "loginSubtitle": "Sign in to open your PreLife.",
-    "signupTitle": "Create your account",
-    "signupSubtitle": "One account for gym, diet, mind and books.",
-    "name": "Name",
-    "namePlaceholder": "Your name",
-    "email": "Email",
-    "emailPlaceholder": "you@example.com",
-    "password": "Password",
-    "passwordPlaceholder": "••••••••",
-    "loginCta": "Sign in",
-    "signupCta": "Create account",
-    "orContinueWith": "or continue with",
-    "google": "Google",
-    "apple": "Apple",
-    "noAccount": "No account yet?",
-    "haveAccount": "Already have an account?",
-    "signUpLink": "Sign up",
-    "signInLink": "Sign in",
-    "backToWelcome": "Back to welcome",
-    "demoHint": "Testing the site? Sign in with email 123 and password 123.",
-    "socialSoonTitle": "{provider} sign-in",
-    "socialSoonDesc": "It will be available soon — for now, please use email and password.",
-    "errors": {
-      "missing_fields": "Please fill in all fields.",
-      "invalid_email": "Please enter a valid email address.",
-      "short_password": "Password must be at least 4 characters.",
-      "invalid_credentials": "Wrong email or password.",
-      "email_taken": "An account with this email already exists.",
-      "generic": "Something went wrong. Please try again."
-    }
-  },
-  "accountMenu": {
-    "signedInAs": "Signed in as",
-    "profile": "Profile",
-    "settings": "Settings",
-    "help": "Help",
-    "home": "Home",
-    "subscription": "Subscription",
-    "terms": "Terms",
-    "rules": "Rules",
-    "logout": "Log out",
-    "signIn": "Sign in"
-  },
-  "cookieBar": {
-    "text": "We use cookies to keep you signed in and remember your choices.",
-    "accept": "Accept",
-    "learnMore": "Terms"
-  },
-  "underConstruction": {
-    "eyebrow": "Coming soon",
-    "title": "Under construction",
-    "text": "This section is being built right now. It opens soon.",
-    "backHome": "Back to home"
-  },
-  "termsPage": {
-    "title": "Terms",
-    "placeholder": "hello, write this"
-  },
-  "rulesPage": {
-    "title": "Rules",
-    "placeholder": "hello, write this"
-  },
-  "settingsPage": {
-    "eyebrow": "Account",
-    "title": "Settings",
-    "subtitle": "A few base settings for now — more arrive as the platform grows.",
-    "navLabel": "Settings categories",
-    "cats": {
-      "account": "Account",
-      "appearance": "Appearance",
-      "language": "Language",
-      "notifications": "Notifications"
-    },
-    "account": {
-      "title": "Account",
-      "subtitle": "Your sign-in details.",
-      "name": "Name",
-      "email": "Email",
-      "plan": "Plan",
-      "planFree": "Free (demo)",
-      "note": "Editing your details arrives together with the full account system."
-    },
-    "appearance": {
-      "title": "Appearance",
-      "subtitle": "How PreLife looks on this device.",
-      "theme": "Theme",
-      "themeHint": "Your choice is remembered after you accept cookies.",
-      "light": "Light",
-      "dark": "Dark"
-    },
-    "language": {
-      "title": "Language",
-      "subtitle": "Interface language — applies immediately.",
-      "hint": "Your choice is remembered after you accept cookies."
-    },
-    "notifications": {
-      "title": "Notifications",
-      "subtitle": "Choose what PreLife may notify you about.",
-      "reminders": "Workout reminders",
-      "remindersHint": "A nudge when a planned session is near.",
-      "digest": "Weekly digest",
-      "digestHint": "One summary of your week, every Sunday.",
-      "news": "Product news",
-      "newsHint": "New sections and features, about once a month.",
-      "note": "Temporary toggles — they will start persisting with the full notification system."
-    }
-  },
-  "profilePage": {
-    "eyebrow": "Account",
-    "title": "Profile",
-    "subtitle": "Your PreLife identity for now.",
-    "name": "Name",
-    "email": "Email",
-    "plan": "Plan",
-    "planFree": "Free (demo)",
-    "settings": "Open settings",
-    "subscription": "Subscription",
-    "note": "A fuller profile — goals, history, progress — arrives soon."
-  },
-  "helpPage": {
-    "eyebrow": "Support",
-    "title": "Help",
-    "subtitle": "Short answers to the questions we hear most.",
-    "faqTitle": "Frequently asked",
-    "contactTitle": "Still stuck?",
-    "contactText": "Write to us and we usually reply within a day.",
-    "contactCta": "hello@prelife.net",
-    "faq": {
-      "q1": "How do I start?",
-      "a1": "Create a free account, then open any of the four sections — gym, diet, psychology or books — straight from the home page.",
-      "q2": "Is PreLife free?",
-      "a2": "Yes, the current preview is completely free. Paid plans arrive with the full release.",
-      "q3": "Can I change the language?",
-      "a3": "Yes — switch between Azərbaycan, English and Русский from the top bar, or in Settings → Language.",
-      "q4": "How do I turn on dark mode?",
-      "a4": "Use the moon icon in the top bar, or Settings → Appearance."
-    }
-  },
-  "notFoundPage": {
-    "eyebrow": "Error 404",
-    "title": "Page not found",
-    "text": "The address is right, but this page doesn't exist — it may have moved or been removed.",
-    "backHome": "Back to home"
-  },
-  "connection": {
-    "lost": "Your internet connection was lost",
-    "back": "Connection restored",
-    "dismiss": "Dismiss"
   }
 }

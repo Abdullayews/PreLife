@@ -475,6 +475,10 @@ export const en = {
     "navThemeToggle": "Toggle dark / light mode",
     "navHome": "PreLife — home",
     "galleryLabel": "Hero photos",
+    "galleryPause": "Pause slideshow",
+    "galleryPlay": "Resume slideshow",
+    "marqueePause": "Pause scrolling text",
+    "marqueePlay": "Resume scrolling text",
   },
   "gymHome": {
     "metaTitle": "Gym",

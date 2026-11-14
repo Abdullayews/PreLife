@@ -29,7 +29,13 @@ export default async function WelcomePage({ params }: Props) {
   return (
     <div data-world="shell" className="world">
       <section className="hero" aria-label={t("hero.ariaLabel")}>
-        <Gallery images={landingFrames.map((f) => f.src)} positions={landingFrames.map((f) => f.pos)} label={tc("galleryLabel")} />
+        <Gallery
+          images={landingFrames.map((f) => f.src)}
+          positions={landingFrames.map((f) => f.pos)}
+          label={tc("galleryLabel")}
+          pauseLabel={tc("galleryPause")}
+          playLabel={tc("galleryPlay")}
+        />
         <div className="hero-scrim" aria-hidden />
         <div className="wrap hero-body">
           <div className="hero-copy">
