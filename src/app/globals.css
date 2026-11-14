@@ -64,8 +64,12 @@ html.dark :is(body:has([data-world="gym"]), [data-world="gym"]) {
   --bg:#14100e; --surface:#1c1613; --tint:#19130f; --ink:#f3e9e1; --muted:#b0a095; --line:rgba(243,233,225,.14);
   /* accent #ff7a4d → #ee6a41 (A1): keeps the true-orange hue (14°) but L
      drops 65→59% so the pair vs the shell rose clears the 15pp lightness
-     band (15.7pp measured). Ink label 5.85:1 incl. hover. */
-  --accent:#ee6a41; --accent-ink:#2a0d04; --accent-text:var(--accent); --deep:#2a1114; --deep-ink:#f7ece4; --raised:#262017;
+     band (15.7pp measured). Ink label 5.85:1 incl. hover.
+     --accent-text is a dedicated brighter tone (#ff8a63, not the accent
+     itself): the accent at L59 sits at 4.48:1 on the wash tier (active
+     nav pill) — 0.02 short; the text tone clears every surface at
+     ≥6:1 while buttons keep the deeper accent + dark ink. */
+  --accent:#ee6a41; --accent-ink:#2a0d04; --accent-text:#ff8a63; --deep:#2a1114; --deep-ink:#f7ece4; --raised:#262017;
 }
 :is(body:has([data-world="diet"]), [data-world="diet"]) {
   --bg:#f6f2e4; --surface:#fffdf4; --tint:#ece6cf; --ink:#1f2616; --muted:#646a52; --line:rgba(31,38,22,.14);
