@@ -9,6 +9,10 @@ import { Pause, Play } from "lucide-react";
  * the visitor has pressed the visible Pause button — `data-paused` carries
  * that state to the stylesheet. Under prefers-reduced-motion the band is a
  * static wrapped list and the toggle is hidden (nothing to pause).
+ *
+ * No aria-label on the band: ARIA prohibits aria-label on a plain <div>
+ * (axe: aria-prohibited-attr) and screen readers gain nothing from it —
+ * the words are a decorative repetition of section themes.
  */
 export function Marquee({
   items, pauseLabel, playLabel,
@@ -19,7 +23,7 @@ export function Marquee({
 }) {
   const [paused, setPaused] = useState(false);
   return (
-    <div className="marquee" data-paused={paused || undefined} aria-label={items.join(", ")}>
+    <div className="marquee" data-paused={paused || undefined}>
       <div className="marquee-track">
         {[0, 1].map((copy) => (
           <ul key={copy} aria-hidden="true">
