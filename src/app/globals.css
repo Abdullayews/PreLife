@@ -278,15 +278,14 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 }
 .nav-signin:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); }
 
-/* Wordmark. WELCOME surface: pill-centered, absolute — the Ultrahuman
-   anchor. APP surface: in-flow on the left next to the burger, so the
-   right-top main tabs always have clear space. */
+/* Wordmark — LEFT beside the burger on BOTH surfaces (same slot, so
+   switching welcome <-> app never re-flows the bar). The section links
+   (welcome, lg+) continue the row after it. */
 .brand {
   display: inline-flex; align-items: baseline; white-space: nowrap;
   font: 700 1.4rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink);
 }
-.nav[data-surface="welcome"] .brand { position: absolute; left: 50%; transform: translateX(-50%); margin-left: 0; }
-.nav[data-surface="app"] .brand { position: static; transform: none; margin-left: .5rem; }
+.nav .brand { margin-left: .5rem; }
 .brand em { font-style: italic; color: var(--accent); }
 .brand::after { content: ""; width: .35rem; height: .35rem; margin-left: .25rem; border-radius: 50%; background: var(--accent); }
 
@@ -323,6 +322,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 /* Welcome surface: links join the bar at lg (burger/panel until lg).
    App surface: tabs join at lg; the language segment only at xl (it also
    lives in the drawer); the burger stays available until xl. */
+.nav-lang { display: none; }
 @media (min-width: 64rem) {
   .nav-tabs { display: flex; }
   .nav[data-surface="welcome"] .nav-burger,
@@ -334,7 +334,6 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   .nav[data-surface="app"] .nav-panel { display: none; }
   .nav-lang { display: inline-flex; }
 }
-.nav-lang { display: none; }
 @media (prefers-reduced-motion: reduce) {
   .nav-shrink, .nav-pill, .nav-pill::before, .nav-panel::before { transition: none; }
 }
