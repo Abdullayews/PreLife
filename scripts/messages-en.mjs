@@ -820,6 +820,8 @@ export const en = {
       email: "Email",
       emailPlaceholder: "you@example.com",
       password: "Password",
+      showPassword: "Show password",
+      hidePassword: "Hide password",
       passwordPlaceholder: "••••••••",
       loginCta: "Sign in",
       signupCta: "Create account",
@@ -836,7 +838,7 @@ export const en = {
       errors: {
         missing_fields: "Please fill in all fields.",
         invalid_email: "Please enter a valid email address.",
-        short_password: "Password must be at least 4 characters.",
+        short_password: "Password must be at least 8 characters.",
         invalid_credentials: "Wrong email or password.",
         email_taken: "An account with this email already exists.",
         generic: "Something went wrong. Please try again."

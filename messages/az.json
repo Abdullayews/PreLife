@@ -818,6 +818,8 @@
     "email": "E-po\u00e7t",
     "emailPlaceholder": "siz@n\u00fcmun\u0259.com",
     "password": "\u015eifr\u0259",
+    "showPassword": "\u015eifr\u0259ni g\u00f6st\u0259r",
+    "hidePassword": "\u015eifr\u0259ni gizl\u0259t",
     "passwordPlaceholder": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
     "loginCta": "Daxil ol",
     "signupCta": "Hesab yarat",
@@ -834,7 +836,7 @@
     "errors": {
       "missing_fields": "B\u00fct\u00fcn xanalar\u0131 doldurun.",
       "invalid_email": "D\u00fczg\u00fcn e-po\u00e7t \u00fcnvan\u0131 daxil edin.",
-      "short_password": "\u015eifr\u0259 \u0259n az\u0131 4 simvoldan ibar\u0259t olmal\u0131d\u0131r.",
+      "short_password": "\u015eifr\u0259 \u0259n az\u0131 8 simvoldan ibar\u0259t olmal\u0131d\u0131r.",
       "invalid_credentials": "E-po\u00e7t v\u0259 ya \u015fifr\u0259 yanl\u0131\u015fd\u0131r.",
       "email_taken": "Bu e-po\u00e7tla hesab art\u0131q m\u00f6vcuddur.",
       "generic": "Bir x\u0259ta ba\u015f verdi. Yenid\u0259n c\u0259hd edin."
