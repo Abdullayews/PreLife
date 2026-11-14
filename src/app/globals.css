@@ -182,7 +182,13 @@ img { display: block; max-width: 100%; }
 a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; } /* C1/D5: no radius override — the ring follows each control's own shape */
+/* D5 — ONE focus system: 2px accent ring, 3px offset, following each
+   control's own shape (no radius override). Controls take it as the
+   standard outline; text fields render the same contract in their own
+   material (accent border + 3px 22%-accent halo — see .field input);
+   the password eye inverts the offset (-3px) because it sits inside
+   the field's box. Nothing uses any other ring color or weight. */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 [id] { scroll-margin-top: calc(var(--nav-h) + 1rem); }
 .wrap { width: 100%; max-width: 72rem; margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2rem); }
 .center { text-align: center; margin-inline: auto; }
@@ -443,7 +449,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   transition: border-color .2s, box-shadow .2s;
 }
 .field input::placeholder { color: var(--muted); }
-.field input:focus {
+.field input:focus-visible {
   outline: none; border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
@@ -921,7 +927,6 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
     scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
     padding-bottom: .5rem; scrollbar-width: thin;
   }
-  .places-wrap:focus-visible { outline-offset: 4px; }
   .places { display: flex; gap: 1rem; }
   .place { flex: 0 0 min(75vw, 19rem); scroll-snap-align: start; }
 }
