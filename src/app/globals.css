@@ -3,6 +3,17 @@
    token set is applied to <body> (via :has) so the nav and page edges follow
    the page. Dark mode = `.dark` on <html>, set before first paint. */
 
+/* C4 — font stacks are SYSTEM-ONLY (zero downloads, zero FOUT), each step
+   covering Latin + Cyrillic + the Azerbaijani ə (verified: az/en/ru pages
+   render with no fallback-glyph boxes in Chromium):
+   body    → macOS/iOS: system-ui/-apple-system (SF) · Windows: Segoe UI ·
+             Android/most Linux: Roboto · this render box: DejaVu Sans via
+             ui-sans-serif (= system-ui metrics, canvas-probe measured) ·
+             final guard: Arial, then generic sans.
+   display → macOS/iOS: Iowan Old Style · Windows: Palatino Linotype /
+             Book Antiqua · here: the Georgia/Liberation-Serif alias (probe:
+             display chain metrics == Georgia == generic serif) · final
+             guard: Georgia, then generic serif. No webfont will be added. */
 :root {
   --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
