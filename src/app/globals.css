@@ -591,6 +591,19 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .gal-dots [aria-current="true"] span { width: 1.6rem; background: var(--accent); }
 .gal-dots button:hover span { background: color-mix(in srgb, var(--ink) 65%, transparent); }
 .gal-dots [aria-current="true"]:hover span { background: var(--accent); }
+/* Gallery autoplay toggle (WCAG 2.2.2) — icon-btn base, frosted like the
+   dots pill, anchored to the hero's bottom-right corner. */
+.gal-toggle {
+  position: absolute; right: 1.25rem; bottom: 1.25rem; z-index: 3;
+  border-color: var(--line); color: var(--ink);
+  background: color-mix(in srgb, var(--raised) 62%, transparent);
+  backdrop-filter: blur(14px) saturate(1.5); -webkit-backdrop-filter: blur(14px) saturate(1.5);
+}
+.gal-toggle:hover { background: color-mix(in srgb, var(--raised) 82%, transparent); }
+@media (prefers-reduced-motion: reduce) {
+  /* autoplay never runs under reduced motion — hide the control */
+  .gal-toggle { display: none; }
+}
 
 /* ── Motion (CSS only) ────────────────────────────────────────────────── */
 @keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
@@ -603,20 +616,35 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 }
 
 /* ── Marquee ──────────────────────────────────────────────────────────── */
-.marquee { overflow: hidden; background: var(--deep); color: var(--deep-ink); padding-block: 1.05rem; }
+/* The band scrolls on its own (WCAG 2.2.2): it must pause on hover, on
+   focus-within, and while the visitor has pressed the Pause toggle
+   ([data-paused], set by components/Marquee.tsx). */
+.marquee { position: relative; overflow: hidden; background: var(--deep); color: var(--deep-ink); padding-block: 1.05rem; }
 .marquee-track { display: flex; width: max-content; }
 .marquee ul { display: flex; align-items: center; flex: none; }
 .marquee li { display: flex; align-items: center; white-space: nowrap; font-size: .8125rem; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; }
 .marquee li::after { content: "\2726"; margin-inline: 2.5rem; color: var(--accent); font-size: .7em; letter-spacing: 0; }
 @media (prefers-reduced-motion: no-preference) {
   .marquee-track { animation: scroll 40s linear infinite; }
-  .marquee:hover .marquee-track { animation-play-state: paused; }
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track,
+  .marquee[data-paused] .marquee-track { animation-play-state: paused; }
 }
 @keyframes scroll { to { transform: translateX(-50%); } }
+/* Pause toggle on the deep band — icon-btn base, deep-ink colors, and
+   a ≥44px hit area on touch screens (see the pointer:coarse block). */
+.marquee-toggle {
+  position: absolute; top: 50%; right: .9rem; translate: 0 -50%; z-index: 2;
+  border-color: color-mix(in srgb, var(--deep-ink) 45%, transparent);
+  color: var(--deep-ink); background: color-mix(in srgb, var(--deep-ink) 10%, transparent);
+}
+.marquee-toggle:hover { background: color-mix(in srgb, var(--deep-ink) 18%, transparent); }
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { width: 100%; justify-content: center; }
   .marquee ul[aria-hidden] { display: none; }
   .marquee ul { flex-wrap: wrap; justify-content: center; row-gap: .5rem; }
+  /* nothing scrolls — the control is hidden, not just inert */
+  .marquee-toggle { display: none; }
 }
 
 /* ── Section scaffolding ──────────────────────────────────────────────── */

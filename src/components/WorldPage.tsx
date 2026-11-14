@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { worlds, scheduleDayKeys, type Level, type WorldSlug } from "@/lib/worlds";
 import { sections } from "@/lib/shell";
 import { Gallery } from "./Gallery";
+import { Marquee } from "./Marquee";
 
 const cap = (l: Level) => `level${l[0].toUpperCase()}${l.slice(1)}`;
 
@@ -41,7 +42,13 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
     <div data-world={slug} className="world">
       {/* ── Hero ─────────────────────────────── */}
       <section id="top" className="hero">
-        <Gallery images={w.hero.images} positions={w.hero.positions} label={tc("galleryLabel")} />
+        <Gallery
+          images={w.hero.images}
+          positions={w.hero.positions}
+          label={tc("galleryLabel")}
+          pauseLabel={tc("galleryPause")}
+          playLabel={tc("galleryPlay")}
+        />
         <div className="hero-scrim" aria-hidden />
         <div className="wrap hero-body">
           <div className="hero-copy">
@@ -63,15 +70,7 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
       </section>
 
       {/* ── Marquee ──────────────────────────── */}
-      <div className="marquee" aria-label={marquee.join(", ")}>
-        <div className="marquee-track">
-          {[0, 1].map((copy) => (
-            <ul key={copy} aria-hidden="true">
-              {marquee.map((word) => <li key={word}>{word}</li>)}
-            </ul>
-          ))}
-        </div>
-      </div>
+      <Marquee items={marquee} pauseLabel={tc("marqueePause")} playLabel={tc("marqueePlay")} />
 
       {/* ── Why ──────────────────────────────── */}
       <section id="why" className="sec">
