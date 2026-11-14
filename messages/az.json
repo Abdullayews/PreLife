@@ -347,11 +347,7 @@
     "navStart": "Ba\u015fla",
     "navThemeToggle": "T\u00fcnd / i\u015f\u0131q rejimini d\u0259yi\u015f",
     "navHome": "PreLife \u2014 ana s\u0259hif\u0259",
-    "galleryLabel": "Hero \u015f\u0259kill\u0259ri",
-    "galleryPause": "Slaydlar\u0131 dayand\u0131r",
-    "galleryPlay": "Slaydlar\u0131 davam etdir",
-    "marqueePause": "H\u0259r\u0259k\u0259tli yaz\u0131n\u0131 dayand\u0131r",
-    "marqueePlay": "H\u0259r\u0259k\u0259tli yaz\u0131n\u0131 davam etdir"
+    "galleryLabel": "Hero \u015f\u0259kill\u0259ri"
   },
   "gymHome": {
     "metaTitle": "Gym",
@@ -821,6 +817,7 @@
     "showPassword": "\u015eifr\u0259ni g\u00f6st\u0259r",
     "hidePassword": "\u015eifr\u0259ni gizl\u0259t",
     "passwordPlaceholder": "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+    "forgotPassword": "\u015eifr\u0259ni unutmusunuz?",
     "loginCta": "Daxil ol",
     "signupCta": "Hesab yarat",
     "orContinueWith": "v\u0259 ya davam edin",

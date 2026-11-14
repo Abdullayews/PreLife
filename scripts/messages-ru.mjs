@@ -349,11 +349,7 @@ export const ru = {
       navStart: "Начать",
       navThemeToggle: "Переключить тёмный / светлый режим",
       navHome: "PreLife — главная",
-      galleryLabel: "Фотографии в шапке",
-      galleryPause: "Остановить слайд-шоу",
-      galleryPlay: "Возобновить слайд-шоу",
-      marqueePause: "Остановить бегущую строку",
-      marqueePlay: "Возобновить бегущую строку"
+      galleryLabel: "Фотографии в шапке"
     },
     gymHome: {
       metaTitle: "Тренировки",
@@ -823,6 +819,7 @@ export const ru = {
       showPassword: "Показать пароль",
       hidePassword: "Скрыть пароль",
       passwordPlaceholder: "••••••••",
+      forgotPassword: "Забыли пароль?",
       loginCta: "Войти",
       signupCta: "Создать аккаунт",
       orContinueWith: "или продолжить через",

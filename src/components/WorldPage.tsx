@@ -46,8 +46,6 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
           images={w.hero.images}
           positions={w.hero.positions}
           label={tc("galleryLabel")}
-          pauseLabel={tc("galleryPause")}
-          playLabel={tc("galleryPlay")}
         />
         <div className="hero-scrim" aria-hidden />
         <div className="wrap hero-body">
@@ -70,7 +68,7 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
       </section>
 
       {/* ── Marquee ──────────────────────────── */}
-      <Marquee items={marquee} pauseLabel={tc("marqueePause")} playLabel={tc("marqueePlay")} />
+      <Marquee items={marquee} />
 
       {/* ── Why ──────────────────────────────── */}
       <section id="why" className="sec">

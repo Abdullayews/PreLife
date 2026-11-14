@@ -349,11 +349,7 @@ export const az = {
       navStart: "Başla",
       navThemeToggle: "Tünd / işıq rejimini dəyiş",
       navHome: "PreLife — ana səhifə",
-      galleryLabel: "Hero şəkilləri",
-      galleryPause: "Slaydları dayandır",
-      galleryPlay: "Slaydları davam etdir",
-      marqueePause: "Hərəkətli yazını dayandır",
-      marqueePlay: "Hərəkətli yazını davam etdir"
+      galleryLabel: "Hero şəkilləri"
     },
     gymHome: {
       metaTitle: "Gym",
@@ -823,6 +819,7 @@ export const az = {
       showPassword: "Şifrəni göstər",
       hidePassword: "Şifrəni gizlət",
       passwordPlaceholder: "••••••••",
+      forgotPassword: "Şifrəni unutmusunuz?",
       loginCta: "Daxil ol",
       signupCta: "Hesab yarat",
       orContinueWith: "və ya davam edin",

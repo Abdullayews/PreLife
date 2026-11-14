@@ -1,29 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { Pause, Play } from "lucide-react";
-
 /**
- * The scrolling word band between hero and content (WCAG 2.2.2): the CSS
- * animation pauses on hover, on focus-within (the toggle itself), and while
- * the visitor has pressed the visible Pause button — `data-paused` carries
- * that state to the stylesheet. Under prefers-reduced-motion the band is a
- * static wrapped list and the toggle is hidden (nothing to pause).
+ * The scrolling word band between hero and content. The CSS animation
+ * pauses on hover and on focus-within — no visible control needed.
+ * Under prefers-reduced-motion the band is a static wrapped list.
  *
  * No aria-label on the band: ARIA prohibits aria-label on a plain <div>
  * (axe: aria-prohibited-attr) and screen readers gain nothing from it —
  * the words are a decorative repetition of section themes.
  */
-export function Marquee({
-  items, pauseLabel, playLabel,
-}: {
-  items: string[];
-  pauseLabel: string;
-  playLabel: string;
-}) {
-  const [paused, setPaused] = useState(false);
+export function Marquee({ items }: { items: string[] }) {
   return (
-    <div className="marquee" data-paused={paused || undefined}>
+    <div className="marquee">
       <div className="marquee-track">
         {[0, 1].map((copy) => (
           <ul key={copy} aria-hidden="true">
@@ -31,15 +19,6 @@ export function Marquee({
           </ul>
         ))}
       </div>
-      <button
-        type="button"
-        className="icon-btn marquee-toggle"
-        aria-pressed={paused}
-        aria-label={paused ? playLabel : pauseLabel}
-        onClick={() => setPaused((v) => !v)}
-      >
-        {paused ? <Play size={16} aria-hidden /> : <Pause size={16} aria-hidden />}
-      </button>
     </div>
   );
 }

@@ -89,7 +89,12 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
           <input id="email" name="email" type={emailType} inputMode="email" placeholder={t("emailPlaceholder")} autoComplete="email" required maxLength={120} />
         </div>
         <div className="field">
-          <label htmlFor="password">{t("password")}</label>
+          <div className="field-row">
+            <label htmlFor="password">{t("password")}</label>
+            {mode === "login" && (
+              <Link className="forgot" href="/help">{t("forgotPassword")}</Link>
+            )}
+          </div>
           <div className="field-pw">
             <input
               id="password"

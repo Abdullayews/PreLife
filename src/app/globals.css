@@ -348,14 +348,15 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 }
 .nav-signin:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); }
 
-/* Wordmark — LEFT beside the burger on BOTH surfaces (same slot, so
-   switching welcome <-> app never re-flows the bar). The section links
-   (welcome, lg+) continue the row after it. */
+/* Wordmark. WELCOME surface: pill-centered, absolute — the Ultrahuman
+   anchor. APP surface: in-flow on the left next to the burger, so the
+   right-top main tabs always have clear space. */
 .brand {
   display: inline-flex; align-items: baseline; white-space: nowrap;
   font: 700 1.4rem/1 var(--font-display); letter-spacing: -.02em; color: var(--ink);
 }
-.nav .brand { margin-left: .5rem; }
+.nav[data-surface="welcome"] .brand { position: absolute; left: 50%; transform: translateX(-50%); margin-left: 0; }
+.nav[data-surface="app"] .brand { position: static; transform: none; margin-left: .5rem; }
 .brand em { font-style: italic; color: var(--accent); }
 .brand::after { content: ""; width: .35rem; height: .35rem; margin-left: .25rem; border-radius: 50%; background: var(--accent); }
 
@@ -447,6 +448,10 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .auth-form { display: grid; gap: 1rem; margin-top: .35rem; }
 .field { display: grid; gap: .4rem; }
 .field label { font-size: .8125rem; font-weight: 650; color: var(--ink); }
+/* Label row with the login-only "forgot password" link on the right */
+.field-row { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; }
+.forgot { font-size: .8125rem; font-weight: 600; color: var(--accent-text); white-space: nowrap; }
+.forgot:hover { text-decoration: underline; }
 .field input {
   height: 2.75rem; padding-inline: 1rem; border: 1px solid var(--line-strong); border-radius: var(--r-sm);
   background: var(--surface); color: var(--ink); font-size: .9375rem;
@@ -657,7 +662,10 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 @media (prefers-reduced-motion: no-preference) {
   .gal-pic[data-active="true"] { animation: drift 34s linear both; }
 }
-@keyframes drift { from { transform: scale(1.07); } to { transform: scale(1); } }
+/* Softened on purpose: a 3.5% settle reads as a gentle breath, not a
+   recede — the outgoing frame is ~99.6% settled when the 30s autoplay
+   swap happens, so the animation reset never snaps. */
+@keyframes drift { from { transform: scale(1.035); } to { transform: scale(1); } }
 .hero-scrim {
   position: absolute; inset: 0; z-index: -1;
   background:
@@ -694,19 +702,6 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .gal-dots [aria-current="true"] span { width: 1.6rem; background: var(--accent); }
 .gal-dots button:hover span { background: color-mix(in srgb, var(--ink) 65%, transparent); }
 .gal-dots [aria-current="true"]:hover span { background: var(--accent); }
-/* Gallery autoplay toggle (WCAG 2.2.2) — icon-btn base, frosted like the
-   dots pill, anchored to the hero's bottom-right corner. */
-.gal-toggle {
-  position: absolute; right: 1.25rem; bottom: 1.25rem; z-index: 3;
-  border-color: var(--line); color: var(--ink);
-  background: color-mix(in srgb, var(--raised) 62%, transparent);
-  backdrop-filter: blur(14px) saturate(1.5); -webkit-backdrop-filter: blur(14px) saturate(1.5);
-}
-.gal-toggle:hover { background: color-mix(in srgb, var(--raised) 82%, transparent); }
-@media (prefers-reduced-motion: reduce) {
-  /* autoplay never runs under reduced motion — hide the control */
-  .gal-toggle { display: none; }
-}
 
 /* ── Motion (CSS only) ────────────────────────────────────────────────── */
 @keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
@@ -719,9 +714,14 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 }
 
 /* ── Marquee ──────────────────────────────────────────────────────────── */
-/* The band scrolls on its own (WCAG 2.2.2): it must pause on hover, on
-   focus-within, and while the visitor has pressed the Pause toggle
-   ([data-paused], set by components/Marquee.tsx). */
+/* The scrolling word band between hero and content: the CSS animation
+   pauses on hover and on focus-within — no visible control needed.
+   Under prefers-reduced-motion the band is a static wrapped list.
+ *
+ * No aria-label on the band: ARIA prohibits aria-label on a plain <div>
+ * (axe: aria-prohibited-attr) and screen readers gain nothing from it —
+ * the words are a decorative repetition of section themes.
+ */
 .marquee { position: relative; overflow: hidden; background: var(--deep); color: var(--deep-ink); padding-block: 1.05rem; }
 .marquee-track { display: flex; width: max-content; }
 .marquee ul { display: flex; align-items: center; flex: none; }
@@ -730,24 +730,13 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 @media (prefers-reduced-motion: no-preference) {
   .marquee-track { animation: scroll 40s linear infinite; }
   .marquee:hover .marquee-track,
-  .marquee:focus-within .marquee-track,
-  .marquee[data-paused] .marquee-track { animation-play-state: paused; }
+  .marquee:focus-within .marquee-track { animation-play-state: paused; }
 }
 @keyframes scroll { to { transform: translateX(-50%); } }
-/* Pause toggle on the deep band — icon-btn base, deep-ink colors, and
-   a ≥44px hit area on touch screens (see the pointer:coarse block). */
-.marquee-toggle {
-  position: absolute; top: 50%; right: .9rem; translate: 0 -50%; z-index: 2;
-  border-color: color-mix(in srgb, var(--deep-ink) 45%, transparent);
-  color: var(--deep-ink); background: color-mix(in srgb, var(--deep-ink) 10%, transparent);
-}
-.marquee-toggle:hover { background: color-mix(in srgb, var(--deep-ink) 18%, transparent); }
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { width: 100%; justify-content: center; }
   .marquee ul[aria-hidden] { display: none; }
   .marquee ul { flex-wrap: wrap; justify-content: center; row-gap: .5rem; }
-  /* nothing scrolls — the control is hidden, not just inert */
-  .marquee-toggle { display: none; }
 }
 
 /* ── Section scaffolding ──────────────────────────────────────────────── */
