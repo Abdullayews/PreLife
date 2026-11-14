@@ -272,7 +272,7 @@ export const en = {
       text: "One plan, every section — gym, diet, psychology and books, with AI and videos included.",
       bestValue: "Best value",
       choose: "Choose plan",
-      note: "Payments (Ödeniş) arrive in an upcoming update — nothing is charged in this preview.",
+      note: "Payments arrive in an upcoming update — nothing is charged in this preview.",
       plans: {
         monthly: {
           name: "Monthly",
