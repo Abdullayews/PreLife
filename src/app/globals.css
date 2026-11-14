@@ -832,9 +832,22 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .stories figcaption small { display: block; }
 .avatar { --px: 2.75rem; display: inline-grid; place-items: center; flex: none; width: var(--px); height: var(--px); border-radius: 50%; background: var(--wash-2); color: var(--wash-ink); font-size: calc(var(--px) * .33); font-weight: 700; letter-spacing: .03em; }
 @media (min-width: 52rem) {
-  .stories { grid-template-columns: repeat(3, 1fr); gap: 3rem; }
+  /* B4 mosaic: the first review leads across two columns with an
+     oversized serif opening mark; the second rides the right rail
+     spanning both rows (its figure already pins quote top / caption
+     bottom); the third closes the bottom-left. The old
+     nth-child(2) 2.5rem nudge is gone — placement is now structural.
+     ::first-letter styles the DOM's own opening “ (+ the first letter,
+     per CSS spec) — nothing duplicated, nothing added. */
+  .stories { grid-template-columns: repeat(3, 1fr); gap: 2.5rem 3rem; }
   .stories li { padding-top: 1.5rem; border-top: 2px solid var(--line-strong); }
-  .stories li:nth-child(2) { margin-top: 2.5rem; }
+  .stories li:first-child { grid-column: 1 / span 2; grid-row: 1; }
+  .stories li:nth-child(2) { grid-column: 3; grid-row: 1 / span 2; }
+  .stories li:nth-child(3) { grid-column: 1 / span 2; grid-row: 2; }
+  .stories li:first-child blockquote::first-letter {
+    font: 600 3rem/0.85 var(--font-display);
+    float: left; padding: .1rem .5rem 0 0; color: var(--muted);
+  }
 }
 
 /* Places */
