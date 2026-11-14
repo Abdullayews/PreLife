@@ -745,19 +745,29 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
    affordance). The featured plan keeps its accent bar + deeper shadow. */
 .plans { display: grid; gap: 1.25rem; }
 .plan { position: relative; display: flex; flex-direction: column; overflow: hidden; background: var(--raised); border: 1px solid var(--line); border-radius: 22px; box-shadow: var(--shadow-1); }
+/* B3: the featured plan reads as the hero of the row at every size —
+   deeper shadow + a 5px accent bar (was 3px). At ≥52rem it is also
+   physically larger: a wider middle track (featured is always the 2nd
+   plan in every world) and negative block margins that let it stand
+   1.5rem taller than its siblings. Plans are still not links — no
+   hover affordance (D2). */
 .plan[data-featured] { box-shadow: var(--shadow-2); }
-.plan[data-featured]::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--accent); }
+.plan[data-featured]::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 5px; background: var(--accent); }
 .plan .tag-solid { background: var(--ink); color: var(--bg); border-color: transparent; box-shadow: 0 0 0 1px color-mix(in srgb, var(--raised) 45%, transparent), var(--shadow-1); }
 .plan-img { position: relative; aspect-ratio: 16 / 10; background: var(--tint); }
 .plan-img img { width: 100%; height: 100%; object-fit: cover; }
 .plan-img .tag { position: absolute; top: .85rem; left: .85rem; }
 .plan-body { display: grid; gap: .7rem; padding: 1.4rem; align-content: start; flex: 1; }
-.plan-body .tag { justify-self: start; }
+.plan-body .tag { justify-self: start; font-size: .8125rem; font-weight: 650; color: var(--ink); } /* B3: level label — larger, darker, easier to scan */
 .plan-body h3 { font: 600 1.4rem/1.15 var(--font-display); }
 .plan-body > p { color: var(--muted); }
 .facts { display: grid; gap: .35rem; margin-top: .5rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .875rem; font-variant-numeric: tabular-nums; }
 .facts li::before { content: ""; display: inline-block; width: .4rem; height: .4rem; margin-right: .6rem; border-radius: 50%; background: var(--muted); vertical-align: middle; }
-@media (min-width: 52rem) { .plans { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 52rem) {
+  .plans { grid-template-columns: 1fr 1.12fr 1fr; }
+  .plan[data-featured] { margin-block: -.75rem; }
+  .plan[data-featured] .plan-body { padding-block: 1.65rem; }
+}
 
 /* Items */
 /* Items — static rows (exercise/recipe/session/book listings), not
