@@ -469,8 +469,7 @@ export const az = {
       ctaTitle: "İlk həftə bizdən.",
       ctaSubtitle: "Plan seç, zalını tap və əməyin nəticəsini gör. Başlanğıc dərsi və ilk həftə pulsuzdur — kart tələb olunmur.",
       ctaButton: "Bu gün məşqə başla",
-      ctaNote: "Hər plana pulsuz başlanğıc dərsi daxildir.",
-      baseNote: "Bu, yeni İdman bölməsinin təməlidir — plan izləmə, məşq videoları və şəxsi rekordlar tezliklə burada olacaq."
+      ctaNote: "Hər plana pulsuz başlanğıc dərsi daxildir."
     },
     dietHome: {
       metaTitle: "Diet",

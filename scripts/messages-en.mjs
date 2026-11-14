@@ -469,8 +469,7 @@ export const en = {
       ctaTitle: "Your first week is on us.",
       ctaSubtitle: "Pick a plan, find your gym and let the work compound. Onboarding and week one are free — no card required.",
       ctaButton: "Start training today",
-      ctaNote: "Free onboarding session with every plan.",
-      baseNote: "This is the foundation of the new Gym — plan tracking, exercise videos and personal records arrive here soon."
+      ctaNote: "Free onboarding session with every plan."
     },
     dietHome: {
       metaTitle: "Diet",
