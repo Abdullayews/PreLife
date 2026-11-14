@@ -820,6 +820,8 @@ export const ru = {
       email: "Эл. почта",
       emailPlaceholder: "you@example.com",
       password: "Пароль",
+      showPassword: "Показать пароль",
+      hidePassword: "Скрыть пароль",
       passwordPlaceholder: "••••••••",
       loginCta: "Войти",
       signupCta: "Создать аккаунт",
@@ -837,7 +839,7 @@ export const ru = {
       errors: {
         missing_fields: "Заполните все поля.",
         invalid_email: "Введите корректный адрес почты.",
-        short_password: "Пароль должен быть не короче 4 символов.",
+        short_password: "Пароль должен быть не короче 8 символов.",
         invalid_credentials: "Неверная почта или пароль.",
         email_taken: "Аккаунт с такой почтой уже существует.",
         generic: "Что-то пошло не так. Попробуйте ещё раз."

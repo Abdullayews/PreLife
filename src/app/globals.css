@@ -388,6 +388,18 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   outline: none; border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
+/* Password field with the show/hide toggle inside the input's right
+   edge. The button spans the input's full 2.75rem (44px) height — no
+   coarse-pointer override needed. */
+.field-pw { position: relative; }
+.field-pw input { width: 100%; padding-right: 3.2rem; }
+.pw-toggle {
+  position: absolute; inset-block: 0; right: 0; width: 2.75rem;
+  display: inline-grid; place-items: center; border: 0; background: none;
+  color: var(--muted); cursor: pointer; transition: color .2s;
+}
+.pw-toggle:hover { color: var(--ink); }
+.pw-toggle:focus-visible { outline-offset: -3px; }
 .field-error {
   padding: .6rem .85rem; border-radius: 12px; font-size: .875rem; color: var(--ink);
   background: color-mix(in srgb, var(--accent) 12%, var(--raised));

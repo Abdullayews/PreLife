@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { safeNext } from "@/lib/next-url";
 
@@ -35,6 +35,7 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [socialNote, setSocialNote] = useState<string | null>(null);
+  const [showPw, setShowPw] = useState(false);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -89,16 +90,27 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
         </div>
         <div className="field">
           <label htmlFor="password">{t("password")}</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            placeholder={t("passwordPlaceholder")}
-            autoComplete={mode === "login" ? "current-password" : "new-password"}
-            required
-            minLength={mode === "signup" ? 4 : undefined}
-            maxLength={100}
-          />
+          <div className="field-pw">
+            <input
+              id="password"
+              name="password"
+              type={showPw ? "text" : "password"}
+              placeholder={t("passwordPlaceholder")}
+              autoComplete={mode === "login" ? "current-password" : "new-password"}
+              required
+              minLength={mode === "signup" ? 8 : undefined}
+              maxLength={100}
+            />
+            <button
+              type="button"
+              className="pw-toggle"
+              aria-pressed={showPw}
+              aria-label={showPw ? t("hidePassword") : t("showPassword")}
+              onClick={() => setShowPw((v) => !v)}
+            >
+              {showPw ? <EyeOff size={17} aria-hidden /> : <Eye size={17} aria-hidden />}
+            </button>
+          </div>
         </div>
 
         {error && (

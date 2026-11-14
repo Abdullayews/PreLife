@@ -820,6 +820,8 @@ export const az = {
       email: "E-poçt",
       emailPlaceholder: "siz@nümunə.com",
       password: "Şifrə",
+      showPassword: "Şifrəni göstər",
+      hidePassword: "Şifrəni gizlət",
       passwordPlaceholder: "••••••••",
       loginCta: "Daxil ol",
       signupCta: "Hesab yarat",
@@ -837,7 +839,7 @@ export const az = {
       errors: {
         missing_fields: "Bütün xanaları doldurun.",
         invalid_email: "Düzgün e-poçt ünvanı daxil edin.",
-        short_password: "Şifrə ən azı 4 simvoldan ibarət olmalıdır.",
+        short_password: "Şifrə ən azı 8 simvoldan ibarət olmalıdır.",
         invalid_credentials: "E-poçt və ya şifrə yanlışdır.",
         email_taken: "Bu e-poçtla hesab artıq mövcuddur.",
         generic: "Bir xəta baş verdi. Yenidən cəhd edin."
