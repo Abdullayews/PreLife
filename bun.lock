@@ -25,6 +25,11 @@
   },
   "trustedDependencies": [
     "typescript",
+    "@prisma/engines",
+    "@swc/core",
+    "better-sqlite3",
+    "prisma",
+    "@parcel/watcher",
   ],
   "packages": {
     "@electric-sql/pglite": ["@electric-sql/pglite@0.4.3", "", {}, "sha512-ichuWTgtd4mOM1G4SpyGJa5trT03lWbMypDV0fUXUCXg5hiHqVAz/bZyV68NqmkLB7WcYmj1RMJVSp8HV/v/ZQ=="],
