@@ -13,18 +13,13 @@ datasource db {
 }
 
 model User {
-  id                 String              @id @default(cuid())
-  email              String              @unique
-  name               String?
-  passwordHash       String
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  sessions           Session[]
-  appointments       Appointment[]
-  moodLogs           MoodLog[]
-  quizResults        QuizResult[]
-  journalEntries     JournalEntry[]
-  meditationProgress MeditationProgress[]
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
 }
 
 /** One row per signed-in device (Settings → Devices). The cookie carries
@@ -41,92 +36,4 @@ model Session {
   createdAt  DateTime @default(now())
   lastUsedAt DateTime @default(now())
   expiresAt  DateTime
-}
-
-/* ── Psychology (/meditation) — user-generated rows only. Psychologist
-   profiles, specialties, prices and weekly availability live in
-   src/lib/psychology.ts (message-keyed, trilingual); the DB stores what
-   the user creates: bookings, mood check-ins, quiz results, journal
-   entries and meditation progress. ════════════════════════════════════ */
-
-/** A booked session with a psychologist. Sessions become "completed"
- *  implicitly once their start time passes (computed at read time). */
-model Appointment {
-  id               String       @id @default(cuid())
-  userId           String
-  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  psychologistSlug String
-  /// Session start (local wall-clock stored as UTC instant of that date+hour).
-  startAt          DateTime
-  mode             String       @default("online") // online | office
-  price            Int
-  status           String       @default("upcoming") // upcoming | cancelled
-  payment          String       @default("unpaid") // unpaid | paid
-  createdAt        DateTime     @default(now())
-
-  @@index([userId, startAt])
-  @@index([psychologistSlug, startAt])
-}
-
-/** One daily check-in per user: mood / energy / sleep (1–5), reason tags
- *  (comma-separated message keys) and an optional one-line note. */
-model MoodLog {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  /// Local calendar date "YYYY-MM-DD" — one row per user per day.
-  date      String
-  mood      Int
-  energy    Int
-  sleepQ    Int
-  tags      String   @default("")
-  note      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([userId, date])
-}
-
-/** A finished self-check quiz (stress / sleep / focus): stored answers as
- *  JSON plus the derived 0–max score for the charts. */
-model QuizResult {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quizId    String
-  score     Int
-  maxScore  Int
-  answers   String   @default("[]")
-  createdAt DateTime @default(now())
-
-  @@index([userId, quizId])
-}
-
-/** A journal entry. promptKey is the optional day prompt (message key);
- *  content is the free text the user wrote. */
-model JournalEntry {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  promptKey String?
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, createdAt])
-}
-
-/** Listening/watching progress for a meditation media resource. One row
- *  per play — rows add up to the weekly minutes chart. */
-model MeditationProgress {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resourceId  String
-  kind        String   @default("audio") // audio | video
-  seconds     Int
-  completed   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-
-  @@index([userId, createdAt])
 }
