@@ -45,6 +45,12 @@ npm run dev                # http://localhost:3000
 
 `/` redirects to `/welcome` in the default locale.
 
+`npm run dev` also runs `scripts/warm.mjs`: once the server answers it
+requests every route once (pages with a demo-account session, APIs with
+GET or invalid-JSON POSTs), so the first real visit to any page is not a
+0.2–4 s cold compile. Fault-tolerant — see `docs/sandbox-parity.md` for
+the full sandbox↔Render parity notes.
+
 ## Deploy (Render / any Node host)
 
 - **Runtime**: Node ≥ 20.19 (`.node-version` pins 24)
