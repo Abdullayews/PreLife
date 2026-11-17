@@ -11,10 +11,9 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { ThemeGuard } from "@/components/ThemeGuard";
 import { SwRegister } from "@/components/SwRegister";
 import { ConnectionNotice } from "@/components/ConnectionNotice";
+import { HtmlLang } from "@/components/HtmlLang";
 import { getSessionUser } from "@/lib/auth";
-import { THEME_KEY } from "@/lib/shell";
 import { CONSENT_COOKIE } from "@/lib/consent";
-import "../globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://prelife.net"),
@@ -26,11 +25,13 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-/** White is the default; only an explicit saved "dark" choice applies dark
- *  mode. Runs before paint. localStorage is written only after cookie
- *  consent — before consent the theme lives in memory for the visit. */
-const themeScript = `try{if(localStorage.getItem('${THEME_KEY}')==='dark')document.documentElement.classList.add('dark')}catch(e){}`;
-
+/**
+ * The per-locale layout: a fragment below the true root layout
+ * (src/app/layout.tsx — see the notes there for why <html> moved up).
+ * Everything that needs the locale or per-request data renders here;
+ * <HtmlLang> mirrors the active locale onto <html lang> after hydration
+ * and on every soft language switch.
+ */
 export default async function LocaleLayout({
   children, params,
 }: { children: ReactNode; params: Promise<{ locale: string }> }) {
@@ -54,27 +55,17 @@ export default async function LocaleLayout({
   };
 
   return (
-    <html lang={locale} data-scroll-behavior="smooth" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
-      {/* suppressHydrationWarning on <body>: the preview wrapper (and some
-          browser extensions) add classes like "vc-init" to <body> BEFORE
-          React hydrates. React then sees attributes it did not render and
-          throws a false-positive hydration mismatch. Suppression is scoped
-          to this element's attributes only (children unaffected) — the same
-          technique next-themes uses. */}
-      <body suppressHydrationWarning>
-        <NextIntlClientProvider messages={client}>
-          <Nav user={user ? { name: user.name, email: user.email } : null} />
-          <ThemeGuard />
-          <SwRegister />
-          <ConnectionNotice />
-          <main>{children}</main>
-          <Footer />
-          <CookieConsent initialAccepted={cookieStore.get(CONSENT_COOKIE)?.value === "1"} />
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <>
+      <HtmlLang locale={locale} />
+      <NextIntlClientProvider messages={client}>
+        <Nav user={user ? { name: user.name, email: user.email } : null} />
+        <ThemeGuard />
+        <SwRegister />
+        <ConnectionNotice />
+        <main>{children}</main>
+        <Footer />
+        <CookieConsent initialAccepted={cookieStore.get(CONSENT_COOKIE)?.value === "1"} />
+      </NextIntlClientProvider>
+    </>
   );
 }
