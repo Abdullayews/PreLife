@@ -115,8 +115,16 @@ export const az = {
         navLabel: "Bölmələr",
         language: "Dili dəyişin"
       },
-      placeholder: "Tam ev paneli layihənin növbəti addımında əlavə olunacaq — indi istənilən bölməyə keçin.",
+      placeholder: "Planın, bu günün seçimləri və bütün bölmələr — hamısı bir dashboardda.",
       sectionsEyebrow: "Bölmələr",
+      greetMorning: "Sabahınız xeyir",
+      greetAfternoon: "Günortanız xeyir",
+      greetEvening: "Axşamınız xeyir",
+      statsEyebrow: "Bu həftə qısa",
+      statWorkoutsLabel: "məşq bu həftə",
+      statPlanLabel: "plan həftəsi",
+      statStreakLabel: "günlük seriya",
+      statMembershipLabel: "abunəlik",
       today: {
         eyebrow: "Bu gün",
         open: "Açın",
@@ -129,6 +137,15 @@ export const az = {
         pick3: {
           title: "Səhər sakitliyi — 5 dəq"
         }
+      },
+      shop: {
+        eyebrow: "İdman mağazası",
+        hint: "Hardan ala biləcəyini gör — kataloqlar və mağazalar.",
+        open: "Bax",
+        equipment: "Ştanqa, halter, girya və daha çox",
+        supplements: "Whey, kreatin, omega-3 və vitaminlər",
+        accessories: "Kəmər, əlcək, shaker və çanta",
+        clothing: "Tişört, ayaqqabı, hudi və şort"
       },
       subscription: {
         title: "PreLife Premium",
@@ -1298,5 +1315,112 @@ export const az = {
       mediaVSleepTitle: "Gecə vizualı",
       mediaVSleepDesc: "Tünd sakitlik — yuxu ərəfəsində izləmək üçün.",
       fitTagDaysOnly: "{days} gününüz üst-üstə düşür · uyğunluq {score}/100"
+    },
+    gymApp: {
+      metaTitle: "İdman",
+      metaDescription: "İdman planı, tərəfdaş zallar və idman malları kataloqu — hardan ala biləcəyini gör.",
+      title: "İdman mərkəzin",
+      lede: "Plan, zallar və alış-veriş — alt-sekmələrlə bir paneldə.",
+      railLabel: "Alt-sekmələr",
+      railOpen: "Alt-sekmələri aç",
+      railClose: "Alt-sekmələri yığ",
+      currentTabSr: "Hazırkı:",
+      tab_plan: "İdman planı",
+      tab_gyms: "Zallar",
+      tab_equipment: "İdman alətləri",
+      tab_supplements: "Qida əlavələri",
+      tab_accessories: "Aksesuarlar",
+      tab_clothing: "Geyim",
+      heads: {
+        plan: {
+          eyebrow: "İdman planı",
+          title: "İdman planın",
+          lede: "Aktiv plan, həftəlik cədvəl və bütün proqramlar — bir yerdə."
+        },
+        gyms: {
+          eyebrow: "Zallar",
+          title: "Zal kataloqu",
+          lede: "Qiymətlər, rəylər və ünvanlar — harada məşq edəcəyini seç."
+        },
+        equipment: {
+          eyebrow: "İdman alətləri",
+          title: "Alət kataloqu",
+          lede: "Bax, müqayisə et — hardan ala biləcəyini gör."
+        },
+        supplements: {
+          eyebrow: "Qida əlavələri",
+          title: "Əlavə kataloqu",
+          lede: "Zülaldan vitaminə — hardan ala biləcəyini gör."
+        },
+        accessories: {
+          eyebrow: "Aksesuarlar",
+          title: "Aksesuar kataloqu",
+          lede: "Kiçik detallar — hardan ala biləcəyini gör."
+        },
+        clothing: {
+          eyebrow: "Geyim",
+          title: "Geyim kataloqu",
+          lede: "Təlim üçün geyim — hardan ala biləcəyini gör."
+        }
+      },
+      shopNote: "Qiymətlər istinad üçündür — dəqiq qiyməti mağazanın səhifəsində yoxlayın.",
+      whereToBuy: "Hardan almaq",
+      kind_online: "Onlayn",
+      kind_store: "Mağaza",
+      kind_pharmacy: "Aptek",
+      plan: {
+        activeEyebrow: "Aktiv plan",
+        activeTag: "Aktiv",
+        select: "Bu planı seç",
+        plansEyebrow: "Bütün planlar",
+        weekLabel: "{week}/{total} həftə",
+        progressA11y: "Plan gedişatı: {percent}%",
+        switchHint: "Başqa plana keçmək üçün aşağıdan seç.",
+        scheduleEyebrow: "Həftəlik cədvəl",
+        scheduleA11y: "Həftəlik təlim cədvəli"
+      },
+      gyms: {
+        dayPass: "Gün kartı",
+        mapsCta: "Xəritədə aç",
+        openHoursSr: "İş saatları"
+      },
+      placeAtlasName: "Atlas Club",
+      placeAtlasDesc: "Yasamalda geniş kardio zonası və qrup dərsləri olan müasir zal — günün istənilən vaxtı açıq.",
+      placeForgeName: "The Forge",
+      placeForgeDesc: "Güç liftinqi üçün platformalar, geniş parkovka və sauna — ciddi təlim üçün baza.",
+      placeSummitName: "Summit Fitness",
+      placeSummitDesc: "Bakının şimalında üzgüçülük hovuzu və bərpa zonası olan premium fitnes mərkəzi.",
+      equipment: {
+        barbell: "Olimpiya ştanqası",
+        dumbbells: "Tənzimlənən halter dəsti",
+        kettlebell: "Giriya",
+        bands: "Müqavimət lentləri",
+        pullup: "Barmaqlıq çubuğu",
+        mat: "Yoqa matı"
+      },
+      supplements: {
+        whey: "Whey protein",
+        creatine: "Kreatin monohidrat",
+        omega3: "Omega-3 balıq yağı",
+        vitamind: "D3 vitamini",
+        magnesium: "Maqnezium",
+        proteinbar: "Zülal batonchası"
+      },
+      accessories: {
+        belt: "Ağır atletika kəməri",
+        gloves: "Təlim əlcəkləri",
+        shaker: "Shaker butulkası",
+        bag: "İdman çantası",
+        rope: "İp atlama",
+        wraps: "Bilək bağlayıcıları"
+      },
+      clothing: {
+        tshirt: "Təlim tişörtü",
+        shoes: "Təlim ayaqqabısı",
+        shorts: "İdman şortu",
+        hoodie: "İdman huddisi",
+        socks: "İdman corabı (dəst)",
+        tights: "İdman taytları"
+      }
     }
   };

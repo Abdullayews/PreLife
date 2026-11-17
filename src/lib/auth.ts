@@ -106,10 +106,31 @@ async function loadSession(token: string | undefined | null): Promise<CurrentSes
 
 /* ── Current user (server components / route handlers) ────────────────── */
 
+/** V1 PREVIEW scaffolding — the stand-in "signed in" user for visitors
+ *  without a session: the demo account (seeded if needed), or a static
+ *  stub if even the DB is unreachable. Every protected surface (home
+ *  dashboard, gym tabs, …) then renders as if a user exists, per the
+ *  v1 product decision. REMOVE when real auth gating returns. */
+async function previewUser(): Promise<SessionUser> {
+  try {
+    await ensureDemoAccount();
+    return (
+      (await db.user.findUnique({
+        where: { email: DEMO_EMAIL },
+        select: { id: true, email: true, name: true },
+      })) ?? { id: "preview", email: DEMO_EMAIL, name: "Demo" }
+    );
+  } catch {
+    return { id: "preview", email: DEMO_EMAIL, name: "Demo" };
+  }
+}
+
 export async function getSessionUser(): Promise<SessionUser | null> {
   const store = await cookies();
   const current = await loadSession(store.get(SESSION_COOKIE)?.value);
-  return current?.user ?? null;
+  if (current) return current.user;
+  // V1 preview: treat every visitor as signed in (see previewUser).
+  return previewUser();
 }
 
 /** The current session + user — used by the Devices API to mark "this

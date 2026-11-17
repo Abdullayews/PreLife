@@ -4,13 +4,20 @@ import { ArrowRight, Crown } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { sections, sectionById, type SectionId } from "@/lib/shell";
 import { requireUser } from "@/lib/auth";
+import { bakuParts } from "@/lib/diet";
+import { GYM_TABS, isShopTab } from "@/lib/gym";
 
 type Props = { params: Promise<{ locale: string }> };
-const PICKS: { key: string; section: SectionId }[] = [
-  { key: "pick1", section: "gym" },
-  { key: "pick2", section: "diet" },
-  { key: "pick3", section: "meditation" },
+
+/** Today's picks — one card per product area, deep-linking into it. */
+const PICKS: { key: string; section: SectionId; href: string }[] = [
+  { key: "pick1", section: "gym", href: "/gym?tab=plan" },
+  { key: "pick2", section: "diet", href: "/diet" },
+  { key: "pick3", section: "meditation", href: "/meditation" },
 ];
+
+/** V1 mock dashboard values — replaced by real tracking later. */
+const STATS = { workouts: "3/4", planWeek: "5/12", streak: "6", membership: "Premium" };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -21,28 +28,51 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  // Server-side guard: no account → login page, never the home menu.
-  await requireUser(locale, "/home");
+  const user = await requireUser(locale, "/home");
+
   const t = await getTranslations({ locale, namespace: "homePage" });
   const tm = await getTranslations({ locale, namespace: "welcomePage.modules" });
+  const tg = await getTranslations({ locale, namespace: "gymApp" });
+
+  // Baku wall-clock drives the greeting; the date line renders in-locale.
+  const now = new Date();
+  const hour = bakuParts(now).hour;
+  const greeting =
+    hour < 12 ? t("greetMorning") : hour < 18 ? t("greetAfternoon") : t("greetEvening");
+  const dateLine = new Intl.DateTimeFormat(locale, {
+    weekday: "long", day: "numeric", month: "long", timeZone: "Asia/Baku",
+  }).format(now);
+
+  const shopTabs = GYM_TABS.filter((tab) => isShopTab(tab.id));
 
   return (
     <div data-world="shell" className="world page">
       <div className="wrap">
         <header className="page-head">
-          <p className="eyebrow">{t("tagline")}</p>
-          <h1 className="display sm">{t("title")}</h1>
+          <p className="eyebrow"><i />{dateLine}</p>
+          <h1 className="display sm">{greeting}{user.name ? `, ${user.name}` : ""}</h1>
           <p className="lede">{t("placeholder")}</p>
         </header>
+
+        {/* This week at a glance — V1 mock numbers. */}
+        <section aria-label={t("statsEyebrow")} className="blk">
+          <h2 className="eyebrow"><i />{t("statsEyebrow")}</h2>
+          <dl className="mini-stats cols4">
+            <div className="mini-stat"><dd>{STATS.workouts}</dd><dt>{t("statWorkoutsLabel")}</dt></div>
+            <div className="mini-stat"><dd>{STATS.planWeek}</dd><dt>{t("statPlanLabel")}</dt></div>
+            <div className="mini-stat"><dd>{STATS.streak}</dd><dt>{t("statStreakLabel")}</dt></div>
+            <div className="mini-stat"><dd>{STATS.membership}</dd><dt>{t("statMembershipLabel")}</dt></div>
+          </dl>
+        </section>
 
         <section aria-labelledby="today" className="blk">
           <h2 id="today" className="eyebrow">{t("today.eyebrow")}</h2>
           <ul className="cards3">
-            {PICKS.map(({ key, section }) => {
+            {PICKS.map(({ key, section, href }) => {
               const s = sectionById(section);
               return (
                 <li key={key}>
-                  <Link href={s.href} className="card" style={{ "--c": s.color } as React.CSSProperties}>
+                  <Link href={href} className="card" style={{ "--c": s.color } as React.CSSProperties}>
                     <span className="card-top">
                       <span className="chip-ico tinted"><s.icon size={20} aria-hidden /></span>
                       <span className="eyebrow">{tm(`cards.${s.id}.name`)}</span>
@@ -53,6 +83,24 @@ export default async function HomePage({ params }: Props) {
                 </li>
               );
             })}
+          </ul>
+        </section>
+
+        {/* Gym store shortcuts — the four shop subtabs under /gym. */}
+        <section aria-labelledby="shop" className="blk">
+          <h2 id="shop" className="eyebrow"><i />{t("shop.eyebrow")}</h2>
+          <p className="lede-panel">{t("shop.hint")}</p>
+          <ul className="cards4">
+            {shopTabs.map(({ id, icon: Icon }) => (
+              <li key={id}>
+                <Link href={`/gym?tab=${id}`} className="card">
+                  <span className="chip-ico tinted"><Icon size={20} aria-hidden /></span>
+                  <h3>{tg(`tab_${id}`)}</h3>
+                  <p>{t(`shop.${id}`)}</p>
+                  <em>{t("shop.open")}<ArrowRight size={15} aria-hidden /></em>
+                </Link>
+              </li>
+            ))}
           </ul>
         </section>
 

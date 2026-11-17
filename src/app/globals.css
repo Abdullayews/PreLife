@@ -1308,3 +1308,162 @@ a.card:hover em svg { transform: translateX(3px); }
 .cards2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 @media (max-width: 51.99rem) { .cards2 { grid-template-columns: 1fr; } }
 .psy-sched .sched { min-width: 72rem; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   GYM APP — the registered surface (/gym): the ☰ + current-subtab rail
+   on the left, the active panel on the right. One open/closed state,
+   two responsive shapes: below 64rem the rail is a bar and the choice
+   list drops down (grid-template-rows 0fr→1fr); at ≥64rem the rail is
+   a sticky sidebar that animates between an icon strip (closed) and
+   the full label list (open) via grid-template-columns track tweens.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* Small shared utilities (used app-wide, defined here for now). */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.h4 { font: 600 1.05rem/1.3 var(--font-display); }
+.lede-panel { color: var(--muted); max-width: 42rem; text-wrap: pretty; }
+
+.gym-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+
+/* ── The rail (☰ + indicator + choice list) ── */
+.gym-rail {
+  position: sticky; top: calc(var(--nav-h) + .75rem); z-index: 5;
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  background: var(--raised); box-shadow: var(--shadow-1); overflow: hidden;
+}
+.gym-rail-head {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .7rem;
+  width: 100%; min-height: 3.4rem; padding: .7rem 1rem; border: 0;
+  background: transparent; color: var(--ink);
+  font: 650 .9375rem/1.2 var(--font-body); cursor: pointer;
+  transition: background-color .2s, grid-template-columns .45s var(--ease), justify-content .45s var(--ease);
+}
+.gym-rail-head:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+.gym-rail-head > svg:first-child { color: var(--muted); }
+.gym-rail-now { min-width: 0; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity .25s var(--ease); }
+.gym-rail-head .chev { color: var(--muted); transition: transform .4s var(--ease); }
+.gym-rail[data-open="true"] .gym-rail-head .chev { transform: rotate(180deg); }
+
+.gym-rail-list { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s var(--ease); }
+.gym-rail[data-open="true"] .gym-rail-list { grid-template-rows: 1fr; }
+.gym-rail-clip { overflow: hidden; min-height: 0; }
+.gym-tabs { display: grid; gap: 2px; padding: .5rem; border-top: 1px solid var(--line); }
+
+.gym-tab {
+  position: relative; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .75rem;
+  width: 100%; min-height: 2.9rem; padding: .5rem .85rem; border: 0; border-radius: var(--r-md);
+  background: transparent; color: var(--muted); font: 600 .9375rem/1.2 var(--font-body); text-align: left;
+  cursor: pointer; transition: background-color .2s, color .2s, grid-template-columns .45s var(--ease), padding .45s var(--ease);
+}
+.gym-tab .label { min-width: 0; overflow: hidden; white-space: nowrap; transition: opacity .25s var(--ease); }
+.gym-tab:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); color: var(--ink); }
+.gym-tab[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 13%, transparent); color: var(--accent-text); }
+.gym-tab[aria-selected="true"]::before {
+  content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 3px;
+  border-radius: 999px; background: var(--accent); transition: opacity .25s var(--ease);
+}
+
+/* ── Panels ── */
+.gym-panel { animation: gym-in .5s var(--ease) both; }
+@keyframes gym-in { from { opacity: 0; transform: translateY(12px); } }
+.gym-panel-head { display: grid; gap: .65rem; margin-bottom: 1.5rem; }
+.gpanel-blk { margin-top: 2.25rem; display: grid; gap: .9rem; }
+
+/* ── Plan hero + plan cards ── */
+.gplan {
+  display: grid; overflow: hidden;
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  background: var(--raised); box-shadow: var(--shadow-1);
+}
+.gplan-img { aspect-ratio: 16 / 9; }
+.gplan-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gplan-body { display: grid; gap: .7rem; padding: 1.35rem; align-content: start; }
+.gplan-body h3 { font: 600 1.35rem/1.2 var(--font-display); }
+.gplan-body > p { color: var(--muted); font-size: .9375rem; max-width: 46rem; }
+.gplan-progress { display: grid; gap: .55rem; margin-top: .6rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.gplan-week { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; font-size: .875rem; }
+.gplan-week span { color: var(--muted); font-variant-numeric: tabular-nums; }
+.gplan-bar { height: .55rem; border-radius: 999px; background: color-mix(in srgb, var(--ink) 10%, transparent); overflow: hidden; }
+.gplan-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent); animation: gym-bar 1s var(--ease) both; }
+@keyframes gym-bar { from { width: 0; } }
+.gplan-hint { font-size: .8125rem; color: var(--muted); }
+.gshop-grid .card[data-active] { border-color: color-mix(in srgb, var(--accent) 45%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), var(--shadow-1); }
+.gplan-choose, .gplan-chosen { margin-top: auto; align-self: start; }
+@media (min-width: 48rem) {
+  .gplan { grid-template-columns: minmax(0, 42%) minmax(0, 1fr); }
+  .gplan-img { aspect-ratio: auto; min-height: 100%; }
+  .gplan-body { padding: 1.5rem 1.6rem; }
+}
+
+/* ── Zallar (partner gyms) ── */
+.gyms-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); }
+.gplace {
+  display: flex; flex-direction: column; overflow: hidden;
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  background: var(--raised); box-shadow: var(--shadow-1);
+  transition: transform .25s var(--ease), box-shadow .25s;
+}
+.gplace:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+.gplace-img { aspect-ratio: 3 / 2; overflow: hidden; }
+.gplace-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s var(--ease); }
+.gplace:hover .gplace-img img { transform: scale(1.04); }
+.gplace-body { display: grid; gap: .75rem; padding: 1.2rem; align-content: start; flex: 1; }
+.gplace-body p { color: var(--muted); font-size: .9375rem; }
+.gplace-meta { display: grid; gap: .4rem; font-size: .875rem; color: var(--muted); }
+.gplace-line { display: inline-flex; align-items: center; gap: .45rem; min-width: 0; }
+.gplace-line svg { flex: none; }
+.gplace-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding-top: .9rem; border-top: 1px solid var(--line); }
+
+/* ── Shop directories (equipment / supplements / accessories / clothing) ── */
+.gshop-note { display: flex; align-items: center; gap: .5rem; margin: -.4rem 0 1.1rem; font-size: .8125rem; color: var(--muted); }
+.gshop-note svg { flex: none; }
+.gshop-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr)); }
+.gprod {
+  display: flex; flex-direction: column; gap: .6rem; padding: 1.25rem;
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  background: var(--raised); box-shadow: var(--shadow-1);
+  animation: gym-in .5s var(--ease) both; animation-delay: calc(var(--i, 0) * 45ms);
+  transition: transform .25s var(--ease), box-shadow .25s;
+}
+.gprod:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
+.gprod .card-top .tag { margin-left: auto; }
+.gprod-brand { color: var(--muted); font-size: .875rem; }
+.gprod-buy { margin-top: .3rem; font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.buy-list { display: grid; gap: .45rem; margin-top: auto; }
+.buy-list a {
+  display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: .55rem;
+  padding: .55rem .7rem; border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface); color: var(--ink); text-decoration: none; font-size: .875rem;
+  transition: border-color .2s, color .2s, transform .2s var(--ease);
+}
+.buy-list a:hover { border-color: color-mix(in srgb, var(--accent) 50%, transparent); color: var(--accent-text); transform: translateY(-1px); }
+.buy-list b { font-weight: 650; white-space: nowrap; }
+.buy-kind { font-size: .7rem; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .08rem .5rem; white-space: nowrap; }
+.buy-price { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.buy-list a > svg { color: var(--muted); transition: color .2s, transform .2s var(--ease); }
+.buy-list a:hover > svg { color: var(--accent-text); transform: translate(1px, -1px); }
+
+/* ── Desktop (≥64rem): sidebar shape — closed = icon strip, open = labels ── */
+@media (min-width: 64rem) {
+  .gym-layout { grid-template-columns: 16.5rem minmax(0, 1fr); transition: grid-template-columns .45s var(--ease); }
+  .gym-layout[data-rail="closed"] { grid-template-columns: 4.75rem minmax(0, 1fr); }
+  .gym-rail { top: calc(var(--nav-h) + 1.25rem); }
+  .gym-rail-list { grid-template-rows: 1fr; } /* the list never hides here */
+  .gym-layout[data-rail="closed"] .gym-rail-head { grid-template-columns: auto 0fr auto; justify-content: center; padding-inline: 0; }
+  .gym-layout[data-rail="closed"] .gym-rail-now { opacity: 0; }
+  .gym-layout[data-rail="closed"] .gym-tab { grid-template-columns: auto 0fr; justify-content: center; padding-inline: 0; }
+  .gym-layout[data-rail="closed"] .gym-tab .label { opacity: 0; }
+  .gym-layout[data-rail="closed"] .gym-tab[aria-selected="true"]::before { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gym-layout, .gym-rail-head, .gym-rail-now, .gym-rail-head .chev,
+  .gym-rail-list, .gym-tab, .gym-tab .label, .gym-panel, .gprod,
+  .gplace, .gplace-img img, .gplan-bar i, .buy-list a, .buy-list a > svg {
+    transition: none; animation: none;
+  }
+}
+
+/* Home dashboard — 4-up stat row (2 columns on phones). */
+.mini-stats.cols4 { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 40rem) { .mini-stats.cols4 { grid-template-columns: repeat(4, 1fr); } }
