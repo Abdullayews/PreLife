@@ -1415,7 +1415,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .gplace-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding-top: .9rem; border-top: 1px solid var(--line); }
 
 /* ── Shop directories (equipment / supplements / accessories / clothing) ── */
-.gshop-note { display: flex; align-items: center; gap: .5rem; margin: -.4rem 0 1.1rem; font-size: .8125rem; color: var(--muted); }
+.gshop-note { display: flex; align-items: center; gap: .5rem; margin: -.4rem 0 .65rem; font-size: .8125rem; color: var(--muted); }
 .gshop-note svg { flex: none; }
 .gshop-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(16.5rem, 1fr)); }
 .gprod {
@@ -1431,6 +1431,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .gprod-buy { margin-top: .3rem; font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .buy-list { display: grid; gap: .45rem; margin-top: auto; }
 .buy-list a {
+  position: relative;
   display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: .55rem;
   padding: .55rem .7rem; border: 1px solid var(--line); border-radius: var(--r-md);
   background: var(--surface); color: var(--ink); text-decoration: none; font-size: .875rem;
@@ -1467,3 +1468,79 @@ a.card:hover em svg { transform: translateX(3px); }
 /* Home dashboard — 4-up stat row (2 columns on phones). */
 .mini-stats.cols4 { grid-template-columns: repeat(2, 1fr); }
 @media (min-width: 40rem) { .mini-stats.cols4 { grid-template-columns: repeat(4, 1fr); } }
+
+/* ── Gym v1.1 — sort control, best-price badge, scrim, stat links ────── */
+.gshop-bar { display: flex; align-items: center; gap: .75rem; margin: 0 0 1.1rem; }
+.sort-seg {
+  display: inline-flex; gap: 2px; padding: 3px;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+}
+.sort-seg button {
+  border: 0; background: transparent; color: var(--muted);
+  font: 650 .8125rem/1 var(--font-body); padding: .5rem .95rem; border-radius: 999px;
+  cursor: pointer; transition: background-color .2s, color .2s;
+}
+.sort-seg button:hover { color: var(--ink); }
+.sort-seg button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-text);
+}
+
+/* The cheapest store row in a product card gets an accent wash + badge. */
+.buy-list a[data-best="true"] {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.buy-best {
+  position: absolute; top: -.55rem; right: .8rem;
+  font: 700 .65rem/1 var(--font-body); letter-spacing: .09em; text-transform: uppercase;
+  color: var(--accent-ink); background: var(--accent);
+  border-radius: 999px; padding: .24rem .6rem; box-shadow: var(--shadow-1);
+}
+.gprod-count { font-size: .75rem; color: var(--muted); }
+
+/* Today's column in the plan schedule (set post-mount, Baku time). */
+.sched th[data-today="true"], .sched td[data-today="true"] {
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+}
+.sched thead th[data-today="true"] { color: var(--accent-text); }
+
+/* Below lg an open rail overlays the page — this scrim closes it on an
+   outside tap. Fixed, out-of-flow, hidden entirely at lg+ (the sidebar
+   shape never overlays, so no scrim is needed there). */
+.gym-scrim {
+  position: fixed; inset: 0; z-index: 4;
+  background: color-mix(in srgb, var(--ink) 30%, transparent);
+  animation: gym-scrim .25s var(--ease);
+}
+@keyframes gym-scrim { from { opacity: 0; } }
+@media (min-width: 64rem) { .gym-scrim { display: none; } }
+
+/* Home dashboard v1.1 — each stat became a deep link into its surface. */
+.stats-hint { margin: .65rem .2rem 0; font-size: .75rem; color: var(--muted); }
+.stat-link {
+  position: relative; text-decoration: none;
+  transition: transform .25s var(--ease), border-color .2s, box-shadow .25s;
+}
+.stat-link:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: var(--shadow-2);
+}
+.stat-link::after {
+  content: "\2197"; position: absolute; top: .85rem; right: .95rem;
+  font-size: .85rem; color: var(--muted); opacity: 0;
+  transition: opacity .2s, color .2s;
+}
+.stat-link:hover::after { opacity: 1; color: var(--accent-text); }
+.stat-link .stat-num {
+  display: block; font: 600 1.5rem/1.15 var(--font-display);
+  font-variant-numeric: tabular-nums; color: var(--accent-text);
+  overflow-wrap: anywhere; /* "Premium" must never blow up the card */
+}
+.stat-link .stat-label { font-size: .8125rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .gym-scrim, .sort-seg button, .stat-link, .stat-link::after {
+    transition: none; animation: none;
+  }
+}

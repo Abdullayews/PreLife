@@ -4,7 +4,7 @@ import { requireUser } from "@/lib/auth";
 import { GymApp, type GymAppStrings } from "@/components/gym/GymApp";
 import {
   GYM_PLACES, PLAN_WEEKS, SHOP_TAB_IDS, STORES,
-  gymPlans, gymSchedule, productsOf, scheduleDayKeys,
+  gymPlans, gymSchedule, minPriceOf, productsOf, scheduleDayKeys,
   isGymTabId, type GymTabId, type ShopTabId,
 } from "@/lib/gym";
 
@@ -33,6 +33,9 @@ export default async function GymPage({ params, searchParams }: Props) {
 
   const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
   const initialTab: GymTabId = tabParam && isGymTabId(tabParam) ? tabParam : "plan";
+  /** A valid ?tab= was in the URL — a shareable deep link beats the
+   *  remembered tab when the client restores its last choice. */
+  const linked = tabParam === initialTab;
 
   const t = await getTranslations({ locale, namespace: "gymApp" });
   // gymHome carries the shared gym copy (plans, levels, features, schedule…)
@@ -59,16 +62,23 @@ export default async function GymPage({ params, searchParams }: Props) {
   const shops = Object.fromEntries(
     SHOP_TAB_IDS.map((id) => [
       id,
-      productsOf(id).map((p) => ({
-        id: p.id,
-        name: t(`${id}.${p.nameKey}`),
-        brand: p.brand,
-        priceLabel: `${p.price[0]}–${p.price[1]} ₼`,
-        at: p.at.map(({ store, price }) => {
-          const s = STORES[store]!;
-          return { name: s.name, kind: t(`kind_${s.kind}`), url: s.url, price };
-        }),
-      })),
+      productsOf(id).map((p) => {
+        const cheapest = minPriceOf(p);
+        return {
+          id: p.id,
+          name: t(`${id}.${p.nameKey}`),
+          brand: p.brand,
+          priceLabel: `${p.price[0]}–${p.price[1]} ₼`,
+          minPrice: cheapest,
+          // Index of the cheapest store row — wins ties by first occurrence.
+          best: p.at.findIndex((a) => a.price === cheapest),
+          countLabel: t("atCount", { count: p.at.length }),
+          at: p.at.map(({ store, price }) => {
+            const s = STORES[store]!;
+            return { name: s.name, kind: t(`kind_${s.kind}`), url: s.url, price };
+          }),
+        };
+      }),
     ]),
   ) as Record<ShopTabId, GymAppStrings["shops"][ShopTabId]>;
 
@@ -95,6 +105,10 @@ export default async function GymPage({ params, searchParams }: Props) {
     },
     shopNote: t("shopNote"),
     whereToBuy: t("whereToBuy"),
+    bestPrice: t("bestPrice"),
+    sortLabel: t("sortLabel"),
+    sortPopular: t("sortPopular"),
+    sortCheap: t("sortCheap"),
     plans,
     planUi: {
       activeEyebrow: t("plan.activeEyebrow"),
@@ -147,7 +161,7 @@ export default async function GymPage({ params, searchParams }: Props) {
           <h1 className="display sm">{t("title")}</h1>
           <p className="lede">{t("lede")}</p>
         </header>
-        <GymApp initialTab={initialTab} initialPlan={initialPlan} strings={strings} />
+        <GymApp initialTab={initialTab} initialPlan={initialPlan} linked={linked} strings={strings} />
       </div>
     </div>
   );
