@@ -137,6 +137,12 @@ export const SHOP_CATALOG: readonly ShopCategory[] = [
 export const productsOf = (tab: ShopTabId) =>
   SHOP_CATALOG.find((c) => c.id === tab)!.items;
 
+/** Cheapest store price for a product — drives the "best price" row
+ *  highlight and the sort-by-cheapest order (computed once, server-side,
+ *  so the client never re-derives it from the price list). */
+export const minPriceOf = (p: Product) =>
+  p.at.reduce((min, a) => Math.min(min, a.price), Number.POSITIVE_INFINITY);
+
 /* ── Partner gyms (zallar) ─────────────────────────────────────────────── */
 
 export type GymPlace = {

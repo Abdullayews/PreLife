@@ -16,8 +16,14 @@ const PICKS: { key: string; section: SectionId; href: string }[] = [
   { key: "pick3", section: "meditation", href: "/meditation" },
 ];
 
-/** V1 mock dashboard values — replaced by real tracking later. */
-const STATS = { workouts: "3/4", planWeek: "5/12", streak: "6", membership: "Premium" };
+/** V1 mock dashboard values — replaced by real tracking later.
+ *  Each stat is a link into the surface it describes. */
+const STATS: { key: string; num: string; labelKey: string; href: string }[] = [
+  { key: "workouts", num: "3/4", labelKey: "statWorkoutsLabel", href: "/gym?tab=plan" },
+  { key: "planWeek", num: "5/12", labelKey: "statPlanLabel", href: "/gym?tab=plan" },
+  { key: "streak", num: "6", labelKey: "statStreakLabel", href: "/gym?tab=plan" },
+  { key: "membership", num: "Premium", labelKey: "statMembershipLabel", href: "/subscription" },
+];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -54,15 +60,20 @@ export default async function HomePage({ params }: Props) {
           <p className="lede">{t("placeholder")}</p>
         </header>
 
-        {/* This week at a glance — V1 mock numbers. */}
+        {/* This week at a glance — V1 mock numbers, each deep-linking on. */}
         <section aria-label={t("statsEyebrow")} className="blk">
           <h2 className="eyebrow"><i />{t("statsEyebrow")}</h2>
-          <dl className="mini-stats cols4">
-            <div className="mini-stat"><dd>{STATS.workouts}</dd><dt>{t("statWorkoutsLabel")}</dt></div>
-            <div className="mini-stat"><dd>{STATS.planWeek}</dd><dt>{t("statPlanLabel")}</dt></div>
-            <div className="mini-stat"><dd>{STATS.streak}</dd><dt>{t("statStreakLabel")}</dt></div>
-            <div className="mini-stat"><dd>{STATS.membership}</dd><dt>{t("statMembershipLabel")}</dt></div>
-          </dl>
+          <ul className="mini-stats cols4">
+            {STATS.map((s) => (
+              <li key={s.key}>
+                <Link href={s.href} className="mini-stat stat-link">
+                  <b className="stat-num">{s.num}</b>
+                  <span className="stat-label">{t(s.labelKey)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="stats-hint">{t("statsHint")}</p>
         </section>
 
         <section aria-labelledby="today" className="blk">
