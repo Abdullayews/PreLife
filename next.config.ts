@@ -6,6 +6,12 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  // Sandbox↔Render parity: `next dev` ships a floating "Next.js dev tools"
+  // badge (bottom-left) plus route-compile spinners. None of that exists in
+  // the production build served on Render, so the preview panel looked
+  // different from the live site. Turning the indicators off makes the
+  // dev sandbox render pixel-identical chrome to production.
+  devIndicators: false,
   // The sandbox preview panel serves the app from a *.space-z.ai host.
   // Without this, Next.js dev (16) blocks cross-origin requests to dev
   // resources (e.g. /__nextjs_original-stack-frames) from that origin.
