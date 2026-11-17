@@ -113,8 +113,16 @@
       "navLabel": "B\u00f6lm\u0259l\u0259r",
       "language": "Dili d\u0259yi\u015fin"
     },
-    "placeholder": "Tam ev paneli layih\u0259nin n\u00f6vb\u0259ti add\u0131m\u0131nda \u0259lav\u0259 olunacaq \u2014 indi ist\u0259nil\u0259n b\u00f6lm\u0259y\u0259 ke\u00e7in.",
+    "placeholder": "Plan\u0131n, bu g\u00fcn\u00fcn se\u00e7iml\u0259ri v\u0259 b\u00fct\u00fcn b\u00f6lm\u0259l\u0259r \u2014 ham\u0131s\u0131 bir dashboardda.",
     "sectionsEyebrow": "B\u00f6lm\u0259l\u0259r",
+    "greetMorning": "Sabah\u0131n\u0131z xeyir",
+    "greetAfternoon": "G\u00fcnortan\u0131z xeyir",
+    "greetEvening": "Ax\u015fam\u0131n\u0131z xeyir",
+    "statsEyebrow": "Bu h\u0259ft\u0259 q\u0131sa",
+    "statWorkoutsLabel": "m\u0259\u015fq bu h\u0259ft\u0259",
+    "statPlanLabel": "plan h\u0259ft\u0259si",
+    "statStreakLabel": "g\u00fcnl\u00fck seriya",
+    "statMembershipLabel": "abun\u0259lik",
     "today": {
       "eyebrow": "Bu g\u00fcn",
       "open": "A\u00e7\u0131n",
@@ -127,6 +135,15 @@
       "pick3": {
         "title": "S\u0259h\u0259r sakitliyi \u2014 5 d\u0259q"
       }
+    },
+    "shop": {
+      "eyebrow": "\u0130dman ma\u011fazas\u0131",
+      "hint": "Hardan ala bil\u0259c\u0259yini g\u00f6r \u2014 kataloqlar v\u0259 ma\u011fazalar.",
+      "open": "Bax",
+      "equipment": "\u015etanqa, halter, girya v\u0259 daha \u00e7ox",
+      "supplements": "Whey, kreatin, omega-3 v\u0259 vitaminl\u0259r",
+      "accessories": "K\u0259m\u0259r, \u0259lc\u0259k, shaker v\u0259 \u00e7anta",
+      "clothing": "Ti\u015f\u00f6rt, ayaqqab\u0131, hudi v\u0259 \u015fort"
     },
     "subscription": {
       "title": "PreLife Premium",
@@ -1295,5 +1312,112 @@
     "mediaVSleepTitle": "Gec\u0259 vizual\u0131",
     "mediaVSleepDesc": "T\u00fcnd sakitlik \u2014 yuxu \u0259r\u0259f\u0259sind\u0259 izl\u0259m\u0259k \u00fc\u00e7\u00fcn.",
     "fitTagDaysOnly": "{days} g\u00fcn\u00fcn\u00fcz \u00fcst-\u00fcst\u0259 d\u00fc\u015f\u00fcr \u00b7 uy\u011funluq {score}/100"
+  },
+  "gymApp": {
+    "metaTitle": "\u0130dman",
+    "metaDescription": "\u0130dman plan\u0131, t\u0259r\u0259fda\u015f zallar v\u0259 idman mallar\u0131 kataloqu \u2014 hardan ala bil\u0259c\u0259yini g\u00f6r.",
+    "title": "\u0130dman m\u0259rk\u0259zin",
+    "lede": "Plan, zallar v\u0259 al\u0131\u015f-veri\u015f \u2014 alt-sekm\u0259l\u0259rl\u0259 bir paneld\u0259.",
+    "railLabel": "Alt-sekm\u0259l\u0259r",
+    "railOpen": "Alt-sekm\u0259l\u0259ri a\u00e7",
+    "railClose": "Alt-sekm\u0259l\u0259ri y\u0131\u011f",
+    "currentTabSr": "Haz\u0131rk\u0131:",
+    "tab_plan": "\u0130dman plan\u0131",
+    "tab_gyms": "Zallar",
+    "tab_equipment": "\u0130dman al\u0259tl\u0259ri",
+    "tab_supplements": "Qida \u0259lav\u0259l\u0259ri",
+    "tab_accessories": "Aksesuarlar",
+    "tab_clothing": "Geyim",
+    "heads": {
+      "plan": {
+        "eyebrow": "\u0130dman plan\u0131",
+        "title": "\u0130dman plan\u0131n",
+        "lede": "Aktiv plan, h\u0259ft\u0259lik c\u0259dv\u0259l v\u0259 b\u00fct\u00fcn proqramlar \u2014 bir yerd\u0259."
+      },
+      "gyms": {
+        "eyebrow": "Zallar",
+        "title": "Zal kataloqu",
+        "lede": "Qiym\u0259tl\u0259r, r\u0259yl\u0259r v\u0259 \u00fcnvanlar \u2014 harada m\u0259\u015fq ed\u0259c\u0259yini se\u00e7."
+      },
+      "equipment": {
+        "eyebrow": "\u0130dman al\u0259tl\u0259ri",
+        "title": "Al\u0259t kataloqu",
+        "lede": "Bax, m\u00fcqayis\u0259 et \u2014 hardan ala bil\u0259c\u0259yini g\u00f6r."
+      },
+      "supplements": {
+        "eyebrow": "Qida \u0259lav\u0259l\u0259ri",
+        "title": "\u018flav\u0259 kataloqu",
+        "lede": "Z\u00fclaldan vitamin\u0259 \u2014 hardan ala bil\u0259c\u0259yini g\u00f6r."
+      },
+      "accessories": {
+        "eyebrow": "Aksesuarlar",
+        "title": "Aksesuar kataloqu",
+        "lede": "Ki\u00e7ik detallar \u2014 hardan ala bil\u0259c\u0259yini g\u00f6r."
+      },
+      "clothing": {
+        "eyebrow": "Geyim",
+        "title": "Geyim kataloqu",
+        "lede": "T\u0259lim \u00fc\u00e7\u00fcn geyim \u2014 hardan ala bil\u0259c\u0259yini g\u00f6r."
+      }
+    },
+    "shopNote": "Qiym\u0259tl\u0259r istinad \u00fc\u00e7\u00fcnd\u00fcr \u2014 d\u0259qiq qiym\u0259ti ma\u011fazan\u0131n s\u0259hif\u0259sind\u0259 yoxlay\u0131n.",
+    "whereToBuy": "Hardan almaq",
+    "kind_online": "Onlayn",
+    "kind_store": "Ma\u011faza",
+    "kind_pharmacy": "Aptek",
+    "plan": {
+      "activeEyebrow": "Aktiv plan",
+      "activeTag": "Aktiv",
+      "select": "Bu plan\u0131 se\u00e7",
+      "plansEyebrow": "B\u00fct\u00fcn planlar",
+      "weekLabel": "{week}/{total} h\u0259ft\u0259",
+      "progressA11y": "Plan gedi\u015fat\u0131: {percent}%",
+      "switchHint": "Ba\u015fqa plana ke\u00e7m\u0259k \u00fc\u00e7\u00fcn a\u015fa\u011f\u0131dan se\u00e7.",
+      "scheduleEyebrow": "H\u0259ft\u0259lik c\u0259dv\u0259l",
+      "scheduleA11y": "H\u0259ft\u0259lik t\u0259lim c\u0259dv\u0259li"
+    },
+    "gyms": {
+      "dayPass": "G\u00fcn kart\u0131",
+      "mapsCta": "X\u0259rit\u0259d\u0259 a\u00e7",
+      "openHoursSr": "\u0130\u015f saatlar\u0131"
+    },
+    "placeAtlasName": "Atlas Club",
+    "placeAtlasDesc": "Yasamalda geni\u015f kardio zonas\u0131 v\u0259 qrup d\u0259rsl\u0259ri olan m\u00fcasir zal \u2014 g\u00fcn\u00fcn ist\u0259nil\u0259n vaxt\u0131 a\u00e7\u0131q.",
+    "placeForgeName": "The Forge",
+    "placeForgeDesc": "G\u00fc\u00e7 liftinqi \u00fc\u00e7\u00fcn platformalar, geni\u015f parkovka v\u0259 sauna \u2014 ciddi t\u0259lim \u00fc\u00e7\u00fcn baza.",
+    "placeSummitName": "Summit Fitness",
+    "placeSummitDesc": "Bak\u0131n\u0131n \u015fimal\u0131nda \u00fczg\u00fc\u00e7\u00fcl\u00fck hovuzu v\u0259 b\u0259rpa zonas\u0131 olan premium fitnes m\u0259rk\u0259zi.",
+    "equipment": {
+      "barbell": "Olimpiya \u015ftanqas\u0131",
+      "dumbbells": "T\u0259nziml\u0259n\u0259n halter d\u0259sti",
+      "kettlebell": "Giriya",
+      "bands": "M\u00fcqavim\u0259t lentl\u0259ri",
+      "pullup": "Barmaql\u0131q \u00e7ubu\u011fu",
+      "mat": "Yoqa mat\u0131"
+    },
+    "supplements": {
+      "whey": "Whey protein",
+      "creatine": "Kreatin monohidrat",
+      "omega3": "Omega-3 bal\u0131q ya\u011f\u0131",
+      "vitamind": "D3 vitamini",
+      "magnesium": "Maqnezium",
+      "proteinbar": "Z\u00fclal batonchas\u0131"
+    },
+    "accessories": {
+      "belt": "A\u011f\u0131r atletika k\u0259m\u0259ri",
+      "gloves": "T\u0259lim \u0259lc\u0259kl\u0259ri",
+      "shaker": "Shaker butulkas\u0131",
+      "bag": "\u0130dman \u00e7antas\u0131",
+      "rope": "\u0130p atlama",
+      "wraps": "Bil\u0259k ba\u011flay\u0131c\u0131lar\u0131"
+    },
+    "clothing": {
+      "tshirt": "T\u0259lim ti\u015f\u00f6rt\u00fc",
+      "shoes": "T\u0259lim ayaqqab\u0131s\u0131",
+      "shorts": "\u0130dman \u015fortu",
+      "hoodie": "\u0130dman huddisi",
+      "socks": "\u0130dman corab\u0131 (d\u0259st)",
+      "tights": "\u0130dman taytlar\u0131"
+    }
   }
 }

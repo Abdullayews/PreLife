@@ -106,7 +106,7 @@ async function loadSession(token: string | undefined | null): Promise<CurrentSes
 export async function getSessionUser(): Promise<SessionUser | null> {
   const store = await cookies();
   const current = await loadSession(store.get(SESSION_COOKIE)?.value);
-  return current?.user ?? null;
+  if (current) return current.user;
 }
 
 /** The current session + user — used by the Devices API to mark "this

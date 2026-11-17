@@ -115,8 +115,16 @@ export const en = {
         navLabel: "Sections",
         language: "Change language"
       },
-      placeholder: "The full home dashboard lands in the next step of this build — for now, jump into any section.",
+      placeholder: "Your plan, today's picks and every section — all on one dashboard.",
       sectionsEyebrow: "Sections",
+      greetMorning: "Good morning",
+      greetAfternoon: "Good afternoon",
+      greetEvening: "Good evening",
+      statsEyebrow: "This week at a glance",
+      statWorkoutsLabel: "workouts this week",
+      statPlanLabel: "plan week",
+      statStreakLabel: "day streak",
+      statMembershipLabel: "membership",
       today: {
         eyebrow: "Today",
         open: "Open",
@@ -129,6 +137,15 @@ export const en = {
         pick3: {
           title: "Morning calm — 5 min"
         }
+      },
+      shop: {
+        eyebrow: "Gym store",
+        hint: "See where to buy — catalogues and stores.",
+        open: "Browse",
+        equipment: "Barbells, dumbbells, kettlebells and more",
+        supplements: "Whey, creatine, omega-3 and vitamins",
+        accessories: "Belts, gloves, shakers and bags",
+        clothing: "T-shirts, shoes, hoodies and shorts"
       },
       subscription: {
         title: "PreLife Premium",
@@ -1297,5 +1314,112 @@ export const en = {
       mediaVSleepTitle: "Night visual",
       mediaVSleepDesc: "Dark quiet — for the edge of sleep.",
       fitTagDaysOnly: "{days} of your days overlap · fit {score}/100"
+    },
+    gymApp: {
+      metaTitle: "Gym",
+      metaDescription: "Training plans, partner gyms and a gear directory — see where to buy.",
+      title: "Your training hub",
+      lede: "Plans, gyms and shopping — one panel, one tap between subtabs.",
+      railLabel: "Subtabs",
+      railOpen: "Open subtabs",
+      railClose: "Close subtabs",
+      currentTabSr: "Current:",
+      tab_plan: "Training plan",
+      tab_gyms: "Gyms",
+      tab_equipment: "Equipment",
+      tab_supplements: "Supplements",
+      tab_accessories: "Accessories",
+      tab_clothing: "Clothing",
+      heads: {
+        plan: {
+          eyebrow: "Training plan",
+          title: "Your training plan",
+          lede: "Active plan, weekly schedule and every programme — in one place."
+        },
+        gyms: {
+          eyebrow: "Gyms",
+          title: "Gym directory",
+          lede: "Prices, ratings and addresses — pick where you train."
+        },
+        equipment: {
+          eyebrow: "Equipment",
+          title: "Equipment directory",
+          lede: "Browse, compare — see where to buy."
+        },
+        supplements: {
+          eyebrow: "Supplements",
+          title: "Supplements directory",
+          lede: "From protein to vitamins — see where to buy."
+        },
+        accessories: {
+          eyebrow: "Accessories",
+          title: "Accessories directory",
+          lede: "The small essentials — see where to buy."
+        },
+        clothing: {
+          eyebrow: "Clothing",
+          title: "Clothing directory",
+          lede: "Kit for training — see where to buy."
+        }
+      },
+      shopNote: "Prices are indicative — check the exact price on the store's page.",
+      whereToBuy: "Where to buy",
+      kind_online: "Online",
+      kind_store: "Store",
+      kind_pharmacy: "Pharmacy",
+      plan: {
+        activeEyebrow: "Active plan",
+        activeTag: "Active",
+        select: "Choose this plan",
+        plansEyebrow: "All plans",
+        weekLabel: "Week {week} of {total}",
+        progressA11y: "Plan progress: {percent}%",
+        switchHint: "Pick another plan below to switch.",
+        scheduleEyebrow: "Weekly schedule",
+        scheduleA11y: "Weekly training schedule"
+      },
+      gyms: {
+        dayPass: "Day pass",
+        mapsCta: "Open in Maps",
+        openHoursSr: "Opening hours"
+      },
+      placeAtlasName: "Atlas Club",
+      placeAtlasDesc: "A modern hall in Yasamal with a wide cardio zone and group classes — open around the clock.",
+      placeForgeName: "The Forge",
+      placeForgeDesc: "Lifting platforms, ample parking and a sauna — a base for serious training.",
+      placeSummitName: "Summit Fitness",
+      placeSummitDesc: "A premium fitness centre in northern Baku with a pool and a recovery zone.",
+      equipment: {
+        barbell: "Olympic barbell",
+        dumbbells: "Adjustable dumbbell set",
+        kettlebell: "Kettlebell",
+        bands: "Resistance bands",
+        pullup: "Pull-up bar",
+        mat: "Yoga mat"
+      },
+      supplements: {
+        whey: "Whey protein",
+        creatine: "Creatine monohydrate",
+        omega3: "Omega-3 fish oil",
+        vitamind: "Vitamin D3",
+        magnesium: "Magnesium",
+        proteinbar: "Protein bar"
+      },
+      accessories: {
+        belt: "Lifting belt",
+        gloves: "Training gloves",
+        shaker: "Shaker bottle",
+        bag: "Gym backpack",
+        rope: "Skipping rope",
+        wraps: "Wrist wraps"
+      },
+      clothing: {
+        tshirt: "Training t-shirt",
+        shoes: "Training shoes",
+        shorts: "Training shorts",
+        hoodie: "Training hoodie",
+        socks: "Training socks (set)",
+        tights: "Training tights"
+      }
     }
   };
