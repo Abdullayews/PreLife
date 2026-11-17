@@ -109,6 +109,13 @@ export default async function GymPage({ params, searchParams }: Props) {
     sortLabel: t("sortLabel"),
     sortPopular: t("sortPopular"),
     sortCheap: t("sortCheap"),
+    searchLabel: t("searchLabel"),
+    searchPlaceholder: t("searchPlaceholder"),
+    searchClear: t("searchClear"),
+    /* Raw template — {shown}/{total} are filled in client-side (the count
+     * is unknown at render time, so t() would demand the ICU values). */
+    resultsA11y: String(t.raw("resultsA11y")),
+    noResults: t("noResults"),
     plans,
     planUi: {
       activeEyebrow: t("plan.activeEyebrow"),
@@ -119,6 +126,9 @@ export default async function GymPage({ params, searchParams }: Props) {
       scheduleEyebrow: t("plan.scheduleEyebrow"),
       scheduleA11y: t("plan.scheduleA11y"),
       timeCol: tw("scheduleTime"),
+      doneCta: t("plan.doneCta"),
+      doneLabel: t("plan.doneLabel"),
+      doneUndo: t("plan.doneUndo"),
     },
     schedule: {
       days: scheduleDayKeys.map((k) => tw(k)),
@@ -147,6 +157,11 @@ export default async function GymPage({ params, searchParams }: Props) {
       dayPass: t("gyms.dayPass"),
       mapsCta: t("gyms.mapsCta"),
       openHoursSr: t("gyms.openHoursSr"),
+      sortRating: t("gyms.sortRating"),
+      sortPrice: t("gyms.sortPrice"),
+      filterLabel: t("gyms.filterLabel"),
+      filterAll: t("gyms.filterAll"),
+      gymsNoResults: t("gyms.gymsNoResults"),
     },
     shops,
   };

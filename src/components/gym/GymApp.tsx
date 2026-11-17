@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import {
-  ArrowUpRight, ChevronDown, Clock, Info, MapPin, Menu, Star, Dumbbell,
+  ArrowUpRight, CheckCircle2, ChevronDown, Clock, Info, MapPin, Menu,
+  Search, SearchX, Star, Dumbbell, X,
   type LucideIcon,
 } from "lucide-react";
 import { hasConsent } from "@/lib/consent";
@@ -27,6 +28,14 @@ import {
  *   badge on each product's cheapest store row, a store-count line;
  * • the schedule highlights today's column (Baku wall clock, set after
  *   mount so server and client never disagree).
+ *
+ * v1.2 additions:
+ * • shop tabs: a live search field (name / brand / store) with a clear
+ *   button, an a11y result count and an empty state;
+ * • the gyms tab: sort by rating ↔ day-pass price plus amenity chips
+ *   (OR semantics) — both reset when the tab is left;
+ * • the plan tab: a "mark today done" check-in per plan (dated in Baku
+ *   time, consent-gated) with an undo.
  *
  * Every string arrives pre-translated from the server (the page builds
  * `strings` with getTranslations) — this component is locale-agnostic,
@@ -88,6 +97,12 @@ export type GymAppStrings = {
   sortLabel: string;
   sortPopular: string;
   sortCheap: string;
+  searchLabel: string;
+  searchPlaceholder: string;
+  searchClear: string;
+  /** "{shown} / {total}"-style template — {shown}/{total} are replaced client-side. */
+  resultsA11y: string;
+  noResults: string;
   plans: PlanView[];
   planUi: {
     activeEyebrow: string;
@@ -95,6 +110,9 @@ export type GymAppStrings = {
     select: string;
     plansEyebrow: string;
     switchHint: string;
+    doneCta: string;
+    doneLabel: string;
+    doneUndo: string;
     scheduleEyebrow: string;
     scheduleA11y: string;
     timeCol: string;
@@ -104,7 +122,16 @@ export type GymAppStrings = {
     slots: { time: string; label: string; cells: { label: string; kind: number }[] }[];
   };
   gyms: GymView[];
-  gymsUi: { dayPass: string; mapsCta: string; openHoursSr: string };
+  gymsUi: {
+    dayPass: string;
+    mapsCta: string;
+    openHoursSr: string;
+    sortRating: string;
+    sortPrice: string;
+    filterLabel: string;
+    filterAll: string;
+    gymsNoResults: string;
+  };
   shops: Record<ShopTabId, ShopItemView[]>;
 };
 
@@ -127,6 +154,8 @@ type ShopSort = "popular" | "cheap";
 const LS_TAB = "pl:gym:tab";
 const LS_PLAN = "pl:gym:plan";
 const LS_RAIL = "pl:gym:rail";
+/** pl:gym:done:<planId> = YYYY-MM-DD (Baku) — the last day checked off. */
+const LS_DONE = "pl:gym:done:";
 
 const readStored = (key: string): string | null => {
   if (!hasConsent()) return null;
@@ -136,6 +165,11 @@ const readStored = (key: string): string | null => {
 const store = (key: string, value: string): void => {
   if (!hasConsent()) return;
   try { localStorage.setItem(key, value); } catch { /* private mode */ }
+};
+
+const removeStored = (key: string): void => {
+  if (!hasConsent()) return;
+  try { localStorage.removeItem(key); } catch { /* private mode */ }
 };
 
 /* ── Small helpers ─────────────────────────────────────────────────────── */
@@ -154,6 +188,14 @@ const bakuToday = (): number => {
   return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(dow);
 };
 
+/** Today as YYYY-MM-DD in Baku wall time (en-CA renders that exact shape). */
+const bakuTodayStr = () =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Baku" }).format(new Date());
+
+/** "{shown} / {total}"-style templates carry their placeholders verbatim. */
+const fillCount = (tpl: string, shown: number, total: number) =>
+  tpl.replace("{shown}", String(shown)).replace("{total}", String(total));
+
 /* ── Shell ─────────────────────────────────────────────────────────────── */
 
 export function GymApp({ initialTab, initialPlan, linked, strings }: Props) {
@@ -161,6 +203,7 @@ export function GymApp({ initialTab, initialPlan, linked, strings }: Props) {
   const [railOpen, setRailOpen] = useState(false);
   const [activePlan, setActivePlan] = useState(initialPlan);
   const [shopSort, setShopSort] = useState<ShopSort>("popular");
+  const [query, setQuery] = useState("");
   const [todayIdx, setTodayIdx] = useState(-1);
   const tabListRef = useRef<HTMLUListElement>(null);
 
@@ -190,6 +233,7 @@ export function GymApp({ initialTab, initialPlan, linked, strings }: Props) {
 
   const selectTab = (id: GymTabId) => {
     setTab(id);
+    setQuery(""); // the search box is scoped to one shop view — reset on switch
     store(LS_TAB, id);
     // Keep ?tab= in sync so the link is shareable / survives a refresh —
     // plain history.replaceState, no refetch, no scroll.
@@ -309,7 +353,7 @@ export function GymApp({ initialTab, initialPlan, linked, strings }: Props) {
                 onSelectPlan={choosePlan}
               />
             )}
-            {tab === "gyms" && <GymsPanel gyms={strings.gyms} ui={strings.gymsUi} />}
+            {tab === "gyms" && <GymsPanel strings={strings} />}
             {isShopTab(tab) && (
               <ShopPanel
                 tab={tab}
@@ -317,6 +361,8 @@ export function GymApp({ initialTab, initialPlan, linked, strings }: Props) {
                 ui={strings}
                 sort={shopSort}
                 onSort={setShopSort}
+                query={query}
+                onQuery={setQuery}
               />
             )}
           </div>
@@ -339,6 +385,22 @@ function PlanPanel({
 }) {
   const { plans, planUi, schedule } = strings;
   const current = plans.find((p) => p.id === activePlan) ?? plans[0]!;
+
+  /* "Mark today done" — one check per plan per day, dated in Baku time.
+   * The whole panel remounts on a plan switch (key on .gym-panel), so this
+   * effect re-reads the stored date for the newly active plan. */
+  const [doneToday, setDoneToday] = useState(false);
+  useEffect(() => {
+    setDoneToday(readStored(LS_DONE + activePlan) === bakuTodayStr());
+  }, [activePlan]);
+  const markDone = () => {
+    setDoneToday(true);
+    store(LS_DONE + activePlan, bakuTodayStr());
+  };
+  const undoDone = () => {
+    setDoneToday(false);
+    removeStored(LS_DONE + activePlan);
+  };
 
   return (
     <>
@@ -371,6 +433,22 @@ function PlanPanel({
               aria-label={current.progressA11y}
             >
               <i style={{ width: `${current.percent}%` }} />
+            </div>
+            <div className="gplan-done">
+              {doneToday ? (
+                <>
+                  <span className="gdone-pill">
+                    <CheckCircle2 size={16} aria-hidden />{planUi.doneLabel}
+                  </span>
+                  <button type="button" className="btn btn-sm btn-ghost" onClick={undoDone}>
+                    {planUi.doneUndo}
+                  </button>
+                </>
+              ) : (
+                <button type="button" className="btn btn-sm gdone-btn" onClick={markDone}>
+                  <CheckCircle2 size={16} aria-hidden />{planUi.doneCta}
+                </button>
+              )}
             </div>
             <p className="gplan-hint">{planUi.switchHint}</p>
           </div>
@@ -441,77 +519,167 @@ function PlanPanel({
 
 /* ── Zallar ────────────────────────────────────────────────────────────── */
 
-function GymsPanel({ gyms, ui }: { gyms: GymView[]; ui: GymAppStrings["gymsUi"] }) {
+function GymsPanel({ strings }: { strings: GymAppStrings }) {
+  const { gyms, gymsUi } = strings;
+
+  /* v1.2 directory controls. Both live in this panel only — it unmounts
+   * on a tab switch, so the state resets itself (nothing to persist). */
+  const [sort, setSort] = useState<"rating" | "price">("rating");
+  const [active, setActive] = useState<string[]>([]);
+
+  /* Amenity chips are derived from the already-translated feature labels
+   * — no extra data plumbed through, first-seen order. */
+  const features = useMemo(
+    () => Array.from(new Set(gyms.flatMap((g) => g.features))),
+    [gyms],
+  );
+
+  /* Empty set = no filter; otherwise OR — a gym passes on any active chip. */
+  const visible = active.length
+    ? gyms.filter((g) => active.some((f) => g.features.includes(f)))
+    : gyms;
+  const ordered = [...visible].sort((a, b) =>
+    sort === "rating" ? b.rating - a.rating : a.dayPrice - b.dayPrice,
+  );
+
+  const toggle = (f: string) =>
+    setActive((prev) =>
+      prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f],
+    );
+
   return (
-    <ul className="gyms-grid">
-      {gyms.map((g) => (
-        <li key={g.id} className="gplace">
-          <div className="gplace-img">
-            <img src={g.image} alt="" width={800} height={533} loading="lazy" decoding="async" />
-          </div>
-          <div className="gplace-body">
-            <div className="place-top">
-              <h3>{g.name}</h3>
-              <span className="score" role="img" aria-label={g.ratingA11y}>
-                <Star size={14} fill="currentColor" aria-hidden />{g.rating.toFixed(1)}
-              </span>
-            </div>
-            <p>{g.desc}</p>
-            <ul className="chips">
-              {g.features.map((f) => <li key={f}>{f}</li>)}
-            </ul>
-            <div className="gplace-meta">
-              <span className="gplace-line">
-                <MapPin size={15} aria-hidden />{g.address}
-              </span>
-              <span className="gplace-line">
-                <span className="sr-only">{ui.openHoursSr}: </span>
-                <Clock size={15} aria-hidden />{g.hours}
-              </span>
-            </div>
-            <div className="gplace-foot">
-              <span className="tag">{ui.dayPass} · {g.dayPrice} ₼</span>
-              <a
-                className="btn btn-sm btn-ghost"
-                href={mapsUrl(g.name)}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {ui.mapsCta}<ArrowUpRight size={15} aria-hidden />
-              </a>
-            </div>
-          </div>
+    <>
+      <div className="gyms-bar">
+        <div className="sort-seg" role="group" aria-label={strings.sortLabel}>
+          <button type="button" aria-pressed={sort === "rating"} onClick={() => setSort("rating")}>
+            {gymsUi.sortRating}
+          </button>
+          <button type="button" aria-pressed={sort === "price"} onClick={() => setSort("price")}>
+            {gymsUi.sortPrice}
+          </button>
+        </div>
+      </div>
+      <ul className="gyms-chips" aria-label={gymsUi.filterLabel}>
+        <li>
+          <button
+            type="button"
+            className="chip-f"
+            aria-pressed={active.length === 0}
+            onClick={() => setActive([])}
+          >
+            {gymsUi.filterAll}
+          </button>
         </li>
-      ))}
-    </ul>
+        {features.map((f) => (
+          <li key={f}>
+            <button
+              type="button"
+              className="chip-f"
+              aria-pressed={active.includes(f)}
+              onClick={() => toggle(f)}
+            >
+              {f}
+            </button>
+          </li>
+        ))}
+      </ul>
+      {/* <output> carries an implicit status/polite live region. */}
+      <output className="sr-only">
+        {fillCount(strings.resultsA11y, ordered.length, gyms.length)}
+      </output>
+      {ordered.length === 0 ? (
+        <div className="gempty">
+          <SearchX size={22} aria-hidden />
+          <p><b>{gymsUi.gymsNoResults}</b></p>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={() => setActive([])}>
+            {gymsUi.filterAll}
+          </button>
+        </div>
+      ) : (
+        /* The key replays the entrance stagger when the controls change —
+         * the new order/selection arrives with the same card animation. */
+        <ul className="gyms-grid" key={`${sort}|${active.join("|")}`}>
+          {ordered.map((g, i) => (
+            <li key={g.id} className="gplace" style={{ "--i": i } as CSSProperties}>
+              <div className="gplace-img">
+                <img src={g.image} alt="" width={800} height={533} loading="lazy" decoding="async" />
+              </div>
+              <div className="gplace-body">
+                <div className="place-top">
+                  <h3>{g.name}</h3>
+                  <span className="score" role="img" aria-label={g.ratingA11y}>
+                    <Star size={14} fill="currentColor" aria-hidden />{g.rating.toFixed(1)}
+                  </span>
+                </div>
+                <p>{g.desc}</p>
+                <ul className="chips">
+                  {g.features.map((f) => <li key={f}>{f}</li>)}
+                </ul>
+                <div className="gplace-meta">
+                  <span className="gplace-line">
+                    <MapPin size={15} aria-hidden />{g.address}
+                  </span>
+                  <span className="gplace-line">
+                    <span className="sr-only">{gymsUi.openHoursSr}: </span>
+                    <Clock size={15} aria-hidden />{g.hours}
+                  </span>
+                </div>
+                <div className="gplace-foot">
+                  <span className="tag">{gymsUi.dayPass} · {g.dayPrice} ₼</span>
+                  <a
+                    className="btn btn-sm btn-ghost"
+                    href={mapsUrl(g.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {gymsUi.mapsCta}<ArrowUpRight size={15} aria-hidden />
+                  </a>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }
 
 /* ── Shop directories (alətlər / əlavələr / aksesuarlar / geyim) ───────── */
 
 function ShopPanel({
-  tab, items, ui, sort, onSort,
+  tab, items, ui, sort, onSort, query, onQuery,
 }: {
   tab: ShopTabId;
   items: ShopItemView[];
   ui: GymAppStrings;
   sort: ShopSort;
   onSort: (s: ShopSort) => void;
+  /** Live search — shared across the shop tabs, reset on a tab switch. */
+  query: string;
+  onQuery: (q: string) => void;
 }) {
   const catalog = productsOf(tab);
 
   const iconOf = (id: string): LucideIcon =>
     catalog.find((p) => p.id === id)?.icon ?? Dumbbell;
 
+  // Live search first (name / brand / any store), then the chosen sort.
+  const q = query.trim().toLowerCase();
+  const visible = q
+    ? items.filter((it) =>
+        it.name.toLowerCase().includes(q) ||
+        it.brand.toLowerCase().includes(q) ||
+        it.at.some((s) => s.name.toLowerCase().includes(q)))
+    : items;
   // Cheap = ascending by the cheapest store price; popular = curated order.
   const ordered =
-    sort === "cheap" ? [...items].sort((a, b) => a.minPrice - b.minPrice) : items;
+    sort === "cheap" ? [...visible].sort((a, b) => a.minPrice - b.minPrice) : visible;
 
   return (
     <>
       <p className="gshop-note"><Info size={15} aria-hidden />{ui.shopNote}</p>
-      <div className="gshop-bar" role="group" aria-label={ui.sortLabel}>
-        <div className="sort-seg">
+      <div className="gshop-bar">
+        <div className="sort-seg" role="group" aria-label={ui.sortLabel}>
           <button type="button" aria-pressed={sort === "popular"} onClick={() => onSort("popular")}>
             {ui.sortPopular}
           </button>
@@ -519,9 +687,47 @@ function ShopPanel({
             {ui.sortCheap}
           </button>
         </div>
+        <div className="gshop-search">
+          <Search size={16} aria-hidden />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => onQuery(e.target.value)}
+            placeholder={ui.searchPlaceholder}
+            aria-label={ui.searchLabel}
+            autoComplete="off"
+            spellCheck={false}
+          />
+          {query && (
+            <button
+              type="button"
+              className="gsearch-clear"
+              onClick={() => onQuery("")}
+              aria-label={ui.searchClear}
+            >
+              <X size={15} aria-hidden />
+            </button>
+          )}
+        </div>
       </div>
-      <ul className="gshop-grid">
-        {ordered.map((item, i) => {
+      {/* <output> carries an implicit status/polite live region. */}
+      <output className="sr-only">
+        {fillCount(ui.resultsA11y, ordered.length, items.length)}
+      </output>
+      {ordered.length === 0 ? (
+        <div className="gempty">
+          <SearchX size={22} aria-hidden />
+          <p><b>{ui.noResults}</b></p>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={() => onQuery("")}>
+            {ui.searchClear}
+          </button>
+        </div>
+      ) : (
+        /* The key replays the entrance stagger when the sort changes —
+         * typing in the search box must NOT remount (focus lives in the
+         * bar above; matches simply drop out of the still-mounted list). */
+        <ul className="gshop-grid" key={`${tab}|${sort}`}>
+          {ordered.map((item, i) => {
           const Icon = iconOf(item.id);
           return (
             <li
@@ -558,7 +764,8 @@ function ShopPanel({
             </li>
           );
         })}
-      </ul>
+        </ul>
+      )}
     </>
   );
 }
