@@ -1544,3 +1544,83 @@ a.card:hover em svg { transform: translateX(3px); }
     transition: none; animation: none;
   }
 }
+
+/* ── Gym v1.2 — shop search, gym filters/sort, daily check-in ─────────── */
+
+/* Shop bar: the segmented control plus a live search field; wraps under
+   it on narrow screens, the field takes the remaining space. */
+.gshop-bar { flex-wrap: wrap; }
+.gshop-bar .sort-seg { flex: none; }
+.gshop-search {
+  flex: 1 1 12rem; max-width: 24rem; margin-left: auto;
+  display: flex; align-items: center; gap: .5rem;
+  padding: .45rem .5rem .45rem .9rem;
+  border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+  transition: border-color .2s;
+}
+.gshop-search:focus-within { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.gshop-search > svg { flex: none; color: var(--muted); }
+.gshop-search input {
+  flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink);
+  font: 500 .875rem/1.3 var(--font-body);
+}
+.gshop-search input:focus { outline: none; }
+.gshop-search input::placeholder { color: var(--muted); }
+.gshop-search input::-webkit-search-cancel-button,
+.gshop-search input::-webkit-search-decoration { -webkit-appearance: none; }
+.gsearch-clear {
+  flex: none; display: grid; place-items: center; width: 1.6rem; height: 1.6rem;
+  border: 0; border-radius: 999px; background: transparent; color: var(--muted);
+  cursor: pointer; transition: color .2s, background-color .2s;
+}
+.gsearch-clear:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, transparent); }
+
+/* Empty state — the search / gym filters came up with nothing. */
+.gempty {
+  display: grid; justify-items: center; gap: .55rem; text-align: center;
+  padding: 2.4rem 1.2rem; border: 1px dashed var(--line);
+  border-radius: var(--r-lg); color: var(--muted);
+}
+.gempty p { font-size: .9375rem; }
+.gempty .btn { margin-top: .4rem; }
+
+/* Gyms: the sort bar + amenity chips (toggle buttons, OR semantics). */
+.gyms-bar { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin: 0 0 1.1rem; }
+.gyms-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: 0 0 1.1rem; }
+.chip-f {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .45rem .9rem; border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); color: var(--muted);
+  font: 600 .8125rem/1 var(--font-body); cursor: pointer;
+  transition: color .2s, border-color .2s, background-color .2s;
+}
+.chip-f:hover { color: var(--ink); border-color: color-mix(in srgb, var(--ink) 30%, transparent); }
+.chip-f[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent-text);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+/* Same entrance stagger the shop cards have — the grid re-keys on a
+   sort/filter change so the new order arrives animated. */
+.gplace { animation: gym-in .5s var(--ease) both; animation-delay: calc(var(--i, 0) * 45ms); }
+
+/* Plan: the "mark today done" check-in row under the progress bar. */
+.gplan-done { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.gdone-btn { justify-self: start; }
+.gdone-pill {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .45rem .95rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent-text); font-weight: 650; font-size: .875rem;
+  animation: gym-pop .45s var(--ease) both;
+}
+@keyframes gym-pop {
+  from { transform: scale(.85); opacity: 0; }
+  60% { transform: scale(1.05); }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gplace, .gdone-pill { transition: none; animation: none; }
+  .gshop-search, .gsearch-clear, .chip-f { transition: none; }
+}
