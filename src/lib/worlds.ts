@@ -1,10 +1,10 @@
 import {
-  Activity, BedDouble, Bookmark, Brain, ChefHat, Compass, Dumbbell, Feather,
-  Fish, Flame, HeartPulse, Landmark, Leaf, Lightbulb, MessagesSquare, Microscope,
-  Moon, PersonStanding, Salad, Scale, ShieldCheck, Soup, Sparkles, Sun, Target,
-  Timer, Waves, Wheat, Wind, Zap, type LucideIcon,
+  Activity, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ClipboardList,
+  Compass, Dumbbell, Fish, Flame, HeartPulse, Landmark, Layers, Leaf, Lightbulb,
+  MapPin, Microscope, Moon, NotebookPen, PersonStanding, Pill, Salad,
+  Shirt, Smile, Soup, Sparkles, Sun, Target, Timer, UsersRound,
+  Wheat, Wind, Zap, type LucideIcon,
 } from "lucide-react";
-
 /**
  * One typed description per content "world" (gym, diet, meditation, library).
  * This file holds only structure, numbers, schedule matrices and media.
@@ -25,6 +25,9 @@ export type Plan = {
   meta: [string, number][];
 };
 export type Item = { id: string; nameKey: string; targetKey: string; icon: LucideIcon; level: Level };
+/** A "what you can do here" capability on the public welcome page —
+ *  mirrors what the registered app at /<slug> actually offers. */
+export type CanDo = { icon: LucideIcon; titleKey: string; descKey: string };
 export type Place = {
   id: string; nameKey: string; descKey: string; image: string;
   rating: number; featureKeys: string[];
@@ -42,7 +45,7 @@ export type World = {
   hero: { images: string[]; positions: string[]; stats: [string, string][] };
   plans: Plan[];
   items: Item[];
-  featureIcons: LucideIcon[];
+  canDo: CanDo[];
   schedule: { slots: Slot[]; cellKeys: Record<string, string> };
   initials: string[];
   places: Place[];
@@ -78,7 +81,15 @@ const gym: World = {
     { id: "pullup", nameKey: "exPullupName", targetKey: "exPullupTarget", icon: PersonStanding, level: "intermediate" },
     { id: "farmer", nameKey: "exFarmerName", targetKey: "exFarmerTarget", icon: HeartPulse, level: "beginner" },
   ],
-  featureIcons: [Compass, ShieldCheck, Waves, Salad],
+  /* Mirrors the six tabs of the /gym app: plan, gyms + the four shop tabs. */
+  canDo: [
+    { icon: CalendarDays, titleKey: "can1Title", descKey: "can1Desc" },
+    { icon: MapPin, titleKey: "can2Title", descKey: "can2Desc" },
+    { icon: Dumbbell, titleKey: "can3Title", descKey: "can3Desc" },
+    { icon: Pill, titleKey: "can4Title", descKey: "can4Desc" },
+    { icon: Backpack, titleKey: "can5Title", descKey: "can5Desc" },
+    { icon: Shirt, titleKey: "can6Title", descKey: "can6Desc" },
+  ],
   schedule: {
     slots: [
       { time: "07:00", labelKey: "scheduleSlotMorning", cells: ["strength", "open", "strength", "conditioning", "strength", "conditioning"] },
@@ -117,7 +128,15 @@ const diet: World = {
     { id: "oats", nameKey: "recOatsName", targetKey: "recOatsTarget", icon: Wheat, level: "beginner" },
     { id: "chefs-plate", nameKey: "recChefName", targetKey: "recChefTarget", icon: ChefHat, level: "advanced" },
   ],
-  featureIcons: [Scale, Leaf, ChefHat, Compass],
+  /* Mirrors the /diet app: program, mood, journal, practice, psychologists, AI. */
+  canDo: [
+    { icon: ClipboardList, titleKey: "can1Title", descKey: "can1Desc" },
+    { icon: Smile, titleKey: "can2Title", descKey: "can2Desc" },
+    { icon: NotebookPen, titleKey: "can3Title", descKey: "can3Desc" },
+    { icon: HeartPulse, titleKey: "can4Title", descKey: "can4Desc" },
+    { icon: UsersRound, titleKey: "can5Title", descKey: "can5Desc" },
+    { icon: Sparkles, titleKey: "can6Title", descKey: "can6Desc" },
+  ],
   schedule: {
     slots: [
       { time: "07:30", labelKey: "scheduleSlotBreakfast", cells: ["protein", "plant", "light", "protein", "chef", "protein"] },
@@ -157,7 +176,12 @@ const meditation: World = {
     { id: "walking", nameKey: "sesWalkingName", targetKey: "sesWalkingTarget", icon: Timer, level: "intermediate" },
     { id: "evening-unwind", nameKey: "sesEveningName", targetKey: "sesEveningTarget", icon: Moon, level: "advanced" },
   ],
-  featureIcons: [Brain, Timer, BedDouble, Compass],
+  /* Mirrors the /meditation app rail: programs, sessions, mentors. */
+  canDo: [
+    { icon: Layers, titleKey: "can1Title", descKey: "can1Desc" },
+    { icon: Wind, titleKey: "can2Title", descKey: "can2Desc" },
+    { icon: UsersRound, titleKey: "can3Title", descKey: "can3Desc" },
+  ],
   schedule: {
     slots: [
       { time: "07:00", labelKey: "scheduleSlotMorning", cells: ["breathe", "focus", "breathe", "focus", "breathe", "rest"] },
@@ -196,7 +220,12 @@ const library: World = {
     { id: "meditations", nameKey: "bookMeditationsName", targetKey: "bookMeditationsTarget", icon: Landmark, level: "advanced" },
     { id: "flow", nameKey: "bookFlowName", targetKey: "bookFlowTarget", icon: Sparkles, level: "advanced" },
   ],
-  featureIcons: [Feather, Timer, MessagesSquare, Bookmark],
+  /* Mirrors the /library app rail: collections, books, venues. */
+  canDo: [
+    { icon: Landmark, titleKey: "can1Title", descKey: "can1Desc" },
+    { icon: BookOpen, titleKey: "can2Title", descKey: "can2Desc" },
+    { icon: MapPin, titleKey: "can3Title", descKey: "can3Desc" },
+  ],
   schedule: {
     slots: [
       { time: "08:00", labelKey: "scheduleSlotCommute", cells: ["summary", "chapter", "summary", "free", "chapter", "chapter"] },

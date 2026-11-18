@@ -732,34 +732,17 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   }
 }
 
-/* ── Marquee ──────────────────────────────────────────────────────────── */
-/* The scrolling word band between hero and content: the CSS animation
-   pauses on hover and on focus-within — no visible control needed.
-   Under prefers-reduced-motion the band is a static wrapped list.
- *
- * No aria-label on the band: ARIA prohibits aria-label on a plain <div>
- * (axe: aria-prohibited-attr) and screen readers gain nothing from it —
- * the words are a decorative repetition of section themes.
- */
-.marquee { position: relative; overflow: hidden; background: var(--deep); color: var(--deep-ink); padding-block: 1.05rem; }
-.marquee-track { display: flex; width: max-content; }
-.marquee ul { display: flex; align-items: center; flex: none; }
-.marquee li { display: flex; align-items: center; white-space: nowrap; font-size: .8125rem; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; }
-.marquee li::after { content: "\2726"; margin-inline: 2.5rem; color: color-mix(in srgb, var(--deep-ink) 55%, transparent); font-size: .7em; letter-spacing: 0; }
-@media (prefers-reduced-motion: no-preference) {
-  .marquee-track { animation: scroll 40s linear infinite; }
-  .marquee:hover .marquee-track,
-  .marquee:focus-within .marquee-track { animation-play-state: paused; }
-}
-@keyframes scroll { to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track { width: 100%; justify-content: center; }
-  .marquee ul[aria-hidden] { display: none; }
-  .marquee ul { flex-wrap: wrap; justify-content: center; row-gap: .5rem; }
-}
-
 /* ── Section scaffolding ──────────────────────────────────────────────── */
 .head { display: grid; gap: 1rem; margin-bottom: clamp(2rem, 5vw, 3.25rem); }
+
+/* ── What you can do (welcome /welcome/<slug> capability grid) ───────── */
+/* Calm two-column card grid — one card per capability of the registered
+   app. The world's accent tints the icon chip via the [data-world] scope. */
+.can { display: grid; gap: 1rem; }
+.can li { display: grid; gap: .65rem; align-content: start; padding: 1.35rem; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); }
+.can h3 { font: 600 1.05rem/1.25 var(--font-display); }
+.can p { color: var(--muted); font-size: .9375rem; }
+@media (min-width: 40rem) { .can { grid-template-columns: repeat(2, 1fr); } }
 
 /* Why — three faces of one list:
    <48rem  stacked rows (mobile, unchanged);
@@ -1004,6 +987,12 @@ a.card:hover em svg { transform: translateX(3px); }
 .card .chip-ico { background: color-mix(in srgb, var(--c) 13%, transparent); color: var(--c); }
 .card-top { display: flex; align-items: center; gap: .8rem; }
 .stat-n { font: 600 3rem/1 var(--font-display); color: var(--accent); }
+
+/* The three "you can" bullets on the landing module cards — quiet rows,
+   check-marked, muted; the card link stays the single interactive element. */
+.card-points { display: grid; gap: .45rem; }
+.card-points li { position: relative; padding-left: 1.15rem; color: var(--muted); font-size: .875rem; }
+.card-points li::before { content: "\2713"; position: absolute; left: 0; color: var(--c, var(--accent)); font-weight: 650; }
 
 .reasons { display: grid; gap: 2rem; }
 .reasons li { display: grid; gap: .6rem; padding-top: 1.25rem; border-top: 2px solid var(--ink); }

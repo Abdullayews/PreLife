@@ -1,42 +1,31 @@
 import { getTranslations } from "next-intl/server";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { worlds, scheduleDayKeys, type Level, type WorldSlug } from "@/lib/worlds";
+import { worlds, type WorldSlug } from "@/lib/worlds";
 import { sections } from "@/lib/shell";
+import { getSessionUser } from "@/lib/auth";
 import { Gallery } from "./Gallery";
-import { Marquee } from "./Marquee";
-
-const cap = (l: Level) => `level${l[0].toUpperCase()}${l.slice(1)}`;
-
-function Head({ n, eyebrow, title, subtitle }: { n: number; eyebrow: string; title: string; subtitle?: string }) {
-  return (
-    <header className="head rv">
-      <p className="eyebrow"><b>{String(n).padStart(2, "0")}</b>{eyebrow}</p>
-      <h2 className="h2">{title}</h2>
-      {subtitle && <p className="lede">{subtitle}</p>}
-    </header>
-  );
-}
-
-function Stars({ size = 15 }: { size?: number }) {
-  return (
-    <span className="stars" aria-hidden>
-      {Array.from({ length: 5 }, (_, i) => <Star key={i} size={size} fill="currentColor" />)}
-    </span>
-  );
-}
+import { StartButton } from "./StartButton";
 
 /**
- * The PUBLIC marketing page for one content world (gym, diet, meditation,
- * library) — served at /welcome/<slug> for every visitor, no account needed.
- * The registered-user app pages at /<slug> are a separate experience.
+ * The PUBLIC page for one content world (gym, diet, meditation, library) —
+ * served at /welcome/<slug> for every visitor, no account needed.
+ *
+ * v1.3: this surface is deliberately minimal. Visitors are not here to read
+ * marketing — the page answers ONE question: "what can I do in this section?"
+ * A slim hero, the capability list (mirroring the registered app's tabs),
+ * the start CTA and cross-links to the other worlds. Everything else
+ * (plans, schedules, stories, venue directories) lives inside the app,
+ * where it belongs.
  */
 export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: string }) {
   const w = worlds[slug];
-  const t = await getTranslations({ locale, namespace: w.ns });
-  const tc = await getTranslations({ locale, namespace: "moduleCommon" });
-  const marquee = t("marqueeItems").split("\u2022").map((s) => s.trim()).filter(Boolean);
-  let n = 0;
+  const [t, tc, user] = await Promise.all([
+    getTranslations({ locale, namespace: w.ns }),
+    getTranslations({ locale, namespace: "moduleCommon" }),
+    getSessionUser(),
+  ]);
+  const signedIn = !!user;
 
   return (
     <div data-world={slug} className="world">
@@ -53,169 +42,31 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
             <p className="eyebrow rise"><i />{t("heroEyebrow")}</p>
             <h1 className="display rise d1">{t("heroTitle")}</h1>
             <p className="lede rise d2">{t("heroSubtitle")}</p>
-            <p className="rating rise d2"><Stars /><span>{t("heroRating")}</span></p>
             <div className="actions rise d3">
-              <a className="btn btn-lg" href={`#${w.ids.plans}`}>{t("heroCtaPrimary")}</a>
-              <a className="btn btn-lg btn-ghost" href={`#${w.ids.places}`}>{t("heroCtaSecondary")}</a>
+              <StartButton className="btn btn-lg" signedIn={signedIn} />
+              <a className="btn btn-lg btn-ghost" href="#can">{t("canCta")}</a>
             </div>
           </div>
-          <dl className="hero-stats rise d3">
-            {w.hero.stats.map(([v, l]) => (
-              <div key={l}><dd>{t(v)}</dd><dt>{t(l)}</dt></div>
-            ))}
-          </dl>
         </div>
       </section>
 
-      {/* ── Marquee ──────────────────────────── */}
-      <Marquee items={marquee} />
-
-      {/* ── Why ──────────────────────────────── */}
-      <section id="why" className="sec">
+      {/* ── What you can do ──────────────────── */}
+      <section id="can" className="sec sec-tint">
         <div className="wrap">
-          <Head n={++n} eyebrow={t("whyEyebrow")} title={t("whyTitle")} subtitle={t("whySubtitle")} />
-          <ul className="why">
-            {w.featureIcons.map((Icon, i) => (
+          <header className="head rv">
+            <p className="eyebrow">{t("canEyebrow")}</p>
+            <h2 className="h2">{t("canTitle")}</h2>
+            <p className="lede">{t("canSubtitle")}</p>
+          </header>
+          <ul className="can">
+            {w.canDo.map((c, i) => (
               <li key={i} className="rv">
-                <Icon size={22} aria-hidden />
-                <h3>{t(`why${i + 1}Title`)}</h3>
-                <p>{t(`why${i + 1}Desc`)}</p>
+                <span className="chip-ico tinted"><c.icon size={20} aria-hidden /></span>
+                <h3>{t(c.titleKey)}</h3>
+                <p>{t(c.descKey)}</p>
               </li>
             ))}
           </ul>
-        </div>
-      </section>
-
-      {/* ── Plans ────────────────────────────── */}
-      <section id={w.ids.plans} className="sec sec-tint">
-        <div className="wrap">
-          <Head n={++n} eyebrow={t("plansEyebrow")} title={t("plansTitle")} subtitle={t("plansSubtitle")} />
-          <ul className="plans">
-            {w.plans.map((p) => (
-              <li key={p.id} className="plan rv" data-featured={p.featured ? "" : undefined}>
-                <div className="plan-img">
-                  <img src={p.image} alt="" width={800} height={500} loading="lazy" decoding="async" />
-                  {p.featured && <span className="tag tag-solid">{t("plansMostPopular")}</span>}
-                </div>
-                <div className="plan-body">
-                  <span className="tag">{t(cap(p.level))}</span>
-                  <h3>{t(p.nameKey)}</h3>
-                  <p>{t(p.descKey)}</p>
-                  <ul className="facts">
-                    {p.meta.map(([key, count]) => <li key={key}>{t(key, { count })}</li>)}
-                  </ul>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ── Items (exercises / recipes / sessions / books) ── */}
-      <section id={w.ids.items} className="sec">
-        <div className="wrap">
-          <Head n={++n} eyebrow={t(`${w.prefix.items}Eyebrow`)} title={t(`${w.prefix.items}Title`)} subtitle={t(`${w.prefix.items}Subtitle`)} />
-          <ul className="items">
-            {w.items.map(({ id, icon: Icon, nameKey, targetKey, level }) => (
-              <li key={id} className="item rv">
-                <span className="chip-ico"><Icon size={20} aria-hidden /></span>
-                <div>
-                  <h3>{t(nameKey)}</h3>
-                  <p>{t(targetKey)}</p>
-                </div>
-                <span className="tag">{t(cap(level))}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ── Schedule ─────────────────────────── */}
-      <section id="schedule" className="sec sec-tint">
-        <div className="wrap">
-          <Head n={++n} eyebrow={t("scheduleEyebrow")} title={t("scheduleTitle")} subtitle={t("scheduleSubtitle")} />
-          {/* B6: .sched-clip is a non-scrolling parent — its ::after gradient
-              (mobile only) stays pinned over the scroller's right edge while
-              the week slides under it. The region contract on .sched-wrap is
-              unchanged. */}
-          <div className="sched-clip">
-            <div className="sched-wrap rv" tabIndex={0} role="region" aria-label={t("scheduleTitle")}>
-              <table className="sched">
-              <thead>
-                <tr>
-                  <th scope="col">{t("scheduleTime")}</th>
-                  {scheduleDayKeys.map((d) => <th key={d} scope="col">{t(d)}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {w.schedule.slots.map((slot) => (
-                  <tr key={slot.time}>
-                    <th scope="row"><b>{slot.time}</b><span>{t(slot.labelKey)}</span></th>
-                    {slot.cells.map((cell, i) => (
-                      <td key={i}>
-                        <span className="cell" data-kind={Object.keys(w.schedule.cellKeys).indexOf(cell)}>
-                          {t(w.schedule.cellKeys[cell])}
-                        </span>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            </div>
-          </div>
-          <p className="note">{t("scheduleRestNote")}</p>
-        </div>
-      </section>
-
-      {/* ── Stories ──────────────────────────── */}
-      <section id="stories" className="sec">
-        <div className="wrap">
-          <Head n={++n} eyebrow={t("storiesEyebrow")} title={t("storiesTitle")} />
-          <ul className="stories">
-            {w.initials.map((ini, i) => (
-              <li key={ini} className="rv">
-                <figure>
-                  <blockquote>{"\u201C"}{t(`stories${i + 1}Quote`)}{"\u201D"}</blockquote>
-                  <figcaption>
-                    <span className="avatar" aria-hidden>{ini}</span>
-                    <span><b>{t(`stories${i + 1}Name`)}</b><small>{t(`stories${i + 1}Role`)}</small></span>
-                  </figcaption>
-                </figure>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      {/* ── Places (gyms / venues / mentors) ─── */}
-      <section id={w.ids.places} className="sec sec-tint">
-        <div className="wrap">
-          <Head n={++n} eyebrow={t(`${w.prefix.places}Eyebrow`)} title={t(`${w.prefix.places}Title`)} subtitle={t(`${w.prefix.places}Subtitle`)} />
-          {/* B5: scrollable region below 52rem — same contract as .sched-wrap:
-              tabIndex + role=region + the section's own translated title as
-              the aria-label (no new message keys). */}
-          <div className="places-wrap" tabIndex={0} role="region" aria-label={t(`${w.prefix.places}Title`)}>
-            <ul className="places">
-              {w.places.map((p) => (
-                <li key={p.id} className="place rv">
-                  <img src={p.image} alt="" width={800} height={600} loading="lazy" decoding="async" />
-                  <div>
-                    <div className="place-top">
-                      <h3>{t(p.nameKey)}</h3>
-                      <span className="score" role="img" aria-label={t(`${w.prefix.places}RatingA11y`, { score: p.rating })}>
-                        <Star size={14} fill="currentColor" aria-hidden />{p.rating.toFixed(1)}
-                      </span>
-                    </div>
-                    <p>{t(p.descKey)}</p>
-                    <ul className="chips">
-                      {p.featureKeys.map((k) => <li key={k}>{t(k)}</li>)}
-                    </ul>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </section>
 
@@ -225,7 +76,7 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
           <div className="cta rv">
             <h2 className="h2">{t("ctaTitle")}</h2>
             <p>{t("ctaSubtitle")}</p>
-            <a className="btn btn-lg btn-light" href="#top">{t("ctaButton")}</a>
+            <StartButton className="btn btn-lg btn-light" signedIn={signedIn} label={t("ctaButton")} />
             <small>{t("ctaNote")}</small>
           </div>
         </div>
