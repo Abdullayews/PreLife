@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Banknote, LoaderCircle, X } from "lucide-react";
+import { apiUrl } from "@/lib/api-url";
 
 /** Row actions on the "My sessions" page: pay (demo flag) and cancel
  *  (only before the session starts). */
@@ -16,7 +17,7 @@ export function BookingsActions({ id, payment, canCancel }: { id: string; paymen
   const post = (path: string, kind: "pay" | "cancel") =>
     start(async () => {
       setBusy(kind);
-      await fetch(path, {
+      await fetch(apiUrl(path), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ id }),

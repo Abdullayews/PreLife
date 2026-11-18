@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Flame } from "lucide-react";
 import { requireUser } from "@/lib/auth";
-import { dietPlans } from "@/lib/nutrition";
+import { getDietContent } from "@/lib/api";
 import { DietShell } from "@/components/diet/DietShell";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -23,6 +23,7 @@ export default async function DietPlansPage({ params }: Props) {
   await requireUser(locale, "/diet/plans");
 
   const t = await getTranslations({ locale, namespace: "dietApp" });
+  const { plans: dietPlans } = (await getDietContent())!;
   
   return (
     <DietShell locale={locale} active="plans">

@@ -75,3 +75,10 @@ server.log
 db/*.db
 .zscripts/dev.pid
 .zshots/
+
+# secrets
+.env
+.env.local
+
+# rust
+mini-services/prelife-api/target/

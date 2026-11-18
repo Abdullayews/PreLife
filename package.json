@@ -1,31 +1,25 @@
 {
   "name": "prelife",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "engines": {
     "node": ">=20.19"
   },
   "scripts": {
-    "predev": "node scripts/ensure-sqlite-binding.mjs",
     "dev": "next dev -p 3000 2>&1 | tee dev.log & node scripts/warm.mjs; wait",
-    "postinstall": "node scripts/ensure-sqlite-binding.mjs",
-    "build": "prisma generate && next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
-    "start": "prisma db push && NODE_ENV=production HOSTNAME=0.0.0.0 node .next/standalone/server.js",
+    "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
+    "start": "NODE_ENV=production HOSTNAME=0.0.0.0 node .next/standalone/server.js",
     "lint": "oxlint . && tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "db:push": "prisma db push --accept-data-loss && prisma generate",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:reset": "prisma migrate reset"
+    "db:export": "bun scripts/export-content.mjs",
+    "db:apply": "node scripts/apply-db.mjs",
+    "db:apply:schema": "node scripts/apply-db.mjs schema",
+    "api:dev": "cd mini-services/prelife-api && bun run dev"
   },
   "dependencies": {
-    "@prisma/adapter-better-sqlite3": "7.10.1",
-    "@prisma/client": "7.10.1",
-    "dotenv": "18.0.10",
     "lucide-react": "1.72.0",
     "next": "16.4.6",
     "next-intl": "4.15.1",
-    "prisma": "7.10.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "z-ai-web-dev-sdk": "^0.0.18"
@@ -38,21 +32,15 @@
     "typescript": "npm:@tsc-rs/typescript@0.8.0"
   },
   "trustedDependencies": [
-    "typescript",
-    "better-sqlite3",
-    "@prisma/engines",
-    "@parcel/watcher",
     "@swc/core",
-    "prisma",
-    "unrs-resolver"
+    "@parcel/watcher",
+    "typescript",
+    "@tsc-rs/typescript",
+    "oxlint"
   ],
   "allowScripts": {
-    "better-sqlite3": true,
-    "@prisma/engines": true,
     "@parcel/watcher": true,
     "@swc/core": true,
-    "prisma": true,
-    "unrs-resolver": true,
     "typescript": true,
     "@tsc-rs/typescript": true,
     "oxlint": true

@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import { Trash2 } from "lucide-react";
 
 export type JournalRow = { id: string; createdAt: string; prompt: string | null; content: string };
@@ -16,7 +17,7 @@ export function JournalList({ entries }: { entries: JournalRow[] }) {
 
   const remove = (id: string) =>
     start(async () => {
-      await fetch(`/api/psych/journal/${id}`, { method: "DELETE" });
+      await fetch(apiUrl(`/api/psych/journal/${id}`), { method: "DELETE" });
       router.refresh();
     });
 

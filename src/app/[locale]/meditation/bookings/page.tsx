@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
-import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
+import { getMeditationContent, getBookings } from "@/lib/api";
 import { psyBySlug } from "@/lib/psychology";
 import { BookingsActions } from "@/components/psych/BookingsActions";
 import { PsychShell } from "@/components/psych/PsychShell";
@@ -19,16 +19,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BookingsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const user = await requireUser(locale, "/meditation/bookings");
+  await requireUser(locale, "/meditation/bookings");
 
   const t = await getTranslations({ locale, namespace: "psychApp" });
   const now = new Date();
 
-  const rows = await db.appointment.findMany({
-    where: { userId: user.id },
-    orderBy: { startAt: "desc" },
-    take: 60,
-  });
+  // The user's appointments + the psychologist catalog both come from
+  // the Rust API (Supabase Postgres).
+  const [contentData, bookingsData] = await Promise.all([
+    getMeditationContent(), getBookings(),
+  ]);
+  const psychologists = contentData?.psychologists ?? [];
+  const rows = (bookingsData?.appointments ?? []).map((r) => ({
+    ...r,
+    startAt: new Date(r.startAt),
+  }));
 
   const upcoming = rows
     .filter((r) => r.status === "upcoming" && r.startAt.getTime() > now.getTime())
@@ -42,7 +47,7 @@ export default async function BookingsPage({ params }: Props) {
   const unpaid = upcoming.filter((r) => r.payment === "unpaid").length;
 
   const psyName = (slug: string) => {
-    const psy = psyBySlug(slug);
+    const psy = psyBySlug(psychologists, slug);
     return psy ? t(psy.nameKey) : slug;
   };
 

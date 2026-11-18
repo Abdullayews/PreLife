@@ -1,0 +1,9 @@
+{
+  "name": "prelife-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "bash dev.sh",
+    "start": "bash dev.sh"
+  }
+}

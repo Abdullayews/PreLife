@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
-import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { QUIZZES, bakuParts } from "@/lib/psychology";
+import { getMeditationContent, getMoodData } from "@/lib/api";
+import { bakuParts } from "@/lib/psychology";
 import { MoodCheck } from "@/components/psych/MoodCheck";
 import { QuizCard } from "@/components/psych/QuizCard";
 import { MoodCharts } from "@/components/psych/MoodCharts";
@@ -22,21 +22,18 @@ export default async function MoodPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "psychApp" });
-  const user = await requireUser(locale, "/meditation/mood");
+  await requireUser(locale, "/meditation/mood");
 
-  const logs = await db.moodLog.findMany({
-    where: { userId: user.id },
-    orderBy: { date: "asc" },
-    take: 60,
-  });
+  // Mood logs + recent quiz results come from the Rust API; the quiz
+  // catalog itself from the meditation content endpoint.
+  const [contentData, moodData] = await Promise.all([
+    getMeditationContent(), getMoodData(),
+  ]);
+  const QUIZZES = contentData?.quizzes ?? [];
+  const logs = moodData?.logs ?? [];
+  const quizRows = moodData?.quizResults ?? [];
   const today = bakuParts(new Date()).date;
   const todayLog = logs.findLast((l) => l.date === today) ?? null;
-
-  const quizRows = await db.quizResult.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-    take: 6,
-  });
 
   // Pre-translated quiz labels for the client component.
   const labels = Object.fromEntries(
@@ -68,6 +65,7 @@ export default async function MoodPage({ params }: Props) {
           <h2 id="check-h" className="eyebrow"><b>01</b>{t("moodEyebrow")}</h2>
           <div className="card">
             <MoodCheck
+              moodTags={contentData?.moodTags ?? []}
               initial={todayLog
                 ? { mood: todayLog.mood, energy: todayLog.energy, sleepQ: todayLog.sleepQ, tags: todayLog.tags ? todayLog.tags.split(",") : [], note: todayLog.note ?? "" }
                 : null}
@@ -85,7 +83,7 @@ export default async function MoodPage({ params }: Props) {
 
         <section aria-labelledby="charts-h" className="blk">
           <h2 id="charts-h" className="eyebrow"><b>03</b>{t("chartsEyebrow")}</h2>
-          <MoodCharts logs={logs.map((l) => ({ date: l.date, mood: l.mood, energy: l.energy, sleepQ: l.sleepQ, tags: l.tags }))} locale={locale} />
+          <MoodCharts logs={logs.map((l) => ({ date: l.date, mood: l.mood, energy: l.energy, sleepQ: l.sleepQ, tags: l.tags }))} locale={locale} tags={contentData?.moodTags ?? []} />
         </section>
 
         {quizRows.length > 0 && (
@@ -103,7 +101,7 @@ export default async function MoodPage({ params }: Props) {
                 <tbody>
                   {quizRows.map((r) => (
                     <tr key={r.id}>
-                      <td>{fmt.format(r.createdAt)}</td>
+                      <td>{fmt.format(new Date(r.createdAt))}</td>
                       <td>{t(`quiz_${r.quizId}_title`)}</td>
                       <td><b>{r.score} / {r.maxScore}</b></td>
                     </tr>

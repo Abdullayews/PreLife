@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import { ChevronDown, CircleHelp, Crown, FileText, Home, LogOut, ScrollText, Settings, UserRound } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 
@@ -42,7 +43,7 @@ export function UserMenu({ user }: { user: MenuUser }) {
   const logout = async () => {
     setBusy(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch(apiUrl("/api/auth/logout"), { method: "POST" });
       setOpen(false);
       router.replace("/welcome");
       router.refresh();

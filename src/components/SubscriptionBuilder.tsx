@@ -16,7 +16,8 @@ export type SubFeature = {
 /** A template tier — the ids of the features it bundles + its flat
  *  monthly price (beats the sum when selected as-is). */
 export type SubTier = {
-  id: "plus" | "pro" | "ultra";
+  /** Tier code (plus / pro / ultra) — content-driven from the DB now. */
+  id: string;
   name: string;
   price: number;
   features: string[];

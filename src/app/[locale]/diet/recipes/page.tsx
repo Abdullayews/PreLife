@@ -3,7 +3,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, ChefHat, Clock, Flame, ListChecks } from "lucide-react";
 import { requireUser } from "@/lib/auth";
-import { dietRecipes, RECIPE_DETAILS, RECIPE_ICONS } from "@/lib/nutrition";
+import { getDietContent } from "@/lib/api";
+import { RECIPE_ICONS } from "@/lib/nutrition";
 import { DietShell } from "@/components/diet/DietShell";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -23,6 +24,7 @@ export default async function DietRecipesPage({ params }: Props) {
   await requireUser(locale, "/diet/recipes");
 
   const t = await getTranslations({ locale, namespace: "dietApp" });
+  const { recipes: dietRecipes, recipeDetails: RECIPE_DETAILS } = (await getDietContent())!;
 
   return (
     <DietShell locale={locale} active="recipes">

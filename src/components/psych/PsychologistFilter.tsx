@@ -3,14 +3,14 @@
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { PSYCHOLOGISTS, type PsyFormat, type PsySpecialty, type PsyWeekday } from "@/lib/psychology";
+import type { PsyFormat, PsySpecialty, PsyWeekday } from "@/lib/psychology";
 
 const SPECIALTIES: PsySpecialty[] = ["individual", "couples", "family", "child", "trauma", "group"];
 
 /** The fit-search filter bar. State lives in the URL (?sp&days&from&to&fmt)
  *  so the server re-scores the catalog on every change and the result is
  *  shareable. Sorted "most → least suitable" happens server-side. */
-export function PsychologistFilter({ dayNames }: { dayNames: Record<PsyWeekday, string> }) {
+export function PsychologistFilter({ dayNames, count }: { dayNames: Record<PsyWeekday, string>; count: number }) {
   const t = useTranslations("psychApp");
   const router = useRouter();
   const pathname = usePathname();
@@ -94,7 +94,7 @@ export function PsychologistFilter({ dayNames }: { dayNames: Record<PsyWeekday, 
         ))}
       </div>
 
-      <p className="avail-note">{t("filterHint", { count: PSYCHOLOGISTS.length })}</p>
+      <p className="avail-note">{t("filterHint", { count })}</p>
     </div>
   );
 }

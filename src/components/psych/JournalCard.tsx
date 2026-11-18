@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import { LoaderCircle, PenLine } from "lucide-react";
 
 /** Journal writer — the day prompt (already translated on the server) plus
@@ -21,7 +22,7 @@ export function JournalCard({ prompt, promptKey }: { prompt: string; promptKey: 
   const save = () =>
     start(async () => {
       setError(false);
-      const res = await fetch("/api/psych/journal", {
+      const res = await fetch(apiUrl("/api/psych/journal"), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ content, promptKey }),

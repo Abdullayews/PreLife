@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requireUser } from "@/lib/auth";
+import { getGymContent } from "@/lib/api";
 import { GymApp, type GymAppStrings, type SessionExerciseView, type SessionPlanView } from "@/components/gym/GymApp";
 import {
-  GYM_PLACES, HALL_DETAILS, PLAN_WEEKS, SHOP_TAB_IDS, STORES,
-  EXERCISES, WORKOUTS, gymPlans, gymSchedule, minPriceOf, productsOf,
-  scheduleDayKeys, repsLabelKey,
+  SHOP_TAB_IDS, minPriceOf, repsLabelKey,
   isGymTabId, type GymTabId, type ShopTabId, type Reps,
 } from "@/lib/gym";
+import { scheduleDayKeys } from "@/lib/worlds";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -24,8 +24,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** level keys in gymHome: levelBeginner / levelIntermediate / levelAdvanced. */
 const cap = (l: string) => l[0]!.toUpperCase() + l.slice(1);
 
-const kindKeys = Object.keys(gymSchedule.cellKeys);
-
 export default async function GymPage({ params, searchParams }: Props) {
   const { locale } = await params;
   const sp = await searchParams;
@@ -38,13 +36,18 @@ export default async function GymPage({ params, searchParams }: Props) {
    *  remembered tab when the client restores its last choice. */
   const linked = tabParam === initialTab;
 
+  // The whole gym catalog comes from the Rust API (Supabase Postgres).
+  const gym = (await getGymContent())!;
+  const gymSchedule = gym.schedule;
+  const kindKeys = Object.keys(gymSchedule.cellKeys);
+
   const t = await getTranslations({ locale, namespace: "gymApp" });
   // gymHome carries the shared gym copy (plans, levels, features, schedule…)
   // written for the welcome page — reuse it instead of duplicating strings.
   const tw = await getTranslations({ locale, namespace: "gymHome" });
 
-  const plans = gymPlans.map((p) => {
-    const w = PLAN_WEEKS[p.id] ?? { week: 1, total: 12 };
+  const plans = gym.plans.map((p) => {
+    const w = gym.planWeeks[p.id] ?? { week: 1, total: 12 };
     const percent = Math.round((w.week / w.total) * 100);
     return {
       id: p.id,
@@ -69,12 +72,12 @@ export default async function GymPage({ params, searchParams }: Props) {
     return t(key, { count: r.a });
   };
   const sessions: Record<string, SessionPlanView> = Object.fromEntries(
-    Object.entries(WORKOUTS).map(([planId, days]) => [
+    Object.entries(gym.workouts).map(([planId, days]) => [
       planId,
       Object.fromEntries(
         days.map((d) => {
           const list: SessionExerciseView[] = d.exercises.map((pe) => {
-            const ex = EXERCISES[pe.ex]!;
+            const ex = gym.exercises[pe.ex]!;
             return {
               id: pe.ex,
               name: t(ex.nameKey),
@@ -93,20 +96,21 @@ export default async function GymPage({ params, searchParams }: Props) {
   const shops = Object.fromEntries(
     SHOP_TAB_IDS.map((id) => [
       id,
-      productsOf(id).map((p) => {
+      gym.catalog[id].map((p) => {
         const cheapest = minPriceOf(p);
         return {
           id: p.id,
           name: t(`${id}.${p.nameKey}`),
           brand: p.brand,
+          icon: p.icon,
           priceLabel: `${p.price[0]}–${p.price[1]} ₼`,
-          image: p.image ?? null,
+          image: p.image,
           minPrice: cheapest,
           // Index of the cheapest store row — wins ties by first occurrence.
           best: p.at.findIndex((a) => a.price === cheapest),
           countLabel: t("atCount", { count: p.at.length }),
           at: p.at.map(({ store, price }) => {
-            const s = STORES[store]!;
+            const s = gym.stores[store]!;
             return { name: s.name, kind: t(`kind_${s.kind}`), url: s.url, price };
           }),
         };
@@ -179,33 +183,30 @@ export default async function GymPage({ params, searchParams }: Props) {
         time: slot.time,
         label: tw(slot.labelKey),
         cells: slot.cells.map((cell) => ({
-          label: tw(gymSchedule.cellKeys[cell]),
+          label: tw(gymSchedule.cellKeys[cell]!),
           kind: kindKeys.indexOf(cell),
         })),
       })),
     },
-    gyms: GYM_PLACES.map((g) => {
-      const details = HALL_DETAILS[g.id]!;
-      return {
-        id: g.id,
-        name: g.ns === "gymHome" ? tw(g.nameKey) : t(g.nameKey),
-        desc: g.ns === "gymHome" ? tw(g.descKey) : t(g.descKey),
-        image: g.image,
-        rating: g.rating,
-        ratingA11y: tw("gymsRatingA11y", { score: g.rating }),
-        features: g.featureKeys.map((k) => tw(k)),
-        address: g.address,
-        hours: g.hours,
-        dayPrice: g.dayPrice,
-        equipment: details.equipment.map((eq) => t(`hallEq.${eq}`)),
-        trainers: details.trainers.map((tr) => ({
-          name: tr.name,
-          spec: t(`hallSpec.${tr.spec}`),
-          years: tr.years,
-        })),
-        trainerYears: String(t.raw("gyms.trainerYears")),
-      };
-    }),
+    gyms: gym.places.map((g) => ({
+      id: g.id,
+      name: g.ns === "gymHome" ? tw(g.nameKey) : t(g.nameKey),
+      desc: g.ns === "gymHome" ? tw(g.descKey) : t(g.descKey),
+      image: g.image,
+      rating: g.rating,
+      ratingA11y: tw("gymsRatingA11y", { score: g.rating }),
+      features: g.featureKeys.map((k) => tw(k)),
+      address: g.address,
+      hours: g.hours,
+      dayPrice: g.dayPrice,
+      equipment: g.equipment.map((eq) => t(`hallEq.${eq}`)),
+      trainers: g.trainers.map((tr) => ({
+        name: tr.name,
+        spec: t(`hallSpec.${tr.spec}`),
+        years: tr.years,
+      })),
+      trainerYears: String(t.raw("gyms.trainerYears")),
+    })),
     gymsUi: {
       dayPass: t("gyms.dayPass"),
       mapsCta: t("gyms.mapsCta"),
@@ -224,7 +225,7 @@ export default async function GymPage({ params, searchParams }: Props) {
     shops,
   };
 
-  const initialPlan = gymPlans.find((p) => p.featured)?.id ?? gymPlans[0]!.id;
+  const initialPlan = gym.plans.find((p) => p.featured)?.id ?? gym.plans[0]!.id;
 
   return (
     <div data-world="gym" className="world app-page">

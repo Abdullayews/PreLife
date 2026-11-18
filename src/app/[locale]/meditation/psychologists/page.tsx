@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
-import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
+import { getMeditationContent, getScheduleWindow } from "@/lib/api";
 import {
-  PSYCHOLOGISTS, buildSchedule, fitAll,
+  fitAll, buildSchedule,
   type PsyFormat, type PsySpecialty, type PsyWeekday,
 } from "@/lib/psychology";
 import { PsychologistFilter } from "@/components/psych/PsychologistFilter";
@@ -28,7 +28,7 @@ const WEEKDAYS: PsyWeekday[] = [1, 2, 3, 4, 5, 6];
 export default async function PsychologistsPage({ params, searchParams }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const user = await requireUser(locale, "/meditation/psychologists");
+  await requireUser(locale, "/meditation/psychologists");
 
   const t = await getTranslations({ locale, namespace: "psychApp" });
   const tm = await getTranslations({ locale, namespace: "meditationHome" });
@@ -47,23 +47,19 @@ export default async function PsychologistsPage({ params, searchParams }: Props)
   const format = (["online", "office"].includes(sp.fmt ?? "") ? sp.fmt : "any") as PsyFormat | "any";
 
   // Scored most→least suitable; zero-fit cut when a day filter is active.
-  const results = fitAll({ days, from, to, specialty, format });
+  // The catalog and the 14-day booking window both come from the Rust API.
+  const [contentData, windowData] = await Promise.all([
+    getMeditationContent(), getScheduleWindow(),
+  ]);
+  const PSYCHOLOGISTS = contentData?.psychologists ?? [];
+  const results = fitAll(PSYCHOLOGISTS, { days, from, to, specialty, format });
 
-  // Booking grid data: everyone's active bookings inside the window.
-  const windowStart = new Date();
-  const windowEnd = new Date(windowStart.getTime() + 14 * 86_400_000);
-  const bookings = await db.appointment.findMany({
-    where: {
-      psychologistSlug: { in: PSYCHOLOGISTS.map((p) => p.slug) },
-      startAt: { gte: windowStart, lte: windowEnd },
-      status: { not: "cancelled" },
-    },
-    select: { userId: true, psychologistSlug: true, startAt: true },
-  });
-  const mine = bookings
-    .filter((b) => b.userId === user.id)
-    .map((b) => ({ startAt: b.startAt, psychologistSlug: b.psychologistSlug }));
-  const all = bookings.map((b) => ({ startAt: b.startAt, psychologistSlug: b.psychologistSlug }));
+  const mine = (windowData?.mine ?? []).map((b) => ({
+    startAt: new Date(b.startAt), psychologistSlug: b.psychologistSlug,
+  }));
+  const all = (windowData?.all ?? []).map((b) => ({
+    startAt: new Date(b.startAt), psychologistSlug: b.psychologistSlug,
+  }));
 
   const dayNames = Object.fromEntries(
     WEEKDAYS.map((d) => [d, tm(`scheduleDay${["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d - 1]}`)]),
@@ -81,7 +77,7 @@ export default async function PsychologistsPage({ params, searchParams }: Props)
           <p className="lede">{t("psychSubtitle")}</p>
         </header>
 
-        <PsychologistFilter dayNames={dayNames} />
+        <PsychologistFilter dayNames={dayNames} count={PSYCHOLOGISTS.length} />
 
         <ul className="psy-list">
           {results.map(({ psy, score, dayHits, hourHits }) => {
