@@ -9,8 +9,8 @@ import { landingFrames } from "@/lib/worlds";
 import { getSessionUser } from "@/lib/auth";
 
 type Props = { params: Promise<{ locale: string }> };
-const STATS = ["exercises", "recipes", "sessions", "books"] as const;
-const REASONS = ["one", "two", "three"] as const;
+/** The three "you can" bullets on each module card. */
+const POINTS = [1, 2, 3] as const;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -18,6 +18,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: t("welcomeTitle"), description: t("welcomeDescription") };
 }
 
+/**
+ * The public landing page. v1.3: no stats walls, no manifesto — the page
+ * states what the platform is, shows what you can DO in each of the four
+ * sections, and invites you to start. That's it.
+ */
 export default async function WelcomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -55,19 +60,6 @@ export default async function WelcomePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="sec">
-        <div className="wrap">
-          <ul className="stats">
-            {STATS.map((k) => (
-              <li key={k} className="rv">
-                <b>{t(`stats.items.${k}.value`)}</b>
-                <span>{t(`stats.items.${k}.label`)}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
       <section id="modules" className="sec sec-tint">
         <div className="wrap">
           <header className="head rv">
@@ -81,27 +73,13 @@ export default async function WelcomePage({ params }: Props) {
                 <Link href={s.welcomeHref} className="card" style={{ "--c": s.color } as React.CSSProperties}>
                   <span className="chip-ico tinted"><s.icon size={20} aria-hidden /></span>
                   <h3>{t(`modules.cards.${s.id}.name`)}</h3>
-                  <p>{t(`modules.cards.${s.id}.tagline`)}</p>
+                  <ul className="card-points">
+                    {POINTS.map((n) => (
+                      <li key={n}>{t(`modules.cards.${s.id}.point${n}`)}</li>
+                    ))}
+                  </ul>
                   <em>{t("modules.explore")}<ArrowRight size={15} aria-hidden /></em>
                 </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className="sec">
-        <div className="wrap">
-          <header className="head rv">
-            <p className="eyebrow">{t("reasons.eyebrow")}</p>
-            <h2 className="h2">{t("reasons.title")}</h2>
-          </header>
-          <ul className="reasons">
-            {REASONS.map((k) => (
-              <li key={k} className="rv">
-                <p className="eyebrow">{t(`reasons.items.${k}.label`)}</p>
-                <h3>{t(`reasons.items.${k}.title`)}</h3>
-                <p>{t(`reasons.items.${k}.text`)}</p>
               </li>
             ))}
           </ul>
