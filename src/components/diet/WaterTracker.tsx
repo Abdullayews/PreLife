@@ -41,7 +41,7 @@ export function WaterTracker() {
         <span className="chip-ico tinted"><CupSoda size={20} aria-hidden /></span>
         <span className="eyebrow">{t("waterEyebrow")}</span>
       </div>
-      <div className="water-row" role="group" aria-label={t("waterEyebrow")}>
+      <fieldset className="water-row" aria-label={t("waterEyebrow")}>
         {Array.from({ length: 8 }, (_, i) => (
           <button
             key={i}
@@ -54,7 +54,7 @@ export function WaterTracker() {
             <CupSoda size={20} aria-hidden />
           </button>
         ))}
-      </div>
+      </fieldset>
       <p className="mood-state" style={{ color: "var(--muted)" }}>
         {count >= 8 ? t("waterDone") : `${count}/8`}
       </p>

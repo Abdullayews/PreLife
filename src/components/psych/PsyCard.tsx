@@ -51,8 +51,9 @@ export function PsyCard({
         <div className="psy-id">
           <div className="place-top">
             <h3>{psy.name}</h3>
-            <span className="score" role="img" aria-label={psy.ratingA11y}>
+            <span className="score">
               <Star size={14} fill="currentColor" aria-hidden />
+              <span className="sr-only">{psy.ratingA11y}</span>
               {psy.rating.toFixed(1)}
             </span>
           </div>

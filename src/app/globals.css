@@ -1623,29 +1623,24 @@ a.card:hover em svg { transform: translateX(3px); }
 /* ══ Modal dialog (shared) ══════════════════════════════════════════════
    Scrim + centered panel in the system's own voice: rounded-xl surface,
    hairline, two-part shadow, sticky header with the X. */
-.modal-root {
-  position: fixed; inset: 0; z-index: 60;
-  display: grid; place-items: center; padding: 1rem;
-  overflow-y: auto; pointer-events: none;
+/* Native <dialog>: showModal() brings the focus trap, Escape and the
+   ::backdrop scrim; we style the chrome. */
+dialog.modal-panel {
+  width: min(34rem, 100%); max-height: min(86svh, 46rem);
+  display: flex; flex-direction: column; overflow: hidden;
+  padding: 0; border: 1px solid var(--line); border-radius: var(--r-xl);
+  background: var(--surface); box-shadow: var(--shadow-3);
+  color: var(--ink);
+  animation: modal-pop .3s var(--ease);
+  margin: auto; /* centers in the dialog box, incl. overflow scrolling */
 }
-.modal-scrim {
-  position: fixed; inset: 0; z-index: 60;
+dialog.modal-panel.modal-wide { width: min(56rem, 100%); }
+dialog.modal-panel::backdrop {
   background: color-mix(in srgb, var(--ink) 42%, transparent);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   animation: modal-in .22s var(--ease);
-  pointer-events: auto;
 }
 @keyframes modal-in { from { opacity: 0; } }
-.modal-panel {
-  position: relative; z-index: 61; pointer-events: auto;
-  width: min(34rem, 100%); max-height: min(86svh, 46rem);
-  display: flex; flex-direction: column; overflow: hidden;
-  border: 1px solid var(--line); border-radius: var(--r-xl);
-  background: var(--surface); box-shadow: var(--shadow-3);
-  animation: modal-pop .3s var(--ease);
-  margin: auto;
-}
-.modal-panel.modal-wide { width: min(56rem, 100%); }
 @keyframes modal-pop { from { transform: translateY(16px) scale(.97); opacity: 0; } }
 .modal-head {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
@@ -2005,3 +2000,9 @@ a.card:hover em svg { transform: translateX(3px); }
 .subcustom-cta { justify-self: start; }
 .subcustom-cta:disabled { opacity: .5; cursor: default; }
 .subcustom-hint { font-size: .8125rem; color: var(--muted); }
+
+/* Fieldset-based button groups (water tracker, journal day nav) — reset
+   the native chrome, keep the custom look. */
+fieldset.water-row, fieldset.jrnl-nav {
+  border: 0; padding: 0; margin: 0; min-width: 0;
+}
