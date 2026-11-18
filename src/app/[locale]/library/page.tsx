@@ -46,6 +46,7 @@ export default async function LibraryPage({ params, searchParams }: Props) {
   const t = await getTranslations({ locale, namespace: "libraryApp" });
   const tr = await getTranslations({ locale, namespace: "libraryHome" });
   const r = await getTranslations({ locale, namespace: "sectionRail" });
+  const s = await getTranslations({ locale, namespace: "sections" });
 
   const libraryContent = await getLibraryContent();
   if (!libraryContent) return <ContentUnavailable locale={locale} />;
@@ -66,7 +67,7 @@ export default async function LibraryPage({ params, searchParams }: Props) {
         tabs={tabs}
         activeId={active}
         hrefs={hrefs}
-        ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current") }}
+        ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("library.name") }}
         storageKey="pl:rail:library"
       >
         <div className="wrap">

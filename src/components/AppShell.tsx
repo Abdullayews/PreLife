@@ -56,6 +56,9 @@ export type ShellUi = {
   close: string;
   /** "Current:" — screen-reader prefix before the active tab name. */
   current: string;
+  /** The section's display name ("Diet", "Gym"…) — the small uppercase
+   *  caption at the top of the sidebar capsule (lg+ only). */
+  title?: string;
 };
 
 type Props = {
@@ -71,6 +74,12 @@ type Props = {
   storageKey?: string;
   children: ReactNode;
 };
+
+/* The floating glass capsule that holds the section's subtabs — the
+ * design language of the submitted prelife-sidebar.html mock, rebuilt on
+ * the site's token system. Desktop: a rounded capsule pinned below the top
+ * nav with breathing room on every side; mobile: the same capsule squashed
+ * into a horizontal pill strip. */
 
 export function AppShell({
   mode, tabs, activeId, hrefs, onSelect, ui, children,
@@ -109,6 +118,7 @@ export function AppShell({
           below lg — same hairline + frosted-surface tone as the nav. ── */}
       <nav className="app-rail" aria-label={ui.label}>
         <div className="app-rail-clip">
+          {ui.title && <p className="app-rail-title">{ui.title}</p>}
           <ul
             className="app-tabs"
             ref={listRef}

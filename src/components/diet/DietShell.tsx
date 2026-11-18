@@ -24,6 +24,7 @@ export async function DietShell({
 }: { locale: string; active: string; children: ReactNode }) {
   const t = await getTranslations({ locale, namespace: "dietApp" });
   const r = await getTranslations({ locale, namespace: "sectionRail" });
+  const s = await getTranslations({ locale, namespace: "sections" });
 
   const tabs = TABS.map(({ id, icon }) => ({ id, label: t(`rail_${id}`), icon }));
   const hrefs = Object.fromEntries(TABS.map(({ id, href }) => [id, href]));
@@ -35,7 +36,7 @@ export async function DietShell({
         tabs={tabs}
         activeId={active}
         hrefs={hrefs}
-        ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current") }}
+        ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("diet.name") }}
         storageKey="pl:rail:diet"
       >
         {children}
