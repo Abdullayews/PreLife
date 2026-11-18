@@ -54,6 +54,15 @@ async function run(sql, label) {
 
 const mode = process.argv[2] ?? "all";
 
+/* v3: the unified (Supabase Auth based) schema — applies ON TOP of an
+   already-seeded v2 database. Renames the two colliding v2 tables, creates
+   the v3 tables + RLS policies, migrates content. See db/schema-v3.sql. */
+if (mode === "v3") {
+  await run(readFileSync(new URL("db/schema-v3.sql", root), "utf8"), "schema-v3.sql");
+  console.log("done.");
+  process.exit(0);
+}
+
 if (mode === "all" || mode === "schema") {
   await run(readFileSync(new URL("db/schema.sql", root), "utf8"), "schema.sql");
 }
