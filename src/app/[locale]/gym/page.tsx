@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requireUser } from "@/lib/auth";
 import { getGymContent } from "@/lib/api";
+import { ContentUnavailable } from "@/components/ContentUnavailable";
 import { GymApp, type GymAppStrings, type SessionExerciseView, type SessionPlanView } from "@/components/gym/GymApp";
 import {
   SHOP_TAB_IDS, minPriceOf, repsLabelKey,
@@ -37,7 +38,8 @@ export default async function GymPage({ params, searchParams }: Props) {
   const linked = tabParam === initialTab;
 
   // The whole gym catalog comes from the Rust API (Supabase Postgres).
-  const gym = (await getGymContent())!;
+  const gym = await getGymContent();
+  if (!gym) return <ContentUnavailable locale={locale} />;
   const gymSchedule = gym.schedule;
   const kindKeys = Object.keys(gymSchedule.cellKeys);
 

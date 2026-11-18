@@ -6,6 +6,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { requireUser } from "@/lib/auth";
 import { getLibraryContent } from "@/lib/api";
+import { ContentUnavailable } from "@/components/ContentUnavailable";
 import { iconByName } from "@/lib/icons";
 
 type Props = {
@@ -46,10 +47,12 @@ export default async function LibraryPage({ params, searchParams }: Props) {
   const tr = await getTranslations({ locale, namespace: "libraryHome" });
   const r = await getTranslations({ locale, namespace: "sectionRail" });
 
+  const libraryContent = await getLibraryContent();
+  if (!libraryContent) return <ContentUnavailable locale={locale} />;
   const {
     collections: libraryCollections, books: libraryBooks, places: libraryPlaces,
     bookDetails: BOOK_DETAILS, venueDetails: LIB_VENUE_DETAILS,
-  } = (await getLibraryContent())!;
+  } = libraryContent;
 
   const tabs = TABS.map(({ id, icon }) => ({ id, label: tr(`rail_${id}`), icon }));
   const hrefs = Object.fromEntries(

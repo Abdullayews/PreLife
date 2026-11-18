@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Crown } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { getSubscriptionContent } from "@/lib/api";
+import { ContentUnavailable } from "@/components/ContentUnavailable";
 import { SubscriptionBuilder, type SubFeature, type SubTier } from "@/components/SubscriptionBuilder";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -23,7 +24,8 @@ export default async function SubscriptionPage({ params }: Props) {
   /* Tiers and the à-la-carte feature menu come from the Rust API
    * (subscription_tiers / subscription_features in Postgres); names are
    * message keys resolved here, prices are ₼/month. */
-  const sub = (await getSubscriptionContent())!;
+  const sub = await getSubscriptionContent();
+  if (!sub) return <ContentUnavailable locale={locale} />;
   const features: SubFeature[] = sub.features.map((f) => ({
     id: f.id, name: t(f.nameKey), price: f.price,
   }));

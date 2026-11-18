@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getWorlds } from "@/lib/api";
+import { ContentUnavailable } from "./ContentUnavailable";
 import { iconByName } from "@/lib/icons";
 import type { WorldSlug } from "@/lib/worlds";
 import { sections } from "@/lib/shell";
@@ -22,7 +23,11 @@ import { StartButton } from "./StartButton";
  */
 export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: string }) {
   // The world's content (hero, canDo cards) comes from the Rust API.
-  const data = (await getWorlds())!;
+  // Null → the API is unreachable (e.g. prerendered at build time while
+  // the backend was down): render the graceful offline shell instead of
+  // crashing. ISR replaces it with real content once the API recovers.
+  const data = await getWorlds();
+  if (!data) return <ContentUnavailable locale={locale} />;
   const w = data.worlds[slug];
   const [t, tc, user] = await Promise.all([
     getTranslations({ locale, namespace: w.ns }),

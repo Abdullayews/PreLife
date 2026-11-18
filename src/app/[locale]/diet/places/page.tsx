@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { ArrowLeft, ArrowUpRight, Clock, MapPin, Star } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { getDietContent } from "@/lib/api";
+import { ContentUnavailable } from "@/components/ContentUnavailable";
 import { DietShell } from "@/components/diet/DietShell";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -20,7 +21,9 @@ export default async function DietPlacesPage({ params }: Props) {
   await requireUser(locale, "/diet/places");
 
   const t = await getTranslations({ locale, namespace: "dietApp" });
-  const { places: dietPlaces, venueDetails: VENUE_DETAILS } = (await getDietContent())!;
+  const dietContent = await getDietContent();
+  if (!dietContent) return <ContentUnavailable locale={locale} />;
+  const { places: dietPlaces, venueDetails: VENUE_DETAILS } = dietContent;
 
   return (
     <DietShell locale={locale} active="places">
