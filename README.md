@@ -53,9 +53,11 @@ Locales `az` / `en` / `ru` (default `en`), prefixed: `/en/…`.
 Legacy addresses `/welcome/psychology` and `/welcome/books` 301-redirect to
 `/welcome/meditation` and `/welcome/library` (all locales, `src/proxy.ts`).
 
-A static demo account is seeded automatically: email `123`, password `123`.
-Per the V1 product decision every visitor renders as signed in (preview
-user), and their journal/booking actions act as the demo account.
+Since the v3.1 auth migration there is **no demo account**: accounts live in
+Supabase Auth (`auth.users` + `public.profiles`), passwords are verified by
+GoTrue's password grant, and users sign up normally with email + password.
+The legacy `public.users` table (scrypt hashes, the auto-created `123` demo)
+was dropped — code older than commit `95d5120` cannot log in anymore.
 
 ## Develop
 
@@ -145,3 +147,28 @@ Browser code must call these through the sandbox gateway:
   `auth.users`. The legacy custom-auth table `public.users` (scrypt hashes,
   the auto-created `123` demo) and every demo account were removed — there
   is no built-in demo login; sign up normally instead.
+
+## Troubleshooting / environment
+
+| Variable | Where | Needed by |
+| --- | --- | --- |
+| `SUPABASE_URL` | `.env` / host env | Rust API (PostgREST + GoTrue) |
+| `SUPABASE_SERVICE_ROLE_KEY` | `.env` / host env | Rust API (service role — bypasses RLS) |
+| `SUPABASE_ACCESS_TOKEN` (`sbp_…`) | `.env` (dev only) | `scripts/apply-db.mjs` migrations |
+| `PRELIFE_API_URL` | host env (Render) | Next.js server components + `/api` proxy |
+| `GH_TOKEN` | shell env only | `scripts/push-github.sh` (never stored) |
+
+- **Degraded mode**: if `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` are
+  missing, prelife-api still boots but every `/api/*` route (except
+  `/api/health`) answers `503 {"error":"supabase_unconfigured"}` and the
+  auth forms show a clear "server is not connected to the database" message
+  instead of a vague generic error. `GET /api/health` reports
+  `"supabaseConfigured": false`.
+- **Deploy order matters**: the database is already on v3.1 (Supabase Auth,
+  `public.users` dropped). Any deployment running code older than commit
+  `95d5120` breaks login/signup with `500 generic` ("Something went wrong")
+  because the old code queries the dropped table. Deploy the current `main`
+  and the flow works again.
+- **After a sandbox/host restart**: `.env` secrets are not persisted —
+  re-paste `SUPABASE_SERVICE_ROLE_KEY` (backend) and, for migrations,
+  `SUPABASE_ACCESS_TOKEN`.

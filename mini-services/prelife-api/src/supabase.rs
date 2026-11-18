@@ -8,17 +8,27 @@ pub struct Supa {
     base: String,
     auth_base: String,
     key: String,
+    configured: bool,
 }
 
 impl Supa {
     pub fn new(url: &str, key: &str) -> Self {
         let root = url.trim_end_matches('/');
+        let configured = !root.is_empty() && !key.is_empty();
         Self {
             client: Client::new(),
             base: format!("{}/rest/v1", root),
             auth_base: format!("{}/auth/v1", root),
             key: key.to_string(),
+            configured,
         }
+    }
+
+    /// False when SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY were not set —
+    /// the service then runs degraded (see main.rs) and answers 503
+    /// `supabase_unconfigured` instead of failing with vague 500s.
+    pub fn is_configured(&self) -> bool {
+        self.configured
     }
 
     fn auth(&self, req: reqwest::RequestBuilder) -> reqwest::RequestBuilder {

@@ -13,6 +13,22 @@ const API_BASE = process.env.PRELIFE_API_URL ?? "http://127.0.0.1:3031";
 
 type Catalog = Record<string, unknown>;
 
+/** Fallback under, DB over: keys shipped in messages/*.json stay available
+ *  even when the database catalog is older (e.g. a just-added error code),
+ *  while every key the database has still wins. */
+function deepMerge(base: Catalog, override: Catalog): Catalog {
+  const out: Catalog = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    const prev = out[key];
+    out[key] =
+      value && typeof value === "object" && !Array.isArray(value) &&
+      prev && typeof prev === "object" && !Array.isArray(prev)
+        ? deepMerge(prev as Catalog, value as Catalog)
+        : value;
+  }
+  return out;
+}
+
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
   const locale = hasLocale(routing.locales, requested)
@@ -29,7 +45,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     if (res.ok) {
       const fetched = (await res.json()) as Catalog;
       if (fetched && typeof fetched === "object" && Object.keys(fetched).length > 0) {
-        messages = fetched;
+        messages = deepMerge(fallback, fetched);
       }
     }
   } catch {

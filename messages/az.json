@@ -519,6 +519,8 @@
       "short_password": "Şifrə ən azı 8 simvoldan ibarət olmalıdır.",
       "invalid_credentials": "E-poçt və ya şifrə yanlışdır.",
       "email_taken": "Bu e-poçtla hesab artıq mövcuddur.",
+      "api_unavailable": "Serverə çatmaq mümkün deyil — bir azdan yenidən cəhd edin.",
+      "supabase_unconfigured": "Server bazaya qoşulmayıb (SUPABASE açarları təyin edilməyib) — admin ilə əlaqə saxlayın.",
       "generic": "Bir xəta baş verdi. Yenidən cəhd edin."
     }
   },
