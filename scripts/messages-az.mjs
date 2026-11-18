@@ -601,9 +601,18 @@ export const az = {
       ctaButton: "Yaxşı yeməyə başlayın",
       ctaNote: "Hər planla pulsuz nutrisioloq konsultasiyası."
     },
+    sectionRail: {
+      label: "Alt-sekmələr",
+      open: "Alt-sekmələri aç",
+      close: "Alt-sekmələri yığ",
+      current: "Hazırkı:",
+    },
     meditationHome: {
       metaTitle: "Psixologiya",
       metaDescription: "Müşayiətli meditasiya sessiyaları, elmi əsaslı proqramlar, sertifikatlı mentorlar və sakit zehin üçün həftəlik ritm.",
+      rail_programs: "Proqramlar",
+      rail_sessions: "Sessiyalar",
+      rail_mentors: "Bələdçilər",
       heroEyebrow: "PreLife Meditation",
       heroTitle: "Sükut, zərif formada.",
       heroSubtitle: "Müşayiətli sessiyalar, elmi əsaslı proqramlar və sertifikatlı mentorlar — daha sakit zehin üçün bir premium praktikada.",
@@ -715,6 +724,9 @@ export const az = {
     libraryHome: {
       metaTitle: "Kitablar",
       metaDescription: "Redaktor seçimi kitab kolleksiyaları, on beş dəqiqəlik xülasələr, həftəlik oxu planları və ən yaxşı tərəfdaş oxu zalları.",
+      rail_collections: "Kolleksiyalar",
+      rail_books: "Kitablar",
+      rail_venues: "Oxu zalları",
       heroEyebrow: "PreLife Library",
       heroTitle: "Oxu, zərif formada.",
       heroSubtitle: "Seçilmiş kolleksiyalar, on beş dəqiqəlik xülasələr və oxu dairələri — bir premium oxu təcrübəsində.",
@@ -1010,6 +1022,12 @@ export const az = {
     dietApp: {
       metaTitle: "Psixologiya",
       metaDescription: "Sakit zehin sistemi — psixoloqlar, seanslar, mood izləmə, meditasiya və AI dəstəyi.",
+      rail_overview: "Baxış",
+      rail_psychologists: "Psixoloqlar",
+      rail_bookings: "Seanslarım",
+      rail_mood: "Əhvalım",
+      rail_journal: "Gündəlik",
+      rail_practice: "Məşqlər",
       homeTitle: "Zehninə dəyən sakitlik",
       homeSubtitle: "Psixoloqlar, seans cədvəli, duyğusal tablolar, meditasiya praktikası və AI müşayiəti — hamısı bir sakit sistemdə.",
       greetMorning: "Sabahız xeyir",

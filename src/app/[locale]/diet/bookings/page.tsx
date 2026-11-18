@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { psyBySlug } from "@/lib/diet";
 import { BookingsActions } from "@/components/diet/BookingsActions";
+import { DietShell } from "@/components/diet/DietShell";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -46,7 +47,7 @@ export default async function BookingsPage({ params }: Props) {
   };
 
   return (
-    <div data-world="diet" className="world page">
+    <DietShell locale={locale} active="bookings">
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i /><Link href="/diet" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>{t("bookingsEyebrow")}</p>
@@ -137,6 +138,6 @@ export default async function BookingsPage({ params }: Props) {
           <p className="note">{t("bookingsNote")}</p>
         </section>
       </div>
-    </div>
+    </DietShell>
   );
 }

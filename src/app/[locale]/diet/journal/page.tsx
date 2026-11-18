@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { todaysPromptKey, JOURNAL_PROMPT_KEYS } from "@/lib/diet";
 import { JournalCard } from "@/components/diet/JournalCard";
 import { JournalList } from "@/components/diet/JournalList";
+import { DietShell } from "@/components/diet/DietShell";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -32,7 +33,7 @@ export default async function JournalPage({ params }: Props) {
   const promptKey = todaysPromptKey();
 
   return (
-    <div data-world="diet" className="world page">
+    <DietShell locale={locale} active="journal">
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i /><Link href="/diet" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>{t("journalPageEyebrow")}</p>
@@ -61,6 +62,6 @@ export default async function JournalPage({ params }: Props) {
           />
         </section>
       </div>
-    </div>
+    </DietShell>
   );
 }

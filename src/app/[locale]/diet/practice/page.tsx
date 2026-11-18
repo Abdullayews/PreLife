@@ -9,6 +9,7 @@ import { requireUser } from "@/lib/auth";
 import { MEDIA } from "@/lib/diet";
 import { AudioPlayerCard } from "@/components/diet/AudioPlayerCard";
 import { VideoCard } from "@/components/diet/VideoCard";
+import { DietShell } from "@/components/diet/DietShell";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -43,7 +44,7 @@ export default async function PracticePage({ params }: Props) {
   ];
 
   return (
-    <div data-world="diet" className="world page">
+    <DietShell locale={locale} active="practice">
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i /><Link href="/diet" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>{t("practiceEyebrow")}</p>
@@ -101,6 +102,6 @@ export default async function PracticePage({ params }: Props) {
           </dl>
         </section>
       </div>
-    </div>
+    </DietShell>
   );
 }

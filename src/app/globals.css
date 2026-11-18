@@ -1310,12 +1310,8 @@ a.card:hover em svg { transform: translateX(3px); }
 .psy-sched .sched { min-width: 72rem; }
 
 /* ════════════════════════════════════════════════════════════════════════
-   GYM APP — the registered surface (/gym): the ☰ + current-subtab rail
-   on the left, the active panel on the right. One open/closed state,
-   two responsive shapes: below 64rem the rail is a bar and the choice
-   list drops down (grid-template-rows 0fr→1fr); at ≥64rem the rail is
-   a sticky sidebar that animates between an icon strip (closed) and
-   the full label list (open) via grid-template-columns track tweens.
+   GYM PANELS — the six subtab panels rendered inside the AppShell's
+   content column (the rail itself lives in the shared block above).
    ════════════════════════════════════════════════════════════════════════ */
 
 /* Small shared utilities (used app-wide, defined here for now). */
@@ -1323,45 +1319,65 @@ a.card:hover em svg { transform: translateX(3px); }
 .h4 { font: 600 1.05rem/1.3 var(--font-display); }
 .lede-panel { color: var(--muted); max-width: 42rem; text-wrap: pretty; }
 
-.gym-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+/* ════════════════════════════════════════════════════════════════════════
+   APP SHELL — the registered-surface shell every section sits in: the
+   ☰ + current-subtab rail pinned to the viewport's LEFT EDGE (full
+   height below the top nav, hairline seam), the section content to its
+   right. One open/closed state, two responsive shapes: below 64rem the
+   rail is a sticky bar and the choice list drops down over a scrim
+   (grid-template-rows 0fr→1fr); at ≥64rem the rail is a full-height
+   sidebar that animates between an icon strip (closed) and the full
+   label list (open) via grid-template-columns track tweens.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* The page wrapper: nav clearance only — the shell owns the rest. */
+.world.app-page { padding-top: var(--nav-h); }
+
+.app-shell {
+  display: grid; grid-template-columns: minmax(0, 1fr);
+  min-height: calc(100svh - var(--nav-h));
+}
 
 /* ── The rail (☰ + indicator + choice list) ── */
-.gym-rail {
-  position: sticky; top: calc(var(--nav-h) + .75rem); z-index: 5;
-  border: 1px solid var(--line); border-radius: var(--r-lg);
-  background: var(--raised); box-shadow: var(--shadow-1); overflow: hidden;
+.app-rail {
+  position: sticky; top: var(--nav-h); z-index: 5;
+  background: var(--surface); border-bottom: 1px solid var(--line);
 }
-.gym-rail-head {
+.app-rail-head {
   display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .7rem;
   width: 100%; min-height: 3.4rem; padding: .7rem 1rem; border: 0;
   background: transparent; color: var(--ink);
   font: 650 .9375rem/1.2 var(--font-body); cursor: pointer;
   transition: background-color .2s, grid-template-columns .45s var(--ease), justify-content .45s var(--ease);
 }
-.gym-rail-head:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
-.gym-rail-head > svg:first-child { color: var(--muted); }
-.gym-rail-now { min-width: 0; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity .25s var(--ease); }
-.gym-rail-head .chev { color: var(--muted); transition: transform .4s var(--ease); }
-.gym-rail[data-open="true"] .gym-rail-head .chev { transform: rotate(180deg); }
+.app-rail-head:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+.app-rail-head > svg:first-child { color: var(--muted); }
+.app-rail-now { min-width: 0; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: opacity .25s var(--ease); }
+.app-rail-head .chev { color: var(--muted); transition: transform .4s var(--ease); }
+.app-rail[data-open="true"] .app-rail-head .chev { transform: rotate(180deg); }
 
-.gym-rail-list { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s var(--ease); }
-.gym-rail[data-open="true"] .gym-rail-list { grid-template-rows: 1fr; }
-.gym-rail-clip { overflow: hidden; min-height: 0; }
-.gym-tabs { display: grid; gap: 2px; padding: .5rem; border-top: 1px solid var(--line); }
+.app-rail-list { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .45s var(--ease); }
+.app-rail[data-open="true"] .app-rail-list { grid-template-rows: 1fr; }
+.app-rail-clip { overflow: hidden; min-height: 0; }
+.app-tabs { display: grid; gap: 2px; padding: .5rem; border-top: 1px solid var(--line); }
 
-.gym-tab {
+.app-tab {
   position: relative; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: .75rem;
   width: 100%; min-height: 2.9rem; padding: .5rem .85rem; border: 0; border-radius: var(--r-md);
   background: transparent; color: var(--muted); font: 600 .9375rem/1.2 var(--font-body); text-align: left;
-  cursor: pointer; transition: background-color .2s, color .2s, grid-template-columns .45s var(--ease), padding .45s var(--ease);
+  cursor: pointer; text-decoration: none;
+  transition: background-color .2s, color .2s, grid-template-columns .45s var(--ease), padding .45s var(--ease);
 }
-.gym-tab .label { min-width: 0; overflow: hidden; white-space: nowrap; transition: opacity .25s var(--ease); }
-.gym-tab:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); color: var(--ink); }
-.gym-tab[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 13%, transparent); color: var(--accent-text); }
-.gym-tab[aria-selected="true"]::before {
+.app-tab .label { min-width: 0; overflow: hidden; white-space: nowrap; transition: opacity .25s var(--ease); }
+.app-tab:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); color: var(--ink); }
+.app-tab[aria-selected="true"], .app-tab[aria-current="page"] { background: color-mix(in srgb, var(--accent) 13%, transparent); color: var(--accent-text); }
+.app-tab[aria-selected="true"]::before, .app-tab[aria-current="page"]::before {
   content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 3px;
   border-radius: 999px; background: var(--accent); transition: opacity .25s var(--ease);
 }
+
+/* The content column — children keep their own .wrap centering. */
+.app-main { min-width: 0; padding-block: clamp(1.25rem, 3.5vw, 2.5rem) clamp(2.5rem, 6vw, 4.5rem); }
 
 /* ── Panels ── */
 .gym-panel { animation: gym-in .5s var(--ease) both; }
@@ -1444,22 +1460,30 @@ a.card:hover em svg { transform: translateX(3px); }
 .buy-list a > svg { color: var(--muted); transition: color .2s, transform .2s var(--ease); }
 .buy-list a:hover > svg { color: var(--accent-text); transform: translate(1px, -1px); }
 
-/* ── Desktop (≥64rem): sidebar shape — closed = icon strip, open = labels ── */
+/* ── Desktop (≥64rem): left-flush sidebar — closed = icon strip, open = labels ── */
 @media (min-width: 64rem) {
-  .gym-layout { grid-template-columns: 16.5rem minmax(0, 1fr); transition: grid-template-columns .45s var(--ease); }
-  .gym-layout[data-rail="closed"] { grid-template-columns: 4.75rem minmax(0, 1fr); }
-  .gym-rail { top: calc(var(--nav-h) + 1.25rem); }
-  .gym-rail-list { grid-template-rows: 1fr; } /* the list never hides here */
-  .gym-layout[data-rail="closed"] .gym-rail-head { grid-template-columns: auto 0fr auto; justify-content: center; padding-inline: 0; }
-  .gym-layout[data-rail="closed"] .gym-rail-now { opacity: 0; }
-  .gym-layout[data-rail="closed"] .gym-tab { grid-template-columns: auto 0fr; justify-content: center; padding-inline: 0; }
-  .gym-layout[data-rail="closed"] .gym-tab .label { opacity: 0; }
-  .gym-layout[data-rail="closed"] .gym-tab[aria-selected="true"]::before { opacity: 0; }
+  .app-shell { grid-template-columns: 16.5rem minmax(0, 1fr); transition: grid-template-columns .45s var(--ease); }
+  .app-shell[data-rail="closed"] { grid-template-columns: 4.75rem minmax(0, 1fr); }
+  .app-rail {
+    height: calc(100dvh - var(--nav-h));
+    border-bottom: 0; border-right: 1px solid var(--line);
+    overflow-y: auto; overscroll-behavior: contain;
+  }
+  .app-rail::-webkit-scrollbar { width: 8px; }
+  .app-rail::-webkit-scrollbar-track { background: transparent; }
+  .app-rail::-webkit-scrollbar-thumb { border-radius: 999px; background: color-mix(in srgb, var(--ink) 18%, transparent); }
+  .app-rail-list { grid-template-rows: 1fr; } /* the list never hides here */
+  .app-shell[data-rail="closed"] .app-rail-head { grid-template-columns: auto 0fr auto; justify-content: center; padding-inline: 0; }
+  .app-shell[data-rail="closed"] .app-rail-now { opacity: 0; }
+  .app-shell[data-rail="closed"] .app-tab { grid-template-columns: auto 0fr; justify-content: center; padding-inline: 0; }
+  .app-shell[data-rail="closed"] .app-tab .label { opacity: 0; }
+  .app-shell[data-rail="closed"] .app-tab[aria-selected="true"]::before,
+  .app-shell[data-rail="closed"] .app-tab[aria-current="page"]::before { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .gym-layout, .gym-rail-head, .gym-rail-now, .gym-rail-head .chev,
-  .gym-rail-list, .gym-tab, .gym-tab .label, .gym-panel, .gprod,
+  .app-shell, .app-rail-head, .app-rail-now, .app-rail-head .chev,
+  .app-rail-list, .app-tab, .app-tab .label, .app-scrim, .gym-panel, .gprod,
   .gplace, .gplace-img img, .gplan-bar i, .buy-list a, .buy-list a > svg {
     transition: none; animation: none;
   }
@@ -1507,13 +1531,13 @@ a.card:hover em svg { transform: translateX(3px); }
 /* Below lg an open rail overlays the page — this scrim closes it on an
    outside tap. Fixed, out-of-flow, hidden entirely at lg+ (the sidebar
    shape never overlays, so no scrim is needed there). */
-.gym-scrim {
+.app-scrim {
   position: fixed; inset: 0; z-index: 4;
   background: color-mix(in srgb, var(--ink) 30%, transparent);
-  animation: gym-scrim .25s var(--ease);
+  animation: app-scrim .25s var(--ease);
 }
-@keyframes gym-scrim { from { opacity: 0; } }
-@media (min-width: 64rem) { .gym-scrim { display: none; } }
+@keyframes app-scrim { from { opacity: 0; } }
+@media (min-width: 64rem) { .app-scrim { display: none; } }
 
 /* Home dashboard v1.1 — each stat became a deep link into its surface. */
 .stats-hint { margin: .65rem .2rem 0; font-size: .75rem; color: var(--muted); }
@@ -1540,7 +1564,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .stat-link .stat-label { font-size: .8125rem; color: var(--muted); }
 
 @media (prefers-reduced-motion: reduce) {
-  .gym-scrim, .sort-seg button, .stat-link, .stat-link::after {
+  .app-scrim, .sort-seg button, .stat-link, .stat-link::after {
     transition: none; animation: none;
   }
 }

@@ -10,6 +10,7 @@ import {
 } from "@/lib/diet";
 import { PsychologistFilter } from "@/components/diet/PsychologistFilter";
 import { ScheduleBook } from "@/components/diet/ScheduleBook";
+import { DietShell } from "@/components/diet/DietShell";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -72,7 +73,7 @@ export default async function PsychologistsPage({ params, searchParams }: Props)
   ) as Record<string, string>;
 
   return (
-    <div data-world="diet" className="world page">
+    <DietShell locale={locale} active="psychologists">
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i /><Link href="/diet" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>{t("psychEyebrow")}</p>
@@ -127,6 +128,6 @@ export default async function PsychologistsPage({ params, searchParams }: Props)
           })}
         </ul>
       </div>
-    </div>
+    </DietShell>
   );
 }

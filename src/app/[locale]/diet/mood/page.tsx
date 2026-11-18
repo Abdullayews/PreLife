@@ -8,6 +8,7 @@ import { QUIZZES, bakuParts } from "@/lib/diet";
 import { MoodCheck } from "@/components/diet/MoodCheck";
 import { QuizCard } from "@/components/diet/QuizCard";
 import { MoodCharts } from "@/components/diet/MoodCharts";
+import { DietShell } from "@/components/diet/DietShell";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -55,7 +56,7 @@ export default async function MoodPage({ params }: Props) {
   const fmt = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
   return (
-    <div data-world="diet" className="world page">
+    <DietShell locale={locale} active="mood">
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i /><Link href="/diet" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>{t("moodPageEyebrow")}</p>
@@ -113,6 +114,6 @@ export default async function MoodPage({ params }: Props) {
           </section>
         )}
       </div>
-    </div>
+    </DietShell>
   );
 }

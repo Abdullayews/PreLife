@@ -1,22 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import {
-  ArrowUpRight, CheckCircle2, ChevronDown, Clock, Info, MapPin, Menu,
+  ArrowUpRight, CheckCircle2, Clock, Info, MapPin,
   Search, SearchX, Star, Dumbbell, X,
   type LucideIcon,
 } from "lucide-react";
 import { hasConsent } from "@/lib/consent";
+import { AppShell } from "@/components/AppShell";
 import {
   GYM_TABS, productsOf, isShopTab,
   type GymTabId, type ShopTabId,
 } from "@/lib/gym";
 
 /**
- * The registered-surface gym app: a collapsible left rail (the ☰ button
- * plus an indicator of the current subtab — tapping it opens/collapses
- * the choice list with an animation) and the active tab's panel on the
- * right. Six subtabs: plan, gyms and the four shop directories.
+ * The registered-surface gym app: six subtabs (plan, gyms and the four
+ * shop directories) inside the shared AppShell — the ☰ rail pinned to
+ * the viewport's left edge switches the panel on the right.
  *
  * v1.1 additions:
  * • full keyboard support — arrows/Home/End walk the tab list, Escape
@@ -36,6 +36,9 @@ import {
  *   (OR semantics) — both reset when the tab is left;
  * • the plan tab: a "mark today done" check-in per plan (dated in Baku
  *   time, consent-gated) with an undo.
+ *
+ * v1.3: the rail moved into the shared AppShell (left-flush, every
+ * section has one); the server page header now arrives as children.
  *
  * Every string arrives pre-translated from the server (the page builds
  * `strings` with getTranslations) — this component is locale-agnostic,
@@ -143,6 +146,8 @@ type Props = {
    *  remembered tab: shareable deep links always win. */
   linked: boolean;
   strings: GymAppStrings;
+  /** The server-rendered page header (title/lede) — sits above the panels. */
+  children: ReactNode;
 };
 
 /* ── Shop ordering ─────────────────────────────────────────────────────── */
@@ -153,7 +158,6 @@ type ShopSort = "popular" | "cheap";
 
 const LS_TAB = "pl:gym:tab";
 const LS_PLAN = "pl:gym:plan";
-const LS_RAIL = "pl:gym:rail";
 /** pl:gym:done:<planId> = YYYY-MM-DD (Baku) — the last day checked off. */
 const LS_DONE = "pl:gym:done:";
 
@@ -177,9 +181,6 @@ const removeStored = (key: string): void => {
 const mapsUrl = (name: string) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} Bakı`)}`;
 
-/** The dropdown-overlay shape exists only below lg (64rem). */
-const isMobileView = () => window.matchMedia("(max-width: 63.99rem)").matches;
-
 /** Today's schedule column in Baku wall time — Mon..Sat → 0..5, else -1.
  *  Called from an effect only, so SSR and hydration never disagree. */
 const bakuToday = (): number => {
@@ -198,17 +199,15 @@ const fillCount = (tpl: string, shown: number, total: number) =>
 
 /* ── Shell ─────────────────────────────────────────────────────────────── */
 
-export function GymApp({ initialTab, initialPlan, linked, strings }: Props) {
+export function GymApp({ initialTab, initialPlan, linked, strings, children }: Props) {
   const [tab, setTab] = useState<GymTabId>(initialTab);
-  const [railOpen, setRailOpen] = useState(false);
   const [activePlan, setActivePlan] = useState(initialPlan);
   const [shopSort, setShopSort] = useState<ShopSort>("popular");
   const [query, setQuery] = useState("");
   const [todayIdx, setTodayIdx] = useState(-1);
-  const tabListRef = useRef<HTMLUListElement>(null);
 
   /* Restore the last choices after mount (a deep link beats the remembered
-   * tab; the rail state applies to the desktop sidebar shape only). */
+   * tab; the rail shape itself is the AppShell's business now). */
   useEffect(() => {
     if (!linked) {
       const remembered = readStored(LS_TAB);
@@ -218,18 +217,8 @@ export function GymApp({ initialTab, initialPlan, linked, strings }: Props) {
     }
     const plan = readStored(LS_PLAN);
     if (plan && strings.plans.some((p) => p.id === plan)) setActivePlan(plan);
-    if (readStored(LS_RAIL) === "open" && !isMobileView()) setRailOpen(true);
     setTodayIdx(bakuToday());
   }, [linked, strings.plans]);
-
-  /* Escape collapses the mobile dropdown (the desktop sidebar stays). */
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isMobileView()) setRailOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-}, []);
 
   const selectTab = (id: GymTabId) => {
     setTab(id);
@@ -238,8 +227,6 @@ export function GymApp({ initialTab, initialPlan, linked, strings }: Props) {
     // Keep ?tab= in sync so the link is shareable / survives a refresh —
     // plain history.replaceState, no refetch, no scroll.
     window.history.replaceState(null, "", `?tab=${id}`);
-    // Below lg the rail overlays the content — close it after a choice.
-    if (isMobileView()) setRailOpen(false);
   };
 
   const choosePlan = (id: string) => {
@@ -247,128 +234,61 @@ export function GymApp({ initialTab, initialPlan, linked, strings }: Props) {
     store(LS_PLAN, id);
   };
 
-  const toggleRail = () => {
-    const next = !railOpen;
-    setRailOpen(next);
-    store(LS_RAIL, next ? "open" : "closed");
-  };
-
-  /* Roving focus across the tab list: arrows walk it, Home/End jump. */
-  const onTabsKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
-    const list = tabListRef.current;
-    if (!list) return;
-    const tabs = Array.from(list.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
-    if (!tabs.length) return;
-    const i = tabs.indexOf(document.activeElement as HTMLButtonElement);
-    const len = tabs.length;
-    let next = -1;
-    if (e.key === "ArrowDown" || e.key === "ArrowRight") next = (i + 1) % len;
-    else if (e.key === "ArrowUp" || e.key === "ArrowLeft") next = (i - 1 + len) % len;
-    else if (e.key === "Home") next = 0;
-    else if (e.key === "End") next = len - 1;
-    if (next >= 0) {
-      e.preventDefault();
-      tabs[next]!.focus();
-    }
-  };
-
   const head = strings.heads[tab];
 
   return (
-    <>
-      {/* Below lg an open rail overlays the page — this scrim closes it on
-          an outside tap. Fixed, out-of-flow, hidden entirely at lg+. */}
-      {railOpen && (
-        <div className="gym-scrim" onPointerDown={() => setRailOpen(false)} aria-hidden="true" />
-      )}
+    <AppShell
+      mode="tab"
+      tabs={GYM_TABS.map(({ id, icon }) => ({ id, label: strings.tabs[id], icon }))}
+      activeId={tab}
+      hrefs={{}}
+      onSelect={(id) => selectTab(id as GymTabId)}
+      ui={{
+        label: strings.railLabel,
+        open: strings.railOpen,
+        close: strings.railClose,
+        current: strings.currentTabSr,
+      }}
+      storageKey="pl:gym:rail"
+    >
+      <div className="wrap gym-wrap">
+        {children}
+        <div
+          key={tab === "plan" ? `plan-${activePlan}` : tab}
+          className="gym-panel"
+          role="tabpanel"
+          id="app-panel"
+          aria-label={strings.tabs[tab]}
+        >
+          <header className="gym-panel-head">
+            <p className="eyebrow"><i />{head.eyebrow}</p>
+            <h2 className="h3">{head.title}</h2>
+            <p className="lede-panel">{head.lede}</p>
+          </header>
 
-      <div className="gym-layout" data-rail={railOpen ? "open" : "closed"}>
-        {/* ── Left rail: ☰ + current-subtab indicator, tap to open/collapse ── */}
-        <nav className="gym-rail" data-open={railOpen} aria-label={strings.railLabel}>
-          <button
-            type="button"
-            className="gym-rail-head"
-            aria-expanded={railOpen}
-            aria-controls="gym-tab-list"
-            aria-label={railOpen ? strings.railClose : strings.railOpen}
-            onClick={toggleRail}
-          >
-            <Menu size={20} aria-hidden />
-            <span className="gym-rail-now">
-              <span className="sr-only">{strings.currentTabSr} </span>
-              {strings.tabs[tab]}
-            </span>
-            <ChevronDown size={17} className="chev" aria-hidden />
-          </button>
-          <div className="gym-rail-list" id="gym-tab-list">
-            <div className="gym-rail-clip">
-              <ul
-                className="gym-tabs"
-                role="tablist"
-                aria-label={strings.railLabel}
-                ref={tabListRef}
-                onKeyDown={onTabsKeyDown}
-              >
-                {GYM_TABS.map(({ id, icon: Icon }) => (
-                  <li key={id}>
-                    <button
-                      type="button"
-                      role="tab"
-                      className="gym-tab"
-                      aria-selected={tab === id}
-                      aria-controls="gym-panel"
-                      title={strings.tabs[id]}
-                      onClick={() => selectTab(id)}
-                    >
-                      <Icon size={19} aria-hidden />
-                      <span className="label">{strings.tabs[id]}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </nav>
-
-        {/* ── Right: the active subtab's content ── */}
-        <div className="gym-body">
-          <div
-            key={tab === "plan" ? `plan-${activePlan}` : tab}
-            className="gym-panel"
-            role="tabpanel"
-            id="gym-panel"
-            aria-label={strings.tabs[tab]}
-          >
-            <header className="gym-panel-head">
-              <p className="eyebrow"><i />{head.eyebrow}</p>
-              <h2 className="h3">{head.title}</h2>
-              <p className="lede-panel">{head.lede}</p>
-            </header>
-
-            {tab === "plan" && (
-              <PlanPanel
-                strings={strings}
-                activePlan={activePlan}
-                todayIdx={todayIdx}
-                onSelectPlan={choosePlan}
-              />
-            )}
-            {tab === "gyms" && <GymsPanel strings={strings} />}
-            {isShopTab(tab) && (
-              <ShopPanel
-                tab={tab}
-                items={strings.shops[tab]}
-                ui={strings}
-                sort={shopSort}
-                onSort={setShopSort}
-                query={query}
-                onQuery={setQuery}
-              />
-            )}
-          </div>
+          {tab === "plan" && (
+            <PlanPanel
+              strings={strings}
+              activePlan={activePlan}
+              todayIdx={todayIdx}
+              onSelectPlan={choosePlan}
+            />
+          )}
+          {tab === "gyms" && <GymsPanel strings={strings} />}
+          {isShopTab(tab) && (
+            <ShopPanel
+              tab={tab}
+              items={strings.shops[tab]}
+              ui={strings}
+              sort={shopSort}
+              onSort={setShopSort}
+              query={query}
+              onQuery={setQuery}
+            />
+          )}
         </div>
       </div>
-    </>
+    </AppShell>
   );
 }
 
