@@ -62,7 +62,10 @@ server.log
 /prelife-preview/
 /tests/
 /examples/
-/mini-services/
+# mini-services: platform scratch services are ignored, but the PreLife
+# Rust backend IS the product's backend — keep it tracked.
+/mini-services/*
+!/mini-services/prelife-api/
 /tool-results/
 /upload/
 
