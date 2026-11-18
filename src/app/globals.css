@@ -1,22 +1,24 @@
 /* PreLife — hand-written design system. No framework.
    Theming: every page wrapper carries data-world="<slug|shell>"; the same
    token set is applied to <body> (via :has) so the nav and page edges follow
-   the page. Dark mode = `.dark` on <html>, set before first paint. */
+   the page. Dark mode = `.dark` on <html>, set before first paint.
 
-/* C4 — font stacks are SYSTEM-ONLY (zero downloads, zero FOUT), each step
+   v2 (Apple HIG pass): one typeface family for everything (the system
+   sans — SF on Apple platforms), calm neutral surfaces with a whisper
+   of each world's hue, clean texture-free backgrounds, hairline seams
+   and soft two-part shadows. The per-world accent stays the only
+   saturated color on the page. The top nav's own rules are untouched
+   (it follows the shared tokens). */
+
+/* Font stacks are SYSTEM-ONLY (zero downloads, zero FOUT), each step
    covering Latin + Cyrillic + the Azerbaijani ə (verified: az/en/ru pages
    render with no fallback-glyph boxes in Chromium):
-   body    → macOS/iOS: system-ui/-apple-system (SF) · Windows: Segoe UI ·
-             Android/most Linux: Roboto · this render box: DejaVu Sans via
-             ui-sans-serif (= system-ui metrics, canvas-probe measured) ·
-             final guard: Arial, then generic sans.
-   display → macOS/iOS: Iowan Old Style · Windows: Palatino Linotype /
-             Book Antiqua · here: the Georgia/Liberation-Serif alias (probe:
-             display chain metrics == Georgia == generic serif) · final
-             guard: Georgia, then generic serif. No webfont will be added. */
+   body+display → macOS/iOS: system-ui/-apple-system (SF) · Windows: Segoe
+   UI · Android/most Linux: Roboto · this render box: DejaVu Sans via
+   ui-sans-serif · final guard: Arial, then generic sans. */
 :root {
   --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --font-display: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --nav-h: 4rem;
   /* C1 — radius scale: the whole system uses four steps (+ the 999px pill
      and 50% circles). 12 (inputs, notes, chips), 16 (menus, toasts, rows),
@@ -42,64 +44,57 @@ html.dark { color-scheme: dark; }
 /* ── Palettes ─────────────────────────────────────────────────────────── */
 /* tokens: bg surface tint raised | ink muted faint | line line-strong |
    accent accent-ink wash wash-2 wash-ink | deep deep-ink | shadow-1/2/3.
-   Layer logic (M3/Carbon/Polaris study): sunken tint → bg → surface → raised
+   v2 neutrals (Apple HIG): #f5f5f7-class light grays, #1d1d1f ink,
+   #6e6e73 secondary, each world keeping only a WHISPER of its hue in
+   bg/tint; the accent (unchanged, contrast-tuned per A1) is the single
+   saturated voice. Layer logic: sunken tint → bg → surface → raised
    cards; wash = accent container tier; shadows ink-tinted, two-part. */
 body, [data-world="shell"] {
-  --bg:#f6f3ed; --surface:#fcfbf8; --tint:#efeae0; --ink:#1f1d1a; --muted:#6a655a; --line:rgba(31,29,26,.13);
-  --accent:#7b2d3b; --accent-ink:#fff; --accent-text:var(--accent); --deep:#2b1a1e; --deep-ink:#f6efe9; --raised:#fffefb;
+  --bg:#f5f5f7; --surface:#ffffff; --tint:#ebebed; --ink:#1d1d1f; --muted:#6e6e73; --line:rgba(29,29,31,.10);
+  --accent:#7b2d3b; --accent-ink:#fff; --accent-text:var(--accent); --deep:#2b1a1e; --deep-ink:#f6efe9; --raised:#ffffff;
 }
 html.dark body, html.dark [data-world="shell"] {
-  --bg:#171412; --surface:#1f1b18; --tint:#1b1816; --ink:#f1ebe3; --muted:#a39b8f; --line:rgba(241,235,227,.14);
-  --accent:#e59aa6; --accent-ink:#2a0f15; --accent-text:var(--accent); --deep:#241619; --deep-ink:#f6efe9; --raised:#282219;
+  --bg:#0d0d0f; --surface:#161618; --tint:#111113; --ink:#f5f5f7; --muted:#a1a1a6; --line:rgba(245,245,247,.12);
+  --accent:#e59aa6; --accent-ink:#2a0f15; --accent-text:var(--accent); --deep:#241619; --deep-ink:#f6efe9; --raised:#1d1d1f;
 }
 :is(body:has([data-world="gym"]), [data-world="gym"]) {
-  --bg:#f5efe8; --surface:#fffaf5; --tint:#ece3d9; --ink:#231a17; --muted:#6f6058; --line:rgba(35,26,23,.14);
-  /* accent #c3411c → #a05c18 (A1): ember → burnt orange, hue 13°→30°.
-     The old hue sat 24° from the shell wine (rule needs ≥40° or ≥15pp
-     lightness); at hue 30° the pair clears 41°. White label ≥4.5:1 incl.
-     the brightness(1.08) hover state (5.22:1 / 4.87:1, measured). */
-  --accent:#a05c18; --accent-ink:#fff; --accent-text:#8a4d10; --deep:#4a1d22; --deep-ink:#f7ece4; --raised:#fffdf9;
+  --bg:#f6f5f4; --surface:#ffffff; --tint:#ecebe9; --ink:#1d1d1f; --muted:#6e6e73; --line:rgba(29,29,31,.10);
+  /* ember accent (A1, hue 30°) — unchanged, still ≥4.5:1 on the new
+     near-white surfaces (they are lighter than the old cream). */
+  --accent:#a05c18; --accent-ink:#fff; --accent-text:#8a4d10; --deep:#4a1d22; --deep-ink:#f7ece4; --raised:#ffffff;
 }
 html.dark :is(body:has([data-world="gym"]), [data-world="gym"]) {
-  --bg:#14100e; --surface:#1c1613; --tint:#19130f; --ink:#f3e9e1; --muted:#b0a095; --line:rgba(243,233,225,.14);
-  /* accent #ff7a4d → #ee6a41 (A1): keeps the true-orange hue (14°) but L
-     drops 65→59% so the pair vs the shell rose clears the 15pp lightness
-     band (15.7pp measured). Ink label 5.85:1 incl. hover.
-     --accent-text is a dedicated brighter tone (#ff8a63, not the accent
-     itself): the accent at L59 sits at 4.48:1 on the wash tier (active
-     nav pill) — 0.02 short; the text tone clears every surface at
-     ≥6:1 while buttons keep the deeper accent + dark ink. */
-  --accent:#ee6a41; --accent-ink:#2a0d04; --accent-text:#ff8a63; --deep:#2a1114; --deep-ink:#f7ece4; --raised:#262017;
+  --bg:#0f0e0d; --surface:#171513; --tint:#131211; --ink:#f5f5f7; --muted:#a1a1a6; --line:rgba(245,245,247,.12);
+  /* true-orange hue (14°), L 59% — ink label 5.85:1 incl. hover (A1).
+     --accent-text stays the brighter tone: it clears every dark surface
+     at ≥6:1 while buttons keep the deeper accent + dark ink. */
+  --accent:#ee6a41; --accent-ink:#2a0d04; --accent-text:#ff8a63; --deep:#2a1114; --deep-ink:#f7ece4; --raised:#1d1b19;
 }
 :is(body:has([data-world="diet"]), [data-world="diet"]) {
-  --bg:#f6f2e4; --surface:#fffdf4; --tint:#ece6cf; --ink:#1f2616; --muted:#646a52; --line:rgba(31,38,22,.14);
-  /* accent #9d5f04 → #516f2e (A1): amber → olive (hue 88°, the family the
-     deep tone always had) — the old amber sat 22° from the gym ember.
-     White label 5.73:1 incl. hover (measured); --deep already olive. */
-  --accent:#516f2e; --accent-ink:#fff; --accent-text:#445c24; --deep:#34431a; --deep-ink:#f5f1df; --raised:#fffef8;
+  --bg:#f5f6f4; --surface:#ffffff; --tint:#eaede8; --ink:#1d1d1f; --muted:#6e6e73; --line:rgba(29,29,31,.10);
+  /* olive accent (A1, hue 88°) — white label 5.73:1 incl. hover. */
+  --accent:#516f2e; --accent-ink:#fff; --accent-text:#445c24; --deep:#34431a; --deep-ink:#f5f1df; --raised:#ffffff;
 }
 html.dark :is(body:has([data-world="diet"]), [data-world="diet"]) {
-  --bg:#12140c; --surface:#191c10; --tint:#161910; --ink:#f0eedc; --muted:#a6a98f; --line:rgba(240,238,220,.14);
-  /* amber → olive (A1, dark side): hue 87°, L 52%; 96° from the shell
-     rose, 72° from the gym orange. Ink label 6.8:1 incl. hover. */
-  --accent:#8ab84f; --accent-ink:#1c2606; --accent-text:var(--accent); --deep:#1e2610; --deep-ink:#f5f1df; --raised:#232715;
+  --bg:#0d0f0d; --surface:#151814; --tint:#111412; --ink:#f5f5f7; --muted:#a1a1a6; --line:rgba(245,245,247,.12);
+  --accent:#8ab84f; --accent-ink:#1c2606; --accent-text:var(--accent); --deep:#1e2610; --deep-ink:#f5f1df; --raised:#1b1f1a;
 }
 :is(body:has([data-world="meditation"]), [data-world="meditation"]) {
-  --bg:#f2eff8; --surface:#fbfaff; --tint:#e7e2f2; --ink:#1e1a2b; --muted:#625c78; --line:rgba(30,26,43,.14);
-  --accent:#6a42cf; --accent-ink:#fff; --accent-text:var(--accent); --deep:#2c2250; --deep-ink:#efeafb; --raised:#fefeff;
+  --bg:#f6f5f8; --surface:#ffffff; --tint:#ebeaf0; --ink:#1d1d1f; --muted:#6e6e73; --line:rgba(29,29,31,.10);
+  --accent:#6a42cf; --accent-ink:#fff; --accent-text:var(--accent); --deep:#2c2250; --deep-ink:#efeafb; --raised:#ffffff;
 }
 html.dark :is(body:has([data-world="meditation"]), [data-world="meditation"]) {
-  --bg:#110e1a; --surface:#181423; --tint:#151120; --ink:#ece8f8; --muted:#a69fbf; --line:rgba(236,232,248,.14);
-  --accent:#a98bff; --accent-ink:#1a0d3f; --accent-text:var(--accent); --deep:#1e1838; --deep-ink:#efeafb; --raised:#221c32;
+  --bg:#0e0d12; --surface:#16151b; --tint:#121117; --ink:#f5f5f7; --muted:#a1a1a6; --line:rgba(245,245,247,.12);
+  --accent:#a98bff; --accent-ink:#1a0d3f; --accent-text:var(--accent); --deep:#1e1838; --deep-ink:#efeafb; --raised:#1d1c24;
 }
 :is(body:has([data-world="library"]), [data-world="library"]) {
-  --bg:#f1f4f1; --surface:#fafcfa; --tint:#e2e9e5; --ink:#14211f; --muted:#56655f; --line:rgba(20,33,31,.14);
-  /* accent darkened #0b7f73 → #0b7a6f for ≥4.5:1 white label incl. hover */
-  --accent:#0b7a6f; --accent-ink:#fff; --accent-text:#0a7368; --deep:#0f3b38; --deep-ink:#e8f4f1; --raised:#fdfffd;
+  --bg:#f4f6f6; --surface:#ffffff; --tint:#e9efef; --ink:#1d1d1f; --muted:#6e6e73; --line:rgba(29,29,31,.10);
+  /* accent ≥4.5:1 white label incl. hover (A1) */
+  --accent:#0b7a6f; --accent-ink:#fff; --accent-text:#0a7368; --deep:#0f3b38; --deep-ink:#e8f4f1; --raised:#ffffff;
 }
 html.dark :is(body:has([data-world="library"]), [data-world="library"]) {
-  --bg:#0b1413; --surface:#111c1a; --tint:#0e1816; --ink:#e6f1ee; --muted:#9bb0aa; --line:rgba(230,241,238,.14);
-  --accent:#3fd0c0; --accent-ink:#022a26; --accent-text:var(--accent); --deep:#0f2b29; --deep-ink:#e8f4f1; --raised:#1b2725;
+  --bg:#0c0f0f; --surface:#141818; --tint:#101414; --ink:#f5f5f7; --muted:#a1a1a6; --line:rgba(245,245,247,.12);
+  --accent:#3fd0c0; --accent-ink:#022a26; --accent-text:var(--accent); --deep:#0f2b29; --deep-ink:#e8f4f1; --raised:#1a1f1f;
 }
 
 /* ── Derived tiers ──────────────────────────────────────────────────────
@@ -121,9 +116,11 @@ body, [data-world] {
   --wash-ink: color-mix(in srgb, var(--accent) 32%, var(--ink));
   --faint: color-mix(in srgb, var(--muted) 55%, var(--bg));
   --line-strong: color-mix(in srgb, var(--ink) 30%, transparent);
-  --shadow-1: 0 1px 2px color-mix(in srgb, var(--ink) 9%, transparent), 0 6px 16px -4px color-mix(in srgb, var(--ink) 8%, transparent);
-  --shadow-2: 0 2px 6px color-mix(in srgb, var(--ink) 14%, transparent), 0 20px 40px -12px color-mix(in srgb, var(--ink) 22%, transparent);
-  --shadow-3: 0 4px 10px color-mix(in srgb, var(--ink) 20%, transparent), 0 28px 56px -16px color-mix(in srgb, var(--ink) 32%, transparent);
+  /* v2 (Apple HIG): two-part shadows, softer than the old warm set —
+     cards float on a whisper of contact + ambient, never a heavy drop. */
+  --shadow-1: 0 1px 2px color-mix(in srgb, var(--ink) 6%, transparent), 0 6px 16px -6px color-mix(in srgb, var(--ink) 6%, transparent);
+  --shadow-2: 0 2px 6px color-mix(in srgb, var(--ink) 8%, transparent), 0 20px 40px -16px color-mix(in srgb, var(--ink) 14%, transparent);
+  --shadow-3: 0 4px 10px color-mix(in srgb, var(--ink) 12%, transparent), 0 28px 56px -20px color-mix(in srgb, var(--ink) 20%, transparent);
 }
 /* A4 (measured, per palette): in EVERY dark palette the layer chain stays
    readable without leaning on shadows alone — raised vs bg 1.16–1.21:1,
@@ -142,25 +139,9 @@ html.dark body, html.dark [data-world] {
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
-/* Paper grain — Bauhaus material study (Butterick: gentle > strong).
-   True zero-mean grain, no blend modes: the tile carries BOTH a dark and a
-   light speckle field with complementary V-shaped alphas (|t-.5| mapping via
-   feComponentTransfer), so every speckle that darkens is matched by one that
-   lightens — warm tooth with zero net shift of the palette. Fixed layer =
-   no repaints on scroll (verified: rAF scroll benchmark with vs without the
-   layer is identical — median 16.7ms, zero dropped frames in both).
-   Gated OFF for visitors who ask for more contrast, forced-color
-   (Windows High Contrast) or reduced data: a texture layer has no
-   business fighting any of those preferences. */
-body::after {
-  content: ""; position: fixed; inset: 0; z-index: 1; pointer-events: none;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='d'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .33 .33 .33 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='.28 0 0'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Cfilter id='l'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .33 .33 .33 0 0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='table' tableValues='0 0 .28'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23d)'/%3E%3Crect width='100%25' height='100%25' filter='url(%23l)'/%3E%3C/svg%3E") repeat 0 0 / 300px 300px;
-  opacity: .7;
-}
-html.dark body::after { opacity: .5; }
-@media (prefers-contrast: more), (prefers-reduced-data: reduce), (forced-colors: active) {
-  body::after { content: none; }
-}
+/* v2 (Apple HIG): clean, texture-free surfaces — the paper-grain layer
+   is gone; depth comes from the layer stack, hairlines and soft shadows
+   alone. (The old grain also cost a fixed compositing layer.) */
 ::selection { background: var(--wash-2); color: var(--ink); }
 body {
   margin: 0; min-height: 100svh; display: flex; flex-direction: column;
@@ -199,17 +180,17 @@ button { cursor: pointer; }
 .sec { padding-block: clamp(3.5rem, 8vw, 6.5rem); }
 /* Sunken wells: tinted bands get a crisp engraved seam — 1px dark line at
    the top edge, mirrored at the bottom (Albers: decided boundaries). */
-.sec-tint { background: var(--tint); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 14%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--ink) 12%, transparent); }
+.sec-tint { background: var(--tint); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 10%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--ink) 8%, transparent); }
 @media (max-width: 40rem) { .hide-sm { display: none !important; } }
 @media (max-width: 63.99rem) { .hide-md { display: none !important; } }
 
 /* ── Type ─────────────────────────────────────────────────────────────── */
-.display { font: 600 var(--step-display)/0.98 var(--font-display); letter-spacing: -0.025em; text-wrap: balance; }
+.display { font: 600 var(--step-display)/1.05 var(--font-display); letter-spacing: -0.03em; text-wrap: balance; }
 .display.sm { font-size: var(--step-display-sm); }
-.h2 { font: 600 var(--step-h2)/1.08 var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
-.h3 { font: 600 var(--step-h3)/1.25 var(--font-display); letter-spacing: -0.01em; }
+.h2 { font: 600 var(--step-h2)/1.1 var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
+.h3 { font: 600 var(--step-h3)/1.25 var(--font-display); letter-spacing: -0.015em; }
 .lede { color: var(--muted); font-size: var(--step-lede); max-width: 40rem; text-wrap: pretty; }
-.eyebrow { display: flex; align-items: center; gap: .75rem; font-size: var(--step-eyebrow); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); } /* C2: tracking .22em → .16em (12px floor kept) */
+.eyebrow { display: flex; align-items: center; gap: .75rem; font-size: var(--step-eyebrow); font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); } /* v2: tracking .16em → .12em (calmer labels) */
 .eyebrow b { color: var(--accent-text); font-variant-numeric: tabular-nums; }
 .eyebrow i { width: 2.5rem; height: 1px; background: var(--muted); flex: none; }
 small, .note { font-size: var(--step-small); color: var(--muted); }
@@ -221,7 +202,7 @@ small, .note { font-size: var(--step-small); color: var(--muted); }
   display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
   min-height: 2.75rem; padding-inline: clamp(1rem, 4vw, 1.5rem);
   border: 1px solid transparent; border-radius: 999px; background: var(--accent); color: var(--accent-ink);
-  font-weight: 650; font-size: .9375rem; text-align: center;
+  font-weight: 600; font-size: .9375rem; text-align: center;
   /* Labels wrap instead of overflowing on narrow screens (long RU strings);
      min-height (not height) lets the pill grow a line when they do. */
   white-space: normal; max-width: 100%;
