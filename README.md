@@ -110,8 +110,12 @@ Browser code must call these through the sandbox gateway:
   build, content pages prerender the graceful offline shell
   (`src/components/ContentUnavailable.tsx`) and ISR swaps in real content
   within 60 s of the API recovering.
-- **Rust API**: build `mini-services/prelife-api` (`cargo build --release`),
-  run with `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in the environment
-  (port via `PORT`, default 3031).
+- **Rust API**: on Render create a **Docker** Web Service (runtime:
+  Docker, root directory `mini-services/prelife-api` — the `Dockerfile`
+  is committed). Run it with `SUPABASE_URL` +
+  `SUPABASE_SERVICE_ROLE_KEY` in the environment (port via `PORT`,
+  default 10000; Render injects it automatically). Without Docker, build
+  `cargo build --release` on any host with a Rust toolchain and run
+  `./target/release/prelife-api` the same way.
 - **Database**: Supabase Postgres — nothing to host. Apply schema changes
   with `node scripts/apply-db.mjs schema`.
