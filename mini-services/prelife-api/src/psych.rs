@@ -1,5 +1,5 @@
 use crate::auth::{
-    current_or_preview_user, current_session, err, generic, parse_body, str_field,
+    current_session, err, generic, parse_body, str_field,
     App, ApiError, CurrentSession,
 };
 use crate::baku::{baku_instant, baku_parts, num};
@@ -27,19 +27,12 @@ fn now_iso() -> String {
     chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Micros, true)
 }
 
-/// Psych data endpoints: a REAL session when present, otherwise the V1
-/// the original Next.js version (every visitor renders as signed in, so
+/// Psych data endpoints: the REAL session from the cookie — no anonymous
+/// access, no fallback account. The app pages are login-gated on the
+/// frontend, so an anonymous caller only gets 401.
 async fn require(app: &App, headers: &HeaderMap) -> Result<CurrentSession, ApiError> {
-    if let Some(cs) = current_session(&app.supa, headers).await {
-        return Ok(cs);
-    }
-    let user = current_or_preview_user(&app.supa, headers).await.map_err(|_| generic())?;
-    Ok(CurrentSession {
-        session_id: "preview".into(),
-        device_name: "Preview".into(),
-        device_icon: "monitor".into(),
-        user,
-    })
+    current_session(&app.supa, headers).await
+        .ok_or_else(|| err(StatusCode::UNAUTHORIZED, "unauthorized"))
 }
 
 /* ── camelCase row views ─────────────────────────────────────────────────── */

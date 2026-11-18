@@ -132,3 +132,13 @@ Browser code must call these through the sandbox gateway:
   `i18n_messages` (8 psychologists + 192 bookable slots for the next 14 days,
   Plus/Pro/Ultra plans + sections, 15 exercises, 3 workouts + 47 rows,
   6 books, 16 practice materials).
+- **v3.1 auth (db/schema-v3.1-auth.sql)** — login verification fully in the
+  database: signup goes through the Supabase Auth admin API (auto-confirmed;
+  the `handle_new_user` trigger creates the `profiles` row) and login is
+  verified by GoTrue's password grant. `public.sessions` gained
+  `user_email`/`user_name` (the session carries the user snapshot) and the
+  six user-data FKs (`sessions`, `journal_entries_v2`, `mood_logs`,
+  `quiz_results`, `meditation_progress`, `appointments`) were re-pointed to
+  `auth.users`. The legacy custom-auth table `public.users` (scrypt hashes,
+  its legacy rows) were removed — there
+  is no built-in login; sign up normally instead.

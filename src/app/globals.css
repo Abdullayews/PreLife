@@ -387,7 +387,7 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   .nav-lang { display: inline-flex; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .nav-shrink, .nav-pill, .nav-pill::before, .nav-panel::before { transition: none; }
+  .nav-shrink, .nav-pill, .nav-pill::before, .nav-panel::before, .app-rail { transition: none; }
 }
 
 /* ── Account menu (avatar dropdown) ───────────────────────────────────── */
@@ -1291,39 +1291,47 @@ a.card:hover em svg { transform: translateX(3px); }
 
 /* ════════════════════════════════════════════════════════════════════════
    APP SHELL — the registered-surface shell every section sits in: the
-   ☰ + current-subtab rail pinned to the viewport's LEFT EDGE (full
-   height below the top nav, hairline seam), the section content to its
-   right. One open/closed state, two responsive shapes: below 64rem the
-   rail is a sticky bar and the choice list drops down over a scrim
-   (grid-template-rows 0fr→1fr); at ≥64rem the rail is a full-height
-   sidebar that animates between an icon strip (closed) and the full
-   label list (open) via grid-template-columns track tweens.
+   section rail (subtabs) as a LEFT COLUMN, the section content to its
+   right. The rail runs the TOP NAV'S system vertically — see the block
+   below for the two states — and stays in page flow, so it scrolls down
+   with the content instead of pinning.
    ════════════════════════════════════════════════════════════════════════ */
 
 /* The page wrapper: nav clearance only — the shell owns the rest. */
 .world.app-page { padding-top: var(--nav-h); }
 
-/* ══ App shell v3 — floating glass capsule (prelife-sidebar.html) ══════
-   The submitted mock's language, on the site's tokens: a rounded glass
-   capsule (blur + hairline border + soft shadow) that FLOATS below the
-   top nav instead of being pinned to the viewport edge.
-   Mobile: the capsule squashes into a horizontal pill strip sticky under
-   the nav (sideways scroll when the list is long).
-   lg+: a vertical capsule — small uppercase section caption, then 44px
-   pill rows (icon + label), active = accent wash. */
+/* ══ App shell v3 — the top nav's system, run vertically ══════════════
+   At rest (scroll ≤ 24px): a full-bleed solid strip flush to the left
+   edge — square corners, painted in --bg, merging into the page exactly
+   like the nav bar does at the top of the page.
+   Past 24px of scroll: the floating frosted-glass capsule the nav pill
+   becomes — margins appear, corners round, hairline border + blur + soft
+   shadow fade in (the nav's paint recipe, same .5s ease).
+   Unlike the fixed nav the rail is IN FLOW: scrolling down takes it with
+   the page. Tab size follows the subtab count (data-density on the
+   shell): ≤4 roomy "cozy" pills, 5-6 "regular", ≥7 "compact". */
 .app-shell {
   display: grid; grid-template-columns: minmax(0, 1fr);
   min-height: calc(100svh - var(--nav-h));
 }
 
 .app-rail {
-  position: sticky; top: calc(var(--nav-h) + .625rem); z-index: 5;
-  margin-top: .625rem; margin-inline: 1rem;
-  background: color-mix(in srgb, var(--surface) 78%, transparent);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  border: 1px solid var(--line);
+  position: relative; z-index: 5;
+  margin: 0;
+  border: 1px solid transparent; border-radius: 0;
+  background: var(--bg);
+  transition:
+    margin .5s var(--nav-ease), border-radius .5s var(--nav-ease),
+    background-color .5s var(--nav-ease), border-color .5s var(--nav-ease),
+    box-shadow .5s var(--nav-ease);
+}
+.app-shell[data-scrolled="true"] .app-rail {
+  margin: .75rem .75rem 0;
+  border-color: var(--line);
   border-radius: 999px;
-  box-shadow: 0 8px 30px color-mix(in srgb, var(--ink) 14%, transparent);
+  background: color-mix(in srgb, var(--raised) 84%, transparent);
+  box-shadow: var(--shadow-2);
+  -webkit-backdrop-filter: blur(14.4px) saturate(1.45); backdrop-filter: blur(14.4px) saturate(1.45);
 }
 .app-rail-title { display: none; }
 .app-rail-clip {
@@ -1333,15 +1341,16 @@ a.card:hover em svg { transform: translateX(3px); }
 .app-rail-clip::-webkit-scrollbar { display: none; }
 .app-tabs {
   display: flex; align-items: center; gap: .375rem;
-  width: max-content; padding: .5rem .625rem;
+  width: max-content; padding: .5rem 1rem;
 }
 
-/* Mobile pill shape — echoes the nav pill / filter chips. */
+/* Mobile pill shape — echoes the nav pill / filter chips. Base size is
+   "regular"; the density overrides below make it roomy or compact. */
 .app-tab {
   position: relative; display: inline-flex; align-items: center; gap: .5rem;
   height: 44px; padding: 0 1rem; border: 0; border-radius: 999px;
   background: transparent; color: var(--muted);
-  font: 650 .8125rem/1 var(--font-body); white-space: nowrap;
+  font: 650 .875rem/1 var(--font-body); white-space: nowrap;
   cursor: pointer; text-decoration: none;
   transition: color .2s, background-color .2s;
 }
@@ -1352,19 +1361,33 @@ a.card:hover em svg { transform: translateX(3px); }
   color: var(--accent-text);
 }
 
+/* Density — the subtab count decides the pill size: few subtabs get big
+   touch targets, crowded stacks compress so everything fits. */
+.app-shell[data-density="cozy"] .app-tab { height: 48px; padding-inline: 1.125rem; font-size: .9375rem; }
+.app-shell[data-density="cozy"] .app-tab svg { width: 20px; height: 20px; }
+.app-shell[data-density="compact"] .app-tab { height: 40px; padding-inline: .875rem; font-size: .8125rem; }
+.app-shell[data-density="compact"] .app-tab svg { width: 16px; height: 16px; }
+
 /* The content column — children keep their own .wrap centering. */
 .app-main { min-width: 0; padding-block: clamp(1.25rem, 3.5vw, 2.5rem) clamp(2.5rem, 6vw, 4.5rem); }
 
-/* ── lg+: the same capsule as a floating vertical sidebar ── */
+/* ── lg+: the same system as a side column ── */
 @media (min-width: 64rem) {
   .app-shell {
     grid-template-columns: 14rem minmax(0, 1fr);
-    gap: 1.5rem; padding-inline: 1rem;
+    column-gap: 1.5rem;
   }
+  /* In flow, capped at one fold: at rest the strip spans exactly from
+     below the nav to the bottom of the viewport. */
   .app-rail {
-    top: calc(var(--nav-h) + 1rem);
-    height: calc(100dvh - var(--nav-h) - 2rem);
-    margin-top: 1rem; margin-inline: 0;
+    align-self: start;
+    height: calc(100svh - var(--nav-h));
+  }
+  /* The capsule detaches from the left edge — inset by the same
+     max(.75rem, 5vw) offset the floating nav pill uses, so the two
+     glass surfaces line up on every screen width. */
+  .app-shell[data-scrolled="true"] .app-rail {
+    margin: .75rem 0 0 max(.75rem, 5vw);
     border-radius: var(--r-xl);
   }
   .app-rail-title {
@@ -1393,7 +1416,11 @@ a.card:hover em svg { transform: translateX(3px); }
   .app-tab[aria-selected="true"], .app-tab[aria-current="page"] {
     background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-text);
   }
-  /* Content starts level with the capsule's top edge (the shell already
+  /* Vertical stacks breathe differently per density: cozy rows are tall,
+     compact ones compress so seven subtabs still fit the fold. */
+  .app-shell[data-density="cozy"] .app-tab { height: 52px; padding-inline: 1rem; }
+  .app-shell[data-density="compact"] .app-tab { height: 38px; gap: .625rem; padding-inline: .75rem; }
+  /* Content starts level with the strip's top edge (the shell already
    * sits below the fixed nav via .world.app-page padding). */
   .app-main { padding-block: 1rem clamp(2.5rem, 6vw, 4.5rem); }
 }

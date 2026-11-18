@@ -63,6 +63,15 @@ if (mode === "v3") {
   process.exit(0);
 }
 
+/* v3.1: auth migration — login verification fully in the database (Supabase
+   Auth). Re-points the user FKs to auth.users and drops the legacy v2
+   users table. See db/schema-v3.1-auth.sql. */
+if (mode === "v3.1") {
+  await run(readFileSync(new URL("db/schema-v3.1-auth.sql", root), "utf8"), "schema-v3.1-auth.sql");
+  console.log("done.");
+  process.exit(0);
+}
+
 if (mode === "all" || mode === "schema") {
   await run(readFileSync(new URL("db/schema.sql", root), "utf8"), "schema.sql");
 }

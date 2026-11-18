@@ -4,11 +4,12 @@ import { redirect } from "@/i18n/navigation";
 /**
  * PreLife auth — thin server-side client for the Rust backend.
  *
- * Password hashing, sessions and device rows all live in the prelife-api
- * service (Rust) + Supabase Postgres now; this module just identifies the
- * current visitor for server components: the browser cookie is forwarded
- * to /api/auth/me, which returns the session user or — per the V1 product
- * until real auth gating returns.
+ * Accounts live in the database: Supabase Auth (auth.users + profiles)
+ * holds the credentials and verifies them; the prelife-api service mints
+ * cookie sessions (public.sessions, which also powers the Devices screen).
+ * This module just identifies the current visitor for server components:
+ * the browser cookie is forwarded to /api/auth/me, which returns the
+ * session user or null for anonymous visitors.
  */
 
 const API_BASE = process.env.PRELIFE_API_URL ?? "http://127.0.0.1:3031";

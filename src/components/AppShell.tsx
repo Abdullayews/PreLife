@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat,
   Circle, Dumbbell, Flower2, House, Landmark, Layers, LibraryBig, MapPin,
@@ -10,18 +10,21 @@ import {
 import { Link } from "@/i18n/navigation";
 
 /**
- * The registered-surface shell every section app sits in — v2, rewritten
- * as a COMPACT rail that mirrors the top navigation bar's style:
+ * The registered-surface shell every section app sits in — v3, running the
+ * TOP NAV'S system vertically:
  *
- * • lg+ — a slim, always-open sidebar pinned to the left edge below the
- *   top nav: the section's subtabs stacked vertically (icon + label),
- *   active tab marked with the accent, hairline seam on the right, the
- *   same frosted-surface look as the nav bar. No collapse, no scrim —
- *   the old dropdown is gone.
+ * • the rail mirrors the nav pill's two states — at rest a full-bleed
+ *   solid strip flush to the left edge (it merges into the page exactly
+ *   like the nav does at the top), and past 24px of scroll the same
+ *   floating frosted-glass capsule: margins appear, corners round,
+ *   border + blur + shadow fade in.
  *
- * • below lg — the rail becomes a compact horizontal tab strip sticky
- *   under the top nav: icon + label chips that scroll sideways when the
- *   list is long, matching the nav pill's tone.
+ * • Unlike the fixed nav, the rail is IN FLOW — when the page scrolls
+ *   down, the rail scrolls down with it (no pinning, no internal sticky).
+ *
+ * • Tab size follows the subtab count (data-density): sections with few
+ *   subtabs get roomy pills, crowded sections get compact ones so the
+ *   stack always fits.
  *
  * Two modes:
  * • "link" — the tabs are routes (diet/meditation subpages); the active
@@ -75,16 +78,29 @@ type Props = {
   children: ReactNode;
 };
 
-/* The floating glass capsule that holds the section's subtabs — the
- * design language of the submitted prelife-sidebar.html mock, rebuilt on
- * the site's token system. Desktop: a rounded capsule pinned below the top
- * nav with breathing room on every side; mobile: the same capsule squashed
- * into a horizontal pill strip. */
+/* The section rail — the top nav's shrink system translated into a side
+ * column on the site's token system: solid and flush at rest, a floating
+ * frosted capsule once the page scrolls; on the site's own tokens, and in
+ * page flow so it travels with the content. */
 
 export function AppShell({
   mode, tabs, activeId, hrefs, onSelect, ui, children,
 }: Props) {
   const listRef = useRef<HTMLUListElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  /* The same scroll signal the top nav uses (24px threshold): past it the
+   * surfaces morph into floating frosted pills — the rail joins in. */
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* Density: few subtabs → roomy pills, many → compact ones, so every
+   * section's stack fits its column. (≤4 cozy · 5-6 regular · ≥7 compact) */
+  const density = tabs.length >= 7 ? "compact" : tabs.length >= 5 ? "regular" : "cozy";
 
   /* Roving focus across the tab list: arrows walk it, Home/End jump.
    * Applies in tab mode (tablist semantics); link mode is plain
@@ -113,9 +129,10 @@ export function AppShell({
     typeof icon !== "string" ? icon : (RAIL_ICONS[icon] ?? Circle);
 
   return (
-    <div className="app-shell">
-      {/* ── The compact rail: vertical sidebar (lg+), horizontal strip
-          below lg — same hairline + frosted-surface tone as the nav. ── */}
+    <div className="app-shell" data-scrolled={scrolled} data-density={density}>
+      {/* ── The rail: the nav pill's system as a side column — solid
+          full-bleed strip at rest, floating frosted capsule past 24px of
+          scroll. In flow, so it scrolls down with the page. ── */}
       <nav className="app-rail" aria-label={ui.label}>
         <div className="app-rail-clip">
           {ui.title && <p className="app-rail-title">{ui.title}</p>}
