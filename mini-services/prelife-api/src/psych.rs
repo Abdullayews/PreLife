@@ -87,7 +87,7 @@ fn appointment_view(r: &Value) -> Value {
 
 pub async fn journal_list(State(app): State<App>, headers: HeaderMap) -> Result<Response, ApiError> {
     let user = require(&app, &headers).await?;
-    let entries = app.supa.select("journal_entries", &[
+    let entries = app.supa.select("journal_entries_v2", &[
         ("select", "*"),
         ("user_id", &format!("eq.{}", user.user.id)),
         ("order", "created_at.desc"),
@@ -116,7 +116,7 @@ pub async fn journal_create(State(app): State<App>, headers: HeaderMap, bytes: B
     if content.is_empty() || content.chars().count() > 4000 {
         return Err(bad_request());
     }
-    let row = app.supa.insert("journal_entries", &json!({
+    let row = app.supa.insert("journal_entries_v2", &json!({
         "user_id": user.user.id, "content": content, "prompt_key": prompt_key,
     })).await.map_err(|_| generic())?;
     Ok(created(json!({ "id": row.get("id") })))
@@ -127,12 +127,12 @@ pub async fn journal_delete(State(app): State<App>, headers: HeaderMap, Path(id)
     if id.is_empty() {
         return Err(bad_request());
     }
-    let row = app.supa.select_one("journal_entries", &[("select", "id,user_id"), ("id", &format!("eq.{id}"))]).await
+    let row = app.supa.select_one("journal_entries_v2", &[("select", "id,user_id"), ("id", &format!("eq.{id}"))]).await
         .map_err(|_| generic())?;
     let row = row.filter(|r| r.get("user_id").and_then(|v| v.as_str()) == Some(user.user.id.as_str()))
         .ok_or_else(|| err(StatusCode::NOT_FOUND, "not_found"))?;
     let row_id = row.get("id").and_then(|v| v.as_str()).unwrap_or_default();
-    app.supa.delete("journal_entries", &[("id", &format!("eq.{row_id}"))]).await
+    app.supa.delete("journal_entries_v2", &[("id", &format!("eq.{row_id}"))]).await
         .map_err(|_| generic())?;
     Ok(ok(json!({ "ok": true })))
 }
@@ -267,7 +267,7 @@ pub async fn quiz_submit(State(app): State<App>, headers: HeaderMap, bytes: Byte
 /* ── Bookings ────────────────────────────────────────────────────────────── */
 
 pub async fn book_count(State(app): State<App>) -> Result<Response, ApiError> {
-    let rows = app.supa.select("psychologists", &[("select", "slug")]).await
+    let rows = app.supa.select("psychologists_v2", &[("select", "slug")]).await
         .map_err(|_| generic())?;
     Ok(ok(json!({ "count": rows.len() })))
 }
@@ -290,7 +290,7 @@ pub async fn book(State(app): State<App>, headers: HeaderMap, bytes: Bytes) -> R
         return Err(bad_request());
     }
 
-    let psy = app.supa.select_one("psychologists", &[("select", "slug,price"), ("slug", &format!("eq.{slug}"))]).await
+    let psy = app.supa.select_one("psychologists_v2", &[("select", "slug,price"), ("slug", &format!("eq.{slug}"))]).await
         .map_err(|_| generic())?;
     let Some(psy) = psy else { return Err(bad_request()); };
 

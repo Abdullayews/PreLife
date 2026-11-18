@@ -456,7 +456,7 @@ pub async fn meditation(State(app): State<App>) -> Result<Response, ApiError> {
     let supa = &app.supa;
     let world = world_rows(&app, "meditation").await?;
 
-    let psy = supa.select("psychologists", &[("select", "*"), ("order", "sort_order.asc")])
+    let psy = supa.select("psychologists_v2", &[("select", "*"), ("order", "sort_order.asc")])
         .await.map_err(|_| generic())?;
     let psy_specs = supa.select("psychologist_specialties", &[("select", "psychologist_slug,specialty_code,sort_order")])
         .await.map_err(|_| generic())?;

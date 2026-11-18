@@ -119,3 +119,20 @@ Browser code must call these through the sandbox gateway:
   `./target/release/prelife-api` the same way.
 - **Database**: Supabase Postgres — nothing to host. Apply schema changes
   with `node scripts/apply-db.mjs schema`.
+- **v3 unified schema** (`db/schema-v3.sql`, applied on top of v2 with
+  `node scripts/apply-db.mjs v3`): the Supabase-Auth-based layer —
+  `profiles` (FK to `auth.users`, auto-created by the `on_auth_user_created`
+  trigger), subscriptions + `plan_sections` (psychology/diet/sports/books/ai,
+  gated by `has_section_access()`), `bookings`/`psychologist_slots`/`payments`,
+  `mood_checkins`, `journal_entries`, `practice_materials`/`practice_sessions`,
+  `exercises`/`workouts`/`workout_exercises`/`user_workout_*`, and
+  `books`/`user_books`/`book_notes`. RLS policies give `authenticated` users
+  access to their own rows; writes to bookings/payments/subscriptions stay
+  server-side (service_role). The two v2 tables whose names the v3 schema
+  reuses were renamed (`psychologists_v2`, `journal_entries_v2`) and the live
+  Rust backend points at the new names — the site never went down. Content
+  was migrated into the v3 tables with Azerbaijani text resolved from
+  `i18n_messages` (8 psychologists + 192 bookable slots for the next 14 days,
+  Plus/Pro/Ultra plans + sections, 15 exercises, 3 workouts + 47 rows,
+  6 books, 16 practice materials). Demo auth user: `demo@prelife.app` /
+  `demo123` (profile auto-created).
