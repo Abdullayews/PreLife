@@ -4,8 +4,9 @@ import { ArrowRight, Crown } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { sections, sectionById, type SectionId } from "@/lib/shell";
 import { requireUser } from "@/lib/auth";
-import { bakuParts } from "@/lib/diet";
+import { bakuParts } from "@/lib/psychology";
 import { GYM_TABS, isShopTab } from "@/lib/gym";
+import { AiChatFab } from "@/components/AiChatFab";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -53,11 +54,11 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <div data-world="shell" className="world page">
+      <AiChatFab />
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i />{dateLine}</p>
           <h1 className="display sm">{greeting}{user.name ? `, ${user.name}` : ""}</h1>
-          <p className="lede">{t("placeholder")}</p>
         </header>
 
         {/* This week at a glance — V1 mock numbers, each deep-linking on. */}
@@ -73,7 +74,6 @@ export default async function HomePage({ params }: Props) {
               </li>
             ))}
           </ul>
-          <p className="stats-hint">{t("statsHint")}</p>
         </section>
 
         <section aria-labelledby="today" className="blk">

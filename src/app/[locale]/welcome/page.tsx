@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Gallery } from "@/components/Gallery";
 import { StartButton } from "@/components/StartButton";
+import { AiChatFab } from "@/components/AiChatFab";
 import { sections } from "@/lib/shell";
 import { landingFrames } from "@/lib/worlds";
 import { getSessionUser } from "@/lib/auth";
@@ -33,6 +34,7 @@ export default async function WelcomePage({ params }: Props) {
 
   return (
     <div data-world="shell" className="world">
+      <AiChatFab />
       <section className="hero" aria-label={t("hero.ariaLabel")}>
         <Gallery
           images={landingFrames.map((f) => f.src)}
