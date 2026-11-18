@@ -12,6 +12,17 @@ const LEGACY_WELCOME: Record<string, string> = {
   books: "library",
 };
 
+/** Legacy psychology-app subpaths that used to live under /diet before
+ *  the nutrition/psychology split — each maps 1:1 onto /meditation/<sub>.
+ *  The bare /diet stays: it is the nutrition section now. */
+const LEGACY_APP: Record<string, string> = {
+  psychologists: "psychologists",
+  bookings: "bookings",
+  mood: "mood",
+  journal: "journal",
+  practice: "practice",
+};
+
 /**
  * next-intl middleware with a pre-consent zero-storage guarantee.
  *
@@ -35,6 +46,17 @@ export default function proxy(request: NextRequest) {
   if (legacyMatch) {
     const locale = legacyMatch[1] ?? routing.defaultLocale;
     const to = new URL(`/${locale}/welcome/${LEGACY_WELCOME[legacyMatch[2]]}`, request.url);
+    return NextResponse.redirect(to, 301);
+  }
+
+  // 301: /<locale>/diet/<psych-sub> -> /<locale>/meditation/<psych-sub> —
+  // the psychology app moved house when /diet became the nutrition section.
+  const legacyApp = pathname.match(
+    /^\/(?:([a-z]{2})\/)?diet\/(psychologists|bookings|mood|journal|practice)\/?$/,
+  );
+  if (legacyApp) {
+    const locale = legacyApp[1] ?? routing.defaultLocale;
+    const to = new URL(`/${locale}/meditation/${LEGACY_APP[legacyApp[2]]}`, request.url);
     return NextResponse.redirect(to, 301);
   }
 

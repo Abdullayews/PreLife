@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { requireUser } from "@/lib/auth";
-import { GymApp, type GymAppStrings } from "@/components/gym/GymApp";
+import { GymApp, type GymAppStrings, type SessionExerciseView, type SessionPlanView } from "@/components/gym/GymApp";
 import {
-  GYM_PLACES, PLAN_WEEKS, SHOP_TAB_IDS, STORES,
-  gymPlans, gymSchedule, minPriceOf, productsOf, scheduleDayKeys,
-  isGymTabId, type GymTabId, type ShopTabId,
+  GYM_PLACES, HALL_DETAILS, PLAN_WEEKS, SHOP_TAB_IDS, STORES,
+  EXERCISES, WORKOUTS, gymPlans, gymSchedule, minPriceOf, productsOf,
+  scheduleDayKeys, repsLabelKey,
+  isGymTabId, type GymTabId, type ShopTabId, type Reps,
 } from "@/lib/gym";
 
 type Props = {
@@ -59,6 +60,36 @@ export default async function GymPage({ params, searchParams }: Props) {
     };
   });
 
+  /* ── Workout sessions: every plan's weekly structure pre-rendered with
+   *  the exercise pool's translated name / target / guide plus the
+   *  composed sets & rest lines. Weekday 1 (Mon) … 6 (Sat). */
+  const renderReps = (r: Reps): string => {
+    const key = repsLabelKey(r);
+    if (r.t === "reps" && r.b !== undefined) return t(key, { from: r.a, to: r.b });
+    return t(key, { count: r.a });
+  };
+  const sessions: Record<string, SessionPlanView> = Object.fromEntries(
+    Object.entries(WORKOUTS).map(([planId, days]) => [
+      planId,
+      Object.fromEntries(
+        days.map((d) => {
+          const list: SessionExerciseView[] = d.exercises.map((pe) => {
+            const ex = EXERCISES[pe.ex]!;
+            return {
+              id: pe.ex,
+              name: t(ex.nameKey),
+              target: t(ex.targetKey),
+              guide: t(ex.guideKey),
+              setsLabel: t("plan.setsLine", { sets: pe.sets, reps: renderReps(pe.reps) }),
+              restLabel: pe.rest > 0 ? t("plan.restLine", { count: pe.rest }) : t("plan.flowLine"),
+            };
+          });
+          return [d.day, list];
+        }),
+      ),
+    ]),
+  );
+
   const shops = Object.fromEntries(
     SHOP_TAB_IDS.map((id) => [
       id,
@@ -69,6 +100,7 @@ export default async function GymPage({ params, searchParams }: Props) {
           name: t(`${id}.${p.nameKey}`),
           brand: p.brand,
           priceLabel: `${p.price[0]}–${p.price[1]} ₼`,
+          image: p.image ?? null,
           minPrice: cheapest,
           // Index of the cheapest store row — wins ties by first occurrence.
           best: p.at.findIndex((a) => a.price === cheapest),
@@ -96,12 +128,12 @@ export default async function GymPage({ params, searchParams }: Props) {
     railClose: t("railClose"),
     currentTabSr: t("currentTabSr"),
     heads: {
-      plan: { eyebrow: t("heads.plan.eyebrow"), title: t("heads.plan.title"), lede: t("heads.plan.lede") },
-      gyms: { eyebrow: t("heads.gyms.eyebrow"), title: t("heads.gyms.title"), lede: t("heads.gyms.lede") },
-      equipment: { eyebrow: t("heads.equipment.eyebrow"), title: t("heads.equipment.title"), lede: t("heads.equipment.lede") },
-      supplements: { eyebrow: t("heads.supplements.eyebrow"), title: t("heads.supplements.title"), lede: t("heads.supplements.lede") },
-      accessories: { eyebrow: t("heads.accessories.eyebrow"), title: t("heads.accessories.title"), lede: t("heads.accessories.lede") },
-      clothing: { eyebrow: t("heads.clothing.eyebrow"), title: t("heads.clothing.title"), lede: t("heads.clothing.lede") },
+      plan: { eyebrow: t("heads.plan.eyebrow"), title: t("heads.plan.title") },
+      gyms: { eyebrow: t("heads.gyms.eyebrow"), title: t("heads.gyms.title") },
+      equipment: { eyebrow: t("heads.equipment.eyebrow"), title: t("heads.equipment.title") },
+      supplements: { eyebrow: t("heads.supplements.eyebrow"), title: t("heads.supplements.title") },
+      accessories: { eyebrow: t("heads.accessories.eyebrow"), title: t("heads.accessories.title") },
+      clothing: { eyebrow: t("heads.clothing.eyebrow"), title: t("heads.clothing.title") },
     },
     shopNote: t("shopNote"),
     whereToBuy: t("whereToBuy"),
@@ -122,14 +154,25 @@ export default async function GymPage({ params, searchParams }: Props) {
       activeTag: t("plan.activeTag"),
       select: t("plan.select"),
       plansEyebrow: t("plan.plansEyebrow"),
-      switchHint: t("plan.switchHint"),
       scheduleEyebrow: t("plan.scheduleEyebrow"),
       scheduleA11y: t("plan.scheduleA11y"),
       timeCol: tw("scheduleTime"),
-      doneCta: t("plan.doneCta"),
-      doneLabel: t("plan.doneLabel"),
-      doneUndo: t("plan.doneUndo"),
+      start: t("plan.start"),
+      sessionTitle: t("plan.sessionTitle"),
+      restDay: t("plan.restDay"),
+      back: t("plan.back"),
+      howTo: t("plan.howTo"),
+      done: t("plan.done"),
+      finish: t("plan.finish"),
+      finished: t("plan.finished"),
+      sessionProgress: String(t.raw("plan.sessionProgress")),
+      sessionProgressA11y: String(t.raw("plan.sessionProgressA11y")),
+      change: t("plan.change"),
+      changeTitle: t("plan.changeTitle"),
+      close: t("plan.close"),
     },
+    sessions,
+    dayNames: scheduleDayKeys.map((k) => tw(k)),
     schedule: {
       days: scheduleDayKeys.map((k) => tw(k)),
       slots: gymSchedule.slots.map((slot) => ({
@@ -141,18 +184,28 @@ export default async function GymPage({ params, searchParams }: Props) {
         })),
       })),
     },
-    gyms: GYM_PLACES.map((g) => ({
-      id: g.id,
-      name: g.ns === "gymHome" ? tw(g.nameKey) : t(g.nameKey),
-      desc: g.ns === "gymHome" ? tw(g.descKey) : t(g.descKey),
-      image: g.image,
-      rating: g.rating,
-      ratingA11y: tw("gymsRatingA11y", { score: g.rating }),
-      features: g.featureKeys.map((k) => tw(k)),
-      address: g.address,
-      hours: g.hours,
-      dayPrice: g.dayPrice,
-    })),
+    gyms: GYM_PLACES.map((g) => {
+      const details = HALL_DETAILS[g.id]!;
+      return {
+        id: g.id,
+        name: g.ns === "gymHome" ? tw(g.nameKey) : t(g.nameKey),
+        desc: g.ns === "gymHome" ? tw(g.descKey) : t(g.descKey),
+        image: g.image,
+        rating: g.rating,
+        ratingA11y: tw("gymsRatingA11y", { score: g.rating }),
+        features: g.featureKeys.map((k) => tw(k)),
+        address: g.address,
+        hours: g.hours,
+        dayPrice: g.dayPrice,
+        equipment: details.equipment.map((eq) => t(`hallEq.${eq}`)),
+        trainers: details.trainers.map((tr) => ({
+          name: tr.name,
+          spec: t(`hallSpec.${tr.spec}`),
+          years: tr.years,
+        })),
+        trainerYears: String(t.raw("gyms.trainerYears")),
+      };
+    }),
     gymsUi: {
       dayPass: t("gyms.dayPass"),
       mapsCta: t("gyms.mapsCta"),
@@ -162,6 +215,11 @@ export default async function GymPage({ params, searchParams }: Props) {
       filterLabel: t("gyms.filterLabel"),
       filterAll: t("gyms.filterAll"),
       gymsNoResults: t("gyms.gymsNoResults"),
+      details: t("gyms.details"),
+      close: t("gyms.close"),
+      aboutTitle: t("gyms.aboutTitle"),
+      equipTitle: t("gyms.equipTitle"),
+      trainersTitle: t("gyms.trainersTitle"),
     },
     shops,
   };
@@ -179,7 +237,6 @@ export default async function GymPage({ params, searchParams }: Props) {
         <header className="page-head">
           <p className="eyebrow"><i />PreLife Gym</p>
           <h1 className="display sm">{t("title")}</h1>
-          <p className="lede">{t("lede")}</p>
         </header>
       </GymApp>
     </div>

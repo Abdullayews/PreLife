@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import { AppShell } from "@/components/AppShell";
 
 /**
- * The diet section's shell: the shared left rail (link mode — each tab
- * is one of the section's real routes) around whatever the active
+ * The nutrition section's shell: the shared left rail (link mode — each
+ * tab is one of the section's real routes) around whatever the active
  * subpage renders. Every /diet* page wraps its content in this, passing
  * its own tab id, so the rail follows the visitor across subpages.
  *
@@ -14,11 +14,9 @@ import { AppShell } from "@/components/AppShell";
 
 const TABS = [
   { id: "overview", href: "/diet", icon: "house" },
-  { id: "psychologists", href: "/diet/psychologists", icon: "brain" },
-  { id: "bookings", href: "/diet/bookings", icon: "calendar" },
-  { id: "mood", href: "/diet/mood", icon: "flower" },
-  { id: "journal", href: "/diet/journal", icon: "notebook" },
-  { id: "practice", href: "/diet/practice", icon: "audio" },
+  { id: "plans", href: "/diet/plans", icon: "calendar" },
+  { id: "recipes", href: "/diet/recipes", icon: "chef" },
+  { id: "places", href: "/diet/places", icon: "mapPin" },
 ] as const;
 
 export async function DietShell({

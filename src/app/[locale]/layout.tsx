@@ -51,7 +51,10 @@ export default async function LocaleLayout({
     settingsPage: all.settingsPage,
     notFoundPage: all.notFoundPage,
     connection: all.connection,
+    psychApp: all.psychApp,
     dietApp: all.dietApp,
+    subscription: all.subscription,
+    aiChat: all.aiChat,
   };
 
   return (
