@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 import { X } from "lucide-react";
 
 /**
- * A minimal, dependency-free modal dialog in the design system's own
- * language: a scrim, a centered surface panel, an X close, Escape to
- * dismiss and a click on the scrim to dismiss. Body scroll locks while
- * open; the close button receives focus on open (a light focus trap —
- * Tab cycles naturally because the dialog sits last in the DOM order).
+ * A modal dialog built on the NATIVE <dialog> element: showModal() gives
+ * us the focus trap, Escape handling and the ::backdrop scrim for free —
+ * this component only adds the shared chrome (sticky header with the X,
+ * body scroll lock while open) and the design system's styling.
+ *
+ * The scrim closes on an outside pointerdown (click on ::backdrop lands
+ * on the dialog element itself, target === currentTarget).
  */
 export function Modal({
   open, onClose, title, closeLabel, children, wide,
@@ -23,75 +25,77 @@ export function Modal({
   /** Wider panel (gym details / plan picker). */
   wide?: boolean;
 }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
 
-  /* Escape closes; focus lands on the close button when opened. */
+  /* Open/close the native dialog after it mounts/updates. Layout effect
+   * so showModal() runs before the browser paints — no flash. */
+  useLayoutEffect(() => {
+    const dlg = dialogRef.current;
+    if (!dlg) return;
+    if (open && !dlg.open) dlg.showModal();
+  }, [open]);
+
+  /* Body scroll lock while open (native dialogs block interaction, not
+   * the background scroll). */
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-      if (e.key === "Tab" && panelRef.current) {
-        // Soft focus trap: keep Tab inside the open panel.
-        const items = Array.from(
-          panelRef.current.querySelectorAll<HTMLElement>(
-            "a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex='-1'])",
-          ),
-        ).filter((el) => el.offsetParent !== null);
-        if (!items.length) return;
-        const first = items[0]!;
-        const last = items[items.length - 1]!;
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    closeRef.current?.focus();
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
     return () => {
-      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [open, onClose]);
+  }, [open]);
+
+  /* Unmount safety: if the owner removes the dialog while open (e.g. a
+   * route change), close() restores the page's interaction state. */
+  useEffect(() => {
+    const dlg = dialogRef.current;
+    return () => {
+      if (dlg?.open) dlg.close();
+    };
+  }, []);
+
+  /* Backdrop click: a click that lands on the dialog element itself is a
+   * click on the ::backdrop (the panel content sits above it). Wired via
+   * addEventListener — the native-dialog pattern, outside JSX props. */
+  useEffect(() => {
+    const dlg = dialogRef.current;
+    if (!dlg) return;
+    const onBackdrop = (e: MouseEvent) => {
+      if (e.target === dlg) onClose();
+    };
+    dlg.addEventListener("click", onBackdrop);
+    return () => dlg.removeEventListener("click", onBackdrop);
+  }, [onClose]);
 
   if (!open) return null;
 
   return (
-    <div className="modal-root" role="presentation">
-      {/* The scrim: pointerdown (not click) closes it — Escape and the X
-          cover keyboard users, so it stays aria-hidden. */}
-      <div
-        className="modal-scrim"
-        aria-hidden="true"
-        onPointerDown={(e) => { if (e.target === e.currentTarget) onClose(); }}
-      />
-      <div
-        className={wide ? "modal-panel modal-wide" : "modal-panel"}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        ref={panelRef}
-      >
-        <header className="modal-head">
-          <h2>{title}</h2>
-          <button
-            type="button"
-            ref={closeRef}
-            className="modal-x"
-            aria-label={closeLabel}
-            onClick={onClose}
-          >
-            <X size={18} aria-hidden />
-          </button>
-        </header>
-        <div className="modal-body">{children}</div>
-      </div>
-    </div>
+    <dialog
+      ref={dialogRef}
+      className={wide ? "modal-panel modal-wide" : "modal-panel"}
+      aria-label={title}
+      onCancel={(e) => {
+        /* Escape: let React own the state change, not the native close. */
+        e.preventDefault();
+        onClose();
+      }}
+    >
+      <header className="modal-head">
+        <h2>{title}</h2>
+        <button
+          type="button"
+          ref={closeRef}
+          className="modal-x"
+          aria-label={closeLabel}
+          onClick={onClose}
+        >
+          <X size={18} aria-hidden />
+        </button>
+      </header>
+      <div className="modal-body">{children}</div>
+    </dialog>
   );
 }

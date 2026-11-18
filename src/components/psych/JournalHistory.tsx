@@ -55,7 +55,7 @@ export function JournalHistory({
 
   return (
     <div className="jrnl-history">
-      <div className="jrnl-nav" role="group" aria-label={t("journalHistoryEyebrow")}>
+      <fieldset className="jrnl-nav" aria-label={t("journalHistoryEyebrow")}>
         <button
           type="button"
           className="icon-btn"
@@ -87,7 +87,7 @@ export function JournalHistory({
         >
           <ChevronRight size={18} aria-hidden />
         </button>
-      </div>
+      </fieldset>
 
       {day?.mood && (
         <p className="jrnl-mood">
