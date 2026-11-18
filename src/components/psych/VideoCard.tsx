@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { apiUrl } from "@/lib/api-url";
 
 /** Quiet video card. Reports one completed-watch to
  *  /api/psych/progress when the video ends. */
@@ -18,7 +19,7 @@ export function VideoCard({ id, src, poster, title, desc }: {
       // report instead of sending seconds=0, which the API rightly rejects.
       const seconds = Math.round(video.duration);
       if (!Number.isFinite(seconds) || seconds < 1) return;
-      void fetch("/api/psych/progress", {
+      void fetch(apiUrl("/api/psych/progress"), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ resourceId: id, seconds, completed: true }),

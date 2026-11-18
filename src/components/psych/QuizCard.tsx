@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import { LoaderCircle } from "lucide-react";
 
 export type QuizLabel = { title: string; desc: string; questions: { q: string; opts: string[] }[] };
@@ -39,7 +40,7 @@ export function QuizCard({ labels, zones }: { labels: QuizLabels; zones: { low: 
 
   const submit = () =>
     start(async () => {
-      const res = await fetch("/api/psych/quiz", {
+      const res = await fetch(apiUrl("/api/psych/quiz"), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ quizId: active, answers: answers.map((a) => a ?? -1) }),

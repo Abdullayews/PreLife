@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import { LoaderCircle, Send, Sparkles, X } from "lucide-react";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -46,7 +47,7 @@ export function AiChatFab() {
     setInput("");
     setBusy(true);
     try {
-      const res = await fetch("/api/ai/chat", {
+      const res = await fetch(apiUrl("/api/ai/chat"), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ locale, messages: next }),

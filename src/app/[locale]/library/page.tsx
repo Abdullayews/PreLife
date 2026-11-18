@@ -5,10 +5,8 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { requireUser } from "@/lib/auth";
-import {
-  libraryCollections, libraryBooks, libraryPlaces,
-  BOOK_DETAILS, LIB_VENUE_DETAILS,
-} from "@/lib/library";
+import { getLibraryContent } from "@/lib/api";
+import { iconByName } from "@/lib/icons";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -47,6 +45,11 @@ export default async function LibraryPage({ params, searchParams }: Props) {
   const t = await getTranslations({ locale, namespace: "libraryApp" });
   const tr = await getTranslations({ locale, namespace: "libraryHome" });
   const r = await getTranslations({ locale, namespace: "sectionRail" });
+
+  const {
+    collections: libraryCollections, books: libraryBooks, places: libraryPlaces,
+    bookDetails: BOOK_DETAILS, venueDetails: LIB_VENUE_DETAILS,
+  } = (await getLibraryContent())!;
 
   const tabs = TABS.map(({ id, icon }) => ({ id, label: tr(`rail_${id}`), icon }));
   const hrefs = Object.fromEntries(
@@ -104,10 +107,11 @@ export default async function LibraryPage({ params, searchParams }: Props) {
               <ul className="drecipes">
                 {libraryBooks.map((b) => {
                   const d = BOOK_DETAILS[b.id]!;
+                  const BookIcon = iconByName(b.icon);
                   return (
                     <li key={b.id} className="card drecipe-card">
                       <div className="card-top">
-                        <span className="chip-ico tinted"><b.icon size={20} aria-hidden /></span>
+                        <span className="chip-ico tinted"><BookIcon size={20} aria-hidden /></span>
                         <span className="tag">{t(`level${cap(b.level)}`)}</span>
                       </div>
                       <h3 className="h4">{t(b.nameKey)}</h3>

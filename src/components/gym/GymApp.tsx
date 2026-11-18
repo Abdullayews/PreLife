@@ -7,10 +7,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { hasConsent } from "@/lib/consent";
+import { iconByName } from "@/lib/icons";
 import { AppShell } from "@/components/AppShell";
 import { Modal } from "@/components/Modal";
 import {
-  GYM_TABS, productsOf, isShopTab,
+  GYM_TABS, isShopTab,
   type GymTabId, type ShopTabId,
 } from "@/lib/gym";
 
@@ -88,6 +89,8 @@ export type ShopItemView = {
   id: string;
   name: string;
   brand: string;
+  /** Lucide icon name (lib/icons.ts registry) — resolved client-side. */
+  icon: string;
   priceLabel: string;
   /** Product photo (OSS/Unsplash URL) — the card keeps its icon chip
    *  as a fallback when null. */
@@ -802,10 +805,10 @@ function ShopPanel({
   query: string;
   onQuery: (q: string) => void;
 }) {
-  const catalog = productsOf(tab);
+  const catalog = items;
 
-  const iconOf = (id: string): LucideIcon =>
-    catalog.find((p) => p.id === id)?.icon ?? Dumbbell;
+  const iconOf = (item: ShopItemView): LucideIcon =>
+    catalog.find((p) => p.id === item.id) ? iconByName(item.icon) : Dumbbell;
 
   // Live search first (name / brand / any store), then the chosen sort.
   const q = query.trim().toLowerCase();
@@ -872,7 +875,7 @@ function ShopPanel({
          * bar above; matches simply drop out of the still-mounted list). */
         <ul className="gshop-grid" key={`${tab}|${sort}`}>
           {ordered.map((item, i) => {
-          const Icon = iconOf(item.id);
+          const Icon = iconOf(item);
           return (
             <li
               key={item.id}

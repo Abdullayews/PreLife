@@ -15,7 +15,10 @@ const nextConfig: NextConfig = {
   // The sandbox preview panel serves the app from a *.space-z.ai host.
   // Without this, Next.js dev (16) blocks cross-origin requests to dev
   // resources (e.g. /__nextjs_original-stack-frames) from that origin.
-  allowedDevOrigins: ["*.space-z.ai"],
+  // 127.0.0.1/localhost: local verification (agent-browser, curl) — without
+  // them the dev server blocks /_next/hmr for these hosts, which silently
+  // breaks client hydration on locally-opened pages.
+  allowedDevOrigins: ["*.space-z.ai", "localhost", "127.0.0.1"],
   // TypeScript is replaced by tsc-rs (Rust port of the TS 7 compiler, see
   // package.json devDependencies -> "typescript": "npm:@tsc-rs/typescript").
   // The native compiler has no JS API, so Next's in-build type-check step

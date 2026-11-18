@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { MOOD_TAGS } from "@/lib/psychology";
+import { apiUrl } from "@/lib/api-url";
 import { LoaderCircle } from "lucide-react";
 
 export type MoodInitial = {
@@ -12,8 +12,9 @@ export type MoodInitial = {
 } | null;
 
 /** Daily check-in: mood / energy / sleep on 1–5 scales (+ tags & note on
- *  the full version). Posts to /api/psych/mood as an upsert. */
-export function MoodCheck({ initial, compact = false }: { initial: MoodInitial; compact?: boolean }) {
+ *  the full version). Posts to /api/psych/mood as an upsert. The tag list
+ *  comes from the server (mood_tags table via the Rust API). */
+export function MoodCheck({ initial, moodTags, compact = false }: { initial: MoodInitial; moodTags: string[]; compact?: boolean }) {
   const t = useTranslations("psychApp");
   const router = useRouter();
   const [mood, setMood] = useState(initial?.mood ?? 0);
@@ -40,7 +41,7 @@ export function MoodCheck({ initial, compact = false }: { initial: MoodInitial; 
   const save = () =>
     start(async () => {
       setError(false);
-      const res = await fetch("/api/psych/mood", {
+      const res = await fetch(apiUrl("/api/psych/mood"), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ mood, energy, sleepQ, tags: [...tags], note }),
@@ -77,7 +78,7 @@ export function MoodCheck({ initial, compact = false }: { initial: MoodInitial; 
           <div className="mood-row">
             <label>{t("moodTagsLabel")}</label>
             <ul className="chips">
-              {MOOD_TAGS.map((tag) => (
+              {moodTags.map((tag) => (
                 <li key={tag}>
                   <button
                     type="button"

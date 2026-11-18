@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { worlds, type WorldSlug } from "@/lib/worlds";
+import { getWorlds } from "@/lib/api";
+import type { WorldSlug } from "@/lib/worlds";
 import { sections, type WelcomeSlug } from "@/lib/shell";
 import { WorldPage } from "@/components/WorldPage";
 
@@ -31,7 +32,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const world = worldByWelcomeSlug(slug);
   if (!world) return {};
-  const t = await getTranslations({ locale, namespace: worlds[world].ns });
+  const data = await getWorlds();
+  const t = await getTranslations({ locale, namespace: data?.worlds[world].ns ?? "gymHome" });
   return { title: t("metaTitle"), description: t("metaDescription") };
 }
 

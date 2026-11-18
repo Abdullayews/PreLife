@@ -1,7 +1,9 @@
 import { getTranslations } from "next-intl/server";
 import { ArrowRight } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { worlds, type WorldSlug } from "@/lib/worlds";
+import { getWorlds } from "@/lib/api";
+import { iconByName } from "@/lib/icons";
+import type { WorldSlug } from "@/lib/worlds";
 import { sections } from "@/lib/shell";
 import { getSessionUser } from "@/lib/auth";
 import { Gallery } from "./Gallery";
@@ -19,7 +21,9 @@ import { StartButton } from "./StartButton";
  * where it belongs.
  */
 export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: string }) {
-  const w = worlds[slug];
+  // The world's content (hero, canDo cards) comes from the Rust API.
+  const data = (await getWorlds())!;
+  const w = data.worlds[slug];
   const [t, tc, user] = await Promise.all([
     getTranslations({ locale, namespace: w.ns }),
     getTranslations({ locale, namespace: "moduleCommon" }),
@@ -59,13 +63,16 @@ export async function WorldPage({ slug, locale }: { slug: WorldSlug; locale: str
             <p className="lede">{t("canSubtitle")}</p>
           </header>
           <ul className="can">
-            {w.canDo.map((c, i) => (
-              <li key={i} className="rv">
-                <span className="chip-ico tinted"><c.icon size={20} aria-hidden /></span>
-                <h3>{t(c.titleKey)}</h3>
-                <p>{t(c.descKey)}</p>
-              </li>
-            ))}
+            {w.canDo.map((c, i) => {
+              const CanIcon = iconByName(c.icon);
+              return (
+                <li key={i} className="rv">
+                  <span className="chip-ico tinted"><CanIcon size={20} aria-hidden /></span>
+                  <h3>{t(c.titleKey)}</h3>
+                  <p>{t(c.descKey)}</p>
+                </li>
+              );
+            })}
           </ul>
         </div>
       </section>

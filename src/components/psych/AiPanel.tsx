@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import { LoaderCircle, Send, Sparkles } from "lucide-react";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -30,7 +31,7 @@ export function AiPanel() {
     setInput("");
     setBusy(true);
     try {
-      const res = await fetch("/api/psych/ai", {
+      const res = await fetch(apiUrl("/api/psych/ai"), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ locale, messages: next }),

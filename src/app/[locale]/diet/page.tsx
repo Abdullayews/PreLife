@@ -3,10 +3,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowRight, CalendarDays, ChefHat, MapPin } from "lucide-react";
 import { requireUser } from "@/lib/auth";
+import { getDietContent } from "@/lib/api";
 import { bakuParts } from "@/lib/psychology";
-import {
-  dietRecipes, recipeOfTheDay, RECIPE_DETAILS, RECIPE_ICONS,
-} from "@/lib/nutrition";
+import { recipeOfTheDay, RECIPE_ICONS } from "@/lib/nutrition";
 import { WaterTracker } from "@/components/diet/WaterTracker";
 import { DietShell } from "@/components/diet/DietShell";
 
@@ -24,15 +23,17 @@ export default async function DietOverviewPage({ params }: Props) {
   const user = await requireUser(locale, "/diet");
 
   const t = await getTranslations({ locale, namespace: "dietApp" });
-  
+
+  // Recipes, plans and venues come from the Rust API (Supabase Postgres).
+  const diet = (await getDietContent())!;
   const hour = bakuParts(new Date()).hour;
   const greeting =
     hour < 12 ? t("greetMorning") : hour < 18 ? t("greetAfternoon") : t("greetEvening");
 
   /* Deterministic pick of the day — stable per day, server-rendered. */
-  const pickId = recipeOfTheDay();
-  const pick = dietRecipes.find((r) => r.id === pickId)!;
-  const pickDetail = RECIPE_DETAILS[pickId]!;
+  const pickId = recipeOfTheDay(diet.recipes);
+  const pick = diet.recipes.find((r) => r.id === pickId)!;
+  const pickDetail = diet.recipeDetails[pickId]!;
   const PickIcon = RECIPE_ICONS[pickId] ?? ChefHat;
 
   const SUBPAGES = [

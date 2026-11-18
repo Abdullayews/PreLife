@@ -5,9 +5,9 @@ import {
   AudioLines, Brain, CalendarDays, Flower2,
 } from "lucide-react";
 import { requireUser } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { getMeditationContent, getOverview } from "@/lib/api";
 import {
-  MEDIA, bakuParts, moodStreak, psyBySlug, todaysPromptKey, todaysQuoteKey,
+  bakuParts, moodStreak, psyBySlug, dayRotated,
 } from "@/lib/psychology";
 import { MoodCheck } from "@/components/psych/MoodCheck";
 import { BreathCircle } from "@/components/psych/BreathCircle";
@@ -38,31 +38,25 @@ export default async function MeditationPage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "psychApp" });
   const user = await requireUser(locale, "/meditation");
   const now = new Date();
-  const logs = await db.moodLog.findMany({
-    where: { userId: user.id },
-    orderBy: { date: "desc" },
-    take: 60,
-  });
+
+  // Content (media, psychologists, rotation pools) + user overview both
+  // come from the Rust API (Supabase Postgres).
+  const [contentData, overview] = await Promise.all([
+    getMeditationContent(), getOverview(),
+  ]);
+  const content = contentData!;
+  const MEDIA = content.media;
+
+  const logs = overview?.logs ?? [];
   const today = bakuParts(now).date;
   const todayLog = logs.find((l) => l.date === today) ?? null;
 
-  const appointments = await db.appointment.findMany({
-    where: { userId: user.id, status: "upcoming", startAt: { gt: now } },
-    orderBy: { startAt: "asc" },
-    take: 3,
-  });
-
-  const weekAgo = new Date(now.getTime() - 7 * 86_400_000);
-  const progress = await db.meditationProgress.aggregate({
-    where: { userId: user.id, createdAt: { gte: weekAgo } },
-    _sum: { seconds: true },
-  });
-  const doneSessions = await db.appointment.count({
-    where: { userId: user.id, startAt: { lte: now }, status: "upcoming" },
-  });
+  const appointments = overview?.upcoming ?? [];
+  const weekSeconds = overview?.weekSeconds ?? 0;
+  const doneSessions = overview?.doneSessions ?? 0;
 
   const streak = moodStreak(logs.map((l) => l.date));
-  const minutesThisWeek = Math.round((progress._sum.seconds ?? 0) / 60);
+  const minutesThisWeek = Math.round(weekSeconds / 60);
 
   const greeting =
     bakuParts(now).hour < 12 ? t("greetMorning")
@@ -75,7 +69,7 @@ export default async function MeditationPage({ params }: Props) {
   const audioItems = MEDIA.filter((m) => m.kind === "audio");
   const digitSum = [...today].reduce((a, ch) => a + (/\d/.test(ch) ? Number(ch) : 0), 0);
   const pick = audioItems[digitSum % audioItems.length]!;
-  const promptKey = todaysPromptKey();
+  const promptKey = dayRotated(content.promptKeys);
 
   const fmt = new Intl.DateTimeFormat(locale, {
     weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Baku",
@@ -90,7 +84,7 @@ export default async function MeditationPage({ params }: Props) {
         </header>
 
         <section aria-label={t("quoteEyebrow")} className="quote">
-          <p>{t(todaysQuoteKey())}</p>
+          <p>{t(dayRotated(content.quoteKeys))}</p>
           <footer><i aria-hidden />PreLife · {t("quoteEyebrow")}</footer>
         </section>
 
@@ -116,6 +110,7 @@ export default async function MeditationPage({ params }: Props) {
               </p>
               <MoodCheck
                 compact
+                moodTags={content.moodTags}
                 initial={todayLog ? { mood: todayLog.mood, energy: todayLog.energy, sleepQ: todayLog.sleepQ, tags: todayLog.tags ? todayLog.tags.split(",") : [], note: todayLog.note ?? "" } : null}
               />
             </li>
@@ -157,13 +152,13 @@ export default async function MeditationPage({ params }: Props) {
             <h2 id="sessions-h" className="eyebrow"><b>05</b>{t("sessionsEyebrow")}</h2>
             <ul className="jrnl">
               {appointments.map((a) => {
-                const psy = psyBySlug(a.psychologistSlug);
+                const psy = psyBySlug(content.psychologists, a.psychologistSlug);
                 return (
                   <li key={a.id} className="jrnl-entry">
                     <div className="row">
                       <span className="chip-ico tinted"><CalendarDays size={18} aria-hidden /></span>
                       <b>{psy ? t(psy.nameKey) : a.psychologistSlug}</b>
-                      <time style={{ marginLeft: "auto" }}>{fmt.format(a.startAt)}</time>
+                      <time style={{ marginLeft: "auto" }}>{fmt.format(new Date(a.startAt))}</time>
                     </div>
                     <div className="row">
                       <span className="tag">{t(`format_${a.mode}`)}</span>

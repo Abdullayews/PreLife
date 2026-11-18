@@ -4,9 +4,8 @@ import { Link } from "@/i18n/navigation";
 import {
   ArrowLeft, BedDouble, Brain, Compass, HeartPulse, Timer, Wind,
 } from "lucide-react";
-import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { MEDIA } from "@/lib/psychology";
+import { getMeditationContent, getOverview } from "@/lib/api";
 import { AudioPlayerCard } from "@/components/psych/AudioPlayerCard";
 import { VideoCard } from "@/components/psych/VideoCard";
 import { PsychShell } from "@/components/psych/PsychShell";
@@ -23,14 +22,13 @@ export default async function PracticePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "psychApp" });
-  const user = await requireUser(locale, "/meditation/practice");
+  await requireUser(locale, "/meditation/practice");
 
-  const weekAgo = new Date(Date.now() - 7 * 86_400_000);
-  const progress = await db.meditationProgress.aggregate({
-    where: { userId: user.id, createdAt: { gte: weekAgo } },
-    _sum: { seconds: true },
-  });
-  const minutesThisWeek = Math.round((progress._sum.seconds ?? 0) / 60);
+  const [contentData, overview] = await Promise.all([
+    getMeditationContent(), getOverview(),
+  ]);
+  const MEDIA = contentData?.media ?? [];
+  const minutesThisWeek = Math.round((overview?.weekSeconds ?? 0) / 60);
 
   const audio = MEDIA.filter((m) => m.kind === "audio");
   const video = MEDIA.filter((m) => m.kind === "video");

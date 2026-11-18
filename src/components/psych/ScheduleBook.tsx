@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import { LoaderCircle } from "lucide-react";
 import type { DayColumn, SlotState } from "@/lib/psychology";
 
@@ -44,7 +45,7 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
     if (!picked) return;
     setError("");
     start(async () => {
-      const res = await fetch("/api/psych/book", {
+      const res = await fetch(apiUrl("/api/psych/book"), {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ slug, date: picked.date, hour: picked.hour, mode }),

@@ -6,7 +6,7 @@ import { Gallery } from "@/components/Gallery";
 import { StartButton } from "@/components/StartButton";
 import { AiChatFab } from "@/components/AiChatFab";
 import { sections } from "@/lib/shell";
-import { landingFrames } from "@/lib/worlds";
+import { getWorlds } from "@/lib/api";
 import { getSessionUser } from "@/lib/auth";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -30,7 +30,8 @@ export default async function WelcomePage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "welcomePage" });
   const tc = await getTranslations({ locale, namespace: "moduleCommon" });
   // Signed-in visitors are welcome here too — no forced redirect anymore.
-  const user = await getSessionUser();
+  const [user, worldsData] = await Promise.all([getSessionUser(), getWorlds()]);
+  const landingFrames = worldsData?.landingFrames ?? [];
 
   return (
     <div data-world="shell" className="world">

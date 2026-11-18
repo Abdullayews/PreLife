@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import { Pause, Play } from "lucide-react";
 
 const fmt = (s: number) =>
@@ -20,7 +21,7 @@ export function AudioPlayerCard({ id, src, title, desc }: { id: string; src: str
   const report = useCallback((seconds: number, completed = false) => {
     if (seconds <= 0) return;
     sent.current = seconds;
-    void fetch("/api/psych/progress", {
+    void fetch(apiUrl("/api/psych/progress"), {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ resourceId: id, seconds: Math.round(seconds), completed }),

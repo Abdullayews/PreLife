@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { safeNext } from "@/lib/next-url";
@@ -44,7 +45,7 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
     const data = new FormData(e.currentTarget);
     setBusy(true);
     try {
-      const res = await fetch(`/api/auth/${mode}`, {
+      const res = await fetch(apiUrl(`/api/auth/${mode}`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Object.fromEntries(data.entries())),

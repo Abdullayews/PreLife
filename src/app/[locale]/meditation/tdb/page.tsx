@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { requireUser } from "@/lib/auth";
-import { TDB_VIDEOS } from "@/lib/psychology";
+import { getMeditationContent } from "@/lib/api";
 import { VideoCard } from "@/components/psych/VideoCard";
 import { PsychShell } from "@/components/psych/PsychShell";
 
@@ -20,6 +20,7 @@ export default async function TdbPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "psychApp" });
   await requireUser(locale, "/meditation/tdb");
+  const TDB_VIDEOS = (await getMeditationContent())?.tdb ?? [];
 
   return (
     <PsychShell locale={locale} active="tdb">

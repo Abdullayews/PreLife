@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Crown } from "lucide-react";
 import { requireUser } from "@/lib/auth";
+import { getSubscriptionContent } from "@/lib/api";
 import { SubscriptionBuilder, type SubFeature, type SubTier } from "@/components/SubscriptionBuilder";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -19,24 +20,17 @@ export default async function SubscriptionPage({ params }: Props) {
 
   const t = await getTranslations({ locale, namespace: "subscription" });
 
-  /* The feature menu — everything the platform offers; ids are stable,
-   * names/prices resolved here (prices in ₼/month). */
-  const features: SubFeature[] = [
-    { id: "gym", name: t("feat.gym"), price: 3 },
-    { id: "diet", name: t("feat.diet"), price: 3 },
-    { id: "psych", name: t("feat.psych"), price: 4 },
-    { id: "library", name: t("feat.library"), price: 2 },
-    { id: "ai", name: t("feat.ai"), price: 2 },
-    { id: "videos", name: t("feat.videos"), price: 2 },
-    { id: "coaching", name: t("feat.coaching"), price: 6 },
-    { id: "family", name: t("feat.family"), price: 5 },
-  ];
+  /* Tiers and the à-la-carte feature menu come from the Rust API
+   * (subscription_tiers / subscription_features in Postgres); names are
+   * message keys resolved here, prices are ₼/month. */
+  const sub = (await getSubscriptionContent())!;
+  const features: SubFeature[] = sub.features.map((f) => ({
+    id: f.id, name: t(f.nameKey), price: f.price,
+  }));
 
-  const tiers: SubTier[] = [
-    { id: "plus", name: t("plans.plus.name"), price: 7, features: ["gym", "diet", "ai"] },
-    { id: "pro", name: t("plans.pro.name"), price: 12, features: ["gym", "diet", "psych", "library", "ai", "videos"] },
-    { id: "ultra", name: t("plans.ultra.name"), price: 19, features: ["gym", "diet", "psych", "library", "ai", "videos", "coaching", "family"] },
-  ];
+  const tiers: SubTier[] = sub.tiers.map((tier) => ({
+    id: tier.id, name: t(tier.nameKey), price: tier.price, features: tier.features,
+  }));
 
   const ui = {
     perMonth: t("perMonth"),

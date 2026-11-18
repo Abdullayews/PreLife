@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { MOOD_TAGS, bakuParts } from "@/lib/psychology";
+import { bakuParts } from "@/lib/psychology";
 
 export type MoodRow = {
   date: string; mood: number; energy: number; sleepQ: number; tags: string;
@@ -19,7 +19,7 @@ const heatLevel = (r: MoodRow) => {
  * the design system's palette: a 14-day line chart (three series), a
  * 5-week heatmap of check-in intensity and a tag distribution bar list.
  */
-export async function MoodCharts({ logs, locale }: { logs: MoodRow[]; locale: string }) {
+export async function MoodCharts({ logs, locale, tags }: { logs: MoodRow[]; locale: string; tags: string[] }) {
   const t = await getTranslations({ locale, namespace: "psychApp" });
 
   const series = logs.slice(-14);
@@ -46,7 +46,7 @@ export async function MoodCharts({ logs, locale }: { logs: MoodRow[]; locale: st
     cells.push({ date: key, level: row ? heatLevel(row) : 0 });
   }
 
-  const tagCounts = MOOD_TAGS.map((tag) => ({
+  const tagCounts = tags.map((tag) => ({
     tag,
     count: logs.reduce((sum, l) => sum + (l.tags.split(",").includes(tag) ? 1 : 0), 0),
   }));

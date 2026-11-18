@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
-import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
+import { getMeditationContent, getJournalData } from "@/lib/api";
 import {
-  bakuParts, todaysPromptKey, JOURNAL_PROMPT_KEYS,
+  bakuParts, dayRotated,
 } from "@/lib/psychology";
 import { JournalCard } from "@/components/psych/JournalCard";
 import { JournalHistory, type JournalDay } from "@/components/psych/JournalHistory";
@@ -24,27 +24,25 @@ export default async function JournalPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "psychApp" });
-  const user = await requireUser(locale, "/meditation/journal");
+  await requireUser(locale, "/meditation/journal");
 
-  const rows = await db.journalEntry.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: "desc" },
-    take: 200,
-  });
-
-  /* The mood check-ins that pair with the journal days — one line per
-   *  date ("Mood 4/5 · Energy 3/5 · Sleep 5/5"), translated here. */
-  const moods = await db.moodLog.findMany({ where: { userId: user.id } });
-  const moodByDate = new Map(moods.map((m) => [m.date, m]));
+  // Entries + the mood check-ins that pair with journal days both come
+  // from the Rust API (Supabase Postgres).
+  const [contentData, journal] = await Promise.all([
+    getMeditationContent(), getJournalData(),
+  ]);
+  const promptKeys = contentData?.promptKeys ?? [];
+  const rows = journal?.entries ?? [];
+  const moodByDate = new Map((journal?.moods ?? []).map((m) => [m.date, m]));
 
   const fmt = new Intl.DateTimeFormat(locale, { dateStyle: "long", timeStyle: "short" });
   const dayFmt = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" });
-  const promptKey = todaysPromptKey();
+  const promptKey = dayRotated(promptKeys);
 
   /* Group entries by Baku calendar date, newest day first. */
   const byDay = new Map<string, JournalDay>();
   for (const r of rows) {
-    const date = bakuParts(r.createdAt).date;
+    const date = bakuParts(new Date(r.createdAt)).date;
     let day = byDay.get(date);
     if (!day) {
       const mood = moodByDate.get(date);
@@ -60,11 +58,11 @@ export default async function JournalPage({ params }: Props) {
     }
     day.entries.push({
       id: r.id,
-      createdAt: fmt.format(r.createdAt),
+      createdAt: fmt.format(new Date(r.createdAt)),
       // Translate the stored prompt message key server-side; legacy
       // rows that predate real keys (or unknown values) show no tag.
-      prompt: r.promptKey && JOURNAL_PROMPT_KEYS.includes(r.promptKey as (typeof JOURNAL_PROMPT_KEYS)[number])
-        ? t(r.promptKey as (typeof JOURNAL_PROMPT_KEYS)[number])
+      prompt: r.promptKey && promptKeys.includes(r.promptKey)
+        ? t(r.promptKey)
         : null,
       content: r.content,
     });
@@ -100,9 +98,9 @@ export default async function JournalPage({ params }: Props) {
           <JournalList
             entries={rows.slice(0, 50).map((r) => ({
               id: r.id,
-              createdAt: fmt.format(r.createdAt),
-              prompt: r.promptKey && JOURNAL_PROMPT_KEYS.includes(r.promptKey as (typeof JOURNAL_PROMPT_KEYS)[number])
-                ? t(r.promptKey as (typeof JOURNAL_PROMPT_KEYS)[number])
+              createdAt: fmt.format(new Date(r.createdAt)),
+              prompt: r.promptKey && promptKeys.includes(r.promptKey)
+                ? t(r.promptKey)
                 : null,
               content: r.content,
             }))}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { apiUrl } from "@/lib/api-url";
 import {
   Bell, Briefcase, Check, Gamepad2, Headphones, Home, Info, Languages, Laptop,
   LogOut, Monitor, Moon, Palette, Pencil, Smartphone, Sun, Tablet, Tv, UserRound,
@@ -87,7 +88,7 @@ function DevicesPanel() {
 
   const load = useCallback(async () => {
     try {
-      const res = await fetch("/api/devices", { cache: "no-store" });
+      const res = await fetch(apiUrl("/api/devices"), { cache: "no-store" });
       if (!res.ok) throw new Error();
       const body = (await res.json()) as { devices: Device[] };
       setDevices(body.devices);
@@ -111,7 +112,7 @@ function DevicesPanel() {
     setBusy(true);
     setError(false);
     try {
-      const res = await fetch(`/api/devices/${editingId}`, {
+      const res = await fetch(apiUrl(`/api/devices/${editingId}`), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: editName, icon: editIcon }),
@@ -133,12 +134,12 @@ function DevicesPanel() {
     try {
       if (d.current) {
         // Signing THIS device out — full logout, back to the welcome page.
-        await fetch("/api/auth/logout", { method: "POST" });
+        await fetch(apiUrl("/api/auth/logout"), { method: "POST" });
         router.push("/welcome");
         router.refresh();
         return;
       }
-      const res = await fetch(`/api/devices/${d.id}`, { method: "DELETE" });
+      const res = await fetch(apiUrl(`/api/devices/${d.id}`), { method: "DELETE" });
       if (!res.ok) throw new Error();
       await load();
     } catch {
