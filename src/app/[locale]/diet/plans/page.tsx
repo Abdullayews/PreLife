@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { ArrowLeft, Flame } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { getDietContent } from "@/lib/api";
+import { ContentUnavailable } from "@/components/ContentUnavailable";
 import { DietShell } from "@/components/diet/DietShell";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -23,7 +24,9 @@ export default async function DietPlansPage({ params }: Props) {
   await requireUser(locale, "/diet/plans");
 
   const t = await getTranslations({ locale, namespace: "dietApp" });
-  const { plans: dietPlans } = (await getDietContent())!;
+  const dietContent = await getDietContent();
+  if (!dietContent) return <ContentUnavailable locale={locale} />;
+  const { plans: dietPlans } = dietContent;
   
   return (
     <DietShell locale={locale} active="plans">

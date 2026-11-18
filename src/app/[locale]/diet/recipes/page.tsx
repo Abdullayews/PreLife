@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { ArrowLeft, ChefHat, Clock, Flame, ListChecks } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { getDietContent } from "@/lib/api";
+import { ContentUnavailable } from "@/components/ContentUnavailable";
 import { RECIPE_ICONS } from "@/lib/nutrition";
 import { DietShell } from "@/components/diet/DietShell";
 
@@ -24,7 +25,9 @@ export default async function DietRecipesPage({ params }: Props) {
   await requireUser(locale, "/diet/recipes");
 
   const t = await getTranslations({ locale, namespace: "dietApp" });
-  const { recipes: dietRecipes, recipeDetails: RECIPE_DETAILS } = (await getDietContent())!;
+  const dietContent = await getDietContent();
+  if (!dietContent) return <ContentUnavailable locale={locale} />;
+  const { recipes: dietRecipes, recipeDetails: RECIPE_DETAILS } = dietContent;
 
   return (
     <DietShell locale={locale} active="recipes">

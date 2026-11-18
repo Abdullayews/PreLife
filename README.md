@@ -100,10 +100,18 @@ Browser code must call these through the sandbox gateway:
 
 ## Deploy
 
-- **Frontend**: Node ≥ 20.19, `bun run build` → standalone Next server on
-  `$PORT`. Set `PRELIFE_API_URL` to the deployed API origin.
+- **Frontend**: Node ≥ 20.19 (`npm ci` — `package-lock.json` is committed;
+  `bun.lock` stays the dev-sandbox lockfile). `npm run build` → standalone
+  Next server on `$PORT`. Set `PRELIFE_API_URL` to the deployed API origin.
+  Browser `/api/*` calls are proxied to it in-app
+  (`src/app/api/[...path]/route.ts`), so a single-origin deployment (Render)
+  needs no external reverse proxy — the sandbox gateway's `?XTransformPort`
+  hint is stripped automatically. If the API is unreachable during the
+  build, content pages prerender the graceful offline shell
+  (`src/components/ContentUnavailable.tsx`) and ISR swaps in real content
+  within 60 s of the API recovering.
 - **Rust API**: build `mini-services/prelife-api` (`cargo build --release`),
   run with `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in the environment
-  (port via `PORT`, default 3031). Reverse-proxy `/api/*` to it.
+  (port via `PORT`, default 3031).
 - **Database**: Supabase Postgres — nothing to host. Apply schema changes
   with `node scripts/apply-db.mjs schema`.
