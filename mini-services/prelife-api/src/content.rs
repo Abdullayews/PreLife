@@ -727,5 +727,6 @@ pub async fn health(State(app): State<App>) -> Result<Response, ApiError> {
         "service": "prelife-api",
         "version": env!("CARGO_PKG_VERSION"),
         "uptimeSecs": app.started.elapsed().as_secs(),
+        "supabaseConfigured": app.supa.is_configured(),
     }))).into_response())
 }

@@ -7,18 +7,45 @@ mod content;
 mod psych;
 mod supabase;
 
-use auth::AppState;
+use auth::{App, AppState};
+use axum::extract::{Request, State};
+use axum::http::StatusCode;
+use axum::middleware::Next;
+use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, patch, post};
 use axum::Router;
+use serde_json::json;
 use std::sync::Arc;
 use tower_http::cors::CorsLayer;
+
+/// Degraded-mode guard: without Supabase credentials every endpoint except
+/// /api/health (reporting) and /api/ai/chat (public, Supabase-independent)
+/// answers 503 `supabase_unconfigured`, so the frontend can show a clear
+/// "server not connected to the database" message instead of a vague
+/// "something went wrong" (this exact failure hid a missing .env after a
+/// sandbox restart).
+async fn require_configured(State(app): State<App>, req: Request, next: Next) -> Response {
+    let path = req.uri().path();
+    let exempt = path == "/api/health" || path == "/api/ai/chat";
+    if !exempt && !app.supa.is_configured() {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            axum::Json(json!({ "error": "supabase_unconfigured" })),
+        )
+            .into_response();
+    }
+    next.run(req).await
+}
 
 #[tokio::main]
 async fn main() {
     let cfg = config::Config::load();
     if cfg.supabase_url.is_empty() || cfg.supabase_key.is_empty() {
-        eprintln!("FATAL: SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not set (check .env)");
-        std::process::exit(1);
+        eprintln!(
+            "WARNING: SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not set — \
+             starting in DEGRADED mode: every /api route answers 503 \
+             `supabase_unconfigured` until the keys are provided (.env)."
+        );
     }
     let port = cfg.port;
 
@@ -67,6 +94,10 @@ async fn main() {
         // AI
         .route("/api/ai/chat", post(ai::chat))
         .route("/api/psych/ai", post(ai::psych_chat))
+        .layer(axum::middleware::from_fn_with_state(
+            state.clone(),
+            require_configured,
+        ))
         .layer(CorsLayer::permissive())
         .with_state(state);
 
