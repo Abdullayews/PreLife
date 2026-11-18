@@ -169,15 +169,19 @@ export default async function GymPage({ params, searchParams }: Props) {
   const initialPlan = gymPlans.find((p) => p.featured)?.id ?? gymPlans[0]!.id;
 
   return (
-    <div data-world="gym" className="world page">
-      <div className="wrap">
+    <div data-world="gym" className="world app-page">
+      <GymApp
+        initialTab={initialTab}
+        initialPlan={initialPlan}
+        linked={linked}
+        strings={strings}
+      >
         <header className="page-head">
           <p className="eyebrow"><i />PreLife Gym</p>
           <h1 className="display sm">{t("title")}</h1>
           <p className="lede">{t("lede")}</p>
         </header>
-        <GymApp initialTab={initialTab} initialPlan={initialPlan} linked={linked} strings={strings} />
-      </div>
+      </GymApp>
     </div>
   );
 }

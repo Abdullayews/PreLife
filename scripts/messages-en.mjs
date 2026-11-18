@@ -601,9 +601,18 @@ export const en = {
       ctaButton: "Start eating well",
       ctaNote: "Free nutritionist consultation with every plan."
     },
+    sectionRail: {
+      label: "Sub-sections",
+      open: "Open sub-sections",
+      close: "Close sub-sections",
+      current: "Current:",
+    },
     meditationHome: {
       metaTitle: "Psychology",
       metaDescription: "Guided meditation sessions, science-backed programs, certified mentors and a weekly rhythm for a quieter mind.",
+      rail_programs: "Programs",
+      rail_sessions: "Sessions",
+      rail_mentors: "Mentors",
       heroEyebrow: "PreLife Meditation",
       heroTitle: "Stillness, refined.",
       heroSubtitle: "Guided sessions, science-backed programs and certified mentors — composed into one premium practice for a quieter mind.",
@@ -715,6 +724,9 @@ export const en = {
     libraryHome: {
       metaTitle: "Books",
       metaDescription: "Curated book collections, fifteen-minute summaries, weekly reading plans and the finest partner reading rooms.",
+      rail_collections: "Collections",
+      rail_books: "Books",
+      rail_venues: "Reading rooms",
       heroEyebrow: "PreLife Library",
       heroTitle: "Reading, refined.",
       heroSubtitle: "Curated collections, fifteen-minute summaries and reading circles — composed into one premium reading experience.",
@@ -1009,6 +1021,12 @@ export const en = {
     dietApp: {
       metaTitle: "Psychology",
       metaDescription: "A calm mind system — psychologists, sessions, mood tracking, meditation and AI support.",
+      rail_overview: "Overview",
+      rail_psychologists: "Psychologists",
+      rail_bookings: "My sessions",
+      rail_mood: "Mood",
+      rail_journal: "Journal",
+      rail_practice: "Practice",
       homeTitle: "The calm your mind deserves",
       homeSubtitle: "Psychologists, session scheduling, mood charts, meditation practice and AI companionship — one quiet system.",
       greetMorning: "Good morning",

@@ -15,6 +15,7 @@ import { AudioPlayerCard } from "@/components/diet/AudioPlayerCard";
 import { VideoCard } from "@/components/diet/VideoCard";
 import { AiPanel } from "@/components/diet/AiPanel";
 import { JournalCard } from "@/components/diet/JournalCard";
+import { DietShell } from "@/components/diet/DietShell";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -81,7 +82,7 @@ export default async function MeditationPage({ params }: Props) {
   });
 
   return (
-    <div data-world="diet" className="world page">
+    <DietShell locale={locale} active="overview">
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i />{greeting}{user.name ? `, ${user.name}` : ""}</p>
@@ -194,6 +195,6 @@ export default async function MeditationPage({ params }: Props) {
           </ul>
         </section>
       </div>
-    </div>
+    </DietShell>
   );
 }

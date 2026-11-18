@@ -599,9 +599,18 @@
     "ctaButton": "Yax\u015f\u0131 yem\u0259y\u0259 ba\u015flay\u0131n",
     "ctaNote": "H\u0259r planla pulsuz nutrisioloq konsultasiyas\u0131."
   },
+  "sectionRail": {
+    "label": "Alt-sekm\u0259l\u0259r",
+    "open": "Alt-sekm\u0259l\u0259ri a\u00e7",
+    "close": "Alt-sekm\u0259l\u0259ri y\u0131\u011f",
+    "current": "Haz\u0131rk\u0131:"
+  },
   "meditationHome": {
     "metaTitle": "Psixologiya",
     "metaDescription": "M\u00fc\u015fayi\u0259tli meditasiya sessiyalar\u0131, elmi \u0259sasl\u0131 proqramlar, sertifikatl\u0131 mentorlar v\u0259 sakit zehin \u00fc\u00e7\u00fcn h\u0259ft\u0259lik ritm.",
+    "rail_programs": "Proqramlar",
+    "rail_sessions": "Sessiyalar",
+    "rail_mentors": "B\u0259l\u0259d\u00e7il\u0259r",
     "heroEyebrow": "PreLife Meditation",
     "heroTitle": "S\u00fckut, z\u0259rif formada.",
     "heroSubtitle": "M\u00fc\u015fayi\u0259tli sessiyalar, elmi \u0259sasl\u0131 proqramlar v\u0259 sertifikatl\u0131 mentorlar \u2014 daha sakit zehin \u00fc\u00e7\u00fcn bir premium praktikada.",
@@ -713,6 +722,9 @@
   "libraryHome": {
     "metaTitle": "Kitablar",
     "metaDescription": "Redaktor se\u00e7imi kitab kolleksiyalar\u0131, on be\u015f d\u0259qiq\u0259lik x\u00fclas\u0259l\u0259r, h\u0259ft\u0259lik oxu planlar\u0131 v\u0259 \u0259n yax\u015f\u0131 t\u0259r\u0259fda\u015f oxu zallar\u0131.",
+    "rail_collections": "Kolleksiyalar",
+    "rail_books": "Kitablar",
+    "rail_venues": "Oxu zallar\u0131",
     "heroEyebrow": "PreLife Library",
     "heroTitle": "Oxu, z\u0259rif formada.",
     "heroSubtitle": "Se\u00e7ilmi\u015f kolleksiyalar, on be\u015f d\u0259qiq\u0259lik x\u00fclas\u0259l\u0259r v\u0259 oxu dair\u0259l\u0259ri \u2014 bir premium oxu t\u0259cr\u00fcb\u0259sind\u0259.",
@@ -1007,6 +1019,12 @@
   "dietApp": {
     "metaTitle": "Psixologiya",
     "metaDescription": "Sakit zehin sistemi \u2014 psixoloqlar, seanslar, mood izl\u0259m\u0259, meditasiya v\u0259 AI d\u0259st\u0259yi.",
+    "rail_overview": "Bax\u0131\u015f",
+    "rail_psychologists": "Psixoloqlar",
+    "rail_bookings": "Seanslar\u0131m",
+    "rail_mood": "\u018fhval\u0131m",
+    "rail_journal": "G\u00fcnd\u0259lik",
+    "rail_practice": "M\u0259\u015fql\u0259r",
     "homeTitle": "Zehnin\u0259 d\u0259y\u0259n sakitlik",
     "homeSubtitle": "Psixoloqlar, seans c\u0259dv\u0259li, duy\u011fusal tablolar, meditasiya praktikas\u0131 v\u0259 AI m\u00fc\u015fayi\u0259ti \u2014 ham\u0131s\u0131 bir sakit sistemd\u0259.",
     "greetMorning": "Sabah\u0131z xeyir",
