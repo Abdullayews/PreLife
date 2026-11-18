@@ -511,7 +511,6 @@
     "signUpLink": "Регистрация",
     "signInLink": "Войти",
     "backToWelcome": "Вернуться на главную",
-    "demoHint": "Тестируете сайт? Войдите с почтой 123 и паролем 123.",
     "socialSoonTitle": "Вход через {provider}",
     "socialSoonDesc": "Появится позжже — пока используйте почту и пароль.",
     "errors": {

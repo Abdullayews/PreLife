@@ -15,9 +15,6 @@ pub const SESSION_COOKIE: &str = "pl_session";
 pub const SESSION_TTL_S: i64 = 60 * 60 * 24 * 365; // 1 year, sliding
 const RENEW_EVERY_MS: i64 = 60 * 60 * 1000; // refresh at most once an hour
 
-pub const DEMO_EMAIL: &str = "123";
-pub const DEMO_PASSWORD: &str = "123";
-
 const DEVICE_ICONS: [&str; 10] = [
     "monitor", "laptop", "smartphone", "tablet", "watch",
     "tv", "gamepad", "headphones", "briefcase", "home",
@@ -46,39 +43,13 @@ pub struct AppState {
 }
 pub type App = Arc<AppState>;
 
-/* ── Passwords — Node-compatible scrypt (salt hex string used as bytes) ─── */
-
-pub fn hash_password(password: &str) -> String {
-    let mut salt = [0u8; 16];
-    rand::thread_rng().fill_bytes(&mut salt);
-    let salt_hex: String = salt.iter().map(|b| format!("{b:02x}")).collect();
-    hash_with_salt(password, &salt_hex)
-}
-
-fn hash_with_salt(password: &str, salt_hex: &str) -> String {
-    let params = scrypt::Params::new(14, 8, 1, 64).expect("scrypt params");
-    let mut out = [0u8; 64];
-    scrypt::scrypt(password.as_bytes(), salt_hex.as_bytes(), &params, &mut out)
-        .expect("scrypt");
-    let hash_hex: String = out.iter().map(|b| format!("{b:02x}")).collect();
-    format!("{salt_hex}:{hash_hex}")
-}
-
-pub fn verify_password(password: &str, stored: &str) -> bool {
-    let Some((salt, hash)) = stored.split_once(':') else { return false };
-    let candidate = hash_with_salt(password, salt);
-    let Some((_, cand_hash)) = candidate.split_once(':') else { return false };
-    if cand_hash.len() != hash.len() {
-        return false;
-    }
-    let mut diff = 0u8;
-    for (a, b) in cand_hash.bytes().zip(hash.bytes()) {
-        diff |= a ^ b;
-    }
-    diff == 0
-}
-
 /* ── Sessions ────────────────────────────────────────────────────────────── */
+/* Accounts live in the database: auth.users (Supabase Auth) holds the
+ * credentials — signup goes through the admin API (the handle_new_user
+ * trigger creates the profiles row) and login is verified by GoTrue's
+ * password grant. This service only mints its own cookie sessions so the
+ * Devices screen (Settings) keeps working; the user's id/email/name ride
+ * along on the session row. */
 
 fn sha256_hex(s: &str) -> String {
     let mut h = Sha256::new();
@@ -105,11 +76,16 @@ pub fn user_view(u: &SessionUser) -> Value {
     json!({ "id": u.id, "email": u.email, "name": u.name })
 }
 
-fn user_from_row(row: &Value) -> Option<SessionUser> {
+/// A user as GoTrue returns it: { id, email, user_metadata: { full_name } }.
+fn user_from_auth(row: &Value) -> Option<SessionUser> {
     Some(SessionUser {
         id: row.get("id")?.as_str()?.to_string(),
         email: row.get("email")?.as_str()?.to_string(),
-        name: row.get("name").and_then(|v| v.as_str()).map(String::from),
+        name: row
+            .get("user_metadata")
+            .and_then(|m| m.get("full_name"))
+            .and_then(|v| v.as_str())
+            .map(String::from),
     })
 }
 
@@ -156,7 +132,7 @@ pub fn default_device(ua: &str) -> (String, String) {
     (name, icon.to_string())
 }
 
-pub async fn create_session(supa: &Supa, user_id: &str, user_agent: Option<&str>) -> Result<String, String> {
+pub async fn create_session(supa: &Supa, user: &SessionUser, user_agent: Option<&str>) -> Result<String, String> {
     let mut token_bytes = [0u8; 32];
     rand::thread_rng().fill_bytes(&mut token_bytes);
     let token = URL_SAFE_NO_PAD.encode(token_bytes);
@@ -165,7 +141,9 @@ pub async fn create_session(supa: &Supa, user_id: &str, user_agent: Option<&str>
     let now = chrono::Utc::now();
     let expires = now + chrono::Duration::seconds(SESSION_TTL_S);
     let body = json!({
-        "user_id": user_id,
+        "user_id": user.id,
+        "user_email": user.email,
+        "user_name": user.name,
         "token_hash": sha256_hex(&token),
         "device_name": name,
         "device_icon": icon,
@@ -204,14 +182,18 @@ pub async fn load_session(supa: &Supa, token: &str) -> Option<CurrentSession> {
             &json!({ "last_used_at": now.to_rfc3339_opts(chrono::SecondsFormat::Micros, true), "expires_at": new_exp })).await;
     }
 
-    let user_id = row.get("user_id")?.as_str()?;
-    let user_row = supa.select_one("users", &[("select", "id,email,name"), ("id", &format!("eq.{user_id}"))]).await.ok()??;
-
+    // The user rides on the session row (user_email / user_name) — written
+    // at login/signup straight from the GoTrue response, so the hot path
+    // needs no extra lookup.
     Some(CurrentSession {
         session_id: row.get("id")?.as_str()?.to_string(),
         device_name: row.get("device_name")?.as_str()?.to_string(),
         device_icon: row.get("device_icon")?.as_str().unwrap_or("monitor").to_string(),
-        user: user_from_row(&user_row)?,
+        user: SessionUser {
+            id: row.get("user_id")?.as_str()?.to_string(),
+            email: row.get("user_email")?.as_str()?.to_string(),
+            name: row.get("user_name").and_then(|v| v.as_str()).map(String::from),
+        },
     })
 }
 
@@ -250,41 +232,12 @@ pub fn with_cookie(response: Response, cookie: String) -> Response {
     Response::from_parts(parts, body)
 }
 
-/* ── Demo account + current session ─────────────────────────────────────── */
-
-pub async fn ensure_demo_account(supa: &Supa) -> Result<(), String> {
-    let existing = supa.select_one("users", &[("select", "id"), ("email", &format!("eq.{DEMO_EMAIL}"))]).await?;
-    if existing.is_none() {
-        supa.insert("users", &json!({
-            "email": DEMO_EMAIL,
-            "name": "Demo",
-            "password_hash": hash_password(DEMO_PASSWORD),
-        })).await?;
-    }
-    Ok(())
-}
+/* ── Current session ─────────────────────────────────────────────────────── */
 
 /// The session from the request cookie, if any.
 pub async fn current_session(supa: &Supa, headers: &HeaderMap) -> Option<CurrentSession> {
     let token = cookie_from_headers(headers)?;
     load_session(supa, &token).await
-}
-
-/// The signed-in user OR the V1 preview demo user (every visitor counts as
-/// signed in until real auth gating returns — same as the Next.js version).
-pub async fn current_or_preview_user(supa: &Supa, headers: &HeaderMap) -> Result<SessionUser, String> {
-    if let Some(cs) = current_session(supa, headers).await {
-        return Ok(cs.user);
-    }
-    ensure_demo_account(supa).await?;
-    let row = supa.select_one("users", &[("select", "id,email,name"), ("email", &format!("eq.{DEMO_EMAIL}"))])
-        .await?
-        .unwrap_or_else(|| json!({ "id": "preview", "email": DEMO_EMAIL, "name": "Demo" }));
-    Ok(SessionUser {
-        id: row.get("id").and_then(|v| v.as_str()).unwrap_or("preview").to_string(),
-        email: row.get("email").and_then(|v| v.as_str()).unwrap_or(DEMO_EMAIL).to_string(),
-        name: row.get("name").and_then(|v| v.as_str()).map(String::from).or_else(|| Some("Demo".into())),
-    })
 }
 
 /* ── Body helpers ────────────────────────────────────────────────────────── */
@@ -324,26 +277,29 @@ pub async fn signup(State(app): State<App>, headers: HeaderMap, bytes: Bytes) ->
         return Err(err(StatusCode::BAD_REQUEST, "short_password"));
     }
 
-    let existing = app.supa.select_one("users", &[("select", "id"), ("email", &format!("eq.{email}"))]).await
-        .map_err(|_| generic())?;
-    if existing.is_some() {
-        return Err(err(StatusCode::CONFLICT, "email_taken"));
-    }
-
-    let user = app.supa.insert("users", &json!({
-        "email": email, "name": name, "password_hash": hash_password(&password),
-    })).await.map_err(|_| generic())?;
-
-    let view = SessionUser {
-        id: user.get("id").and_then(|v| v.as_str()).unwrap_or_default().to_string(),
-        email: user.get("email").and_then(|v| v.as_str()).unwrap_or_default().to_string(),
-        name: user.get("name").and_then(|v| v.as_str()).map(String::from),
+    // The account lives in the database — Supabase Auth creates the
+    // auth.users row (auto-confirmed) and the handle_new_user trigger
+    // makes the profiles row.
+    let created = app.supa.auth_admin_create_user(&email, &password, &name).await;
+    let created = match created {
+        Ok(v) => v,
+        Err(e) => {
+            if e.contains("422") {
+                return Err(err(StatusCode::CONFLICT, "email_taken"));
+            }
+            if e.contains("gotrue 400") {
+                return Err(err(StatusCode::BAD_REQUEST, "invalid_email"));
+            }
+            return Err(generic());
+        }
     };
+    let user = user_from_auth(&created).ok_or_else(generic)?;
+
     let ua = headers.get(axum::http::header::USER_AGENT).and_then(|v| v.to_str().ok());
-    let token = create_session(&app.supa, &view.id, ua).await.map_err(|_| generic())?;
+    let token = create_session(&app.supa, &user, ua).await.map_err(|_| generic())?;
 
     Ok(with_cookie(
-        (StatusCode::OK, Json(json!({ "user": user_view(&view) }))).into_response(),
+        (StatusCode::OK, Json(json!({ "user": user_view(&user) }))).into_response(),
         session_cookie_header(&token, is_secure(&headers)),
     ))
 }
@@ -356,22 +312,23 @@ pub async fn login(State(app): State<App>, headers: HeaderMap, bytes: Bytes) -> 
         return Err(err(StatusCode::BAD_REQUEST, "missing_fields"));
     }
 
-    // The static demo account (123/123) is created on first use.
-    let _ = ensure_demo_account(&app.supa).await;
-
-    let row = app.supa.select_one("users", &[("select", "*"), ("email", &format!("eq.{email}"))]).await
-        .map_err(|_| generic())?;
-    let Some(row) = row else {
-        return Err(err(StatusCode::UNAUTHORIZED, "invalid_credentials"));
+    // Credentials are verified against the database (auth.users) by
+    // GoTrue's password grant.
+    let granted = app.supa.auth_password_login(&email, &password).await;
+    let granted = match granted {
+        Ok(v) => v,
+        Err(e) => {
+            if e.contains("invalid_grant") || e.contains("Invalid login credentials") {
+                return Err(err(StatusCode::UNAUTHORIZED, "invalid_credentials"));
+            }
+            return Err(generic());
+        }
     };
-    let stored = row.get("password_hash").and_then(|v| v.as_str()).unwrap_or("");
-    if !verify_password(&password, stored) {
-        return Err(err(StatusCode::UNAUTHORIZED, "invalid_credentials"));
-    }
+    let user = granted.get("user").ok_or_else(generic)?;
+    let user = user_from_auth(user).ok_or_else(generic)?;
 
-    let user = user_from_row(&row).ok_or_else(generic)?;
     let ua = headers.get(axum::http::header::USER_AGENT).and_then(|v| v.to_str().ok());
-    let token = create_session(&app.supa, &user.id, ua).await.map_err(|_| generic())?;
+    let token = create_session(&app.supa, &user, ua).await.map_err(|_| generic())?;
 
     Ok(with_cookie(
         (StatusCode::OK, Json(json!({ "user": user_view(&user) }))).into_response(),
@@ -390,8 +347,8 @@ pub async fn logout(State(app): State<App>, headers: HeaderMap) -> Result<Respon
 }
 
 pub async fn me(State(app): State<App>, headers: HeaderMap) -> Result<Response, ApiError> {
-    let user = current_or_preview_user(&app.supa, &headers).await.map_err(|_| generic())?;
-    Ok((StatusCode::OK, Json(json!({ "user": user_view(&user) }))).into_response())
+    let user = current_session(&app.supa, &headers).await.map(|cs| cs.user);
+    Ok((StatusCode::OK, Json(json!({ "user": user.as_ref().map(user_view) }))).into_response())
 }
 
 /* ── Devices (Settings → Devices) ────────────────────────────────────────── */

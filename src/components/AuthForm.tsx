@@ -65,7 +65,6 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
   };
 
   const otherHref = (mode === "login" ? "/signup" : "/login") + (next ? `?next=${encodeURIComponent(next)}` : "");
-  const emailType = mode === "login" ? "text" : "email"; // login must accept the "123" demo login
 
   return (
     <div className="auth-card">
@@ -87,7 +86,7 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
         )}
         <div className="field">
           <label htmlFor="email">{t("email")}</label>
-          <input id="email" name="email" type={emailType} inputMode="email" placeholder={t("emailPlaceholder")} autoComplete="email" required maxLength={120} />
+          <input id="email" name="email" type="email" inputMode="email" placeholder={t("emailPlaceholder")} autoComplete="email" required maxLength={120} />
         </div>
         <div className="field">
           <div className="field-row">
@@ -155,7 +154,6 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
           {t("socialSoonDesc")}
         </p>
       )}
-      {mode === "login" && <p className="auth-demo">{t("demoHint")}</p>}
 
       <p className="auth-alt">
         {mode === "login" ? t("noAccount") : t("haveAccount")}{" "}

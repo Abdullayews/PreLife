@@ -511,7 +511,6 @@
     "signUpLink": "Sign up",
     "signInLink": "Sign in",
     "backToWelcome": "Back to welcome",
-    "demoHint": "Testing the site? Sign in with email 123 and password 123.",
     "socialSoonTitle": "{provider} sign-in",
     "socialSoonDesc": "It will be available soon — for now, please use email and password.",
     "errors": {
