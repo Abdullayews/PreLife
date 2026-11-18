@@ -47,6 +47,8 @@ export default async function GymPage({ params, searchParams }: Props) {
   // gymHome carries the shared gym copy (plans, levels, features, schedule…)
   // written for the welcome page — reuse it instead of duplicating strings.
   const tw = await getTranslations({ locale, namespace: "gymHome" });
+  // The sidebar capsule caption — the same section name the top nav shows.
+  const s = await getTranslations({ locale, namespace: "sections" });
 
   const plans = gym.plans.map((p) => {
     const w = gym.planWeeks[p.id] ?? { week: 1, total: 12 };
@@ -132,6 +134,7 @@ export default async function GymPage({ params, searchParams }: Props) {
     railLabel: t("railLabel"),
     railOpen: t("railOpen"),
     railClose: t("railClose"),
+    railTitle: s("gym.name"),
     currentTabSr: t("currentTabSr"),
     heads: {
       plan: { eyebrow: t("heads.plan.eyebrow"), title: t("heads.plan.title") },

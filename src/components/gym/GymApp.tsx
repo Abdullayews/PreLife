@@ -109,6 +109,7 @@ export type GymAppStrings = {
   railLabel: string;
   railOpen: string;
   railClose: string;
+  railTitle: string;
   currentTabSr: string;
   heads: Record<GymTabId, { eyebrow: string; title: string }>;
   shopNote: string;
@@ -287,6 +288,7 @@ export function GymApp({ initialTab, initialPlan, linked, strings, children }: P
         open: strings.railOpen,
         close: strings.railClose,
         current: strings.currentTabSr,
+        title: strings.railTitle,
       }}
       storageKey="pl:gym:rail"
     >
