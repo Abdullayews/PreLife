@@ -1,0 +1,5 @@
+# Keep the build context minimal — local dev artifacts must never leak
+# into the Docker image layer cache.
+target/
+.env
+.z-ai-config
