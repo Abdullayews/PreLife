@@ -9,6 +9,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ThemeGuard } from "@/components/ThemeGuard";
+import { UserPrefsSync } from "@/components/UserPrefsSync";
 import { SwRegister } from "@/components/SwRegister";
 import { ConnectionNotice } from "@/components/ConnectionNotice";
 import { HtmlLang } from "@/components/HtmlLang";
@@ -63,6 +64,7 @@ export default async function LocaleLayout({
       <NextIntlClientProvider messages={client}>
         <Nav user={user ? { name: user.name, email: user.email } : null} />
         <ThemeGuard />
+        <UserPrefsSync userId={user?.id ?? null} />
         <SwRegister />
         <ConnectionNotice />
         <main>{children}</main>

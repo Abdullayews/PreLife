@@ -351,6 +351,188 @@ pub async fn me(State(app): State<App>, headers: HeaderMap) -> Result<Response, 
     Ok((StatusCode::OK, Json(json!({ "user": user.as_ref().map(user_view) }))).into_response())
 }
 
+/* ── OAuth (Google / Apple via Supabase Auth, PKCE S256) ─────────────────── */
+
+const OAUTH_COOKIE: &str = "pl_oauth";
+const OAUTH_TTL_S: i64 = 600;
+
+#[derive(serde::Deserialize)]
+pub struct CallbackParams {
+    code: Option<String>,
+    error: Option<String>,
+}
+
+/// SHA-256 then base64url without padding — the S256 code_challenge format
+/// GoTrue requires (hex digests are rejected).
+fn sha256_b64url(s: &str) -> String {
+    let mut h = Sha256::new();
+    h.update(s.as_bytes());
+    URL_SAFE_NO_PAD.encode(h.finalize())
+}
+
+/// Minimal encodeURIComponent for the redirect_to query parameter.
+fn percent_encode(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 16);
+    for b in s.bytes() {
+        match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'_' | b'.' | b'~' => out.push(b as char),
+            _ => out.push_str(&format!("%{b:02X}")),
+        }
+    }
+    out
+}
+
+/// The public origin the browser sees (x-forwarded-host beats host; proto
+/// from x-forwarded-proto). OAuth redirect_to must return there — the API's
+/// own listen address is unreachable from the outside world.
+fn origin_from_headers(headers: &HeaderMap) -> String {
+    let proto = headers.get("x-forwarded-proto").and_then(|v| v.to_str().ok())
+        .filter(|p| !p.is_empty())
+        .unwrap_or("http");
+    let host = headers.get("x-forwarded-host").and_then(|v| v.to_str().ok())
+        .filter(|h| !h.is_empty())
+        .or_else(|| headers.get(axum::http::header::HOST).and_then(|v| v.to_str().ok()))
+        .filter(|h| !h.is_empty())
+        .unwrap_or("127.0.0.1:3000");
+    format!("{proto}://{host}")
+}
+
+fn see_other(location: String, cookies: Vec<String>) -> Response {
+    let mut builder = axum::http::Response::builder()
+        .status(StatusCode::FOUND)
+        .header("location", location);
+    for c in cookies {
+        builder = builder.header("set-cookie", c);
+    }
+    builder.body(axum::body::Body::empty()).expect("static response")
+}
+
+/// GET /api/auth/oauth/{google|apple} — starts the OAuth flow: mints a
+/// PKCE verifier (kept in a short-lived HttpOnly cookie), then redirects to
+/// Supabase's /authorize. Provider credentials live in Supabase
+/// (Authentication → Providers); without them GoTrue answers 400.
+pub async fn oauth_start(State(app): State<App>, headers: HeaderMap, Path(provider): Path<String>) -> Result<Response, ApiError> {
+    if provider != "google" && provider != "apple" {
+        return Err(err(StatusCode::NOT_FOUND, "unknown_provider"));
+    }
+    let origin = origin_from_headers(&headers);
+    let redirect_to = format!("{origin}/api/auth/callback");
+
+    let mut vb = [0u8; 48];
+    rand::thread_rng().fill_bytes(&mut vb);
+    let verifier = URL_SAFE_NO_PAD.encode(vb); // 64 chars — inside 43..128
+    let challenge = sha256_b64url(&verifier);
+
+    let url = format!(
+        "{}/authorize?provider={provider}&redirect_to={}&code_challenge={challenge}&code_challenge_method=s090",
+        app.supa.auth_base(),
+        percent_encode(&redirect_to),
+    );
+
+    let cookie = format!("{OAUTH_COOKIE}={verifier}; Path=/; Max-Age={OAUTH_TTL_S}; HttpOnly; SameSite=Lax{}",
+        if is_secure(&headers) { "; Secure" } else { "" });
+    Ok(see_other(url, vec![cookie]))
+}
+
+/// GET /api/auth/callback?code=… — Supabase sends the visitor back here
+/// after the provider dance. Exchanges the code with the PKCE verifier,
+/// mints the pl_session cookie, clears the OAuth cookie and lands the user
+/// on /home. Any failure goes to /login?error=oauth.
+pub async fn oauth_callback(
+    State(app): State<App>,
+    headers: HeaderMap,
+    axum::extract::Query(params): axum::extract::Query<CallbackParams>,
+) -> Result<Response, ApiError> {
+    let origin = origin_from_headers(&headers);
+
+    let mut fail = |origin: &str| -> Response {
+        see_other(format!("{origin}/login?error=oauth"), vec![format!(
+            "{OAUTH_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax"
+        )])
+    };
+
+    let Some(code) = params.code.filter(|c| !c.is_empty()) else {
+        return Ok(fail(&origin));
+    };
+    if params.error.is_some() {
+        return Ok(fail(&origin));
+    }
+    let raw = headers.get(axum::http::header::COOKIE).and_then(|v| v.to_str().ok()).unwrap_or("");
+    let Some(verifier) = raw.split(';').map(str::trim)
+        .find_map(|p| p.strip_prefix(&format!("{OAUTH_COOKIE}="))) else {
+        return Ok(fail(&origin));
+    };
+
+    let user = app.supa.auth_pkce_exchange(&code, verifier).await.ok()
+        .and_then(|v| v.get("user").cloned())
+        .and_then(|u| user_from_auth(&u));
+    let Some(user) = user else {
+        return Ok(fail(&origin));
+    };
+
+    let ua = headers.get(axum::http::header::USER_AGENT).and_then(|v| v.to_str().ok());
+    let Ok(token) = create_session(&app.supa, &user, ua).await else {
+        return Ok(fail(&origin));
+    };
+
+    Ok(see_other(
+        format!("{origin}/home"),
+        vec![
+            session_cookie_header(&token, is_secure(&headers)),
+            format!("{OAUTH_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax"),
+        ],
+    ))
+}
+
+/* ── User preferences (language + theme on the profiles row) ──────────────── */
+
+fn prefs_view(row: Option<&Value>) -> Value {
+    json!({
+        "locale": row.and_then(|r| r.get("lang")).and_then(|v| v.as_str()).unwrap_or("en"),
+        "theme": row.and_then(|r| r.get("theme")).and_then(|v| v.as_str()).unwrap_or("light"),
+    })
+}
+
+/// GET /api/me/preferences — the signed-in user's saved language + theme.
+pub async fn preferences_get(State(app): State<App>, headers: HeaderMap) -> Result<Response, ApiError> {
+    let Some(current) = current_session(&app.supa, &headers).await else {
+        return Err(err(StatusCode::UNAUTHORIZED, "unauthorized"));
+    };
+    let row = app.supa.select_one("profiles", &[
+        ("select", "lang,theme"),
+        ("id", &format!("eq.{}", current.user.id)),
+    ]).await.map_err(|_| generic())?;
+    Ok((StatusCode::OK, Json(prefs_view(row.as_ref()))).into_response())
+}
+
+/// PATCH /api/me/preferences { locale?, theme? } — saves the UI choice on
+/// the profile row so it follows the account across devices.
+pub async fn preferences_update(State(app): State<App>, headers: HeaderMap, bytes: Bytes) -> Result<Response, ApiError> {
+    let Some(current) = current_session(&app.supa, &headers).await else {
+        return Err(err(StatusCode::UNAUTHORIZED, "unauthorized"));
+    };
+    let body = parse_body(&bytes);
+    let mut patch = Map::new();
+    if let Some(loc) = str_field(&body, "locale") {
+        if !["az", "en", "ru"].contains(&loc.as_str()) {
+            return Err(err(StatusCode::BAD_REQUEST, "invalid_locale"));
+        }
+        patch.insert("lang".into(), Value::from(loc));
+    }
+    if let Some(theme) = str_field(&body, "theme") {
+        if !["light", "dark"].contains(&theme.as_str()) {
+            return Err(err(StatusCode::BAD_REQUEST, "invalid_theme"));
+        }
+        patch.insert("theme".into(), Value::from(theme));
+    }
+    if patch.is_empty() {
+        return Err(err(StatusCode::BAD_REQUEST, "nothing_to_update"));
+    }
+    let rows = app.supa.update("profiles", &[("id", &format!("eq.{}", current.user.id))], &Value::Object(patch))
+        .await.map_err(|_| generic())?;
+    Ok((StatusCode::OK, Json(prefs_view(rows.first()))).into_response())
+}
+
 /* ── Devices (Settings → Devices) ────────────────────────────────────────── */
 
 fn device_view(row: &Value, current_id: &str) -> Value {

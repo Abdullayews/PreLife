@@ -521,6 +521,7 @@
       "email_taken": "An account with this email already exists.",
       "api_unavailable": "Cannot reach the server — try again in a moment.",
       "supabase_unconfigured": "The server is not connected to the database (SUPABASE keys are not set).",
+      "oauth": "Social sign-in failed — continue with email and password.",
       "generic": "Something went wrong. Please try again."
     }
   },

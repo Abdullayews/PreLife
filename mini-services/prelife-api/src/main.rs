@@ -71,6 +71,11 @@ async fn main() {
         .route("/api/auth/login", post(auth::login))
         .route("/api/auth/logout", post(auth::logout))
         .route("/api/auth/me", get(auth::me))
+        // auth — OAuth (google / apple via Supabase Auth, PKCE)
+        .route("/api/auth/oauth/{provider}", get(auth::oauth_start))
+        .route("/api/auth/callback", get(auth::oauth_callback))
+        // user preferences (language + theme on the profiles row)
+        .route("/api/me/preferences", get(auth::preferences_get).patch(auth::preferences_update))
         // devices
         .route("/api/devices", get(auth::devices_list))
         .route("/api/devices/{id}", patch(auth::device_update).delete(auth::device_revoke))
