@@ -174,7 +174,10 @@ export function Nav({ user }: { user: MenuUser | null }) {
 
               <div className="nav-tools">
                 <LocaleSwitch className="hide-sm" signedIn={!!user} />
-                <ThemeToggle signedIn={!!user} />
+                {/* v6.1: the light/dark toggle lives ONLY in Settings for
+                 * signed-in users — guests (no Settings access) keep it
+                 * here on the public surface. */}
+                {!user && <ThemeToggle />}
                 {user ? (
                   <Link href="/home" aria-label={th("header.account")} className="icon-btn nav-account hide-md">
                     <User size={18} strokeWidth={1.5} aria-hidden />

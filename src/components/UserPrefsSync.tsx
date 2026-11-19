@@ -52,7 +52,9 @@ export function UserPrefsSync({ userId }: { userId: string | null }) {
           try {
             if (!sessionStorage.getItem(key)) {
               sessionStorage.setItem(key, "1");
-              router.replace(pathname, { locale: prefs.locale });
+              // Keep the current query (e.g. /verify?status=ok) — the
+              // one-time language move must not drop it.
+              router.replace(`${pathname}${window.location.search}`, { locale: prefs.locale });
             }
           } catch { /* sessionStorage unavailable — skip the one-time move */ }
         }
