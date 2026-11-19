@@ -4,32 +4,39 @@ import type { GymContent } from "./gym";
 import type { DietContent } from "./nutrition";
 import type { LibraryContent } from "./library";
 import type { MeditationContent } from "./psychology";
+import {
+  dietCatalog,
+  gymCatalog,
+  libraryCatalog,
+  meditationCatalog,
+  subscriptionCatalog,
+  worldsCatalog,
+} from "./server/content";
+import {
+  bookingsList,
+  journalList,
+  moodList,
+  overview,
+  scheduleWindow,
+} from "./server/psych-data";
+import { currentSessionFromHeaders } from "./server/session";
 
 /**
- * Server-side data layer — every fetch hits the Rust backend (prelife-api,
- * port 3031), which reads Supabase Postgres. Content endpoints are cached
- * by Next's data cache (revalidate) AND by the Rust service's own TTL cache;
- * user-data endpoints forward the request cookies and are never cached.
+ * Server-side data layer — the merged backend. Every getter runs the
+ * same assembly code the /api routes use (src/lib/server/*), reading
+ * Supabase Postgres directly: no HTTP hop, no separate service.
+ * Content getters are served from the 60s in-process TTL cache; user
+ * data getters resolve the cookie session per request and are never
+ * cached.
  */
-export const API_BASE = process.env.PRELIFE_API_URL ?? "http://127.0.0.1:3031";
 
-async function apiGet<T>(path: string): Promise<T | null> {
-  try {
-    const res = await fetch(`${API_BASE}${path}`, { next: { revalidate: 60 } });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
-  }
-}
+/* ── Content (public, TTL-cached 60s) ───────────────────────────────────── */
 
-/* ── Content (public, cacheable) ─────────────────────────────────────────── */
-
-export const getWorlds = () => apiGet<WorldsResponse>("/api/content/worlds");
-export const getGymContent = () => apiGet<GymContent>("/api/content/gym");
-export const getDietContent = () => apiGet<DietContent>("/api/content/diet");
-export const getMeditationContent = () => apiGet<MeditationContent>("/api/content/meditation");
-export const getLibraryContent = () => apiGet<LibraryContent>("/api/content/library");
+export const getWorlds = () => worldsCatalog() as Promise<WorldsResponse | null>;
+export const getGymContent = () => gymCatalog() as Promise<GymContent | null>;
+export const getDietContent = () => dietCatalog() as Promise<DietContent | null>;
+export const getMeditationContent = () => meditationCatalog() as Promise<MeditationContent | null>;
+export const getLibraryContent = () => libraryCatalog() as Promise<LibraryContent | null>;
 
 export type SubscriptionFeatureRow = { id: string; nameKey: string; price: number };
 export type SubscriptionTierRow = { id: string; nameKey: string; price: number; features: string[] };
@@ -37,24 +44,10 @@ export type SubscriptionContent = {
   features: SubscriptionFeatureRow[];
   tiers: SubscriptionTierRow[];
 };
-export const getSubscriptionContent = () => apiGet<SubscriptionContent>("/api/content/subscription");
+export const getSubscriptionContent = () =>
+  subscriptionCatalog() as Promise<SubscriptionContent | null>;
 
-/* ── User data (cookie-forwarded, no-store) ──────────────────────────────── */
-
-async function apiGetUser<T>(path: string): Promise<T | null> {
-  try {
-    const h = await headers();
-    const cookie = h.get("cookie");
-    const res = await fetch(`${API_BASE}${path}`, {
-      cache: "no-store",
-      headers: cookie ? { cookie } : undefined,
-    });
-    if (!res.ok) return null;
-    return (await res.json()) as T;
-  } catch {
-    return null;
-  }
-}
+/* ── User data (cookie session, never cached) ───────────────────────────── */
 
 export type JournalEntryRow = {
   id: string; promptKey: string | null; content: string;
@@ -83,8 +76,21 @@ export type OverviewData = {
   doneSessions: number;
 };
 
-export const getJournalData = () => apiGetUser<JournalData>("/api/psych/journal");
-export const getMoodData = () => apiGetUser<MoodData>("/api/psych/mood");
-export const getBookings = () => apiGetUser<BookingsData>("/api/psych/bookings");
-export const getScheduleWindow = () => apiGetUser<ScheduleWindowData>("/api/psych/schedule-window");
-export const getOverview = () => apiGetUser<OverviewData>("/api/psych/overview");
+/** Resolve the cookie session, run the query, and flatten any failure to
+ * null — pages render their signed-out / empty states gracefully. */
+async function withUser<T>(fn: (user: { id: string; email: string; name: string | null }) => Promise<T>): Promise<T | null> {
+  try {
+    const h = await headers();
+    const cs = await currentSessionFromHeaders(h);
+    if (!cs) return null;
+    return await fn(cs.user);
+  } catch {
+    return null;
+  }
+}
+
+export const getJournalData = () => withUser(journalList) as Promise<JournalData | null>;
+export const getMoodData = () => withUser(moodList) as Promise<MoodData | null>;
+export const getBookings = () => withUser(bookingsList) as Promise<BookingsData | null>;
+export const getScheduleWindow = () => withUser(scheduleWindow) as Promise<ScheduleWindowData | null>;
+export const getOverview = () => withUser(overview) as Promise<OverviewData | null>;

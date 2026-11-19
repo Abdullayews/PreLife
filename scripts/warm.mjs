@@ -8,15 +8,13 @@
  * every route pre-compiled (tens of ms). That gap is exactly why the
  * sandbox felt slower and "not the same" as the live site.
  *
- * What this script does, once the dev server answers on :3000:
- *   1. signs in as the demo account (123/123) against the Rust API
- *      (prelife-api on :3031), which also lazily creates the account;
- *   2. requests every page route once (with the session cookie, so the
- *      signed-in surfaces — not the login redirect — get compiled);
- *   3. requests every Rust API route once: GETs normally, POSTs with an
- *      INVALID empty body (the handlers validate before any side effect,
- *      so this warms the code path without touching data);
- *   4. POST /api/auth/logout last — revokes the warmup session.
+ * What this script does, once the dev server answers on :3000 (the
+ * merged backend serves /api/* from the same origin now):
+ *   1. requests every page route once (public pages fully; protected
+ *      ones compile their login-redirect path — enough to kill the lag);
+ *   2. requests every API route once: GETs normally, POSTs with an
+ *      INVALID empty body (the handlers validate before any side
+ *      effect, so this warms the code path without touching data).
  *
  * It is hooked into `bun run dev` (see package.json): the dev server
  * starts in the background, this script runs in the foreground, and
@@ -25,7 +23,6 @@
  * script always exits 0.
  */
 const BASE = process.env.WARM_BASE ?? "http://127.0.0.1:3000";
-const API = process.env.WARM_API ?? "http://127.0.0.1:3031";
 const DEADLINE_MS = 150_000; // give up quietly after 2.5 minutes
 const startedAt = Date.now();
 
@@ -58,34 +55,7 @@ async function main() {
   }
   out("server ready — warming routes (kills the first-visit compile lag)");
 
-  // 1. Demo sign-in against the Rust API. On a brand-new database this
-  //    also seeds the 123/123 account, so the sandbox behaves like an
-  //    account-bearing deployment.
-  let cookie = "";
-  try {
-    const res = await fetch(`${API}/api/auth/login`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email: "123", password: "123" }),
-    });
-    await res.arrayBuffer();
-    // Node ≥ 20: raw Set-Cookie lines, e.g. "pl_session=abc; Path=/; …"
-    const jar = (res.headers.getSetCookie?.() ?? [])
-      .map((line) => line.split(";")[0])
-      .filter(Boolean);
-    if (res.ok && jar.length) {
-      cookie = jar.join("; ");
-      out(`signed in as the demo account (${jar.length} cookie[s])`);
-    } else {
-      out(`login not available (status ${res.status}) — warming public surface only`);
-    }
-  } catch (err) {
-    out(`login failed (${err?.message ?? err}) — warming public surface only`);
-  }
-  const withSession = (init = {}) =>
-    cookie ? { ...init, headers: { ...init.headers, cookie } } : init;
-
-  // 2. Pages — compiled once each; the [locale] module is shared, so the
+  // 1. Pages — compiled once each; the [locale] module is shared, so the
   //    en pass warms az/ru too. The az/ru spots below just pre-render their
   //    first paint. The last entry compiles the 404 surfaces.
   const pages = [
@@ -104,32 +74,33 @@ async function main() {
     if (expired()) { out("deadline hit — stopping early"); return finish(); }
     try {
       const t0 = performance.now();
-      const res = await fetchOk(`${BASE}${path}`, withSession({ cache: "no-store" }));
+      const res = await fetchOk(`${BASE}${path}`, { cache: "no-store" });
       out(`${path} ${res.status} ${Math.round(performance.now() - t0)}ms`);
     } catch (err) {
       out(`${path} FAILED ${err?.message ?? err}`);
     }
   }
 
-  // 3. Rust API routes — GETs are side-effect free; POSTs send an invalid
-  //    empty body so every handler's validation path (a 400) runs, never
-  //    its writes.
+  // 2. API routes (same origin now) — GETs are side-effect free; POSTs
+  //    send an invalid empty body so every handler's validation path
+  //    (a 400/401) runs, never its writes.
   const gets = [
-    "/api/auth/me", "/api/devices", "/api/psych/journal", "/api/psych/mood",
-    "/api/psych/book", "/api/psych/bookings", "/api/psych/schedule-window",
-    "/api/psych/overview", "/api/content/worlds", "/api/content/gym",
-    "/api/content/diet", "/api/content/meditation", "/api/content/library",
+    "/api/health", "/api/auth/me", "/api/devices", "/api/psych/journal",
+    "/api/psych/mood", "/api/psych/book", "/api/psych/bookings",
+    "/api/psych/schedule-window", "/api/psych/overview",
+    "/api/content/worlds", "/api/content/gym", "/api/content/diet",
+    "/api/content/meditation", "/api/content/library",
     "/api/content/subscription", "/api/i18n?locale=en",
   ];
   const badPosts = [
     "/api/auth/signup", "/api/psych/quiz", "/api/psych/book", "/api/psych/pay",
     "/api/psych/cancel", "/api/psych/progress", "/api/psych/journal",
-    "/api/psych/mood",
+    "/api/psych/mood", "/api/ai/chat", "/api/psych/ai",
   ];
   for (const path of gets) {
     if (expired()) { out("deadline hit — stopping early"); return finish(); }
     try {
-      const res = await fetchOk(`${API}${path}`, withSession({ cache: "no-store" }));
+      const res = await fetchOk(`${BASE}${path}`, { cache: "no-store" });
       out(`GET ${path} ${res.status}`);
     } catch (err) {
       out(`GET ${path} FAILED ${err?.message ?? err}`);
@@ -138,12 +109,12 @@ async function main() {
   for (const path of badPosts) {
     if (expired()) { out("deadline hit — stopping early"); return finish(); }
     try {
-      const res = await fetchOk(`${API}${path}`, withSession({
+      const res = await fetchOk(`${BASE}${path}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: "{}",
-      }));
-      out(`POST ${path} ${res.status} (validation warm — 400 expected)`);
+      });
+      out(`POST ${path} ${res.status} (validation warm — 400/401 expected)`);
     } catch (err) {
       out(`POST ${path} FAILED ${err?.message ?? err}`);
     }
@@ -151,13 +122,6 @@ async function main() {
   return finish();
 
   async function finish() {
-    // 4. Revoke the warmup session — leave no stale rows behind.
-    if (cookie) {
-      try {
-        await fetchOk(`${API}/api/auth/logout`, { method: "POST", headers: { cookie } });
-        out("warmup session revoked");
-      } catch { /* best effort */ }
-    }
     out("done");
   }
 }
