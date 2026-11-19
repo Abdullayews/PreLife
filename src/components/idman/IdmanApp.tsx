@@ -7,17 +7,17 @@ import {
 } from "react";
 import {
   Brain, BookOpen, CalendarDays, ChevronsUpDown, Clock, Crown,
-  Dumbbell, House, MapPin, Moon, Pill, Play, Salad, Search, SearchX,
-  Settings, Shirt, Star, Sun, X,
+  Dumbbell, House, LoaderCircle, MapPin, Moon, Pill, Play, Salad, Search,
+  SearchX, Settings, Shirt, Star, Sun, Wand2, X,
   type LucideIcon,
 } from "lucide-react";
 import {
-  DAY_NAMES, DAY_SHORT, EQ_LABELS, EXERCISES, FILTER_GROUPS, HALLS,
-  IDMAN_TABS, PLANS, STORES, STORE_KIND_LABEL, TAB_HEADS, UI,
-  WORKOUTS, isIdmanTabId, minPriceOf, minutesOf, muscleGroupsOf,
-  nextWorkoutDay, productsOf, repsLabel, totalSetsOf, workoutFor,
-  type Hall, type IdmanTabId, type PlannedExercise, type Product,
-  type WorkoutDay,
+  DAY_NAMES, DAY_SHORT, DEMO_PLAN, EQ_LABELS, EXERCISES, FILTER_GROUPS,
+  HALLS, IDMAN_TABS, QUIZ, STORES, STORE_KIND_LABEL, TAB_HEADS, UI,
+  isIdmanTabId, minPriceOf, minutesOf, muscleGroupsOf, productsOf,
+  totalSetsOf,
+  type ActivePlan, type Hall, type IdmanTabId, type PlanDay,
+  type PlanExercise, type Product, type QuizAnswers,
 } from "./data";
 
 /**
@@ -27,17 +27,22 @@ import {
  * group (plan · qida əlavələri · aksesuarlar · zallar · alətlər) plus the
  * other PreLife sections, and a main column that hosts one of five panels:
  *
- *  • plan — today's session: a STICKY summary panel (the day's overall
- *    plan: muscle groups, exercise list with sets × reps, total volume)
- *    beside the day's exercise cards (sets/reps prescription, a real demo
- *    video, the how-to guide and a completion toggle each).
+ *  • plan — the ACTIVE plan (GET /api/gym/plan): a hero with the week
+ *    progress and the "Şəxsi plan qur" questionnaire, today's session as
+ *    a STICKY summary panel (muscle groups, exercise list with sets ×
+ *    reps) beside the day's exercise cards (a real demo video for
+ *    registry moves, a placeholder for custom AI moves, the how-to guide
+ *    and a completion toggle each) and the weekly strip. When the API is
+ *    unreachable (offline, standalone demos) the client-side twin of the
+ *    starter plan from ./data steps in.
  *  • supplements / accessories / equipment — search + filter-chip + sort
  *    catalogs on a 4-column grid (equipment carries a real video per item).
  *  • gyms — hall cards: info & location on top, trainers below, then the
  *    hall's equipment floor.
  *
  * Self-contained by design: embedded data (./data.ts), its own CSS
- * (the "İdman v3" block in globals.css), zero app imports — the same file
+ * (the "İdman v3" block in globals.css), zero app imports (only plain
+ * relative /api/gym/plan fetches) — the same file
  * runs inside PreLife (/[locale]/gym) and in standalone demos.
  */
 
@@ -164,12 +169,113 @@ function NavRow({
 
 /* ── Panel: plan ────────────────────────────────────────────────────────── */
 
-function PlanPanel() {
-  const [planId, setPlanId] = useState<string>(
-    () => PLANS.find((p) => p.featured)?.id ?? PLANS[0]!.id,
-  );
-  const plan = PLANS.find((p) => p.id === planId) ?? PLANS[0]!;
+/** JS getDay() (0 = Sunday) → the plan's 1..7 (1 = Monday, 7 = Sunday). */
+const planDayOf = (jsDay: number): number => (jsDay === 0 ? 7 : jsDay);
+/** The plan's 1..7 → JS numbering (the DAY_* label keys). */
+const jsDayOf = (planDay: number): number => (planDay === 7 ? 0 : planDay);
 
+type PlanStatus = "loading" | "quiz" | "ready";
+
+function PlanPanel() {
+  const [plan, setPlan] = useState<ActivePlan | null>(null);
+  const [status, setStatus] = useState<PlanStatus>("loading");
+  const [busy, setBusy] = useState(false);
+  const [offlineNote, setOfflineNote] = useState(false);
+
+  /* Load the active plan — the server lazily creates the starter plan and
+   * tells whether the questionnaire was already completed. When the API is
+   * unreachable (offline, standalone demos) the client-side twin of the
+   * starter plan steps in. */
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/gym/plan?locale=az", { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as { plan: ActivePlan | null; onboardingDone: boolean };
+      setPlan(data.plan ?? DEMO_PLAN);
+      setStatus(data.onboardingDone ? "ready" : "quiz");
+    } catch {
+      setPlan(DEMO_PLAN);
+      setStatus("ready");
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  /* The questionnaire's answers → a personal plan (AI, rules fallback). */
+  const build = useCallback(async (answers: QuizAnswers) => {
+    setBusy(true);
+    try {
+      const res = await fetch("/api/gym/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locale: "az", answers }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = (await res.json()) as { plan: ActivePlan | null };
+      if (!data.plan) throw new Error("no plan");
+      setPlan(data.plan);
+      setOfflineNote(false);
+      setStatus("ready");
+    } catch {
+      /* offline — keep showing the standard plan + a small note */
+      setOfflineNote(true);
+      setPlan((p) => p ?? DEMO_PLAN);
+      setStatus("ready");
+    } finally {
+      setBusy(false);
+    }
+  }, []);
+
+  /* Sıfırla — deactivate the plan; the reload recreates the starter plan
+   * and the questionnaire becomes available again. */
+  const reset = useCallback(async () => {
+    setBusy(true);
+    try {
+      const res = await fetch("/api/gym/plan", { method: "DELETE" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      await load();
+    } catch {
+      /* offline — nothing to reset */
+    } finally {
+      setBusy(false);
+    }
+  }, [load]);
+
+  if (status === "loading") {
+    return (
+      <div className="iplan" aria-busy="true">
+        <p className="iplan-rest">{UI.planLoading}</p>
+      </div>
+    );
+  }
+
+  if (status === "quiz" || !plan) {
+    return <PlanQuiz busy={busy} onCancel={() => setStatus("ready")} onSubmit={build} />;
+  }
+
+  return (
+    <PlanView
+      plan={plan}
+      busy={busy}
+      note={offlineNote}
+      onBuild={() => { setOfflineNote(false); setStatus("quiz"); }}
+      onReset={reset}
+    />
+  );
+}
+
+/* ── The active plan view (hero + today's session + weekly strip) ───────── */
+
+function PlanView({
+  plan, busy, note, onBuild, onReset,
+}: {
+  plan: ActivePlan;
+  busy: boolean;
+  /** the last personal-plan POST failed — show the offline note. */
+  note: boolean;
+  onBuild: () => void;
+  onReset: () => void;
+}) {
   const [weekday, setWeekday] = useState<number | null>(null);
   const [done, setDone] = useState<Set<string>>(new Set());
   const doneKey = useRef<string>("");
@@ -181,68 +287,83 @@ function PlanPanel() {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  const session: WorkoutDay | null = useMemo(
-    () => (weekday === null ? null : workoutFor(planId, weekday)),
-    [planId, weekday],
+  /* Today's session over the plan's days — or, on a rest day, the next
+   * session cyclically (Sunday wraps to Monday). */
+  const isToday = useMemo(
+    () => weekday !== null && plan.days.some((d) => d.day === planDayOf(weekday)),
+    [plan.days, weekday],
   );
-  const isToday = session !== null;
-  const preview: WorkoutDay = useMemo(
-    () => nextWorkoutDay(planId, weekday === null ? 1 : (weekday === 0 ? 1 : weekday)),
-    [planId, weekday],
-  );
-  const day = session ?? preview;
+  const day = useMemo<PlanDay>(() => {
+    const start = planDayOf(weekday ?? 1);
+    for (let i = 0; i < 7; i++) {
+      const hit = plan.days.find((d) => d.day === ((start - 1 + i) % 7) + 1);
+      if (hit) return hit;
+    }
+    return plan.days[0] ?? { day: 1, focus: "", exercises: [] };
+  }, [plan.days, weekday]);
 
   /* Completion state — per plan + day + date, consent-gated, read a
-   * frame after mount (storage is browser-only). */
+   * frame after mount (storage is browser-only). Keyed by exercise INDEX:
+   * custom AI moves share ex === "". */
   useEffect(() => {
-    const key = `pl:idman:done:${planId}:${day.day}:${bakuToday()}`;
+    const key = `pl:idman:done:${plan.id}:${day.day}:${bakuToday()}`;
     const id = requestAnimationFrame(() => {
       doneKey.current = key;
       const raw = storeGet(key);
       setDone(new Set(raw ? (JSON.parse(raw) as string[]).filter(Boolean) : []));
     });
     return () => cancelAnimationFrame(id);
-  }, [planId, day.day]);
+  }, [plan.id, day.day]);
 
-  const toggleDone = (code: string) => {
+  const toggleDone = (idx: string) => {
     setDone((prev) => {
       const next = new Set(prev);
-      if (next.has(code)) next.delete(code); else next.add(code);
+      if (next.has(idx)) next.delete(idx); else next.add(idx);
       storeSet(doneKey.current, JSON.stringify([...next]));
       return next;
     });
   };
 
   const total = day.exercises.length;
-  const doneCount = day.exercises.filter((pe) => done.has(pe.ex)).length;
+  const doneCount = day.exercises.filter((_, i) => done.has(String(i))).length;
   const allDone = total > 0 && doneCount === total;
   const groups = muscleGroupsOf(day);
   const minutes = minutesOf(day);
   const sets = totalSetsOf(day);
+  const weekPct = Math.max(0, Math.min(100, Math.round((plan.week / Math.max(1, plan.total)) * 100)));
 
   return (
     <div className="iplan">
       {/* Active plan header */}
-      <div className="iplan-hero">
-        <img className="iplan-hero-img" src={plan.image} alt="" width={640} height={360} loading="lazy" decoding="async" />
+      <div className="iplan-hero" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
         <div className="iplan-hero-body">
           <p className="iplan-eyebrow"><span className="iplan-eyebrow-i" aria-hidden />{UI.activeEyebrow}</p>
-          <h2 className="iplan-hero-title">{plan.name}</h2>
-          <p className="iplan-hero-desc">{plan.desc}</p>
+          <h2 className="iplan-hero-title">{plan.title}</h2>
+          {plan.focus && <p className="iplan-hero-desc">{plan.focus}</p>}
           <div className="iplan-hero-meta">
-            <span className="itag itag-solid">{plan.level}</span>
+            {plan.level && <span className="itag itag-solid">{plan.level}</span>}
+            <span className="itag">{plan.source === "ai" ? UI.aiTag : UI.defaultTag}</span>
             <span className="itag">{fill(UI.weekLabel, plan.week, plan.total)}</span>
-            <span className="itag">{WORKOUTS[planId]?.length ?? 0} gün / həftə</span>
+            <span className="itag">{fill(UI.daysPerWeek, plan.days.length)}</span>
           </div>
           <div
             className="iplan-bar"
             role="progressbar"
-            aria-valuenow={Math.round((plan.week / plan.total) * 100)}
+            aria-valuenow={weekPct}
             aria-valuemin={0} aria-valuemax={100}
             aria-label={fill(UI.weekLabel, plan.week, plan.total)}
           >
-            <i style={{ width: `${Math.round((plan.week / plan.total) * 100)}%` }} />
+            <i style={{ width: `${weekPct}%` }} />
           </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem", marginTop: ".2rem" }}>
+            <button type="button" className="ibtn ibtn-sm" onClick={onBuild} disabled={busy}>
+              <Wand2 size={15} aria-hidden />{UI.buildCta}
+            </button>
+            <button type="button" className="ibtn ibtn-sm ibtn-ghost" onClick={onReset} disabled={busy}>
+              {UI.resetCta}
+            </button>
+          </div>
+          {note && <p className="iplan-rest">{UI.offlineNote}</p>}
         </div>
       </div>
 
@@ -254,8 +375,13 @@ function PlanPanel() {
               {isToday ? UI.todayTitle : UI.nextSession}
             </p>
             <p className="iplan-side-date">
-              {DAY_NAMES[isToday ? (weekday ?? 1) : day.day] ?? ""}
+              {DAY_NAMES[jsDayOf(day.day)] ?? ""}
             </p>
+            {day.focus && (
+              <p style={{ margin: 0, fontSize: ".8rem", fontWeight: 600, color: "var(--muted)" }}>
+                {day.focus}
+              </p>
+            )}
 
             {!isToday && <p className="iplan-rest">{UI.restDay}</p>}
 
@@ -271,16 +397,13 @@ function PlanPanel() {
             </ul>
 
             <ol className="iplan-list">
-              {day.exercises.map((pe, i) => {
-                const ex = EXERCISES[pe.ex]!;
-                return (
-                  <li key={pe.ex} className={done.has(pe.ex) ? "done" : undefined}>
-                    <span className="iplan-list-n" aria-hidden>{i + 1}</span>
-                    <span className="iplan-list-name">{ex.name}</span>
-                    <span className="iplan-list-dose">{pe.sets} × {repsLabel(pe.reps)}</span>
-                  </li>
-                );
-              })}
+              {day.exercises.map((pe, i) => (
+                <li key={i} className={done.has(String(i)) ? "done" : undefined}>
+                  <span className="iplan-list-n" aria-hidden>{i + 1}</span>
+                  <span className="iplan-list-name">{pe.name}</span>
+                  <span className="iplan-list-dose">{pe.sets} × {pe.reps}</span>
+                </li>
+              ))}
             </ol>
 
             <div className="iplan-progress">
@@ -296,17 +419,17 @@ function PlanPanel() {
         <div className="iplan-cards">
           {!isToday && (
             <p className="iplan-next-hint">
-              {UI.restDay} — {UI.nextSession}: <b>{DAY_NAMES[day.day]}</b>
+              {UI.restDay} — {UI.nextSession}: <b>{DAY_NAMES[jsDayOf(day.day)]}</b>
             </p>
           )}
           <ul className="iex-grid">
             {day.exercises.map((pe, i) => (
               <ExerciseCard
-                key={pe.ex}
+                key={i}
                 index={i}
                 pe={pe}
-                done={done.has(pe.ex)}
-                onToggle={() => toggleDone(pe.ex)}
+                done={done.has(String(i))}
+                onToggle={() => toggleDone(String(i))}
               />
             ))}
           </ul>
@@ -318,7 +441,7 @@ function PlanPanel() {
         <p className="iplan-side-sub">{UI.weeklyTitle}</p>
         <ul className="iplan-week-row">
           {[1, 2, 3, 4, 5, 6, 0].map((d) => {
-            const has = workoutFor(planId, d) !== null;
+            const has = plan.days.some((pd) => pd.day === planDayOf(d));
             const isTodayRow = weekday === d;
             return (
               <li
@@ -337,35 +460,137 @@ function PlanPanel() {
           })}
         </ul>
       </section>
+    </div>
+  );
+}
 
-      {/* All plans */}
-      <section className="iplan-plans" aria-label={UI.plansEyebrow}>
-        <p className="iplan-side-sub">{UI.plansEyebrow}</p>
-        <ul className="iplan-plan-grid">
-          {PLANS.map((p) => (
-            <li key={p.id} className={`iplan-plan${p.id === planId ? " active" : ""}`}>
-              <img src={p.image} alt="" width={480} height={270} loading="lazy" decoding="async" />
-              <div className="iplan-plan-body">
-                <div className="iplan-plan-top">
-                  <h3>{p.name}</h3>
-                  {p.id === planId
-                    ? <span className="itag itag-solid">{UI.activeTag}</span>
-                    : <span className="itag">{p.level}</span>}
-                </div>
-                <p>{p.desc}</p>
-                <button
-                  type="button"
-                  className="ibtn ibtn-sm"
-                  disabled={p.id === planId}
-                  onClick={() => setPlanId(p.id)}
-                >
-                  {UI.select}
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+/* ── The personal-plan questionnaire (first entry + rebuild) ────────────── */
+
+function PlanQuiz({
+  busy, onCancel, onSubmit,
+}: {
+  busy: boolean;
+  onCancel: () => void;
+  onSubmit: (answers: QuizAnswers) => void;
+}) {
+  const [step, setStep] = useState(0);
+  /* one pick list per step (multi steps hold up to `multi` options) */
+  const [picked, setPicked] = useState<string[][]>(() => QUIZ.steps.map(() => []));
+  const [text, setText] = useState("");
+
+  const s = QUIZ.steps[step] ?? QUIZ.steps[0];
+  const last = step === QUIZ.steps.length - 1;
+  const chosen = picked[step] ?? [];
+  const canNext = Boolean(s.free) || chosen.length > 0;
+
+  const pick = (option: string) => {
+    setPicked((prev) => prev.map((sel, i) => {
+      if (i !== step) return sel;
+      const has = sel.includes(option);
+      if (s.multi) {
+        return has ? sel.filter((o) => o !== option)
+          : sel.length >= s.multi ? sel : [...sel, option];
+      }
+      return has ? [] : [option];
+    }));
+  };
+
+  const next = () => {
+    if (!canNext || busy) return;
+    if (last) {
+      onSubmit({
+        goal: picked[0]?.[0] ?? "",
+        experience: picked[1]?.[0] ?? "",
+        days: picked[2]?.[0] ?? "",
+        equipment: picked[3]?.[0] ?? "",
+        focus: (picked[4] ?? []).join(", "),
+        limitations: text.trim(),
+      });
+      return;
+    }
+    setStep(step + 1);
+  };
+
+  return (
+    <div className="iplan">
+      <div className="iplan-hero" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
+        <div className="iplan-hero-body">
+          <p className="iplan-eyebrow"><span className="iplan-eyebrow-i" aria-hidden />{QUIZ.eyebrow}</p>
+          <h2 className="iplan-hero-title">{QUIZ.title}</h2>
+          <p className="iplan-hero-desc">{QUIZ.desc}</p>
+          <div className="iplan-hero-meta">
+            <span className="itag itag-solid">{fill(QUIZ.stepOf, step + 1, QUIZ.steps.length)}</span>
+          </div>
+
+          <h3 style={{ margin: ".4rem 0 0", font: "600 1.15rem/1.3 var(--font-display)", letterSpacing: "-.01em" }}>
+            {s.q}
+          </h3>
+
+          {s.free ? (
+            <>
+              <textarea
+                value={text}
+                rows={3}
+                placeholder={QUIZ.limitPlaceholder}
+                aria-label={s.q}
+                onChange={(e) => setText(e.target.value)}
+                disabled={busy}
+                style={{
+                  width: "100%", padding: ".7rem .9rem",
+                  border: "1px solid var(--line)", borderRadius: "14px",
+                  background: "var(--surface)", color: "var(--ink)",
+                  font: "500 .9rem/1.45 var(--font-body)", resize: "vertical",
+                }}
+              />
+              <ul className="ishop-chips">
+                <li>
+                  <button
+                    type="button"
+                    className="ichip"
+                    aria-pressed={text.trim() === ""}
+                    onClick={() => setText("")}
+                    disabled={busy}
+                  >
+                    {QUIZ.none}
+                  </button>
+                </li>
+              </ul>
+            </>
+          ) : (
+            <ul className="ishop-chips" aria-label={s.q}>
+              {s.options.map((o) => (
+                <li key={o}>
+                  <button
+                    type="button"
+                    className="ichip"
+                    aria-pressed={chosen.includes(o)}
+                    onClick={() => pick(o)}
+                    disabled={busy}
+                  >
+                    {o}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem", marginTop: ".3rem" }}>
+            <button
+              type="button"
+              className="ibtn ibtn-ghost ibtn-sm"
+              onClick={step === 0 ? onCancel : () => setStep(step - 1)}
+              disabled={busy}
+            >
+              {QUIZ.back}
+            </button>
+            <button type="button" className="ibtn ibtn-sm" onClick={next} disabled={!canNext || busy}>
+              {busy
+                ? <><LoaderCircle size={15} className="spin" aria-hidden />{QUIZ.busy}</>
+                : (last ? QUIZ.finish : QUIZ.next)}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -373,30 +598,42 @@ function PlanPanel() {
 function ExerciseCard({
   index, pe, done, onToggle,
 }: {
-  index: number; pe: PlannedExercise; done: boolean; onToggle: () => void;
+  index: number; pe: PlanExercise; done: boolean; onToggle: () => void;
 }) {
-  const ex = EXERCISES[pe.ex]!;
+  const ex = EXERCISES[pe.ex]; // registry move? undefined → custom AI move
   const [open, setOpen] = useState(false);
   return (
     <li className={`iex${done ? " done" : ""}`}>
-      <div className="iex-media">
-        <VideoTile src={ex.video} label={`${ex.name} — demo video`} tall />
+      <div
+        className="iex-media"
+        style={ex ? undefined : {
+          /* custom AI move — no video: a centered dumbbell placeholder */
+          aspectRatio: "16 / 10", background: "var(--tint)",
+          display: "grid", placeItems: "center",
+        }}
+      >
+        {ex
+          ? <VideoTile src={ex.video} label={`${ex.name} — demo video`} tall />
+          : <Dumbbell size={30} strokeWidth={1.5} aria-hidden style={{ color: "var(--muted)" }} />}
         <span className="iex-n" aria-hidden>{index + 1}</span>
       </div>
       <div className="iex-body">
         <div className="iex-top">
-          <h3 className="iex-name">{ex.name}</h3>
-          <span className="iex-dose">{pe.sets} × {repsLabel(pe.reps)}</span>
+          <h3 className="iex-name">{pe.name}</h3>
+          <span className="iex-dose">{pe.sets} × {pe.reps}</span>
         </div>
-        <p className="iex-target">{ex.target}</p>
+        {ex && <p className="iex-target">{ex.target}</p>}
+        {pe.note && <p className="iex-rest" style={{ fontStyle: "italic" }}>{pe.note}</p>}
         <p className="iex-rest">
           <Clock size={14} aria-hidden />
           {pe.rest > 0 ? fill(UI.restLabel, pe.rest) : UI.flowLine}
         </p>
-        <details className="iex-guide" open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
-          <summary>{UI.howTo}</summary>
-          <p>{ex.guide}</p>
-        </details>
+        {ex && (
+          <details className="iex-guide" open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
+            <summary>{UI.howTo}</summary>
+            <p>{ex.guide}</p>
+          </details>
+        )}
         <button
           type="button"
           className={`ibtn iex-done${done ? " done" : ""}`}

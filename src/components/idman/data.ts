@@ -1,13 +1,15 @@
 /**
  * İdman v3 — the embedded content module for the redesigned gym app.
  *
- * Everything the new İdman surface needs lives here: the three plans with
- * their weekly workout structure, the 15-exercise pool (each with a REAL
- * stock demo video), the six partner halls with trainers and equipment,
- * the store registry and the 40-product catalog. The data mirrors the
- * Supabase seed (db/seed-content.sql) with its official az translations,
- * so the panel renders standalone — no API, no message catalogues — and
- * can be dropped into any surface (the PreLife /gym page or a demo).
+ * Everything the new İdman surface needs lives here: the 15-exercise
+ * pool (each with a REAL stock demo video), the six partner halls with
+ * trainers and equipment, the store registry and the 40-product catalog,
+ * plus the mirror of the server's active-plan payload (the plan types,
+ * the client-side twin of the default starter plan and the personal-plan
+ * questionnaire). The data mirrors the Supabase seed (db/seed-content.sql)
+ * with its official az translations, so the panel renders standalone — no
+ * message catalogues — and can be dropped into any surface (the PreLife
+ * /gym page or a demo).
  *
  * Videos are free stock clips (Mixkit, hotlinkable, free licence):
  * real gym footage, 720p, muted-loop previews.
@@ -97,29 +99,28 @@ export const UI = {
   newsBody: "Yeni İdman paneli: plan, zallar, alətlər və kataloqlar — bir yerdə.",
   /* plan panel */
   activeEyebrow: "Aktiv plan",
-  activeTag: "Aktiv",
   weekLabel: "{week}/{total} həftə",
-  select: "Bu planı seç",
-  plansEyebrow: "Bütün planlar",
+  daysPerWeek: "{count} gün / həftə",
+  planLoading: "Plan yüklənir…",
+  buildCta: "Şəxsi plan qur",
+  resetCta: "Sıfırla",
+  aiTag: "AI planı",
+  defaultTag: "Standart plan",
+  offlineNote: "İnternet yoxdur — standart plan göstərilir",
   todayTitle: "Bugünkü təlim",
   restDay: "Bu gün istirahət günüdür — bədən bərpa olunur.",
   nextSession: "Növbəti təlim",
   howTo: "Necə edilir",
   done: "Tamamlandı",
-  finish: "Təlimi bitir",
   finished: "Bugünkü təlim tamamlandı — əla iş!",
   sessionProgress: "{done}/{total} hərəkət",
   sessionSummary: "Günün xülasəsi",
-  exercisesCount: "{count} hərəkət",
-  setsCount: "{count} yanaşma",
-  minutesEst: "~{count} dəqiqə",
   muscleGroups: "Əzələ qrupları",
   restLabel: "Dinclik: {count} san",
   flowLine: "Ardıcıl — dincliksiz",
   weeklyTitle: "Həftəlik cədvəl",
   restTag: "İstirahət",
   workoutTag: "Təlim",
-  todayTag: "Bu gün",
 } as const;
 
 /* ── Weekday labels (1 Mon … 6 Sat; 0 Sunday = rest) ────────────────────── */
@@ -250,160 +251,88 @@ export const EXERCISES: Record<string, Exercise> = {
   },
 };
 
-/* ── Reps prescription + label helpers ──────────────────────────────────── */
+/* ── The active plan (the /api/gym/plan payload, mirrored) ───────────── */
 
-export type Reps =
-  | { t: "reps"; a: number; b?: number }
-  | { t: "time"; a: number }
-  | { t: "secs"; a: number }
-  | { t: "each"; a: number };
-
-export const repsLabel = (r: Reps): string =>
-  r.t === "reps" ? (r.b === undefined ? `${r.a} təkrar` : `${r.a}–${r.b} təkrar`)
-  : r.t === "time" ? `${r.a} dəq`
-  : r.t === "secs" ? `${r.a} san`
-  : `hər tərəf ${r.a}`;
-
-export type PlannedExercise = { ex: string; sets: number; reps: Reps; rest: number };
-
-export type WorkoutDay = { day: number; exercises: PlannedExercise[] };
-
-/* ── The three plans ────────────────────────────────────────────────────── */
-
-export type Plan = {
-  id: string;
+export type PlanExercise = {
+  /** Registry code into EXERCISES — "" when the AI wrote a custom move. */
+  ex: string;
   name: string;
-  desc: string;
-  level: string;
+  sets: number;
+  /** Free-form prescription, e.g. "8–10" or "40 saniyə". */
+  reps: string;
+  rest: number;
+  note?: string;
+};
+
+export type PlanDay = {
+  /** 1 = Monday … 7 = Sunday. */
+  day: number;
+  focus: string;
+  exercises: PlanExercise[];
+};
+
+export type ActivePlan = {
+  id: string;
+  title: string;
+  level: string | null;
+  source: "default" | "ai";
   week: number;
   total: number;
-  image: string;
-  featured: boolean;
+  focus: string | null;
+  days: PlanDay[];
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
-export const PLANS: Plan[] = [
-  {
-    id: "foundation", name: "Fundament Gücü", level: "Başlanğıc",
-    desc: "Düzgün texnika və əsas güc ölçülü, bütöv bədən başlanğıcı ilə qur.",
-    week: 3, total: 8, featured: false,
-    image: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=1200&q=80&auto=format&fit=crop",
-  },
-  {
-    id: "hypertrophy", name: "Hipertrofiya Mühərriki", level: "Orta",
-    desc: "Həftədə dörd fokuslu təlimlə keyfiyyətli əzələ və simmetriya qazan.",
-    week: 5, total: 12, featured: true,
-    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200&q=80&auto=format&fit=crop",
-  },
-  {
-    id: "athletic", name: "Atletik Kondisiya", level: "İleri",
-    desc: "Güc, sürət və iş qabiliyyəti üçün intensiv dövriyyə və intervallar.",
-    week: 2, total: 6, featured: false,
-    image: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=1200&q=80&auto=format&fit=crop",
-  },
-];
+const planEx = (code: string, sets: number, reps: string, rest: number): PlanExercise => ({
+  ex: code, name: EXERCISES[code]?.name ?? code, sets, reps, rest,
+});
 
-export const WORKOUTS: Record<string, WorkoutDay[]> = {
-  foundation: [
-    { day: 1, exercises: [
-      { ex: "run", sets: 1, reps: { t: "time", a: 5 }, rest: 0 },
-      { ex: "squat", sets: 3, reps: { t: "reps", a: 8, b: 12 }, rest: 90 },
-      { ex: "bench", sets: 3, reps: { t: "reps", a: 8, b: 12 }, rest: 90 },
-      { ex: "row", sets: 3, reps: { t: "reps", a: 10, b: 12 }, rest: 75 },
-      { ex: "plank", sets: 3, reps: { t: "secs", a: 30 }, rest: 45 },
+/** The offline starter plan — the client-side twin of the server default,
+ *  shown when /api/gym/plan is unreachable (offline, standalone demos). */
+export const DEMO_PLAN: ActivePlan = {
+  id: "demo",
+  title: "Başlanğıc plan",
+  level: "Başlanğıc",
+  source: "default",
+  week: 1,
+  total: 8,
+  focus: "Bütün bədən gücü və vərdiş",
+  days: [
+    { day: 1, focus: "Bütün bədən A", exercises: [
+      planEx("run", 1, "5–8 dəq", 0),
+      planEx("squat", 4, "8–10", 90),
+      planEx("bench", 4, "8–10", 90),
+      planEx("row", 4, "10–12", 75),
+      planEx("plank", 3, "30–45 s", 60),
     ] },
-    { day: 3, exercises: [
-      { ex: "run", sets: 1, reps: { t: "time", a: 5 }, rest: 0 },
-      { ex: "deadlift", sets: 3, reps: { t: "reps", a: 6, b: 8 }, rest: 120 },
-      { ex: "lunge", sets: 3, reps: { t: "each", a: 10 }, rest: 75 },
-      { ex: "ohp", sets: 3, reps: { t: "reps", a: 8, b: 10 }, rest: 90 },
-      { ex: "stretch", sets: 1, reps: { t: "time", a: 5 }, rest: 0 },
+    { day: 3, focus: "Bütün bədən B", exercises: [
+      planEx("run", 1, "5–8 dəq", 0),
+      planEx("deadlift", 4, "6–8", 120),
+      planEx("ohp", 4, "8–10", 90),
+      planEx("latpull", 4, "10–12", 75),
+      planEx("bicep", 3, "10–12", 60),
     ] },
-    { day: 5, exercises: [
-      { ex: "swing", sets: 3, reps: { t: "reps", a: 15 }, rest: 60 },
-      { ex: "latpull", sets: 3, reps: { t: "reps", a: 10, b: 12 }, rest: 75 },
-      { ex: "legpress", sets: 3, reps: { t: "reps", a: 10, b: 12 }, rest: 90 },
-      { ex: "bicep", sets: 2, reps: { t: "reps", a: 12 }, rest: 60 },
-      { ex: "plank", sets: 3, reps: { t: "secs", a: 40 }, rest: 45 },
-    ] },
-  ],
-  hypertrophy: [
-    { day: 1, exercises: [
-      { ex: "bench", sets: 4, reps: { t: "reps", a: 8, b: 10 }, rest: 105 },
-      { ex: "ohp", sets: 4, reps: { t: "reps", a: 8, b: 10 }, rest: 105 },
-      { ex: "triceps", sets: 3, reps: { t: "reps", a: 12 }, rest: 60 },
-      { ex: "latpull", sets: 3, reps: { t: "reps", a: 10, b: 12 }, rest: 75 },
-    ] },
-    { day: 2, exercises: [
-      { ex: "squat", sets: 4, reps: { t: "reps", a: 8, b: 10 }, rest: 120 },
-      { ex: "legpress", sets: 4, reps: { t: "reps", a: 10, b: 12 }, rest: 90 },
-      { ex: "lunge", sets: 3, reps: { t: "each", a: 10 }, rest: 75 },
-      { ex: "plank", sets: 3, reps: { t: "secs", a: 45 }, rest: 45 },
-    ] },
-    { day: 4, exercises: [
-      { ex: "deadlift", sets: 4, reps: { t: "reps", a: 6, b: 8 }, rest: 150 },
-      { ex: "row", sets: 4, reps: { t: "reps", a: 8, b: 10 }, rest: 105 },
-      { ex: "pullup", sets: 3, reps: { t: "reps", a: 6, b: 10 }, rest: 105 },
-      { ex: "bicep", sets: 3, reps: { t: "reps", a: 10, b: 12 }, rest: 60 },
-    ] },
-    { day: 5, exercises: [
-      { ex: "swing", sets: 4, reps: { t: "reps", a: 20 }, rest: 60 },
-      { ex: "ohp", sets: 3, reps: { t: "reps", a: 10 }, rest: 90 },
-      { ex: "triceps", sets: 3, reps: { t: "reps", a: 12 }, rest: 60 },
-      { ex: "stretch", sets: 1, reps: { t: "time", a: 7 }, rest: 0 },
+    { day: 5, focus: "Bütün bədən C", exercises: [
+      planEx("run", 1, "5–8 dəq", 0),
+      planEx("legpress", 4, "10–12", 90),
+      planEx("lunge", 3, "10 (hər ayaq)", 75),
+      planEx("triceps", 3, "10–12", 60),
+      planEx("stretch", 1, "5 dəq", 0),
     ] },
   ],
-  athletic: [
-    { day: 1, exercises: [
-      { ex: "run", sets: 1, reps: { t: "time", a: 8 }, rest: 0 },
-      { ex: "squat", sets: 5, reps: { t: "reps", a: 5 }, rest: 150 },
-      { ex: "plank", sets: 3, reps: { t: "secs", a: 60 }, rest: 45 },
-    ] },
-    { day: 2, exercises: [
-      { ex: "swing", sets: 5, reps: { t: "reps", a: 20 }, rest: 60 },
-      { ex: "pullup", sets: 4, reps: { t: "reps", a: 6, b: 8 }, rest: 120 },
-      { ex: "row", sets: 4, reps: { t: "reps", a: 8 }, rest: 105 },
-    ] },
-    { day: 3, exercises: [
-      { ex: "run", sets: 1, reps: { t: "time", a: 6 }, rest: 0 },
-      { ex: "deadlift", sets: 5, reps: { t: "reps", a: 5 }, rest: 180 },
-      { ex: "lunge", sets: 3, reps: { t: "each", a: 12 }, rest: 75 },
-    ] },
-    { day: 4, exercises: [
-      { ex: "bench", sets: 5, reps: { t: "reps", a: 5 }, rest: 150 },
-      { ex: "ohp", sets: 4, reps: { t: "reps", a: 6, b: 8 }, rest: 120 },
-      { ex: "triceps", sets: 3, reps: { t: "reps", a: 12 }, rest: 60 },
-    ] },
-    { day: 5, exercises: [
-      { ex: "run", sets: 1, reps: { t: "time", a: 10 }, rest: 0 },
-      { ex: "legpress", sets: 4, reps: { t: "reps", a: 10 }, rest: 90 },
-      { ex: "bicep", sets: 3, reps: { t: "reps", a: 10 }, rest: 60 },
-      { ex: "stretch", sets: 1, reps: { t: "time", a: 8 }, rest: 0 },
-    ] },
-  ],
+  notes: null,
+  createdAt: "",
+  updatedAt: "",
 };
 
-/** The plan scheduled for a weekday (1 Mon … 6 Sat), or null on rest days. */
-export const workoutFor = (planId: string, weekday: number): WorkoutDay | null =>
-  (WORKOUTS[planId] ?? []).find((d) => d.day === weekday) ?? null;
-
-/** The next day (today included) that has a workout — Sunday wraps to Mon. */
-export const nextWorkoutDay = (planId: string, weekday: number): WorkoutDay => {
-  const list = WORKOUTS[planId] ?? WORKOUTS.hypertrophy!;
-  const order: number[] = [];
-  for (let i = 0; i < 7; i++) order.push(((weekday - 1 + i) % 7) + 1);
-  for (const d of order) {
-    const hit = list.find((w) => w.day === d);
-    if (hit) return hit;
-  }
-  return list[0]!;
-};
-
-/** Short muscle-group chips derived from the exercise targets. */
-export const muscleGroupsOf = (day: WorkoutDay): string[] => {
+/** Muscle-group chips: registry targets + the names of custom AI moves. */
+export const muscleGroupsOf = (day: PlanDay): string[] => {
   const set = new Set<string>();
   for (const pe of day.exercises) {
     const ex = EXERCISES[pe.ex];
-    if (!ex) continue;
+    if (!ex) { set.add(pe.name); continue; } // custom move — name only
     for (const part of ex.target.split(/[,·]/)) {
       const p = part.trim();
       if (p) set.add(p);
@@ -413,14 +342,57 @@ export const muscleGroupsOf = (day: WorkoutDay): string[] => {
 };
 
 /** Total working sets of a day. */
-export const totalSetsOf = (day: WorkoutDay): number =>
+export const totalSetsOf = (day: PlanDay): number =>
   day.exercises.reduce((n, pe) => n + pe.sets, 0);
 
-/** Rough session length: ~40s per set + rest between sets. */
-export const minutesOf = (day: WorkoutDay): number => {
-  let secs = 0;
-  for (const pe of day.exercises) secs += pe.sets * (40 + pe.rest);
-  return Math.max(10, Math.round(secs / 60));
+/** Rough session length: ~1.5 min of work per set + the rests between. */
+export const minutesOf = (day: PlanDay): number => {
+  let mins = 0;
+  for (const pe of day.exercises) mins += pe.sets * 1.5 + (pe.rest * pe.sets) / 60;
+  return Math.max(10, Math.round(mins));
+};
+
+/* ── The personal-plan questionnaire (hardcoded AZ) ─────────────────────── */
+
+export type QuizAnswers = {
+  goal: string;
+  experience: string;
+  days: string;
+  equipment: string;
+  focus: string;
+  limitations: string;
+};
+
+export type QuizStep = {
+  q: string;
+  options: readonly string[];
+  /** multi-select with a pick cap (the focus step). */
+  multi?: number;
+  /** the free-text step (limitations). */
+  free?: boolean;
+};
+
+export const QUIZ_STEPS: readonly QuizStep[] = [
+  { q: "Məqsədin nədir?", options: ["Çəki itirmək", "Kütlə qazanmaq", "Formanı qorumaq", "Ümumi fitnes"] },
+  { q: "Təcrübən?", options: ["Başlanğıc", "Orta", "İleri"] },
+  { q: "Həftədə neçə gün məşq edə bilərsən?", options: ["2", "3", "4", "5"] },
+  { q: "Harada məşq edəcəksən?", options: ["Tam zal", "Ev (az avadanlıq)", "Ev (avadanlıqlı)"] },
+  { q: "Fokus?", options: ["Kürək", "Qollar", "Ayaqlar", "Qarın", "Kürək düzliği", "Ümumi bədən"], multi: 2 },
+  { q: "Məhdudiyyət var?", options: [], free: true },
+];
+
+export const QUIZ = {
+  eyebrow: "Şəxsi plan",
+  title: "Şəxsi planın üçün bir neçə sual",
+  desc: "Cavablarına görə sənin üçün fərdi plan hazırlanacaq — bir dəqiqədən az çəkir.",
+  stepOf: "{step}/{total}",
+  back: "Geri",
+  next: "Növbəti",
+  finish: "Planı hazırla",
+  busy: "Plan hazırlanır…",
+  none: "Yoxdur",
+  limitPlaceholder: "Zədə, ağrı və ya nəzərə alınmalı olan başqa şey… (istəyə bağlı)",
+  steps: QUIZ_STEPS,
 };
 
 /* ── Partner halls (zallar) ─────────────────────────────────────────────── */

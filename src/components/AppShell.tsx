@@ -7,13 +7,13 @@ import { useTranslations } from "next-intl";
 import {
   AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ChevronsUpDown,
   Circle, CircleHelp, Crown, Dumbbell, FileText, Flower2, House, Landmark, Layers,
-  LibraryBig, MapPin, Menu, MonitorPlay, Moon, NotebookPen, PanelLeftClose,
-  PanelLeftOpen, Pill, Salad, ScrollText, Settings, Shirt, Sun, UserRound, Users,
+  LibraryBig, MapPin, Menu, MonitorPlay, NotebookPen, PanelLeftClose,
+  PanelLeftOpen, Pill, Salad, ScrollText, Settings, Shirt, UserRound, Users,
   Wind, type LucideIcon,
 } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { sections } from "@/lib/shell";
-import { hasConsent, setThemeChoice } from "@/lib/consent";
+import { hasConsent } from "@/lib/consent";
 import { saveUserPref } from "@/lib/user-prefs";
 
 /**
@@ -37,9 +37,14 @@ import { saveUserPref } from "@/lib/user-prefs";
  *   (v5.1: Home is always first).
  * • ACCOUNT DROPDOWN (v6) — the identity row at the top is a button;
  *   pressing it opens the account menu DOWNWARD (Profile, Settings, Help,
- *   Terms, Rules). No e-mail in the rail; language and log out live in
- *   Settings; the "What's new" card is gone. The foot keeps only the
- *   theme toggle.
+ *   Terms, Rules). No e-mail in the rail; language, theme and log out
+ *   live in Settings; the "What's new" card is gone. The foot is empty —
+ *   the light/dark toggle exists ONLY in Settings → Appearance (v6.1).
+ * • FOLD STATE (v6.1) — signed-in users get the fold choice from the
+ *   SERVER (profiles.rail_folded rides on the session row), so every
+ *   page renders the rail in the right width on first paint and the
+ *   choice follows the account across devices. Guests keep the
+ *   consent-gated localStorage tier.
  * • MOBILE — the rail becomes the İdman overlay: floating glass panel +
  *   scrim + bottom-left FAB, Escape closes, routes close.
  */
@@ -70,7 +75,14 @@ export type ShellUi = {
   title?: string;
 };
 
-export type ShellUser = { name: string | null; email: string };
+export type ShellUser = {
+  name: string | null;
+  email: string;
+  /** Profile photo (data URL) — rides on the session row (v3.3). */
+  avatar?: string | null;
+  /** The rail fold choice from the server (v6.1) — first-paint correct. */
+  railFolded?: boolean;
+};
 
 type Props = {
   mode: "link" | "tab";
@@ -108,7 +120,9 @@ export function AppShell({
   mode, tabs, activeId, hrefs, onSelect, ui, user, topnav, children,
 }: Props) {
   const listRef = useRef<HTMLUListElement>(null);
-  const [folded, setFolded] = useState(false);
+  /* Signed-in: the server-rendered fold choice (session row) — no flash,
+   * no hydration dance. Guests: start open, localStorage may fold after. */
+  const [folded, setFolded] = useState<boolean>(() => user?.railFolded === true);
   const [mobOpen, setMobOpen] = useState(false);
   const [groupOpen, setGroupOpen] = useState(true);
   const [acctOpen, setAcctOpen] = useState(false);
@@ -123,14 +137,15 @@ export function AppShell({
   const mobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServer);
   const expanded = mobile ? mobOpen : !folded;
 
-  /* The stored fold choice returns post-consent; otherwise the rail starts
-   * fully open (and stays in memory only). */
+  /* Guests only: the stored fold choice returns post-consent; otherwise
+   * the rail starts fully open (and stays in memory only). Signed-in
+   * users carry the choice on their account (see toggleRail). */
   useEffect(() => {
-    if (!hasConsent()) return;
+    if (user || !hasConsent()) return;
     try {
       if (localStorage.getItem(FOLD_KEY) === "1") setFolded(true);
     } catch { /* storage unavailable */ }
-  }, []);
+  }, [user]);
 
   /* Overlay hygiene: a route change closes the mobile drawer and the
    * account dropdown. */
@@ -154,7 +169,11 @@ export function AppShell({
     setFolded((v) => {
       const next = !v;
       if (next) setAcctOpen(false);
-      if (hasConsent()) {
+      if (user) {
+        // v6.1: the choice lives on the account — every device, every
+        // page render. (Mirrored onto the session row server-side.)
+        saveUserPref({ railFolded: next });
+      } else if (hasConsent()) {
         try { localStorage.setItem(FOLD_KEY, next ? "1" : "0"); } catch { /* ignore */ }
       }
       return next;
@@ -221,12 +240,6 @@ export function AppShell({
   const groupHref = tabs.length > 0
     ? mainNav.find(({ href }) => on(href))?.href
     : undefined;
-
-  const toggleTheme = () => {
-    const dark = document.documentElement.classList.toggle("dark");
-    setThemeChoice(dark);
-    if (user) saveUserPref({ theme: dark ? "dark" : "light" });
-  };
 
   const ariaCurrent = (href: string) =>
     on(href) ? ("page" as const) : undefined;
@@ -329,7 +342,9 @@ export function AppShell({
                 aria-controls="rail-account-menu"
                 title={!expanded ? t("accountMenuLabel") : undefined}
               >
-                <span className="rail-avatar" aria-hidden>{initials}</span>
+                <span className="rail-avatar" aria-hidden>
+                  {user.avatar ? <img src={user.avatar} alt="" /> : initials}
+                </span>
                 {expanded && (
                   <>
                     <span className="rail-id-meta">
@@ -454,25 +469,11 @@ export function AppShell({
             })}
           </ul>
         </div>
-
-        {/* The theme toggle — pinned to the card's bottom edge so it stays
-         * reachable even when the nav groups scroll. Language and log out
-         * live in Settings (v6). */}
-        {user && (
-          <div className="rail-foot">
-            <button
-              type="button"
-              className="rail-theme"
-              aria-label={tm("navThemeToggle")}
-              title={tm("navThemeToggle")}
-              onClick={toggleTheme}
-            >
-              <Sun aria-hidden className="ico-sun" size={16} />
-              <Moon aria-hidden className="ico-moon" size={16} />
-            </button>
-          </div>
-        )}
       </nav>
+
+      {/* v6.1: the foot is gone — the light/dark toggle lives ONLY in
+       * Settings → Appearance; language and log out also stay in
+       * Settings. Nothing else pins to the rail's bottom edge. */}
 
       {/* Mobile floating open button */}
       {mobile && !expanded && (

@@ -28,7 +28,12 @@ export async function AppPageShell({
         tabs={[]}
         activeId=""
         hrefs={{}}
-        user={user ? { name: user.name, email: user.email } : null}
+        user={user ? {
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar ?? null,
+          railFolded: user.railFolded ?? false,
+        } : null}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current") }}
       >
         {children}

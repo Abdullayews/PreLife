@@ -193,9 +193,9 @@ export async function updateProfile(userId: string, body: ProfilePatchIn): Promi
   }
 
   if (errors.length) throw new ApiCode(400, errors[0]!);
-  if (Object.keys(patch).length === 0) throw new ApiCode(400, "nothing_to_update");
 
-  // Weight goes to the log table (one row per day — upsert today's entry).
+  // Weight goes to the log table (one row per day — upsert today's entry)
+  // BEFORE the nothing-to-update check: a weight-only PATCH is valid.
   if (body.weightKg !== undefined) {
     const v = Number(body.weightKg);
     if (!Number.isFinite(v) || v < 20 || v > 400) throw new ApiCode(400, "weightKg");
@@ -210,6 +210,12 @@ export async function updateProfile(userId: string, body: ProfilePatchIn): Promi
     } else {
       await supaInsert("user_weight_logs", { user_id: userId, log_date: today, weight_kg: v });
     }
+  }
+
+  if (Object.keys(patch).length === 0) {
+    // Weight-only patches have already done their work above.
+    if (body.weightKg !== undefined) return getProfileView(userId);
+    throw new ApiCode(400, "nothing_to_update");
   }
 
   await supaUpdate("profiles", [["id", `eq.${userId}`]], patch);

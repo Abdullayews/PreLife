@@ -18,7 +18,7 @@ import { isIdmanTabId, type IdmanTabId } from "./data";
 export function IdmanPage({
   user, initialTab, tabs, ui, topnav,
 }: {
-  user: { name: string; email: string };
+  user: { name: string; email: string; avatar?: string | null; railFolded?: boolean };
   initialTab?: IdmanTabId;
   /** Pre-translated rail subtabs (labels from gymApp.tab_*, icon keys). */
   tabs: ShellTab[];

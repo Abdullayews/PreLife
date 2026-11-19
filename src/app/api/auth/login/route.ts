@@ -19,6 +19,12 @@ export async function POST(req: NextRequest) {
     granted = await authPasswordLogin(email, password);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    // Unconfirmed accounts fail the password grant with the same 400
+    // invalid_grant shape as wrong credentials — the description tells
+    // them apart. Checked first, before the generic invalid_grant match.
+    if (msg.includes("Email not confirmed")) {
+      return jsonError(403, "email_unverified");
+    }
     if (msg.includes("invalid_grant") || msg.includes("Invalid login credentials")) {
       return jsonError(401, "invalid_credentials");
     }

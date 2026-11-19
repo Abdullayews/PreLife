@@ -35,7 +35,9 @@ export default async function WelcomePage({ params }: Props) {
 
   return (
     <div data-world="shell" className="world">
-      <AiChatFab />
+      {/* Guests meet the AI assistant here; signed-in visitors get the
+       * global FAB from the [locale] layout on every page instead. */}
+      {!user && <AiChatFab />}
       <section className="hero" aria-label={t("hero.ariaLabel")}>
         <Gallery
           images={landingFrames.map((f) => f.src)}

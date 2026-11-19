@@ -29,7 +29,7 @@ export default async function GymPage({ params, searchParams }: Props) {
   const session = await getSessionUser();
   const user = supabaseConfigured
     ? await requireUser(locale, "/gym")
-    : session ?? { id: "demo", email: "demo@prelife.app", name: "Nigar" };
+    : session ?? { id: "demo", email: "demo@prelife.app", name: "Nigar", avatar: null, railFolded: false };
   const topnav = !(supabaseConfigured ? user : session);
 
   const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
@@ -52,7 +52,12 @@ export default async function GymPage({ params, searchParams }: Props) {
   return (
     <div data-world="gym" className="world app-page">
       <IdmanPage
-        user={{ name: user.name ?? user.email, email: user.email }}
+        user={{
+          name: user.name ?? user.email,
+          email: user.email,
+          avatar: user.avatar ?? null,
+          railFolded: user.railFolded ?? false,
+        }}
         initialTab={initialTab}
         tabs={[...tabs]}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("gym.name") }}

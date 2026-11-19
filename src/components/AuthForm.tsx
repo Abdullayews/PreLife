@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { apiUrl } from "@/lib/api-url";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -26,34 +26,72 @@ function AppleIcon() {
   );
 }
 
+/** The dashed dev box: SMTP is not configured in the sandbox, so the
+ * verification link is surfaced right on screen instead of an e-mail. */
+function DevLinkBox({ note, open, href }: { note: string; open: string; href: string }) {
+  return (
+    <div className="auth-demo">
+      {note}{" "}
+      <a className="forgot" href={href} target="_blank" rel="noreferrer">{open}</a>
+    </div>
+  );
+}
+
 /**
  * Classic email + password form shared by /login and /signup, with
  * Google / Apple buttons wired to the real OAuth flow (GET
  * /api/auth/oauth/<provider> → Supabase /authorize with PKCE →
  * /api/auth/callback mints the session). The buttons are full page
  * navigations: the OAuth dance cannot run inside fetch.
+ *
+ * Signup no longer signs in: the account is created unconfirmed and the
+ * card switches to a "check your inbox" state until the verification
+ * link is opened. Login on an unconfirmed account (403
+ * email_unverified) offers the resend button instead.
  */
 export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup"; next?: string; oauthError?: boolean }) {
   const t = useTranslations("authPage");
+  const locale = useLocale();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(oauthError ? "oauth" : null);
   const [showPw, setShowPw] = useState(false);
 
+  // Signup success: the "check your inbox" state replaces the form.
+  const [signedUp, setSignedUp] = useState<{ email: string; devLink: string | null } | null>(null);
+  // Login on an unconfirmed account: the resend flow below the error.
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
+  const [resendBusy, setResendBusy] = useState(false);
+  const [resendState, setResendState] = useState<"ok" | "fail" | "unknown" | null>(null);
+  const [resendDevLink, setResendDevLink] = useState<string | null>(null);
+
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     const data = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(data.entries());
     setBusy(true);
     try {
       const res = await fetch(apiUrl(`/api/auth/${mode}`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(Object.fromEntries(data.entries())),
+        // Signup carries the locale so the verification e-mail matches.
+        body: JSON.stringify(mode === "signup" ? { ...payload, locale } : payload),
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
+        if (mode === "login" && body.error === "email_unverified") {
+          setUnverifiedEmail(typeof payload.email === "string" ? payload.email : "");
+        }
         setError(body.error ?? "generic");
+        return;
+      }
+      if (mode === "signup") {
+        const body = (await res.json().catch(() => ({}))) as { email?: string; devLink?: string };
+        setSignedUp({
+          email: typeof body.email === "string" ? body.email : String(payload.email ?? ""),
+          devLink: typeof body.devLink === "string" ? body.devLink : null,
+        });
         return;
       }
       router.push(safeNext(next) ?? "/home");
@@ -65,12 +103,68 @@ export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup";
     }
   };
 
+  // Rotates the pending verification token and re-sends the e-mail.
+  const resendVerification = async () => {
+    if (!unverifiedEmail) return;
+    setResendBusy(true);
+    setResendState(null);
+    setResendDevLink(null);
+    try {
+      const res = await fetch(apiUrl("/api/auth/resend"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: unverifiedEmail, locale }),
+      });
+      if (res.status === 404) {
+        setResendState("unknown");
+        return;
+      }
+      if (!res.ok) {
+        setResendState("fail");
+        return;
+      }
+      const body = (await res.json().catch(() => ({}))) as { devLink?: string };
+      setResendDevLink(typeof body.devLink === "string" ? body.devLink : null);
+      setResendState("ok");
+    } catch {
+      setResendState("fail");
+    } finally {
+      setResendBusy(false);
+    }
+  };
+
   const otherHref = (mode === "login" ? "/signup" : "/login") + (next ? `?next=${encodeURIComponent(next)}` : "");
 
   // Full page navigation — the OAuth redirect chain cannot run in fetch.
   const startOauth = (provider: "google" | "apple") => {
     window.location.href = apiUrl(`/api/auth/oauth/${provider}`);
   };
+
+  // Signup succeeded — the card becomes the "check your inbox" state.
+  if (signedUp) {
+    return (
+      <div className="auth-card">
+        <Link href="/welcome" className="brand" aria-label="PreLife">
+          Pre<em>Life</em>
+        </Link>
+
+        <div className="auth-head">
+          <h1 className="h2">{t("signupOkTitle")}</h1>
+          <p className="lede">{t("signupOkText", { email: signedUp.email })}</p>
+        </div>
+
+        <p className="set-note">{t("signupOkNote")}</p>
+
+        {signedUp.devLink && (
+          <DevLinkBox note={t("devLinkNote")} open={t("devLinkOpen")} href={signedUp.devLink} />
+        )}
+
+        <Link href="/welcome" className="back auth-back">
+          <ArrowLeft size={16} aria-hidden />{t("backToWelcome")}
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-card">
@@ -126,8 +220,29 @@ export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup";
 
         {error && (
           <p className="field-error" role="alert">
-            {t(`errors.${error}`)}
+            {error === "email_unverified" ? t("loginUnverified") : t(`errors.${error}`)}
           </p>
+        )}
+
+        {mode === "login" && error === "email_unverified" && (
+          <>
+            {resendState === "ok" ? (
+              <>
+                <p className="set-note">{t("resendOk")}</p>
+                {resendDevLink && (
+                  <DevLinkBox note={t("devLinkNote")} open={t("devLinkOpen")} href={resendDevLink} />
+                )}
+              </>
+            ) : resendState === "unknown" ? (
+              <p className="field-error" role="alert">{t("resendUnknown")}</p>
+            ) : resendState === "fail" ? (
+              <p className="field-error" role="alert">{t("resendFail")}</p>
+            ) : (
+              <button type="button" className="btn btn-ghost" onClick={resendVerification} disabled={resendBusy}>
+                {t("resendCta")}
+              </button>
+            )}
+          </>
         )}
 
         <button type="submit" className="btn btn-lg" disabled={busy}>

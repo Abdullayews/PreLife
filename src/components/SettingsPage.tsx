@@ -9,6 +9,7 @@ import {
   Watch, X, type LucideIcon,
 } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { hasConsent, persistLocale, setThemeChoice } from "@/lib/consent";
 import { saveUserPref } from "@/lib/user-prefs";
@@ -355,6 +356,14 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
                 <div className="set-row">
                   <span className="set-info"><b>{t("account.plan")}</b></span>
                   <span className="set-val">{t("account.planFree")}</span>
+                </div>
+                <div className="set-row">
+                  <span className="set-info">
+                    <b>{t("account.editProfile")}</b>
+                  </span>
+                  <Link href="/profile" className="btn btn-sm">
+                    <UserRound size={15} aria-hidden />{t("account.editProfile")}
+                  </Link>
                 </div>
                 <div className="set-row">
                   <span className="set-info">

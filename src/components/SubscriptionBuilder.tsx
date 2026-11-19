@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Check, Crown, Minus, Plus, Sparkles, Zap } from "lucide-react";
+import { apiUrl } from "@/lib/api-url";
 
 /** One feature row of the custom builder — id, translated name and
  *  monthly price arrive from the server page. */
@@ -23,11 +24,39 @@ export type SubTier = {
   features: string[];
 };
 
+/** One saved custom-package request — the shape GET/POST
+ *  /api/subscription/custom speaks (see src/lib/server/packages.ts). */
+export type CustomPackage = {
+  id: string;
+  features: string[];
+  months: number;
+  monthlyPrice: number;
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+};
+
+/** Allowed durations — must mirror PACKAGE_MONTHS server-side. */
+const MONTHS_OPTIONS = [1, 3, 6, 12] as const;
+
+/** Duration multipliers, mirroring monthsDiscount() in
+ *  src/lib/server/packages.ts (1 → 1, 3 → .95, 6 → .90, 12 → .85).
+ *  Display only — the POST endpoint recomputes the price
+ *  authoritatively, never trusting this table. */
+const MONTHS_MULTIPLIER: Record<number, number> = { 1: 1, 3: 0.95, 6: 0.9, 12: 0.85 };
+
+/** Fills a single "{name}" placeholder in a pre-resolved ui template. */
+const fill = (tpl: string, key: string, val: string | number): string =>
+  tpl.replaceAll(`{${key}}`, String(val));
+
 /**
  * The subscription configurator: three template tiers (Plus / Pro /
  * Ultra) as starting points, plus the "Şəxsi plan" builder where ONLY
- * the features the user wants can be selected — the live total simply
- * sums the picked features (1 ₼ minimum, so a plan is never empty).
+ * the features the user wants can be selected. The live total sums
+ * the picked features and applies the duration discount (1 ₼ minimum,
+ * so a plan is never empty); "Paketi tələb et" POSTs the picks — the
+ * server prices them again — and every request is listed under the
+ * builder with its status chip.
  */
 export function SubscriptionBuilder({
   tiers, features, ui,
@@ -42,27 +71,102 @@ export function SubscriptionBuilder({
     customDesc: string;
     total: string;
     included: string;
-    customCta: string;
     tierCta: string;
     current: string;
+    months: string;
+    monthsUnit: string;
+    discountNote: string;
+    requestCta: string;
+    requesting: string;
+    requested: string;
+    requestedNote: string;
+    myTitle: string;
+    myEmpty: string;
+    statusRequested: string;
+    statusActive: string;
+    quoteTotal: string;
   };
 }) {
   const t = useTranslations("subscription");
+  /* Generic retry line for a failed request — the subscription
+   * namespace has no error string and messages are frozen this phase. */
+  const tErr = useTranslations("settingsPage.devices");
   const [mode, setMode] = useState<"tier" | "custom">("tier");
   const [tier, setTier] = useState<string>("pro");
   const [picked, setPicked] = useState<string[]>(features.slice(0, 2).map((f) => f.id));
+  const [months, setMonths] = useState<number>(1);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [created, setCreated] = useState<CustomPackage | null>(null);
+  const [mine, setMine] = useState<CustomPackage[] | null>(null);
 
   const priceOf = useMemo(
     () => new Map(features.map((f) => [f.id, f.price])),
     [features],
   );
+  /* Codes → localized names, for summarizing saved requests. */
+  const nameOf = useMemo(
+    () => new Map(features.map((f) => [f.id, f.name])),
+    [features],
+  );
 
-  const customTotal = picked.reduce((sum, id) => sum + (priceOf.get(id) ?? 0), 0);
+  const monthlyTotal = picked.reduce((sum, id) => sum + (priceOf.get(id) ?? 0), 0);
+  const multiplier = MONTHS_MULTIPLIER[months] ?? 1;
+  const discountPct = Math.round((1 - multiplier) * 100);
+  const grandTotal = Math.round(monthlyTotal * months * multiplier * 100) / 100;
 
-  const toggle = (id: string) =>
+  /* My saved requests — loaded once on mount, reloaded after each
+   * successful POST so the new row appears immediately. */
+  const loadMine = useCallback(async () => {
+    try {
+      const res = await fetch(apiUrl("/api/subscription/custom"), { cache: "no-store" });
+      if (!res.ok) throw new Error();
+      const body = (await res.json()) as { packages: CustomPackage[] };
+      setMine(body.packages);
+    } catch {
+      setMine([]);
+    }
+  }, []);
+
+  useEffect(() => { loadMine(); }, [loadMine]);
+
+  const toggle = (id: string) => {
+    setFailed(false);
+    setCreated(null);
     setPicked((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
+  };
+
+  const pickMonths = (m: number) => {
+    setFailed(false);
+    setCreated(null);
+    setMonths(m);
+  };
+
+  const request = async () => {
+    if (busy || picked.length === 0) return;
+    setBusy(true);
+    setFailed(false);
+    try {
+      const res = await fetch(apiUrl("/api/subscription/custom"), {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ features: picked, months }),
+      });
+      if (!res.ok) throw new Error();
+      const body = (await res.json()) as { package: CustomPackage };
+      setCreated(body.package);
+      await loadMine();
+    } catch {
+      setFailed(true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /* Feature codes → localized names, joined for one-line summaries. */
+  const namesOf = (codes: string[]) => codes.map((c) => nameOf.get(c) ?? c).join(", ");
 
   return (
     <div className="subcfg">
@@ -136,6 +240,27 @@ export function SubscriptionBuilder({
           <h3 className="h4">{ui.customTitle}</h3>
           <p className="subcustom-desc">{ui.customDesc}</p>
 
+          <div className="subcustom-dur">
+            <span className="subcustom-lbl">{ui.months}</span>
+            <div className="seg" role="group" aria-label={ui.months}>
+              {MONTHS_OPTIONS.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  aria-pressed={months === m}
+                  onClick={() => pickMonths(m)}
+                >
+                  {m} {ui.monthsUnit}
+                </button>
+              ))}
+            </div>
+          </div>
+          {discountPct > 0 && (
+            <p className="subcustom-hint subcustom-disc">
+              {fill(ui.discountNote, "pct", discountPct)}
+            </p>
+          )}
+
           <ul className="subpick">
             {features.map((f) => {
               const on = picked.includes(f.id);
@@ -162,14 +287,58 @@ export function SubscriptionBuilder({
 
           <div className="subcustom-total">
             <span>{ui.total}</span>
-            <b>{customTotal} ₼ <em>/ {ui.perMonth}</em></b>
+            <b>
+              {grandTotal} ₼{" "}
+              <em>/ {months > 1 ? `${months} ${ui.monthsUnit}` : ui.perMonth}</em>
+            </b>
           </div>
-          <button type="button" className="btn subcustom-cta" disabled={picked.length === 0}>
-            {ui.customCta}
+          <button
+            type="button"
+            className="btn subcustom-cta"
+            disabled={busy || picked.length === 0}
+            onClick={request}
+          >
+            {busy ? ui.requesting : ui.requestCta}
           </button>
           {picked.length === 0 && <p className="subcustom-hint">{t("customPickHint")}</p>}
+          {failed && <p className="subcustom-hint" role="alert">{tErr("error")}</p>}
+
+          {created && (
+            /* <output> carries the implicit role="status" — the receipt
+             * of the request just made is announced politely. */
+            <output className="submy-ok">
+              <b>{ui.requested}</b>
+              <span>
+                {namesOf(created.features)} · {created.months} {ui.monthsUnit} ·{" "}
+                {fill(ui.quoteTotal, "total", created.totalPrice)}
+              </span>
+              <span className="subcustom-hint">{ui.requestedNote}</span>
+            </output>
+          )}
         </div>
       )}
+
+      {/* ── My requests — every custom package this account sent ── */}
+      <section className="submy" aria-label={ui.myTitle}>
+        <h2 className="h4">{ui.myTitle}</h2>
+        {mine === null ? null : mine.length === 0 ? (
+          <p className="subcustom-hint">{ui.myEmpty}</p>
+        ) : (
+          <ul className="submy-list" aria-live="polite">
+            {mine.map((p, i) => (
+              <li key={p.id || `pkg-${i}`} className="submy-row">
+                <span className="submy-feats">{namesOf(p.features)}</span>
+                <span className="submy-meta">
+                  {p.months} {ui.monthsUnit} · {fill(ui.quoteTotal, "total", p.totalPrice)}
+                </span>
+                <span className={p.status === "active" ? "tag tag-solid" : "tag"}>
+                  {p.status === "active" ? ui.statusActive : ui.statusRequested}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

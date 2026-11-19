@@ -13,6 +13,7 @@ import { UserPrefsSync } from "@/components/UserPrefsSync";
 import { SwRegister } from "@/components/SwRegister";
 import { ConnectionNotice } from "@/components/ConnectionNotice";
 import { HtmlLang } from "@/components/HtmlLang";
+import { AiChatFab } from "@/components/AiChatFab";
 import { getSessionUser } from "@/lib/auth";
 import { CONSENT_COOKIE } from "@/lib/consent";
 
@@ -75,6 +76,10 @@ export default async function LocaleLayout({
         <UserPrefsSync userId={user?.id ?? null} />
         <SwRegister />
         <ConnectionNotice />
+        {/* v6.1: the AI assistant follows the signed-in user EVERYWHERE —
+            every tab and subtab renders the floating chat (context-aware,
+            account tools enabled). Guests meet it on /welcome. */}
+        {user && <AiChatFab signedIn />}
         <main>{children}</main>
         <Footer />
         <CookieConsent initialAccepted={cookieStore.get(CONSENT_COOKIE)?.value === "1"} />

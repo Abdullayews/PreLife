@@ -9,13 +9,29 @@ import { currentSessionFromHeaders } from "./server/session";
  * Auth (auth.users + profiles) and are verified by the /api/auth routes.
  */
 
-export type SessionUser = { id: string; email: string; name: string | null };
+export type SessionUser = {
+  id: string;
+  email: string;
+  name: string | null;
+  /** Profile photo (data URL) riding on the session row (v3.3). */
+  avatar: string | null;
+  /** The rail fold choice riding on the session row (v3.3). */
+  railFolded: boolean;
+};
 
 export async function getSessionUser(): Promise<SessionUser | null> {
   try {
     const h = await headers();
     const cs = await currentSessionFromHeaders(h);
-    return cs ? { id: cs.user.id, email: cs.user.email, name: cs.user.name } : null;
+    return cs
+      ? {
+        id: cs.user.id,
+        email: cs.user.email,
+        name: cs.user.name,
+        avatar: cs.user.avatar ?? null,
+        railFolded: cs.user.railFolded ?? false,
+      }
+      : null;
   } catch {
     return null;
   }

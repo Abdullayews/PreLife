@@ -3025,3 +3025,70 @@ html.dark .idman {
 .app-shell[data-topnav="off"] .idman.idman-embed .iplan-side {
   top: 1.25rem;
 }
+
+/* ── v3.3 subscription: custom duration + my requests ──────────────────── */
+.subcustom-dur { display: flex; align-items: center; gap: .8rem; flex-wrap: wrap; }
+.subcustom-lbl {
+  font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted);
+}
+.subcustom-disc { color: var(--accent-text); font-weight: 650; }
+.submy { display: grid; gap: .6rem; }
+.submy-list { display: grid; gap: .5rem; list-style: none; margin: 0; padding: 0; }
+.submy-row {
+  display: flex; align-items: center; gap: .8rem; flex-wrap: wrap;
+  padding: .7rem .9rem; border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface);
+}
+.submy-feats { flex: 1 1 14rem; min-width: 0; font: 550 .9375rem/1.3 var(--font-body); }
+.submy-meta {
+  color: var(--muted); font-size: .875rem;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.submy-ok {
+  display: grid; gap: .3rem; padding: .8rem .9rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: var(--r-md); background: var(--wash);
+}
+.submy-ok b { font: 650 .9375rem/1.3 var(--font-body); color: var(--accent-text); }
+.submy-ok span { font-size: .875rem; color: var(--ink); }
+
+/* ══ v6.1 polish — avatar sizing + softer motion ══════════════════════════
+   1. Avatar <img> sizing: the rail avatar and the .avatar circle clamp any
+      photo into the circle — a raw data-URL image at natural size would
+      otherwise blow the expanded rail's width open (the profile-area
+      sizing bug).
+   2. Motion softening: one gentle curve on every interactive surface —
+      slightly longer, eased hovers; settings panels cross-fade in. */
+.rail-avatar, .avatar { overflow: hidden; }
+.rail-avatar img, .avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  border-radius: inherit;
+}
+
+/* Softer hovers — same intent, gentler hand. */
+.btn {
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease),
+    filter .3s var(--ease), background-color .3s var(--ease), color .3s var(--ease);
+}
+.seg button {
+  transition: color .25s var(--ease), background-color .25s var(--ease),
+    box-shadow .25s var(--ease);
+}
+.rail-item, .rail-tab, .rail-id, .rail-fold { transition-duration: .25s; transition-timing-function: var(--ease); }
+.icon-btn, .ai-fab-x, .set-cat {
+  transition: color .25s var(--ease), background-color .25s var(--ease),
+    border-color .25s var(--ease), transform .25s var(--ease);
+}
+
+/* Settings panels cross-fade in when the category switches. */
+.set-body > section { animation: panel-in .35s var(--ease) both; }
+@keyframes panel-in { from { opacity: 0; transform: translateY(8px); } }
+
+/* The signed-in AI hint line under the intro. */
+.ai-fab-intro.dim {
+  margin-top: .45rem; padding-top: .55rem;
+  border-top: 1px dashed var(--line);
+  font-size: .8125rem;
+}
