@@ -1,32 +1,21 @@
 import { headers } from "next/headers";
 import { redirect } from "@/i18n/navigation";
+import { currentSessionFromHeaders } from "./server/session";
 
 /**
- * PreLife auth — thin server-side client for the Rust backend.
- *
- * Accounts live in the database: Supabase Auth (auth.users + profiles)
- * holds the credentials and verifies them; the prelife-api service mints
- * cookie sessions (public.sessions, which also powers the Devices screen).
- * This module just identifies the current visitor for server components:
- * the browser cookie is forwarded to /api/auth/me, which returns the
- * session user or null for anonymous visitors.
+ * PreLife auth — the merged backend identifies the current visitor for
+ * server components straight from the cookie session (public.sessions,
+ * which also powers the Devices screen). Credentials live in Supabase
+ * Auth (auth.users + profiles) and are verified by the /api/auth routes.
  */
-
-const API_BASE = process.env.PRELIFE_API_URL ?? "http://127.0.0.1:3031";
 
 export type SessionUser = { id: string; email: string; name: string | null };
 
 export async function getSessionUser(): Promise<SessionUser | null> {
   try {
     const h = await headers();
-    const cookie = h.get("cookie");
-    const res = await fetch(`${API_BASE}/api/auth/me`, {
-      cache: "no-store",
-      headers: cookie ? { cookie } : undefined,
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { user?: SessionUser | null };
-    return data.user ?? null;
+    const cs = await currentSessionFromHeaders(h);
+    return cs ? { id: cs.user.id, email: cs.user.email, name: cs.user.name } : null;
   } catch {
     return null;
   }

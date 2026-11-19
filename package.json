@@ -1,6 +1,6 @@
 {
   "name": "prelife",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "engines": {
     "node": ">=20.19"
@@ -13,8 +13,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "db:export": "bun scripts/export-content.mjs",
     "db:apply": "node scripts/apply-db.mjs",
-    "db:apply:schema": "node scripts/apply-db.mjs schema",
-    "api:dev": "cd mini-services/prelife-api && bun run dev"
+    "db:apply:schema": "node scripts/apply-db.mjs schema"
   },
   "dependencies": {
     "lucide-react": "1.72.0",
