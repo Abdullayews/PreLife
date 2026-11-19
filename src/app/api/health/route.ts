@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { supabaseConfigured } from "@/lib/server/supa";
 
 export const dynamic = "force-dynamic";

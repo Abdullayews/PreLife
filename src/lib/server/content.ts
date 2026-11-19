@@ -238,12 +238,12 @@ export async function gymCatalog(): Promise<Record<string, unknown>> {
     const id = typeof p.id === "number" ? p.id : 0;
     const featureKeys = (featBy.get(id) ?? []).map((f) => s(f, "feature_key"));
     const eq = (eqBy.get(id) ?? [])
-      .map((e) => ({ o: e.sort_order, code: s(e, "equipment_code") }))
+      .map((e) => ({ o: typeof e.sort_order === "number" ? e.sort_order : 0, code: s(e, "equipment_code") }))
       .sort((a, b) => a.o - b.o)
       .map((e) => e.code);
     const tr = (trBy.get(id) ?? [])
       .map((t) => ({
-        o: t.sort_order,
+        o: typeof t.sort_order === "number" ? t.sort_order : 0,
         v: {
           name: s(t, "name"),
           spec: s(t, "spec_code"),
@@ -290,7 +290,7 @@ export async function gymCatalog(): Promise<Record<string, unknown>> {
       .map((p) => {
         const id = typeof p.id === "number" ? p.id : 0;
         const at = (offersBy.get(id) ?? [])
-          .map((o) => ({ o: o.sort_order, v: { store: s(o, "store_slug"), price: o.price ?? null } }))
+          .map((o) => ({ o: typeof o.sort_order === "number" ? o.sort_order : 0, v: { store: s(o, "store_slug"), price: o.price ?? null } }))
           .sort((a, b) => a.o - b.o)
           .map((o) => o.v);
         return {
@@ -342,7 +342,7 @@ export async function gymCatalog(): Promise<Record<string, unknown>> {
           ? { t: s(e, "reps_type"), a: e.reps_a, b: e.reps_b }
           : { t: s(e, "reps_type"), a: e.reps_a };
         return {
-          o: e.sort_order,
+          o: typeof e.sort_order === "number" ? e.sort_order : 0,
           v: {
             ex: s(e, "exercise_code"),
             sets: e.sets,
@@ -406,7 +406,7 @@ export async function dietCatalog(): Promise<Record<string, unknown>> {
   for (const r of recipes) {
     const slug = s(r, "slug");
     const ing = (ingBy.get(slug) ?? [])
-      .map((i) => ({ o: i.sort_order, k: s(i, "ingredient_key") }))
+      .map((i) => ({ o: typeof i.sort_order === "number" ? i.sort_order : 0, k: s(i, "ingredient_key") }))
       .sort((a, b) => a.o - b.o)
       .map((i) => i.k);
     recipeDetails[slug] = {

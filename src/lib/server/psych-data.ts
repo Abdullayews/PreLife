@@ -211,8 +211,10 @@ export async function quizSubmit(user: SessionUser, body: Row) {
   const answers: number[] = [];
   for (const a of answersRaw) {
     let n: number;
+    // Rust parity: integer numbers pass; JSON floats with a zero fraction
+    // (3.0) already parse as JS integers above; fractional numbers and
+    // non-numeric strings are rejected below.
     if (typeof a === "number" && Number.isInteger(a)) n = a;
-    else if (typeof a === "number" && Number.isInteger(a)) n = a;
     else if (typeof a === "string" && /^-?\d+$/.test(a)) n = Number(a);
     else throw badRequest();
     if (n < 0 || n > 3) throw badRequest();

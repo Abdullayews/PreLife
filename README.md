@@ -2,39 +2,43 @@
 
 One product, four worlds: **Gym, Diet, Psychology, Books** (+ Subscription).
 
-## Architecture (v2 — Rust backend, Supabase Postgres)
+## Architecture (v2.1 — one service: merged Next.js backend)
 
 ```
-Browser ──▶ Next.js 16 (port 3000, UI only)
-              │  server components fetch directly
-              │  client fetches go through the gateway (?XTransformPort=3031)
-              ▼
-         prelife-api — 100% Rust (axum, port 3031, mini-services/prelife-api)
-              │  PostgREST, service_role key, in-memory TTL cache
+Browser ──▶ Next.js 16 (App Router, port 3000 / $PORT)
+              │  UI (React 19, next-intl) + the merged backend:
+              │    /api/* route handlers  (src/app/api/**)
+              │    server data layer      (src/lib/server/*)
+              │  PostgREST + GoTrue admin, service_role key,
+              │  in-process 60 s TTL cache
               ▼
          Supabase Postgres — THE single source of truth
-         (all content, the full i18n catalog, user data)
+         (all content, the full i18n catalog, auth, user data)
 ```
 
+- **One deployment**: the former Rust service (`prelife-api`, port 3031) was
+  merged into the Next.js app 1:1 — every endpoint, session format and error
+  code is identical, so existing `pl_session` cookies keep working. Server
+  components call the same assembly code directly (`src/lib/api.ts` — no HTTP
+  hop); browser code fetches plain relative `/api/...` URLs
+  (`src/lib/api-url.ts`). There is **no second service to run**.
 - **Frontend**: Next.js 16 (App Router) + React 19 + TypeScript + next-intl.
-  No data is hardcoded anymore — every page fetches its content from the
-  Rust API (`src/lib/api.ts`); the message catalogs are database-driven too
-  (`src/i18n/request.ts` loads `i18n_messages` via the API, with the bundled
+  No data is hardcoded — every page reads its content from the database
+  (`src/lib/api.ts`); the message catalogs are database-driven too
+  (`src/i18n/request.ts` loads `i18n_messages`, with the bundled
   `messages/*.json` as a fallback).
-- **Backend**: `mini-services/prelife-api` — an axum service that serves the
-  content endpoints, auth (scrypt + cookie sessions), devices, and the whole
+- **Backend** (inside this app): `/api` route handlers serve the content
+  endpoints, auth (Supabase Auth + cookie sessions), devices, and the whole
   psychology module (journal, mood, quizzes, bookings, media progress, AI
-  companion). It talks to Supabase through PostgREST and caches responses
-  for 60 s. The AI chat calls the same z-ai HTTP API the Node SDK used
-  (config from `.z-ai-config`), with calm canned fallbacks.
-- **Database** (Supabase, 51 tables in 8 groups): `i18n_messages` (≈1300
-  keys × az/en/ru), the four content worlds (plans, items, schedules,
-  places), gym (halls, equipment, trainers, stores, 40 products, workouts),
-  diet, psychology (8 psychologists, media, quizzes), library, subscriptions
-  (Plus/Pro/Ultra + à-la-carte features), and user data (users, sessions,
-  appointments, mood logs, journal, quiz results, meditation progress).
-  RLS is enabled on every table with no policies — only the service_role
-  (the Rust backend) can read/write.
+  companion via the z-ai SDK). `src/lib/server/supa.ts` talks to Supabase
+  through PostgREST/GoTrue with the service_role key; content responses are
+  cached 60 s in-process (`src/lib/server/ttl.ts`).
+- **Database** (Supabase): `i18n_messages` (≈1300 keys × az/en/ru), the four
+  content worlds, gym, diet, psychology (8 psychologists, media, quizzes),
+  library, subscriptions (Plus/Pro/Ultra + à-la-carte features), and user
+  data (profiles, sessions, appointments, mood logs, journal, quiz results,
+  meditation progress). RLS is enabled everywhere; only the service_role
+  (this app's server) can read/write.
 
 ## Routes
 
@@ -53,136 +57,106 @@ Locales `az` / `en` / `ru` (default `en`), prefixed: `/en/…`.
 Legacy addresses `/welcome/psychology` and `/welcome/books` 301-redirect to
 `/welcome/meditation` and `/welcome/library` (all locales, `src/proxy.ts`).
 
-Since the v3.1 auth migration there is **no demo account**: accounts live in
-Supabase Auth (`auth.users` + `public.profiles`), passwords are verified by
-GoTrue's password grant, and users sign up normally with email + password.
-The legacy `public.users` table (scrypt hashes, the auto-created `123` demo)
-was dropped — code older than commit `95d5120` cannot log in anymore.
+There is **no demo account**: accounts live in Supabase Auth
+(`auth.users` + `public.profiles`), passwords are verified by GoTrue's
+password grant, and users sign up normally with email + password (or
+Google — see below).
 
 ## Develop
 
 ```
-bun install                          # frontend deps
+bun install                          # deps
 cp .env.example .env                 # + fill in the Supabase vars
 node scripts/apply-db.mjs            # apply db/schema.sql + seeds to Supabase
-cd mini-services/prelife-api && cargo build   # or: bun run dev (auto-restart)
-bun run dev                          # Next.js on :3000 (warms every route)
+bun run dev                          # Next.js on :3000 — that's all
 ```
 
 `bun run dev` also runs `scripts/warm.mjs`: once the server answers it
-requests every route once (pages with a demo-account session, Rust APIs
-with GET or invalid-JSON POSTs), so the first real visit to any page is
-not a 0.2–4 s cold compile.
+requests every route once (pages, plus API GETs / invalid-JSON POSTs), so
+the first real visit to any page is not a 0.2–4 s cold compile.
 
 ### Content pipeline
 
 The static content in `src/lib/*.ts` and `messages/*.json` was exported into
 the database once with `bun scripts/export-content.mjs` (generates
 `db/seed-content.sql` + `db/seed-i18n-*.sql`; committed for reference).
-To change content now, edit the rows in Supabase — the API picks up
-changes within its 60 s cache window. Re-running the exporter OVERWRITES
-the DB content from the TS files, so only do that deliberately.
+To change content now, edit the rows in Supabase — the app picks up changes
+within its 60 s cache window. Re-running the exporter OVERWRITES the DB
+content from the TS files, so only do that deliberately.
 
-### API surface (Rust, port 3031)
+### API surface (this app, same origin)
 
 Content: `GET /api/content/{worlds,gym,diet,meditation,library,subscription}` ·
 `GET /api/i18n?locale=az|en|ru` · `GET /api/health`
-Auth: `POST /api/auth/{signup,login,logout}` · `GET /api/auth/me`
-Devices: `GET /api/devices` · `PATCH|DELETE /api/devices/{id}`
+Auth: `POST /api/auth/{signup,login,logout}` · `GET /api/auth/me` ·
+`GET /api/auth/oauth/{google,apple}` → `GET /api/auth/callback`
+Account: `GET|PATCH /api/me/preferences` (language + theme) ·
+`GET /api/devices` · `PATCH|DELETE /api/devices/{id}`
 Psychology: `GET|POST /api/psych/journal` · `DELETE /api/psych/journal/{id}` ·
 `GET|POST /api/psych/mood` · `POST /api/psych/quiz` ·
 `GET|POST /api/psych/book` · `POST /api/psych/{cancel,pay,progress}` ·
 `GET /api/psych/{bookings,schedule-window,overview}`
 AI: `POST /api/ai/chat` (public) · `POST /api/psych/ai` (companion)
 
-Browser code must call these through the sandbox gateway:
-`apiUrl("/api/...")` (see `src/lib/api-url.ts`) — the gateway routes
-`?XTransformPort=3031` to the Rust service. Server components use
-`API_BASE` directly (`src/lib/api.ts`).
+## Deploy (single service)
 
-## Deploy
-
-- **Frontend**: Node ≥ 20.19 (`npm ci` — `package-lock.json` is committed;
-  `bun.lock` stays the dev-sandbox lockfile). `npm run build` → standalone
-  Next server on `$PORT`. Set `PRELIFE_API_URL` to the deployed API origin.
-  Browser `/api/*` calls are proxied to it in-app
-  (`src/app/api/[...path]/route.ts`), so a single-origin deployment (Render)
-  needs no external reverse proxy — the sandbox gateway's `?XTransformPort`
-  hint is stripped automatically. If the API is unreachable during the
-  build, content pages prerender the graceful offline shell
-  (`src/components/ContentUnavailable.tsx`) and ISR swaps in real content
-  within 60 s of the API recovering.
-- **Rust API**: on Render create a **Docker** Web Service (runtime:
-  Docker, root directory `mini-services/prelife-api` — the `Dockerfile`
-  is committed). Run it with `SUPABASE_URL` +
-  `SUPABASE_SERVICE_ROLE_KEY` in the environment (port via `PORT`,
-  default 10000; Render injects it automatically). Without Docker, build
-  `cargo build --release` on any host with a Rust toolchain and run
-  `./target/release/prelife-api` the same way.
+- **Render / any Node host**: Node ≥ 20.19 (`npm ci` — `package-lock.json`
+  is committed; `bun.lock` stays the dev-sandbox lockfile). `npm run build` →
+  standalone Next server on `$PORT`. Set **`SUPABASE_URL`** +
+  **`SUPABASE_SERVICE_ROLE_KEY`** in the service environment — that is the
+  whole configuration. The old separate `prelife-api` Render service (Docker,
+  root `mini-services/prelife-api`) is **no longer needed — delete it**; this
+  app serves `/api/*` itself. If the DB is unreachable during the build,
+  content pages prerender the graceful offline shell and ISR swaps in real
+  content within 60 s of recovery.
 - **Database**: Supabase Postgres — nothing to host. Apply schema changes
   with `node scripts/apply-db.mjs schema`.
-- **v3 unified schema** (`db/schema-v3.sql`, applied on top of v2 with
-  `node scripts/apply-db.mjs v3`): the Supabase-Auth-based layer —
+- **v3 unified schema** (`db/schema-v3.sql`): the Supabase-Auth-based layer —
   `profiles` (FK to `auth.users`, auto-created by the `on_auth_user_created`
-  trigger), subscriptions + `plan_sections` (psychology/diet/sports/books/ai,
-  gated by `has_section_access()`), `bookings`/`psychologist_slots`/`payments`,
-  `mood_checkins`, `journal_entries`, `practice_materials`/`practice_sessions`,
+  trigger), subscriptions + `plan_sections` (gated by `has_section_access()`),
+  `bookings`/`psychologist_slots`/`payments`, `mood_checkins`,
+  `journal_entries`, `practice_materials`/`practice_sessions`,
   `exercises`/`workouts`/`workout_exercises`/`user_workout_*`, and
-  `books`/`user_books`/`book_notes`. RLS policies give `authenticated` users
-  access to their own rows; writes to bookings/payments/subscriptions stay
-  server-side (service_role). The two v2 tables whose names the v3 schema
-  reuses were renamed (`psychologists_v2`, `journal_entries_v2`) and the live
-  Rust backend points at the new names — the site never went down. Content
-  was migrated into the v3 tables with Azerbaijani text resolved from
-  `i18n_messages` (8 psychologists + 192 bookable slots for the next 14 days,
-  Plus/Pro/Ultra plans + sections, 15 exercises, 3 workouts + 47 rows,
-  6 books, 16 practice materials).
-- **v3.1 auth (db/schema-v3.1-auth.sql)** — login verification fully in the
-  database: signup goes through the Supabase Auth admin API (auto-confirmed;
-  the `handle_new_user` trigger creates the `profiles` row) and login is
-  verified by GoTrue's password grant. `public.sessions` gained
-  `user_email`/`user_name` (the session carries the user snapshot) and the
-  six user-data FKs (`sessions`, `journal_entries_v2`, `mood_logs`,
-  `quiz_results`, `meditation_progress`, `appointments`) were re-pointed to
-  `auth.users`. The legacy custom-auth table `public.users` (scrypt hashes,
-  the auto-created `123` demo) and every demo account were removed — there
-  is no built-in demo login; sign up normally instead.
-
-- **v3.2 user preferences + OAuth (`db/schema-v3.2-preferences.sql`)** — the
-  signed-in user's language and dark/light theme now live on the profile row
-  (`profiles.lang` existed since v3; `profiles.theme` added): the Nav /
-  Settings toggles save via `PATCH /api/me/preferences` (fire-and-forget),
-  and `UserPrefsSync` applies the account choice on every device at load.
-  Guests keep the consent-tiered cookie/localStorage behaviour. OAuth
-  (Google / Apple) is wired end-to-end through Supabase Auth with PKCE:
-  `GET /api/auth/oauth/{google,apple}` → GoTrue `/authorize` →
-  `GET /api/auth/callback` exchanges the code and mints the `pl_session`.
-  Both providers are enabled and `https://prelife.net/api/auth/callback` is
-  allowlisted — paste the Google / Apple client credentials in Supabase
-  (Authentication → Providers) and the buttons work; until then Supabase
-  answers `missing OAuth client ID`.
+  `books`/`user_books`/`book_notes`.
+- **v3.1 auth (`db/schema-v3.1-auth.sql`)**: login verification fully in the
+  database — signup through the Supabase Auth admin API (auto-confirmed; the
+  `handle_new_user` trigger creates the `profiles` row), login via GoTrue's
+  password grant. `public.sessions` carries the user snapshot. The legacy
+  custom-auth `public.users` table and demo accounts were removed.
+- **v3.2 user preferences + OAuth (`db/schema-v3.2-preferences.sql`)**: the
+  signed-in user's language and dark/light theme live on the profile row
+  (`profiles.lang`, `profiles.theme`): the Nav / Settings toggles save via
+  `PATCH /api/me/preferences`, and `UserPrefsSync` applies the account choice
+  on every device at load. Guests keep the consent-tiered
+  cookie/localStorage behaviour. OAuth (Google / Apple) runs through
+  Supabase Auth with PKCE: `GET /api/auth/oauth/{google,apple}` → GoTrue
+  `/authorize` → `GET /api/auth/callback` exchanges the code and mints the
+  `pl_session`. **Google is configured** (client credentials live in
+  Supabase → Authentication → Providers); its authorized redirect URI in
+  Google Cloud Console must stay
+  `https://zfoafweipekpuqsfsype.supabase.co/auth/v1/callback`. Apple still
+  needs its Services ID + key (Apple Developer Program) pasted into the same
+  Supabase screen — until then the Apple button answers
+  `missing OAuth client ID`.
 
 ## Troubleshooting / environment
 
 | Variable | Where | Needed by |
 | --- | --- | --- |
-| `SUPABASE_URL` | `.env` / host env | Rust API (PostgREST + GoTrue) |
-| `SUPABASE_SERVICE_ROLE_KEY` | `.env` / host env | Rust API (service role — bypasses RLS) |
+| `SUPABASE_URL` | `.env` / host env | merged backend (PostgREST + GoTrue) |
+| `SUPABASE_SERVICE_ROLE_KEY` | `.env` / host env | merged backend (service role — bypasses RLS) |
 | `SUPABASE_ACCESS_TOKEN` (`sbp_…`) | `.env` (dev only) | `scripts/apply-db.mjs` migrations |
-| `PRELIFE_API_URL` | host env (Render) | Next.js server components + `/api` proxy |
 | `GH_TOKEN` | shell env only | `scripts/push-github.sh` (never stored) |
 
 - **Degraded mode**: if `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` are
-  missing, prelife-api still boots but every `/api/*` route (except
+  missing, the app still boots but every `/api/*` route (except
   `/api/health`) answers `503 {"error":"supabase_unconfigured"}` and the
-  auth forms show a clear "server is not connected to the database" message
-  instead of a vague generic error. `GET /api/health` reports
-  `"supabaseConfigured": false`.
-- **Deploy order matters**: the database is already on v3.1 (Supabase Auth,
-  `public.users` dropped). Any deployment running code older than commit
-  `95d5120` breaks login/signup with `500 generic` ("Something went wrong")
-  because the old code queries the dropped table. Deploy the current `main`
-  and the flow works again.
+  auth forms show a clear "server is not connected to the database" message.
+  `GET /api/health` reports `"supabaseConfigured": false` — check it first.
+- **Render checklist**: web service env has both `SUPABASE_*` vars ·
+  the old prelife-api service is deleted (or at least idle) ·
+  `curl https://prelife.net/api/health` shows `"version":"2.1.0"` and
+  `"supabaseConfigured":true`.
 - **After a sandbox/host restart**: `.env` secrets are not persisted —
-  re-paste `SUPABASE_SERVICE_ROLE_KEY` (backend) and, for migrations,
+  re-paste `SUPABASE_SERVICE_ROLE_KEY` and, for migrations,
   `SUPABASE_ACCESS_TOKEN`.
