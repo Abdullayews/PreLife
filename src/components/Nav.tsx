@@ -2,25 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Menu, X } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { sections } from "@/lib/shell";
 import { hasConsent, persistLocale } from "@/lib/consent";
+import { saveUserPref } from "@/lib/user-prefs";
 import { ThemeToggle } from "./ThemeToggle";
 
+/** The account summary the bar needs from the session. */
+export type MenuUser = { name: string | null; email: string };
+
 /**
- * The GUEST bar — matched to the two halves of the site.
+ * The top bar — matched to the two halves of the site.
  *
- * v2.2: registered users never see this component (the İdman glass rail
- * in AppShell is their one navigation + management surface); everything
- * below renders for signed-out visitors only, so every branch is the
- * guest variant:
+ * v2.3: signed-in users keep this bar on the WELCOME surface only; on
+ * the app surface it hides itself (the İdman glass rail in AppShell is
+ * their navigation + management surface there). Guests see it
+ * everywhere. The decision lives here, not in the layout, because only
+ * this component knows the pathname:
  *
  * • WELCOME surface (/welcome, /login, /signup, /terms, /rules) — the
  *   Ultrahuman anchor: burger + section links LEFT, wordmark absolutely
  *   CENTERED, right cluster carries the language segment (sm+), the
- *   theme toggle, Sign in + Get started.
+ *   theme toggle, and either the account icon → /home (signed in) or
+ *   Sign in + Get started (signed out).
  *
  * • APP surface (a signed-out /home or /help visit): wordmark LEFT next
  *   to the burger, main tabs on the RIGHT TOP (Gym, Diet, Psychology,
@@ -33,7 +39,7 @@ import { ThemeToggle } from "./ThemeToggle";
 /** Routes that belong to the logged-in app (the "main pages" experience). */
 const APP_HREFS = ["/home", "/gym", "/diet", "/meditation", "/library", "/subscription", "/settings", "/profile", "/help"];
 
-function LocaleSwitch({ className = "" }: { className?: string }) {
+function LocaleSwitch({ className = "", signedIn = false }: { className?: string; signedIn?: boolean }) {
   const t = useTranslations("welcomePage.header");
   const locale = useLocale();
   const router = useRouter();
@@ -47,9 +53,12 @@ function LocaleSwitch({ className = "" }: { className?: string }) {
           aria-pressed={loc === locale}
           onClick={() => {
             router.replace(pathname, { locale: loc });
-            // Nothing is stored before consent; after consent the choice
-            // is remembered as a persistent 1-year cookie.
+            // Guest tiers: nothing is stored before consent; after consent
+            // the choice is remembered as a persistent 1-year cookie.
             if (hasConsent()) persistLocale(loc);
+            // Account tier (v3.2): signed-in users also save the choice to
+            // their profiles row, so it follows them across devices.
+            if (signedIn) saveUserPref({ locale: loc });
           }}
         >
           {loc}
@@ -59,7 +68,7 @@ function LocaleSwitch({ className = "" }: { className?: string }) {
   );
 }
 
-export function Nav() {
+export function Nav({ user }: { user: MenuUser | null }) {
   const t = useTranslations("moduleCommon");
   const th = useTranslations("welcomePage");
   const ts = useTranslations("sections");
@@ -79,6 +88,11 @@ export function Nav() {
   const on = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   const isApp = APP_HREFS.some(on);
+
+  // v2.3: on the app surface a signed-in visitor navigates via the İdman
+  // rail (AppShell) — the top bar belongs to the welcome surface (and
+  // to guests everywhere). Below every hook, so the rules of hooks hold.
+  if (user && isApp) return null;
 
   // Every main tab in display order — gym first, matching the welcome page.
   const tabs = [
@@ -159,14 +173,22 @@ export function Nav() {
               </Link>
 
               <div className="nav-tools">
-                <LocaleSwitch className="hide-sm" />
-                <ThemeToggle />
-                <Link href="/login" className="nav-signin">
-                  {ta("signIn")}
-                </Link>
-                <Link href="/signup" className="nav-start hide-md">
-                  {th("header.getStarted")}
-                </Link>
+                <LocaleSwitch className="hide-sm" signedIn={!!user} />
+                <ThemeToggle signedIn={!!user} />
+                {user ? (
+                  <Link href="/home" aria-label={th("header.account")} className="icon-btn nav-account hide-md">
+                    <User size={18} strokeWidth={1.5} aria-hidden />
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/login" className="nav-signin">
+                      {ta("signIn")}
+                    </Link>
+                    <Link href="/signup" className="nav-start hide-md">
+                      {th("header.getStarted")}
+                    </Link>
+                  </>
+                )}
               </div>
             </>
           )}
@@ -234,10 +256,16 @@ export function Nav() {
                 </li>
               </ul>
               <div className="panel-row">
-                <LocaleSwitch />
-                <Link href="/signup" onClick={() => setOpen(false)} className="nav-start">
-                  {th("header.getStarted")}
-                </Link>
+                <LocaleSwitch signedIn={!!user} />
+                {user ? (
+                  <Link href="/home" onClick={() => setOpen(false)} className="nav-start">
+                    {th("tabs.home")}
+                  </Link>
+                ) : (
+                  <Link href="/signup" onClick={() => setOpen(false)} className="nav-start">
+                    {th("header.getStarted")}
+                  </Link>
+                )}
               </div>
             </>
           )}

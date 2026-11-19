@@ -63,10 +63,12 @@ export default async function LocaleLayout({
     <>
       <HtmlLang locale={locale} />
       <NextIntlClientProvider messages={client}>
-        {/* v2.2: registered users get NO top navigation — the İdman glass
-            rail (AppShell) is their one management surface. Guests keep the
-            welcome/app bar with sign-in + language + theme. */}
-        {!user && <Nav />}
+        {/* v2.3: the top bar renders for everyone — guests on every
+            surface, signed-in users on the welcome surface. On the app
+            surface a signed-in visitor navigates via the İdman rail
+            (AppShell), so Nav hides itself there (it owns the pathname
+            check — see Nav.tsx). */}
+        <Nav user={user ? { name: user.name, email: user.email } : null} />
         <ThemeGuard />
         <UserPrefsSync userId={user?.id ?? null} />
         <SwRegister />
