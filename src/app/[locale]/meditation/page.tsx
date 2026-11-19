@@ -16,6 +16,7 @@ import { VideoCard } from "@/components/psych/VideoCard";
 import { AiPanel } from "@/components/psych/AiPanel";
 import { JournalCard } from "@/components/psych/JournalCard";
 import { PsychShell } from "@/components/psych/PsychShell";
+import { ContentUnavailable } from "@/components/ContentUnavailable";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -40,11 +41,16 @@ export default async function MeditationPage({ params }: Props) {
   const now = new Date();
 
   // Content (media, psychologists, rotation pools) + user overview both
-  // come from the Rust API (Supabase Postgres).
+  // come from the Rust API (Supabase Postgres). An empty media pool would
+  // crash the pick-of-the-day below — degrade to the unavailable shell
+  // instead of a 500 (same path as a dead API).
   const [contentData, overview] = await Promise.all([
     getMeditationContent(), getOverview(),
   ]);
-  const content = contentData!;
+  if (!contentData || contentData.media.length === 0) {
+    return <ContentUnavailable locale={locale} />;
+  }
+  const content = contentData;
   const MEDIA = content.media;
 
   const logs = overview?.logs ?? [];

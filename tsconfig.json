@@ -40,6 +40,7 @@
     "node_modules",
     "skills",
     "examples",
-    "upload"
+    "upload",
+    "mini-services"
   ]
 }
