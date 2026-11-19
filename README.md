@@ -147,6 +147,20 @@ Browser code must call these through the sandbox gateway:
   its legacy rows) were removed — there
   is no built-in login; sign up normally instead.
 
+- **v3.2 user preferences + OAuth (`db/schema-v3.2-preferences.sql`)** — the
+  signed-in user's language and dark/light theme now live on the profile row
+  (`profiles.lang` existed since v3; `profiles.theme` added): the Nav /
+  Settings toggles save via `PATCH /api/me/preferences` (fire-and-forget),
+  and `UserPrefsSync` applies the account choice on every device at load.
+  Guests keep the consent-tiered cookie/localStorage behaviour. OAuth
+  (Google / Apple) is wired end-to-end through Supabase Auth with PKCE:
+  `GET /api/auth/oauth/{google,apple}` → GoTrue `/authorize` →
+  `GET /api/auth/callback` exchanges the code and mints the `pl_session`.
+  Both providers are enabled and `https://prelife.net/api/auth/callback` is
+  allowlisted — paste the Google / Apple client credentials in Supabase
+  (Authentication → Providers) and the buttons work; until then Supabase
+  answers `missing OAuth client ID`.
+
 ## Troubleshooting / environment
 
 | Variable | Where | Needed by |

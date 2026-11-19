@@ -11,6 +11,7 @@ import {
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { hasConsent, persistLocale, setThemeChoice } from "@/lib/consent";
+import { saveUserPref } from "@/lib/user-prefs";
 import { DEVICE_ICON_KEYS } from "@/lib/devices";
 
 /**
@@ -270,12 +271,17 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
     document.documentElement.classList.toggle("dark", next);
     // Before consent the choice lives in memory for this visit only.
     setThemeChoice(next);
+    // Account tier (v3.2): Settings is signed-in only — always sync the
+    // choice to the profiles row too.
+    saveUserPref({ theme: next ? "dark" : "light" });
   };
 
   const chooseLocale = (next: string) => {
     if (next === locale) return;
     router.replace(pathname, { locale: next });
     if (hasConsent()) persistLocale(next);
+    // Account tier (v3.2) — Settings is signed-in only.
+    saveUserPref({ locale: next });
   };
 
   const toggleNotify = (key: NotifyKey) => {

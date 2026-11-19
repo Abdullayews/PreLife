@@ -72,6 +72,14 @@ if (mode === "v3.1") {
   process.exit(0);
 }
 
+/* v3.2: user preferences — profiles.theme joins the existing profiles.lang;
+   both are synced by /api/me/preferences. See db/schema-v3.2-preferences.sql. */
+if (mode === "v3.2") {
+  await run(readFileSync(new URL("db/schema-v3.2-preferences.sql", root), "utf8"), "schema-v3.2-preferences.sql");
+  console.log("done.");
+  process.exit(0);
+}
+
 if (mode === "all" || mode === "schema") {
   await run(readFileSync(new URL("db/schema.sql", root), "utf8"), "schema.sql");
 }

@@ -28,20 +28,21 @@ function AppleIcon() {
 
 /**
  * Classic email + password form shared by /login and /signup, with
- * Google / Apple buttons (visual until real OAuth lands).
+ * Google / Apple buttons wired to the real OAuth flow (GET
+ * /api/auth/oauth/<provider> → Supabase /authorize with PKCE →
+ * /api/auth/callback mints the session). The buttons are full page
+ * navigations: the OAuth dance cannot run inside fetch.
  */
-export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: string }) {
+export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup"; next?: string; oauthError?: boolean }) {
   const t = useTranslations("authPage");
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [socialNote, setSocialNote] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(oauthError ? "oauth" : null);
   const [showPw, setShowPw] = useState(false);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
-    setSocialNote(null);
     const data = new FormData(e.currentTarget);
     setBusy(true);
     try {
@@ -65,6 +66,11 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
   };
 
   const otherHref = (mode === "login" ? "/signup" : "/login") + (next ? `?next=${encodeURIComponent(next)}` : "");
+
+  // Full page navigation — the OAuth redirect chain cannot run in fetch.
+  const startOauth = (provider: "google" | "apple") => {
+    window.location.href = apiUrl(`/api/auth/oauth/${provider}`);
+  };
 
   return (
     <div className="auth-card">
@@ -136,24 +142,18 @@ export function AuthForm({ mode, next }: { mode: "login" | "signup"; next?: stri
         <button
           type="button"
           className="social-btn"
-          onClick={() => setSocialNote(t("socialSoonTitle", { provider: t("google") }))}
+          onClick={() => startOauth("google")}
         >
           <GoogleIcon />{t("google")}
         </button>
         <button
           type="button"
           className="social-btn"
-          onClick={() => setSocialNote(t("socialSoonTitle", { provider: t("apple") }))}
+          onClick={() => startOauth("apple")}
         >
           <AppleIcon />{t("apple")}
         </button>
       </div>
-
-      {socialNote && (
-        <p className="auth-demo" role="status">
-          {t("socialSoonDesc")}
-        </p>
-      )}
 
       <p className="auth-alt">
         {mode === "login" ? t("noAccount") : t("haveAccount")}{" "}

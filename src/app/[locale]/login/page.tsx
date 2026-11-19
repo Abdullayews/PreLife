@@ -26,11 +26,14 @@ export default async function LoginPage({ params, searchParams }: Props) {
 
   const sp = await searchParams;
   const raw = Array.isArray(sp.next) ? sp.next[0] : sp.next;
+  // /api/auth/callback redirects here with ?error=oauth when the Google /
+  // Apple flow fails (provider not configured in Supabase, denied consent…).
+  const oauthError = sp.error === "oauth";
 
   return (
     <div data-world="shell" className="world page">
       <div className="wrap auth-wrap">
-        <AuthForm mode="login" next={safeNext(raw)} />
+        <AuthForm mode="login" next={safeNext(raw)} oauthError={oauthError} />
       </div>
     </div>
   );

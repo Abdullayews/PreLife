@@ -7,6 +7,7 @@ import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { sections } from "@/lib/shell";
 import { hasConsent, persistLocale } from "@/lib/consent";
+import { saveUserPref } from "@/lib/user-prefs";
 import { ThemeToggle } from "./ThemeToggle";
 import { UserMenu, type MenuUser } from "./UserMenu";
 
@@ -33,7 +34,7 @@ import { UserMenu, type MenuUser } from "./UserMenu";
 /** Routes that belong to the logged-in app (the "main pages" experience). */
 const APP_HREFS = ["/home", "/gym", "/diet", "/meditation", "/library", "/subscription", "/settings", "/profile", "/help"];
 
-function LocaleSwitch({ className = "" }: { className?: string }) {
+function LocaleSwitch({ className = "", signedIn = false }: { className?: string; signedIn?: boolean }) {
   const t = useTranslations("welcomePage.header");
   const locale = useLocale();
   const router = useRouter();
@@ -47,10 +48,12 @@ function LocaleSwitch({ className = "" }: { className?: string }) {
           aria-pressed={loc === locale}
           onClick={() => {
             router.replace(pathname, { locale: loc });
-            // next-intl's own cookie sync is disabled (localeCookie:
-            // false), so nothing is stored before consent; after consent
+            // Guest tiers: nothing is stored before consent; after consent
             // the choice is remembered as a persistent 1-year cookie.
             if (hasConsent()) persistLocale(loc);
+            // Account tier (v3.2): signed-in users also save the choice to
+            // their profiles row, so it follows them across devices.
+            if (signedIn) saveUserPref({ locale: loc });
           }}
         >
           {loc}
@@ -120,8 +123,8 @@ export function Nav({ user }: { user: MenuUser | null }) {
                   ))}
                 </ul>
 
-                <LocaleSwitch className="nav-lang" />
-                <ThemeToggle />
+                <LocaleSwitch className="nav-lang" signedIn={!!user} />
+                <ThemeToggle signedIn={!!user} />
 
                 {user ? (
                   <UserMenu user={user} />
@@ -168,8 +171,8 @@ export function Nav({ user }: { user: MenuUser | null }) {
               </Link>
 
               <div className="nav-tools">
-                <LocaleSwitch className="hide-sm" />
-                <ThemeToggle />
+                <LocaleSwitch className="hide-sm" signedIn={!!user} />
+                <ThemeToggle signedIn={!!user} />
                 {user ? (
                   <Link href="/home" aria-label={th("header.account")} className="icon-btn nav-account hide-md">
                     <User size={18} strokeWidth={1.5} aria-hidden />
@@ -219,7 +222,7 @@ export function Nav({ user }: { user: MenuUser | null }) {
                 </li>
               </ul>
               <div className="panel-row">
-                <LocaleSwitch />
+                <LocaleSwitch signedIn={!!user} />
                 {user ? (
                   <Link href="/home" onClick={() => setOpen(false)} className="nav-start">
                     {th("tabs.home")}
@@ -257,7 +260,7 @@ export function Nav({ user }: { user: MenuUser | null }) {
                 </li>
               </ul>
               <div className="panel-row">
-                <LocaleSwitch />
+                <LocaleSwitch signedIn={!!user} />
                 {user ? (
                   <Link href="/home" onClick={() => setOpen(false)} className="nav-start">
                     {th("tabs.home")}

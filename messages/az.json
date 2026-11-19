@@ -521,6 +521,7 @@
       "email_taken": "Bu e-poçtla hesab artıq mövcuddur.",
       "api_unavailable": "Serverə çatmaq mümkün deyil — bir azdan yenidən cəhd edin.",
       "supabase_unconfigured": "Server bazaya qoşulmayıb (SUPABASE açarları təyin edilməyib) — admin ilə əlaqə saxlayın.",
+      "oauth": "Sosial hesabla giriş alınmadı — e-poçt və şifrə ilə davam edin.",
       "generic": "Bir xəta baş verdi. Yenidən cəhd edin."
     }
   },

@@ -31,6 +31,12 @@ impl Supa {
         self.configured
     }
 
+    /// The GoTrue root ({SUPABASE_URL}/auth/v1) — used to build the
+    /// /authorize redirect for OAuth (google / apple).
+    pub fn auth_base(&self) -> &str {
+        &self.auth_base
+    }
+
     fn auth(&self, req: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
         req.header("apikey", &self.key)
             .header("authorization", format!("Bearer {}", self.key))
@@ -166,6 +172,27 @@ impl Supa {
             .post(format!("{}/token?grant_type=password", self.auth_base))
             .header("apikey", &self.key)
             .json(&json!({ "email": email, "password": password }))
+            .send()
+            .await
+            .map_err(|e| format!("request: {e}"))?;
+        let status = res.status();
+        let text = res.text().await.map_err(|e| format!("body: {e}"))?;
+        if !status.is_success() {
+            return Err(format!("gotrue {status}: {text}"));
+        }
+        serde_json::from_str(&text).map_err(|e| format!("json: {e}"))
+    }
+
+    /// PKCE code exchange (grant_type=pkce) — completes the OAuth flow that
+    /// /auth/v1/authorize started: presents auth_code + the code_verifier
+    /// from the browser cookie. 200 returns the GoTrue session
+    /// ({ access_token, user, … }) just like the password grant.
+    pub async fn auth_pkce_exchange(&self, auth_code: &str, code_verifier: &str) -> Result<Value, String> {
+        let res = self
+            .client
+            .post(format!("{}/token?grant_type=pkce", self.auth_base))
+            .header("apikey", &self.key)
+            .json(&json!({ "auth_code": auth_code, "code_verifier": code_verifier }))
             .send()
             .await
             .map_err(|e| format!("request: {e}"))?;

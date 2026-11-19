@@ -31,6 +31,13 @@ async function proxy(
   const target = `${API_BASE}/api/${path.map(encodeURIComponent).join("/")}${qs ? `?${qs}` : ""}`;
 
   const fwd = new Headers();
+  // Preserve the PUBLIC origin the browser sees (host + proto) so API-side
+  // redirects — OAuth redirect_to above all — point back at the site, not
+  // at the API's internal listen address.
+  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
+  if (host) fwd.set("x-forwarded-host", host);
+  const proto = req.headers.get("x-forwarded-proto") ?? incoming.protocol.replace(":", "");
+  if (proto) fwd.set("x-forwarded-proto", proto);
   const contentType = req.headers.get("content-type");
   if (contentType) fwd.set("content-type", contentType);
   const accept = req.headers.get("accept");
