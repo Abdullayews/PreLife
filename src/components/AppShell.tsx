@@ -3,42 +3,43 @@
 import {
   useEffect, useRef, useState, useSyncExternalStore, type ReactNode,
 } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import {
   AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ChevronsUpDown,
   Circle, CircleHelp, Crown, Dumbbell, FileText, Flower2, House, Landmark, Layers,
-  LibraryBig, LogOut, MapPin, Menu, MonitorPlay, Moon, NotebookPen, Pill,
-  Salad, ScrollText, Settings, Shirt, Sun, UserRound, Users, Wind,
-  type LucideIcon,
+  LibraryBig, MapPin, Menu, MonitorPlay, Moon, NotebookPen, PanelLeftClose,
+  PanelLeftOpen, Pill, Salad, ScrollText, Settings, Shirt, Sun, UserRound, Users,
+  Wind, type LucideIcon,
 } from "lucide-react";
-import { Link, usePathname, useRouter } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/navigation";
 import { sections } from "@/lib/shell";
-import { apiUrl } from "@/lib/api-url";
 import { hasConsent, setThemeChoice } from "@/lib/consent";
 import { saveUserPref } from "@/lib/user-prefs";
 
 /**
- * AppShell v5 — the İdman glass rail, global for every logged-in page.
+ * AppShell v6 — the İdman glass rail, global for every logged-in page.
  *
  * The v2.2 flat management panel is restyled (and re-architected on mobile)
  * after the İdman v3 design the team shipped for the gym surface — now the
  * ONE design language for the registered-user app:
  *
  * • GLASS — backdrop blur(22px) saturate(1.6), 28px radius, 82% surface,
- *   inset highlight — a floating card, not a strip.
+ *   inset highlight — a floating card, not a strip. On lg+ the card floats
+ *   VERTICALLY CENTERED beside the content (equal air above and below).
  * • TWO WIDTHS — fully open (labels + one-line descriptions) or icon-only
  *   (4.75rem), switched by the fold button beside the brand, remembered
- *   post-consent. The grid column animates .45s.
- * • STICKY — on lg+ the card follows the reader down the page and scrolls
- *   internally when the stack outgrows the viewport.
- * • NO TOP NAV for signed-in users (v2.2): the rail carries the brand,
- *   identity, navigation, management, preferences and log out. When the
- *   top nav IS present (guests, offline demo) [data-topnav] keeps the
- *   offsets honest.
+ *   post-consent. The grid column animates .45s. Collapsed, the brand and
+ *   the fold button STACK (no cramping) and every row centers its icon.
  * • NESTED SUBTABS — the current section's row becomes the group head
  *   (caret, collapsible); its subtabs nest underneath (link mode = real
  *   routes, tab mode = in-page tablist), exactly like the İdman group.
+ *   The row keeps ITS position in the list — the order never shuffles
+ *   (v5.1: Home is always first).
+ * • ACCOUNT DROPDOWN (v6) — the identity row at the top is a button;
+ *   pressing it opens the account menu DOWNWARD (Profile, Settings, Help,
+ *   Terms, Rules). No e-mail in the rail; language and log out live in
+ *   Settings; the "What's new" card is gone. The foot keeps only the
+ *   theme toggle.
  * • MOBILE — the rail becomes the İdman overlay: floating glass panel +
  *   scrim + bottom-left FAB, Escape closes, routes close.
  */
@@ -80,7 +81,7 @@ type Props = {
   /** tab mode — called after a tab button activates. */
   onSelect?: (id: string) => void;
   ui: ShellUi;
-  /** The signed-in account — when present the management groups render. */
+  /** The signed-in account — when present the identity + foot render. */
   user?: ShellUser | null;
   /** Whether the TOP nav renders for this visit. Derived from `user`
    *  (no session → the Nav shows) unless the page knows better (the gym
@@ -110,16 +111,14 @@ export function AppShell({
   const [folded, setFolded] = useState(false);
   const [mobOpen, setMobOpen] = useState(false);
   const [groupOpen, setGroupOpen] = useState(true);
-  const [busy, setBusy] = useState(false);
+  const [acctOpen, setAcctOpen] = useState(false);
 
   const t = useTranslations("sidePanel");
   const th = useTranslations("welcomePage");
   const ts = useTranslations("sections");
   const ta = useTranslations("accountMenu");
   const tm = useTranslations("moduleCommon");
-  const locale = useLocale();
   const pathname = usePathname();
-  const router = useRouter();
 
   const mobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServer);
   const expanded = mobile ? mobOpen : !folded;
@@ -133,8 +132,12 @@ export function AppShell({
     } catch { /* storage unavailable */ }
   }, []);
 
-  /* Overlay hygiene: a route change closes the mobile drawer. */
-  useEffect(() => { setMobOpen(false); }, [pathname]);
+  /* Overlay hygiene: a route change closes the mobile drawer and the
+   * account dropdown. */
+  useEffect(() => {
+    setMobOpen(false);
+    setAcctOpen(false);
+  }, [pathname]);
 
   /* Escape closes the mobile overlay. */
   useEffect(() => {
@@ -150,6 +153,7 @@ export function AppShell({
     if (mobile) { setMobOpen((v) => !v); return; }
     setFolded((v) => {
       const next = !v;
+      if (next) setAcctOpen(false);
       if (hasConsent()) {
         try { localStorage.setItem(FOLD_KEY, next ? "1" : "0"); } catch { /* ignore */ }
       }
@@ -190,7 +194,8 @@ export function AppShell({
     { href: "/subscription", label: th("header.drawerSubscription"), icon: Crown, desc: t("desc.subscription") },
   ];
 
-  /* Management links — the old top-right dropdown, now panel rows. */
+  /* Account menu — the old management group, now the dropdown that opens
+   * downward from the identity row at the top of the rail. */
   const manageNav = [
     { href: "/profile", label: ta("profile"), icon: UserRound },
     { href: "/settings", label: ta("settings"), icon: Settings },
@@ -203,6 +208,12 @@ export function AppShell({
     user && (user.name?.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("") ??
       user.email.slice(0, 2)).toUpperCase();
 
+  /* The rail never shows the e-mail — the name, or the handle before the
+   * @ when the profile has no name yet. */
+  const displayName = user
+    ? (user.name?.trim() || user.email.split("@")[0]!)
+    : "";
+
   /* The section whose row becomes the nested group head (when the page
    * carries subtabs): the current section, matched by route prefix. The
    * row keeps ITS position in the list — only its markup changes (v5.1:
@@ -210,25 +221,6 @@ export function AppShell({
   const groupHref = tabs.length > 0
     ? mainNav.find(({ href }) => on(href))?.href
     : undefined;
-
-  const logout = async () => {
-    setBusy(true);
-    try {
-      await fetch(apiUrl("/api/auth/logout"), { method: "POST" });
-      router.replace("/welcome");
-      router.refresh();
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const switchLocale = (loc: string) => {
-    router.replace(pathname, { locale: loc });
-    if (hasConsent()) {
-      document.cookie = `NEXT_LOCALE=${loc}; path=/; max-age=31536000; samesite=lax`;
-    }
-    if (user) saveUserPref({ locale: loc });
-  };
 
   const toggleTheme = () => {
     const dark = document.documentElement.classList.toggle("dark");
@@ -275,6 +267,18 @@ export function AppShell({
     setGroupOpen((v) => !v);
   };
 
+  /* The identity button: collapsed, it expands the rail; open, it toggles
+   * the account menu that drops down beneath it. */
+  const onAccountClick = () => {
+    if (!expanded) {
+      if (mobile) setMobOpen(true);
+      else setFolded(false);
+      setAcctOpen(true);
+      return;
+    }
+    setAcctOpen((v) => !v);
+  };
+
   return (
     <div
       className="app-shell"
@@ -305,22 +309,64 @@ export function AppShell({
             onClick={toggleRail}
             aria-label={expanded ? t("collapse") : t("expand")}
             aria-expanded={expanded}
+            title={expanded ? t("collapse") : t("expand")}
           >
-            <ChevronsUpDown size={16} aria-hidden />
+            {expanded
+              ? <PanelLeftClose size={17} aria-hidden />
+              : <PanelLeftOpen size={17} aria-hidden />}
           </button>
         </div>
 
         <div className="app-rail-clip">
-          {/* Identity */}
+          {/* Identity → the account dropdown */}
           {user && (
-            <div className="rail-id">
-              <span className="rail-avatar" aria-hidden>{initials}</span>
-              {expanded && (
-                <span className="rail-id-meta">
-                  <b>{user.name ?? user.email}</b>
-                  <span>{user.email}</span>
-                </span>
-              )}
+            <div className="rail-account">
+              <button
+                type="button"
+                className="rail-id"
+                onClick={onAccountClick}
+                aria-expanded={expanded && acctOpen}
+                aria-controls="rail-account-menu"
+                title={!expanded ? t("accountMenuLabel") : undefined}
+              >
+                <span className="rail-avatar" aria-hidden>{initials}</span>
+                {expanded && (
+                  <>
+                    <span className="rail-id-meta">
+                      <b>{displayName}</b>
+                    </span>
+                    <ChevronsUpDown
+                      size={14} aria-hidden
+                      className="rail-id-caret"
+                      style={{ transform: acctOpen ? "rotate(180deg)" : "none" }}
+                    />
+                  </>
+                )}
+              </button>
+              <div
+                id="rail-account-menu"
+                className={`rail-acct${acctOpen && expanded ? " open" : ""}`}
+              >
+                <ul aria-label={t("accountMenuLabel")}>
+                  {manageNav.map(({ href, label, icon: Icon }) => (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        className={`rail-item${on(href) ? " active" : ""}`}
+                        aria-current={ariaCurrent(href)}
+                        title={!expanded ? label : undefined}
+                      >
+                        <span className="rail-ic" aria-hidden><Icon size={18} strokeWidth={2} /></span>
+                        {expanded && (
+                          <span className="ri-meta">
+                            <span className="ri-label">{label}</span>
+                          </span>
+                        )}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           )}
 
@@ -407,72 +453,22 @@ export function AppShell({
               );
             })}
           </ul>
-
-          {/* Management (signed in) */}
-          {user && (
-            <>
-              <p className="rail-cap" aria-hidden>{t("manageCaption")}</p>
-              <ul className="rail-list">
-                {manageNav.map(({ href, label, icon: Icon }) => (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      className={`rail-item${on(href) ? " active" : ""}`}
-                      aria-current={ariaCurrent(href)}
-                      title={!expanded ? label : undefined}
-                    >
-                      <span className="rail-ic" aria-hidden><Icon size={19} strokeWidth={2} /></span>
-                      {expanded && (
-                        <span className="ri-meta">
-                          <span className="ri-label">{label}</span>
-                        </span>
-                      )}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-              {expanded && (
-                <div className="rail-card">
-                  <p className="rail-card-t">{t("noteTitle")}</p>
-                  <p className="rail-card-b">{t("noteBody")}</p>
-                </div>
-              )}
-            </>
-          )}
         </div>
 
-        {/* Preferences + log out — pinned to the card's bottom edge so
-            they stay reachable even when the nav groups scroll. */}
+        {/* The theme toggle — pinned to the card's bottom edge so it stays
+         * reachable even when the nav groups scroll. Language and log out
+         * live in Settings (v6). */}
         {user && (
           <div className="rail-foot">
-            <div className="rail-prefs">
-              <div role="group" aria-label={t("langLabel")} className="seg rail-lang">
-                {routing.locales.map((loc) => (
-                  <button
-                    key={loc}
-                    type="button"
-                    aria-pressed={loc === locale}
-                    title={loc.toUpperCase()}
-                    onClick={() => switchLocale(loc)}
-                  >
-                    {loc}
-                  </button>
-                ))}
-              </div>
-              <button
-                type="button"
-                className="rail-theme"
-                aria-label={tm("navThemeToggle")}
-                title={tm("navThemeToggle")}
-                onClick={toggleTheme}
-              >
-                <Sun aria-hidden className="ico-sun" size={16} />
-                <Moon aria-hidden className="ico-moon" size={16} />
-              </button>
-            </div>
-            <button type="button" className="rail-logout" onClick={logout} disabled={busy}>
-              <LogOut size={16} aria-hidden />
-              {expanded && <span className="label">{ta("logout")}</span>}
+            <button
+              type="button"
+              className="rail-theme"
+              aria-label={tm("navThemeToggle")}
+              title={tm("navThemeToggle")}
+              onClick={toggleTheme}
+            >
+              <Sun aria-hidden className="ico-sun" size={16} />
+              <Moon aria-hidden className="ico-moon" size={16} />
             </button>
           </div>
         )}

@@ -574,6 +574,19 @@ html.dark .panel-logout:hover { background: color-mix(in srgb, #e58c86 15%, tran
   background: var(--tint); color: var(--muted); font-size: .8125rem;
 }
 .set-note svg { flex: none; margin-top: .1rem; }
+/* The log out action (Settings → Account) — the rail no longer carries it. */
+.set-logout {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 40px; padding: 0 .95rem;
+  border: 1px solid color-mix(in srgb, #b3261e 22%, transparent); border-radius: var(--r-sm);
+  background: color-mix(in srgb, #b3261e 7%, transparent); color: #b3261e;
+  font: 600 .8125rem/1 var(--font-body); cursor: pointer;
+  transition: background-color .18s, border-color .18s;
+}
+.set-logout:hover { background: color-mix(in srgb, #b3261e 13%, transparent); }
+.set-logout:disabled { opacity: .55; cursor: default; }
+html.dark .set-logout { color: #e58c86; border-color: color-mix(in srgb, #e58c86 26%, transparent); background: color-mix(in srgb, #e58c86 8%, transparent); }
+html.dark .set-logout:hover { background: color-mix(in srgb, #e58c86 15%, transparent); }
 
 /* ── Settings → Devices ──────────────────────────────────────────────── */
 .device-list { display: grid; }
@@ -1304,19 +1317,22 @@ a.card:hover em svg { transform: translateX(3px); }
 .lede-panel { color: var(--muted); max-width: 42rem; text-wrap: pretty; }
 
 /* ════════════════════════════════════════════════════════════════════════
-   APP SHELL v5 — THE İDMAN GLASS RAIL (v2.2 design unification).
+   APP SHELL v6 — THE İDMAN GLASS RAIL (v2.2 design unification).
 
    The İdman v3 glass sidebar, promoted to the ONE left management panel
-   for every registered-user page: brand + fold beside it, identity, the
-   main navigation (label + one-line description) with the current
-   section's subtabs NESTED under its row (collapsible group, İdman
-   semantics), management links, a notice card, and the foot with
-   language / theme / log out.
+   for every registered-user page: brand + fold beside it, the identity
+   BUTTON whose press drops the account menu DOWNWARD (Profile, Settings,
+   Help, Terms, Rules — v6), the main navigation (label + one-line
+   description) with the current section's subtabs NESTED under its row
+   (collapsible group, İdman semantics), and a foot with just the theme
+   toggle (language and log out live in Settings).
 
    Material: backdrop blur(22px) saturate(1.6), 28px radius, 82% surface,
    inset top highlight — a floating card. Two widths (17.5rem open ↔
    4.75rem icon-only) animated through the grid column; the choice is
-   remembered post-consent. STICKY on lg+ so it follows the reader down.
+   remembered post-consent. On lg+ the card floats VERTICALLY CENTERED
+   beside the content — equal air above and below — and stays centered
+   while the page scrolls.
 
    [data-topnav] tells the shell whether the fixed top Nav renders for
    this visit (guests, offline demo) — signed-in users have NO top nav,
@@ -1341,7 +1357,7 @@ a.card:hover em svg { transform: translateX(3px); }
    the slide-out so keyboard focus cannot reach a hidden rail. ─────── */
 .app-rail {
   position: fixed;
-  left: .75rem; top: calc(var(--nav-h) + .5rem); bottom: .75rem;
+  left: .75rem; top: calc(var(--nav-h) + .75rem); bottom: .75rem;
   z-index: 45;
   display: flex; flex-direction: column;
   width: min(19rem, calc(100vw - 1.5rem));
@@ -1390,7 +1406,7 @@ a.card:hover em svg { transform: translateX(3px); }
 /* ── Brand + fold ── */
 .rail-top {
   display: flex; align-items: center; justify-content: space-between; gap: .5rem;
-  padding: .9rem .85rem .7rem;
+  padding: .85rem .85rem;
 }
 .rail-brand {
   display: inline-flex; align-items: center; gap: .6rem;
@@ -1425,28 +1441,50 @@ a.card:hover em svg { transform: translateX(3px); }
   border-radius: 999px;
 }
 
-/* ── Identity ── */
-.rail-id {
-  display: flex; align-items: center; gap: .7rem;
-  padding: .55rem .5rem .8rem;
+/* ── Identity → the account dropdown (v6) ──
+   The identity row at the top is a BUTTON: pressing it opens the account
+   menu (Profile, Settings, Help, Terms, Rules) downward beneath it. The
+   e-mail is never shown in the rail — the name, or the handle before
+   the @ when the profile has no name yet. */
+.rail-account {
   border-bottom: 1px solid var(--line);
   margin-bottom: .6rem;
 }
+.rail-id {
+  display: flex; align-items: center; gap: .65rem;
+  width: 100%; min-height: 48px; padding: .5rem .5rem .65rem;
+  border: 0; border-radius: 13px;
+  background: transparent; color: inherit;
+  font: inherit; text-align: left; cursor: pointer;
+  transition: background-color .2s;
+}
+.rail-id:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
 .rail-avatar {
   display: grid; place-items: center; flex: none;
   width: 42px; height: 42px; border-radius: 50%;
   background: var(--deep); color: var(--deep-ink);
   font: 700 1.05rem/1 var(--font-display);
 }
-.rail-id-meta { display: grid; gap: .1rem; min-width: 0; }
+.rail-id-meta { flex: 1; display: grid; min-width: 0; }
 .rail-id-meta b {
   font-size: .9375rem; font-weight: 650; color: var(--ink);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  line-height: 1.25; overflow-wrap: anywhere;
 }
-.rail-id-meta span {
-  font-size: .75rem; color: var(--muted);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+.rail-id-caret {
+  flex: none; color: var(--muted);
+  transition: transform .3s var(--rail-ease), color .2s;
 }
+.rail-id:hover .rail-id-caret { color: var(--ink); }
+
+/* The downward-opening account menu (the same collapse animation the
+   section subtab group uses). */
+.rail-acct {
+  max-height: 0; overflow: hidden;
+  transition: max-height .35s var(--rail-ease), padding .35s var(--rail-ease);
+}
+.rail-acct.open { max-height: 20rem; padding: .3rem 0 .45rem; }
+.rail-acct ul { display: grid; gap: .15rem; }
+.rail-acct .rail-item { min-height: 42px; }
 
 /* ── Group captions ── */
 .rail-cap {
@@ -1513,32 +1551,13 @@ a.card:hover em svg { transform: translateX(3px); }
 .rail-tab.active .rail-ic { color: var(--accent-text); }
 .rail-tab .label { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-/* ── Notice card ── */
-.rail-card {
-  margin: .8rem .2rem .2rem; padding: .8rem .9rem;
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
-  border-radius: 16px;
-  background:
-    linear-gradient(135deg,
-      color-mix(in srgb, var(--accent) 16%, transparent),
-      color-mix(in srgb, var(--accent) 5%, transparent));
-}
-.rail-card-t {
-  display: flex; align-items: center; gap: .4rem;
-  font-size: .8rem; font-weight: 700; color: var(--accent-text);
-  margin-bottom: .25rem;
-}
-.rail-card-b { font-size: .78rem; line-height: 1.45; color: var(--muted); }
-
-/* ── Foot: preferences + log out — pinned outside the scrolling clip. ── */
+/* ── Foot: the theme toggle, centered — pinned outside the scrolling
+   clip. Language and log out live in Settings (v6). ── */
 .rail-foot {
-  display: grid; gap: .5rem;
+  display: flex; justify-content: center;
   padding: .6rem .7rem .75rem;
   border-top: 1px solid var(--line);
 }
-.rail-prefs { display: flex; align-items: center; gap: .5rem; }
-.rail-lang { flex: 1; height: 2.35rem; }
-.rail-lang button { flex: 1; height: 1.85rem; }
 .rail-theme {
   display: grid; place-items: center; flex: none;
   width: 2.35rem; height: 2.35rem;
@@ -1547,24 +1566,13 @@ a.card:hover em svg { transform: translateX(3px); }
   cursor: pointer; transition: color .2s, background-color .2s;
 }
 .rail-theme:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, transparent); }
-.rail-logout {
-  display: flex; align-items: center; justify-content: center; gap: .55rem;
-  min-height: 40px; padding: 0 .625rem;
-  border: 1px solid color-mix(in srgb, #b3261e 22%, transparent); border-radius: 13px;
-  background: color-mix(in srgb, #b3261e 7%, transparent); color: #b3261e;
-  font: 600 .8125rem/1 var(--font-body); cursor: pointer;
-  transition: background-color .18s, border-color .18s;
-}
-.rail-logout:hover { background: color-mix(in srgb, #b3261e 13%, transparent); }
-.rail-logout:disabled { opacity: .55; cursor: default; }
-html.dark .rail-logout { color: #e58c86; border-color: color-mix(in srgb, #e58c86 26%, transparent); background: color-mix(in srgb, #e58c86 8%, transparent); }
-html.dark .rail-logout:hover { background: color-mix(in srgb, #e58c86 15%, transparent); }
 
 /* Content column */
 .app-main { min-width: 0; padding-block: 1.25rem 2.5rem; }
 
-/* ══ lg+: the sticky glass panel — same card, docked into the grid,
-   always visible, two animated widths. ═════════════════════════════ */
+/* ══ lg+: the floating glass panel — same card, docked into the grid,
+   always visible, two animated widths, VERTICALLY CENTERED beside the
+   content (equal air above and below). ═════════════════════════════ */
 @media (min-width: 64rem) {
   .app-shell {
     --rail-w: 17.5rem;
@@ -1575,30 +1583,46 @@ html.dark .rail-logout:hover { background: color-mix(in srgb, #e58c86 15%, trans
   }
   .app-shell[data-open="closed"] { --rail-w: 4.75rem; }
 
-  .app-rail {
-    position: sticky;
-    top: calc(var(--nav-h) + 1rem);
-    align-self: start;
-    width: auto; max-height: calc(100svh - var(--nav-h) - 2rem);
-    margin: 1rem 0 1.5rem;
-    visibility: visible;
-    transform: none;
-    transition: width .45s var(--rail-ease);
-    pointer-events: auto;
-  }
+  /* Sticky at the viewport's middle + translateY(-50%) centers the
+   * auto-height card and KEEPS it centered while the page scrolls. At
+   * the max height the card spans a symmetric 1rem…100svh-1rem. The
+   * topnav variant recenters inside the space left under the fixed
+   * guest Nav. */
+  .app-rail,
+  .app-shell[data-open="open"] .app-rail,
   .app-shell[data-topnav="off"] .app-rail {
-    top: 1rem;
-    max-height: calc(100svh - 2rem);
+    position: sticky;
+    top: 50svh;
+    align-self: start;
+    width: auto; max-height: calc(100svh - 2rem);
+    margin: 0;
+    visibility: visible;
+    transform: translateY(-50%);
+    pointer-events: auto;
+    transition: width .45s var(--rail-ease);
+  }
+  .app-shell[data-topnav="on"] .app-rail {
+    top: calc(50svh + var(--nav-h) / 2);
+    max-height: calc(100svh - var(--nav-h) - 2rem);
   }
   .rail-scrim, .rail-fab { display: none; }
 
-  /* ── Icon-only (closed) rail ── */
-  .app-shell[data-open="closed"] .rail-top { justify-content: center; }
+  /* ── Icon-only (closed) rail — nothing crams: the brand and the fold
+     button split into two stacked rows, the avatar centers beneath
+     them, every row centers its icon. ── */
+  .app-shell[data-open="closed"] .rail-top {
+    flex-direction: column; justify-content: center;
+    gap: .55rem; padding: .85rem .5rem .8rem;
+  }
   .app-shell[data-open="closed"] .rail-brand { gap: 0; }
   .app-shell[data-open="closed"] .rail-brand-ic { width: 40px; height: 40px; }
+  .app-shell[data-open="closed"] .rail-account {
+    display: grid; justify-items: center;
+    padding-bottom: .8rem;
+  }
   .app-shell[data-open="closed"] .rail-id {
-    flex-direction: column; gap: .5rem;
-    padding: .875rem .5rem .75rem; align-items: center;
+    width: auto; justify-content: center;
+    padding: .3rem .3rem .45rem;
   }
   .app-shell[data-open="closed"] .rail-cap {
     height: 1px; margin: .75rem .875rem .375rem; padding: 0;
@@ -1610,14 +1634,8 @@ html.dark .rail-logout:hover { background: color-mix(in srgb, #e58c86 15%, trans
     justify-content: center; padding: 0; gap: 0;
   }
   .app-shell[data-open="closed"] .rail-sub.open { padding: .15rem 0 .3rem; }
-  .app-shell[data-open="closed"] .rail-card { display: none; }
-  .app-shell[data-open="closed"] .rail-prefs { flex-direction: column; }
-  .app-shell[data-open="closed"] .rail-lang { display: grid; gap: 2px; height: auto; flex: none; width: 100%; }
-  .app-shell[data-open="closed"] .rail-lang button { height: 1.75rem; min-width: 2.25rem; }
-  .app-shell[data-open="closed"] .rail-logout { padding-inline: 0; }
 
-  /* Content starts level with the card's top edge; the wrap widens so
-   * wide screens don't drown in side gutters. */
+  /* The wrap widens so wide screens don't drown in side gutters. */
   .app-main { padding-block: 1rem clamp(2.5rem, 6vw, 4.5rem); }
   .app-main .wrap { max-width: 82rem; }
 }
