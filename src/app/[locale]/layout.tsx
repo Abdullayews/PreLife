@@ -17,7 +17,7 @@ import { getSessionUser } from "@/lib/auth";
 import { CONSENT_COOKIE } from "@/lib/consent";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://prelife.net"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://prelife.onrender.com"),
   title: { default: "PreLife", template: "%s | PreLife" },
   icons: { icon: "/logo.svg" },
 };

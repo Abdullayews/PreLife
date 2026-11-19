@@ -1,4 +1,4 @@
-import { supaSelect, type SupaParams } from "./supa";
+import { supaSelect, supabaseConfigured, type SupaParams } from "./supa";
 import { ttlGet, ttlPut } from "./ttl";
 
 /**
@@ -156,7 +156,8 @@ async function worldRows(worldId: string): Promise<WorldData> {
 
 /* ── GET /api/content/worlds ─────────────────────────────────────────────── */
 
-export async function worldsCatalog(): Promise<Record<string, unknown>> {
+export async function worldsCatalog(): Promise<Record<string, unknown> | null> {
+  if (!supabaseConfigured) return null; // pages render their offline state
   const cached = await ttlGet<Record<string, unknown>>("content:worlds");
   if (cached) return cached;
 
@@ -213,7 +214,8 @@ export async function worldsCatalog(): Promise<Record<string, unknown>> {
 
 /* ── GET /api/content/gym ────────────────────────────────────────────────── */
 
-export async function gymCatalog(): Promise<Record<string, unknown>> {
+export async function gymCatalog(): Promise<Record<string, unknown> | null> {
+  if (!supabaseConfigured) return null;
   const cached = await ttlGet<Record<string, unknown>>("content:gym");
   if (cached) return cached;
 
@@ -391,7 +393,8 @@ export async function gymCatalog(): Promise<Record<string, unknown>> {
 
 /* ── GET /api/content/diet ───────────────────────────────────────────────── */
 
-export async function dietCatalog(): Promise<Record<string, unknown>> {
+export async function dietCatalog(): Promise<Record<string, unknown> | null> {
+  if (!supabaseConfigured) return null;
   const cached = await ttlGet<Record<string, unknown>>("content:diet");
   if (cached) return cached;
 
@@ -450,7 +453,8 @@ export async function dietCatalog(): Promise<Record<string, unknown>> {
 
 /* ── GET /api/content/meditation ─────────────────────────────────────────── */
 
-export async function meditationCatalog(): Promise<Record<string, unknown>> {
+export async function meditationCatalog(): Promise<Record<string, unknown> | null> {
+  if (!supabaseConfigured) return null;
   const cached = await ttlGet<Record<string, unknown>>("content:meditation");
   if (cached) return cached;
 
@@ -558,7 +562,8 @@ export async function meditationCatalog(): Promise<Record<string, unknown>> {
 
 /* ── GET /api/content/library ────────────────────────────────────────────── */
 
-export async function libraryCatalog(): Promise<Record<string, unknown>> {
+export async function libraryCatalog(): Promise<Record<string, unknown> | null> {
+  if (!supabaseConfigured) return null;
   const cached = await ttlGet<Record<string, unknown>>("content:library");
   if (cached) return cached;
 
@@ -607,7 +612,8 @@ export async function libraryCatalog(): Promise<Record<string, unknown>> {
 
 /* ── GET /api/content/subscription ───────────────────────────────────────── */
 
-export async function subscriptionCatalog(): Promise<Record<string, unknown>> {
+export async function subscriptionCatalog(): Promise<Record<string, unknown> | null> {
+  if (!supabaseConfigured) return null;
   const cached = await ttlGet<Record<string, unknown>>("content:subscription");
   if (cached) return cached;
 
@@ -654,7 +660,8 @@ function setNested(root: Record<string, unknown>, path: string[], leaf: string):
   setNested(entry as Record<string, unknown>, path.slice(1), leaf);
 }
 
-export async function i18nCatalog(locale: string): Promise<Record<string, unknown>> {
+export async function i18nCatalog(locale: string): Promise<Record<string, unknown> | null> {
+  if (!supabaseConfigured) return null; // request.ts falls back to messages/*.json
   const loc = locale === "en" ? "en" : locale === "ru" ? "ru" : "az";
   const cacheKey = `i18n:${loc}`;
   const cached = await ttlGet<Record<string, unknown>>(cacheKey);

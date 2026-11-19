@@ -33,6 +33,9 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
+!.env.production.example
+# .env.production itself (real secrets) stays IGNORED — only commit it
+# if the repository is private.
 
 # vercel
 .vercel
