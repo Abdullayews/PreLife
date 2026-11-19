@@ -22,13 +22,17 @@ const RENEW_EVERY_MS = 60 * 60 * 1000; // refresh at most once an hour
 
 export const OAUTH_COOKIE = "pl_oauth";
 export const OAUTH_TTL_S = 600;
-
 const DEVICE_ICONS = [
   "monitor", "laptop", "smartphone", "tablet", "watch",
   "tv", "gamepad", "headphones", "briefcase", "home",
 ];
 
-export type SessionUser = AuthUser;
+export type SessionUser = AuthUser & {
+  /** Profile avatar (data URL) riding on the session row (v3.3). */
+  avatar?: string | null;
+  /** The rail fold choice riding on the session row (v3.3). */
+  railFolded?: boolean;
+};
 
 export type CurrentSession = {
   sessionId: string;
@@ -37,8 +41,10 @@ export type CurrentSession = {
   user: SessionUser;
 };
 
-export function userView(u: SessionUser): { id: string; email: string; name: string | null } {
-  return { id: u.id, email: u.email, name: u.name };
+export function userView(u: SessionUser): {
+  id: string; email: string; name: string | null; avatar: string | null; railFolded: boolean;
+} {
+  return { id: u.id, email: u.email, name: u.name, avatar: u.avatar ?? null, railFolded: u.railFolded ?? false };
 }
 
 /* ── Device identification (mirrors src/lib/devices.ts) ─────────────────── */
@@ -92,7 +98,7 @@ function sha256Hex(s: string): string {
 }
 
 export async function createSession(
-  user: SessionUser,
+  user: AuthUser,
   userAgent: string | null,
 ): Promise<string> {
   const token = randomBytes(32).toString("base64url");
@@ -100,10 +106,31 @@ export async function createSession(
   const { name, icon } = defaultDevice(ua);
   const now = new Date();
   const expires = new Date(now.getTime() + SESSION_TTL_S * 1000);
+
+  // v3.3: the avatar + rail-fold choice ride on the session row too (read
+  // from the profiles row at login) so the shell renders them with zero
+  // extra lookups on the hot path.
+  let avatar: string | null = null;
+  let railFolded = false;
+  try {
+    const prof = await supaSelectOne("profiles", [
+      ["select", "avatar_url,rail_folded"],
+      ["id", `eq.${user.id}`],
+    ]);
+    if (prof) {
+      avatar = typeof prof.avatar_url === "string" ? prof.avatar_url : null;
+      railFolded = prof.rail_folded === true;
+    }
+  } catch {
+    /* profile row may lag — the session still works */
+  }
+
   await supaInsert("sessions", {
     user_id: user.id,
     user_email: user.email,
     user_name: user.name,
+    user_avatar: avatar,
+    user_folded: railFolded,
     token_hash: sha256Hex(token),
     device_name: name,
     device_icon: icon,
@@ -151,9 +178,10 @@ export async function loadSession(token: string): Promise<CurrentSession | null>
     }
   }
 
-  // The user rides on the session row (user_email / user_name) — written
-  // at login/signup straight from the GoTrue response, so the hot path
-  // needs no extra lookup.
+  // The user rides on the session row (user_email / user_name, and since
+  // v3.3 user_avatar / user_folded) — written at login/signup straight
+  // from the GoTrue response + profiles row, so the hot path needs no
+  // extra lookup.
   const userId = row.user_id;
   const email = row.user_email;
   if (typeof userId !== "string" || typeof email !== "string") return null;
@@ -165,6 +193,8 @@ export async function loadSession(token: string): Promise<CurrentSession | null>
       id: userId,
       email,
       name: typeof row.user_name === "string" ? row.user_name : null,
+      avatar: typeof row.user_avatar === "string" ? row.user_avatar : null,
+      railFolded: row.user_folded === true,
     },
   };
 }

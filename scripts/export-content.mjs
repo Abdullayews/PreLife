@@ -369,10 +369,11 @@ emit(`-- ══ Subscriptions ════════════════�
     ["library", "feat.library", 2], ["ai", "feat.ai", 2], ["videos", "feat.videos", 2],
     ["coaching", "feat.coaching", 6], ["family", "feat.family", 5],
   ];
+  /* v3.3 price sheet: Plus 15 ₼ / Pro 40 ₼ / Ultra 60 ₼. */
   const TIERS = [
-    ["plus", "plans.plus.name", 7, ["gym", "diet", "ai"]],
-    ["pro", "plans.pro.name", 12, ["gym", "diet", "psych", "library", "ai", "videos"]],
-    ["ultra", "plans.ultra.name", 19, ["gym", "diet", "psych", "library", "ai", "videos", "coaching", "family"]],
+    ["plus", "plans.plus.name", 15, ["gym", "diet", "ai"]],
+    ["pro", "plans.pro.name", 40, ["gym", "diet", "psych", "library", "ai", "videos"]],
+    ["ultra", "plans.ultra.name", 60, ["gym", "diet", "psych", "library", "ai", "videos", "coaching", "family"]],
   ];
   emit(`INSERT INTO subscription_features (code, name_key, price, sort_order) VALUES\n  ${
     FEATURES.map(([c, k, p], i) => `(${q(c)}, ${q(k)}, ${p}, ${i})`).join(",\n  ")

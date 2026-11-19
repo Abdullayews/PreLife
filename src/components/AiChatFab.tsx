@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { usePathname } from "@/i18n/navigation";
 import { apiUrl } from "@/lib/api-url";
 import { LoaderCircle, Send, Sparkles, X } from "lucide-react";
 
@@ -13,12 +14,17 @@ type Msg = { role: "user" | "assistant"; content: string };
  * opens the chat panel; the X in its header (or Escape) closes it.
  * History lives in memory only — nothing is stored server-side.
  *
- * Mounted on the welcome (public) and home (signed-in) surfaces; the
- * API (/api/ai/chat) works for both.
+ * Mounted GLOBALLY for signed-in users (the [locale] layout) so the
+ * assistant is available on every tab and subtab, plus on the public
+ * welcome surface for guests. The current page rides along with every
+ * request, so the backend builds a context-aware system prompt — and
+ * for signed-in users the assistant can ACT on the account (profile,
+ * plan, package) through the Gemini function tools.
  */
-export function AiChatFab() {
+export function AiChatFab({ signedIn = false }: { signedIn?: boolean }) {
   const t = useTranslations("aiChat");
   const locale = useLocale();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -50,7 +56,7 @@ export function AiChatFab() {
       const res = await fetch(apiUrl("/api/ai/chat"), {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ locale, messages: next }),
+        body: JSON.stringify({ locale, messages: next, page: pathname }),
       });
       const data = (await res.json()) as { reply?: string };
       setMessages((prev) => [
@@ -86,7 +92,12 @@ export function AiChatFab() {
           </header>
 
           <div className="ai-fab-log" ref={logRef}>
-            {messages.length === 0 && <p className="ai-fab-intro">{t("intro")}</p>}
+            {messages.length === 0 && (
+              <>
+                <p className="ai-fab-intro">{t("intro")}</p>
+                {signedIn && <p className="ai-fab-intro dim">{t("toolsHint")}</p>}
+              </>
+            )}
             {messages.map((m, i) => (
               <p key={i} className={`ai-fab-msg ${m.role === "user" ? "user" : "ai"}`}>{m.content}</p>
             ))}

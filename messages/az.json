@@ -117,7 +117,16 @@
       "title": "PreLife Premium",
       "text": "Bir planla bütün bölmələri, AI və video kitabxanalarını açın.",
       "cta": "Planlara baxın"
-    }
+    },
+    "planEyebrow": "İdman planı",
+    "planWeek": "Həftə {week} / {total}",
+    "planPerWeek": "{days} gün / həftə",
+    "planSourceDefault": "Standart plan",
+    "planSourceAi": "AI planı",
+    "planOpen": "Planı aç",
+    "planNone": "Hələ plan yoxdur",
+    "planNoneText": "İdman → Plan bölməsinə ilk girişdə bir neçə suala cavab verib AI ilə şəxsi planınızı qura bilərsiniz.",
+    "planCta": "Planı qur"
   },
   "sections": {
     "backHome": "Əsas səhifəyə qayıdın",
@@ -322,7 +331,19 @@
     "includedFree": "Daxildir",
     "perMonth": "aylıq",
     "templateTag": "Şablonlar",
-    "total": "Ümumi"
+    "total": "Ümumi",
+    "months": "Müddət",
+    "monthsUnit": "ay",
+    "discountNote": "{pct}% endirim",
+    "requestCta": "Paketi tələb et",
+    "requesting": "Göndərilir…",
+    "requested": "Tələbiniz göndərildi",
+    "requestedNote": "Komanda təsdiqləyəndə e-poçt göndəriləcək.",
+    "myTitle": "Müraciətlərim",
+    "myEmpty": "Hələ xüsusi paket tələbi yoxdur.",
+    "statusRequested": "Gözləyir",
+    "statusActive": "Aktiv",
+    "quoteTotal": "Ümumi: {total} ₼"
   },
   "Metadata": {
     "welcomeTitle": "Xoş gəlmisiniz",
@@ -555,8 +576,19 @@
       "short_password": "Şifrə ən azı 8 simvoldan ibarət olmalıdır.",
       "invalid_credentials": "E-poçt və ya şifrə yanlışdır.",
       "email_taken": "Bu e-poçtla hesab artıq mövcuddur.",
-      "generic": "Bir xəta baş verdi. Yenidən cəhd edin."
-    }
+      "generic": "Bir xəta baş verdi. Yenidən cəhd edin.",
+      "email_unverified": "E-poçt təsdiqlənməyib. Gələnlər qutusunu yoxlayın və ya linki yenidən göndərin."
+    },
+    "signupOkTitle": "E-poçtunuzu yoxlayın",
+    "signupOkText": "{email} ünvanına təsdiq linki göndərdik — linki açdıqdan sonra hesabınız aktivləşəcək.",
+    "signupOkNote": "Link 24 saat qüvvədədir. Gəlmədisə spam qovluğuna baxın.",
+    "devLinkNote": "SMTP hələ qurulmayıb — test üçün təsdiq linki:",
+    "devLinkOpen": "Təsdiq linkini aç",
+    "loginUnverified": "Bu e-poçt hələ təsdiqlənməyib — gələnlər qutusunu yoxlayın.",
+    "resendCta": "Təsdiq məktubunu yenidən göndər",
+    "resendOk": "Yeni təsdiq məktubu göndərildi.",
+    "resendFail": "Göndərmə alınmadı — bir azdan yenidən cəhd edin.",
+    "resendUnknown": "Bu e-poçtlə gözləyən qeydiyyat tapılmadı."
   },
   "accountMenu": {
     "signedInAs": "Daxil olmusunuz",
@@ -638,7 +670,9 @@
       "planFree": "Pulsuz (demo)",
       "logout": "Çıxış",
       "logoutHint": "Bu cihazdakı sessiyanı bitirir və welcome səhifəsinə qaytarır.",
-      "note": "Məlumatların redaktəsi tam hesab sistemi ilə birlikdə gələcək."
+      "note": "Ad, şəkil, çəki və məqsədlərinizi Profil səhifəsindən redaktə edin.",
+      "editProfile": "Profil məlumatlarını redaktə et",
+      "avatar": "Profil şəkli"
     },
     "appearance": {
       "title": "Görünüş",
@@ -675,7 +709,52 @@
     "planFree": "Pulsuz (demo)",
     "settings": "Ayarları aç",
     "subscription": "Abunəlik",
-    "note": "Daha dolğun profil — məqsədlər, tarixçə, irəliləyiş — tezliklə gəlir."
+    "note": "Daha dolğun profil — məqsədlər, tarixçə, irəliləyiş — tezliklə gəlir.",
+    "editHint": "Öz datanızı burada dəyişin — AI köməkçisi də eyni məlumatları görür və istədiyinizdə bunları sizin üçün yeniləyir.",
+    "avatarChange": "Şəkli dəyiş",
+    "avatarUpload": "Yeni şəkil seç",
+    "avatarRemove": "Şəkli sil",
+    "avatarErr": "Şəkil açılmadı — maksimum ~350 KB, JPG / PNG / WebP.",
+    "emailLocked": "E-poçt dəyişdirilmir",
+    "emailLockedHint": "Təhlükəsizlik üçün e-poçt yalnız dəstək ilə dəyişilir.",
+    "gender": "Cins",
+    "genders": {
+      "male": "Kişi",
+      "female": "Qadın",
+      "other": "Digər"
+    },
+    "birthYear": "Doğum ili",
+    "height": "Boy (sm)",
+    "weight": "Çəki (kq)",
+    "weightHint": "Hər dəyişiklik tarixçəyə yazılır.",
+    "goal": "Məqsəd",
+    "goals": {
+      "lose": "Çəki itirmək",
+      "maintain": "Formanı saxlamaq",
+      "gain": "Kütlə qazanmaq",
+      "fitness": "Ümumi fitnes"
+    },
+    "activity": "Aktivlik",
+    "activities": {
+      "sedentary": "Oturaq",
+      "light": "Yüngül (həftədə 1–3)",
+      "moderate": "Orta (həftədə 3–5)",
+      "active": "Aktiv (həftədə 6–7)",
+      "athlete": "Atletik (hər gün)"
+    },
+    "fitness": "Hazırlıq",
+    "fitnessLevels": {
+      "beginner": "Başlanğıc",
+      "intermediate": "Orta",
+      "advanced": "İleri"
+    },
+    "perWeek": "Həftədə məşq sayı",
+    "save": "Yadda saxla",
+    "saving": "Saxlanılır…",
+    "saved": "Yadda saxlanıldı",
+    "saveErr": "Saxlanmadı — xanaları yoxlayıb yenidən cəhd edin.",
+    "weightLog": "Çəki tarixçəsi",
+    "weightEmpty": "Hələ çəki qeydi yoxdur."
   },
   "helpPage": {
     "eyebrow": "Dəstək",
@@ -1405,7 +1484,8 @@
     "send": "Göndər",
     "subtitle": "Sənin bələdçin",
     "thinking": "Düşünür…",
-    "title": "PreLife AI"
+    "title": "PreLife AI",
+    "toolsHint": "Daxil olmusunuz — mən həm də hesabınızı idarə edə bilirəm: çəki, boy, məqsəd, idman planı, xüsusi paket. Sadəcə yazın: “çəkim 78 kq olsun”."
   },
   "libraryApp": {
     "blurb": {
@@ -1857,5 +1937,18 @@
     "videoIntro": "Gözlə üçün sakit rəsmlər — nəfəs ritmi izləmək üçün.",
     "whatEyebrow": "Meditasiya nədir",
     "whatText": "Meditasiya — zehni indiki ana toplamaq praktikasıdır. Rəqibin yoxdur, uduş yoxdur: yalnız nəfəs, bədən və diqqət. Elmi araşdırmalar müntəzəm praktikanın stress hormonunu azaltdığını, diqqət müddətini uzatdığını və yuxu keyfiyyətini yaxşılaşdırdığını göstərir. Gündə beş dəqiqə belə başlamaq üçün kifayətdir."
+  },
+  "verifyPage": {
+    "title": "E-poçt təsdiqi",
+    "checking": "Təsdiq yoxlanılır…",
+    "okTitle": "E-poçt təsdiqləndi!",
+    "okText": "Hesabınız hazırdır — xoş gəlmisiniz.",
+    "goHome": "PreLife-a daxil ol",
+    "badTitle": "Link keçərsizdir",
+    "badText": "Bu təsdiq linki yanlışdır və ya artıq istifadə olunub.",
+    "expired": "Linkin vaxtı bitib — yenisini göndərin.",
+    "resend": "Yeni link göndər",
+    "resent": "Yeni təsdiq linki göndərildi — e-poçtunuzu yoxlayın.",
+    "backToLogin": "Daxil olma səhifəsinə qayıt"
   }
 }

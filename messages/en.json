@@ -117,7 +117,16 @@
       "title": "PreLife Premium",
       "text": "Unlock every section, AI and video libraries with one plan.",
       "cta": "View plans"
-    }
+    },
+    "planEyebrow": "Your workout plan",
+    "planWeek": "Week {week} / {total}",
+    "planPerWeek": "{days} days / week",
+    "planSourceDefault": "Starter plan",
+    "planSourceAi": "AI plan",
+    "planOpen": "Open the plan",
+    "planNone": "No plan yet",
+    "planNoneText": "On your first visit to Gym → Plan, answer a few questions and let the AI build your personal plan.",
+    "planCta": "Build the plan"
   },
   "sections": {
     "backHome": "Back to Home",
@@ -322,7 +331,19 @@
     "includedFree": "Included",
     "perMonth": "per month",
     "templateTag": "Templates",
-    "total": "Total"
+    "total": "Total",
+    "months": "Duration",
+    "monthsUnit": "mo",
+    "discountNote": "{pct}% off",
+    "requestCta": "Request this package",
+    "requesting": "Sending…",
+    "requested": "Request sent",
+    "requestedNote": "We'll e-mail you once the team confirms.",
+    "myTitle": "My requests",
+    "myEmpty": "No custom package requests yet.",
+    "statusRequested": "Pending",
+    "statusActive": "Active",
+    "quoteTotal": "Total: {total} ₼"
   },
   "Metadata": {
     "welcomeTitle": "Welcome",
@@ -555,8 +576,19 @@
       "short_password": "Password must be at least 8 characters.",
       "invalid_credentials": "Wrong email or password.",
       "email_taken": "An account with this email already exists.",
-      "generic": "Something went wrong. Please try again."
-    }
+      "generic": "Something went wrong. Please try again.",
+      "email_unverified": "E-mail not confirmed. Check your inbox or resend the link."
+    },
+    "signupOkTitle": "Check your inbox",
+    "signupOkText": "We sent a confirmation link to {email} — your account activates the moment you open it.",
+    "signupOkNote": "The link is valid for 24 hours. Check spam if it hasn't arrived.",
+    "devLinkNote": "SMTP is not configured yet — test verification link:",
+    "devLinkOpen": "Open the verification link",
+    "loginUnverified": "This e-mail isn't confirmed yet — check your inbox.",
+    "resendCta": "Send the confirmation e-mail again",
+    "resendOk": "A new confirmation e-mail was sent.",
+    "resendFail": "Could not send — try again in a moment.",
+    "resendUnknown": "No pending signup found for this e-mail."
   },
   "accountMenu": {
     "signedInAs": "Signed in as",
@@ -638,7 +670,9 @@
       "planFree": "Free (demo)",
       "logout": "Log out",
       "logoutHint": "Ends this device's session and returns you to the welcome page.",
-      "note": "Editing your details arrives together with the full account system."
+      "note": "Edit your name, photo, weight and goals on the Profile page.",
+      "editProfile": "Edit profile data",
+      "avatar": "Profile photo"
     },
     "appearance": {
       "title": "Appearance",
@@ -675,7 +709,52 @@
     "planFree": "Free (demo)",
     "settings": "Open settings",
     "subscription": "Subscription",
-    "note": "A fuller profile — goals, history, progress — arrives soon."
+    "note": "A fuller profile — goals, history, progress — arrives soon.",
+    "editHint": "Edit your own data here — the AI assistant sees the same info and can update it for you on request.",
+    "avatarChange": "Change photo",
+    "avatarUpload": "Pick a new photo",
+    "avatarRemove": "Remove photo",
+    "avatarErr": "Could not use the image — max ~350 KB, JPG / PNG / WebP.",
+    "emailLocked": "E-mail cannot be changed",
+    "emailLockedHint": "For security, the e-mail only changes through support.",
+    "gender": "Gender",
+    "genders": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "birthYear": "Birth year",
+    "height": "Height (cm)",
+    "weight": "Weight (kg)",
+    "weightHint": "Every change is written to your history.",
+    "goal": "Goal",
+    "goals": {
+      "lose": "Lose weight",
+      "maintain": "Maintain",
+      "gain": "Gain muscle",
+      "fitness": "General fitness"
+    },
+    "activity": "Activity",
+    "activities": {
+      "sedentary": "Sedentary",
+      "light": "Light (1–3/week)",
+      "moderate": "Moderate (3–5/week)",
+      "active": "Active (6–7/week)",
+      "athlete": "Athletic (daily)"
+    },
+    "fitness": "Fitness level",
+    "fitnessLevels": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "perWeek": "Workouts per week",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "saveErr": "Could not save — check the fields and try again.",
+    "weightLog": "Weight history",
+    "weightEmpty": "No weight entries yet."
   },
   "helpPage": {
     "eyebrow": "Support",
@@ -1405,7 +1484,8 @@
     "send": "Send",
     "subtitle": "Your guide",
     "thinking": "Thinking…",
-    "title": "PreLife AI"
+    "title": "PreLife AI",
+    "toolsHint": "You are signed in — I can also manage your account: weight, height, goal, workout plan, custom package. Just say: “set my weight to 78 kg”."
   },
   "libraryApp": {
     "blurb": {
@@ -1857,5 +1937,18 @@
     "videoIntro": "Calm visuals for the eyes — to follow the breathing rhythm.",
     "whatEyebrow": "What meditation is",
     "whatText": "Meditation is the practice of gathering the mind into the present moment. There is no opponent and no win: only breath, body and attention. Research shows a regular practice lowers stress hormones, lengthens attention span and improves sleep quality. Five minutes a day is enough to begin."
+  },
+  "verifyPage": {
+    "title": "Verify e-mail",
+    "checking": "Verifying…",
+    "okTitle": "E-mail verified!",
+    "okText": "Your account is ready — welcome aboard.",
+    "goHome": "Enter PreLife",
+    "badTitle": "Link is invalid",
+    "badText": "This verification link is wrong or already used.",
+    "expired": "The link has expired — send a new one.",
+    "resend": "Send a new link",
+    "resent": "A new verification link was sent — check your inbox.",
+    "backToLogin": "Back to sign in"
   }
 }
