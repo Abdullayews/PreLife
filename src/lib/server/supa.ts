@@ -122,14 +122,15 @@ export function userFromAuth(row: Record<string, unknown>): AuthUser | null {
 }
 
 /**
- * Create a confirmed auth user via the admin API. The `handle_new_user`
- * trigger on auth.users makes the profiles row. Error messages look like
+ * Create an auth user via the admin API. The `handle_new_user` trigger on
+ * auth.users makes the profiles row. Error messages look like
  * "gotrue <status>: <body>" (422 = email taken) — callers match on that.
  */
 export async function authAdminCreateUser(
   email: string,
   password: string,
   fullName: string,
+  emailConfirm = true,
 ): Promise<Record<string, unknown>> {
   const res = await fetch(`${AUTH}/admin/users`, {
     method: "POST",
@@ -137,9 +138,26 @@ export async function authAdminCreateUser(
     body: JSON.stringify({
       email,
       password,
-      email_confirm: true,
+      email_confirm: emailConfirm,
       user_metadata: { full_name: fullName },
     }),
+    cache: "no-store",
+  });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`gotrue ${res.status}: ${text}`);
+  return JSON.parse(text) as Record<string, unknown>;
+}
+
+/** Admin update — e.g. { email_confirm: true } after the verification
+ * link is followed, or new user_metadata. Returns the updated user. */
+export async function authAdminUpdateUser(
+  id: string,
+  patch: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  const res = await fetch(`${AUTH}/admin/users/${id}`, {
+    method: "PUT",
+    headers: { ...HDRS, "content-type": "application/json" },
+    body: JSON.stringify(patch),
     cache: "no-store",
   });
   const text = await res.text();

@@ -79,6 +79,8 @@ server.log
 /scripts/gh_check.py
 # runtime state (seeded idempotently at runtime)
 db/*.db
+# local Supabase emulator store (dev-only user data)
+db/emu-store.json
 .zscripts/dev.pid
 .zshots/
 

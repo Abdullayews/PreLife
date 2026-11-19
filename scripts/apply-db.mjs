@@ -80,6 +80,15 @@ if (mode === "v3.2") {
   process.exit(0);
 }
 
+/* v3.3: AI (settings + prompts), profile data editing, custom packages,
+   email verification, user plans, new subscription prices.
+   See db/schema-v3.3.sql. */
+if (mode === "v3.3") {
+  await run(readFileSync(new URL("db/schema-v3.3.sql", root), "utf8"), "schema-v3.3.sql");
+  console.log("done.");
+  process.exit(0);
+}
+
 if (mode === "all" || mode === "schema") {
   await run(readFileSync(new URL("db/schema.sql", root), "utf8"), "schema.sql");
 }

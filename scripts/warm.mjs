@@ -91,11 +91,12 @@ async function main() {
     "/api/content/worlds", "/api/content/gym", "/api/content/diet",
     "/api/content/meditation", "/api/content/library",
     "/api/content/subscription", "/api/i18n?locale=en",
+    "/api/gym/plan",
   ];
   const badPosts = [
     "/api/auth/signup", "/api/psych/quiz", "/api/psych/book", "/api/psych/pay",
     "/api/psych/cancel", "/api/psych/progress", "/api/psych/journal",
-    "/api/psych/mood", "/api/ai/chat", "/api/psych/ai",
+    "/api/psych/mood", "/api/ai/chat", "/api/psych/ai", "/api/gym/plan",
   ];
   for (const path of gets) {
     if (expired()) { out("deadline hit — stopping early"); return finish(); }

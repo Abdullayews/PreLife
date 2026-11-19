@@ -57,6 +57,8 @@ export default async function LocaleLayout({
     dietApp: all.dietApp,
     subscription: all.subscription,
     aiChat: all.aiChat,
+    profilePage: all.profilePage,
+    verifyPage: all.verifyPage,
   };
 
   return (
