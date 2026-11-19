@@ -26,8 +26,10 @@ export default async function DietOverviewPage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: "dietApp" });
 
   // Recipes, plans and venues come from the Rust API (Supabase Postgres).
+  // An empty recipe pool would crash recipeOfTheDay below — degrade to
+  // the unavailable shell instead of a 500 (same path as a dead API).
   const diet = await getDietContent();
-  if (!diet) return <ContentUnavailable locale={locale} />;
+  if (!diet || diet.recipes.length === 0) return <ContentUnavailable locale={locale} />;
   const hour = bakuParts(new Date()).hour;
   const greeting =
     hour < 12 ? t("greetMorning") : hour < 18 ? t("greetAfternoon") : t("greetEvening");

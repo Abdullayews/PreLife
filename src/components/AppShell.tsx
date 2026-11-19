@@ -203,13 +203,12 @@ export function AppShell({
       user.email.slice(0, 2)).toUpperCase();
 
   /* The section whose row becomes the nested group head (when the page
-   * carries subtabs): the current section, matched by route prefix. */
+   * carries subtabs): the current section, matched by route prefix. The
+   * row keeps ITS position in the list — only its markup changes (v5.1:
+   * the order never shuffles; Home stays first). */
   const groupHref = tabs.length > 0
     ? mainNav.find(({ href }) => on(href))?.href
     : undefined;
-  const plainNav = groupHref
-    ? mainNav.filter(({ href }) => href !== groupHref)
-    : mainNav;
 
   const logout = async () => {
     setBusy(true);
@@ -263,10 +262,8 @@ export function AppShell({
   );
 
   /* The current section's nested subtab group (İdman semantics: the row
-   * becomes a collapsible head; the rail expands first when folded). */
-  const groupHead = groupHref
-    ? mainNav.find(({ href }) => href === groupHref)!
-    : null;
+   * becomes a collapsible head; the rail expands first when folded) —
+   * rendered IN PLACE inside the main-nav map below. */
 
   const onGroupClick = () => {
     if (!expanded) {
@@ -328,81 +325,86 @@ export function AppShell({
 
           <p className="rail-cap" aria-hidden>{t("mainCaption")}</p>
           <ul className="rail-list">
-            {/* The current section: group head + nested subtabs */}
-            {groupHead && (
-              <li className="rail-group">
-                <button
-                  type="button"
-                  className={`rail-item rail-group-head${on(groupHead.href) ? " active" : ""}`}
-                  onClick={onGroupClick}
-                  aria-expanded={groupOpen}
-                  title={!expanded ? groupHead.label : undefined}
-                >
-                  <span className="rail-ic" aria-hidden>
-                    <groupHead.icon size={19} strokeWidth={2} />
-                  </span>
-                  {expanded && (
-                    <>
-                      <span className="ri-meta">
-                        <span className="ri-label">{groupHead.label}</span>
-                      </span>
-                      <ChevronsUpDown
-                        size={14} aria-hidden
-                        className="rail-caret"
-                        style={{ transform: groupOpen ? "rotate(180deg)" : "none" }}
-                      />
-                    </>
-                  )}
-                </button>
-                <div className={`rail-sub${groupOpen && expanded ? " open" : ""}`}>
-                  <ul
-                    aria-label={ui.title ?? ui.label}
-                    ref={listRef}
-                    {...(mode === "tab"
-                      ? { role: "tablist" as const, onKeyDown }
-                      : {})}
+            {/* Main pages in their FIXED order — Home first, the four
+                sections, Subscription last. When the page carries subtabs,
+                that section's row becomes the nested group head IN PLACE
+                (v5.1: the order never shuffles — Home stays first). */}
+            {mainNav.map((item) => {
+              if (item.href !== groupHref) return row(item);
+              return (
+                <li className="rail-group" key={item.href}>
+                  <button
+                    type="button"
+                    className={`rail-item rail-group-head${on(item.href) ? " active" : ""}`}
+                    onClick={onGroupClick}
+                    aria-expanded={groupOpen}
+                    title={!expanded ? item.label : undefined}
                   >
-                    {tabs.map((tab) => {
-                      const Icon = iconOf(tab.icon);
-                      const isActive = tab.id === activeId;
-                      const srCurrent = isActive && mode === "link"
-                        ? <span className="sr-only">{ui.current} </span>
-                        : null;
-                      return (
-                        <li key={tab.id}>
-                          {mode === "link" ? (
-                            <Link
-                              href={hrefs[tab.id] ?? "#"}
-                              className={`rail-tab${isActive ? " active" : ""}`}
-                              aria-current={isActive ? "page" : undefined}
-                              title={!expanded ? tab.label : undefined}
-                              onClick={() => onSelect?.(tab.id)}
-                            >
-                              <span className="rail-ic" aria-hidden><Icon size={18} strokeWidth={2} /></span>
-                              {expanded && <span className="label">{srCurrent}{tab.label}</span>}
-                            </Link>
-                          ) : (
-                            <button
-                              type="button"
-                              role="tab"
-                              className={`rail-tab${isActive ? " active" : ""}`}
-                              aria-selected={isActive}
-                              aria-controls="app-panel"
-                              title={!expanded ? tab.label : undefined}
-                              onClick={() => onSelect?.(tab.id)}
-                            >
-                              <span className="rail-ic" aria-hidden><Icon size={18} strokeWidth={2} /></span>
-                              {expanded && <span className="label">{srCurrent}{tab.label}</span>}
-                            </button>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              </li>
-            )}
-            {plainNav.map(row)}
+                    <span className="rail-ic" aria-hidden>
+                      <item.icon size={19} strokeWidth={2} />
+                    </span>
+                    {expanded && (
+                      <>
+                        <span className="ri-meta">
+                          <span className="ri-label">{item.label}</span>
+                        </span>
+                        <ChevronsUpDown
+                          size={14} aria-hidden
+                          className="rail-caret"
+                          style={{ transform: groupOpen ? "rotate(180deg)" : "none" }}
+                        />
+                      </>
+                    )}
+                  </button>
+                  <div className={`rail-sub${groupOpen && expanded ? " open" : ""}`}>
+                    <ul
+                      aria-label={ui.title ?? ui.label}
+                      ref={listRef}
+                      {...(mode === "tab"
+                        ? { role: "tablist" as const, onKeyDown }
+                        : {})}
+                    >
+                      {tabs.map((tab) => {
+                        const Icon = iconOf(tab.icon);
+                        const isActive = tab.id === activeId;
+                        const srCurrent = isActive && mode === "link"
+                          ? <span className="sr-only">{ui.current} </span>
+                          : null;
+                        return (
+                          <li key={tab.id}>
+                            {mode === "link" ? (
+                              <Link
+                                href={hrefs[tab.id] ?? "#"}
+                                className={`rail-tab${isActive ? " active" : ""}`}
+                                aria-current={isActive ? "page" : undefined}
+                                title={!expanded ? tab.label : undefined}
+                                onClick={() => onSelect?.(tab.id)}
+                              >
+                                <span className="rail-ic" aria-hidden><Icon size={18} strokeWidth={2} /></span>
+                                {expanded && <span className="label">{srCurrent}{tab.label}</span>}
+                              </Link>
+                            ) : (
+                              <button
+                                type="button"
+                                role="tab"
+                                className={`rail-tab${isActive ? " active" : ""}`}
+                                aria-selected={isActive}
+                                aria-controls="app-panel"
+                                title={!expanded ? tab.label : undefined}
+                                onClick={() => onSelect?.(tab.id)}
+                              >
+                                <span className="rail-ic" aria-hidden><Icon size={18} strokeWidth={2} /></span>
+                                {expanded && <span className="label">{srCurrent}{tab.label}</span>}
+                              </button>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
 
           {/* Management (signed in) */}
