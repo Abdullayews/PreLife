@@ -4,7 +4,7 @@ import { supabaseConfigured } from "@/lib/server/supa";
 export const dynamic = "force-dynamic";
 
 const STARTED_AT = Date.now();
-const VERSION = "2.1.0";
+const VERSION = "2.1.1";
 
 /** GET /api/health — liveness + Supabase configuration report. */
 export function GET() {
