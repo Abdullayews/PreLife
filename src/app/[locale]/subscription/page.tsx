@@ -4,6 +4,7 @@ import { Crown } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { getSubscriptionContent } from "@/lib/api";
 import { ContentUnavailable } from "@/components/ContentUnavailable";
+import { AppPageShell } from "@/components/AppPageShell";
 import { SubscriptionBuilder, type SubFeature, type SubTier } from "@/components/SubscriptionBuilder";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -48,7 +49,7 @@ export default async function SubscriptionPage({ params }: Props) {
   };
 
   return (
-    <div data-world="shell" className="world page">
+    <AppPageShell locale={locale}>
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i /><Crown size={14} aria-hidden />PreLife Premium</p>
@@ -60,6 +61,6 @@ export default async function SubscriptionPage({ params }: Props) {
 
         <p className="stats-hint">{t("note")}</p>
       </div>
-    </div>
+    </AppPageShell>
   );
 }

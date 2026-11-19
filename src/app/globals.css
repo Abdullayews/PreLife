@@ -371,6 +371,20 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 .panel-links a[aria-current="page"] { color: var(--accent-text); font-weight: 650; }
 .panel-links a[aria-current="page"]::before { background: var(--accent); }
 .panel-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--line); }
+/* The drawer's log-out row — the left panel's footer, mirrored for
+   small screens. */
+.panel-logout {
+  display: flex; align-items: center; gap: .55rem; width: 100%;
+  margin-top: .625rem; padding: .625rem .875rem;
+  border: 1px solid color-mix(in srgb, #b3261e 22%, transparent); border-radius: var(--r-sm);
+  background: color-mix(in srgb, #b3261e 7%, transparent); color: #b3261e;
+  font: 600 .875rem/1 var(--font-body); cursor: pointer;
+  transition: background-color .18s;
+}
+.panel-logout:hover { background: color-mix(in srgb, #b3261e 13%, transparent); }
+.panel-logout:disabled { opacity: .55; cursor: default; }
+html.dark .panel-logout { color: #e58c86; border-color: color-mix(in srgb, #e58c86 26%, transparent); background: color-mix(in srgb, #e58c86 8%, transparent); }
+html.dark .panel-logout:hover { background: color-mix(in srgb, #e58c86 15%, transparent); }
 /* Welcome surface: links join the bar at lg (burger/panel until lg).
    App surface: tabs join at lg; the language segment only at xl (it also
    lives in the drawer); the burger stays available until xl. */
@@ -1290,31 +1304,29 @@ a.card:hover em svg { transform: translateX(3px); }
 .lede-panel { color: var(--muted); max-width: 42rem; text-wrap: pretty; }
 
 /* ════════════════════════════════════════════════════════════════════════
-   APP SHELL — the registered-surface shell every section sits in: the
-   section rail (subtabs) as a LEFT COLUMN, the section content to its
-   right. The rail runs the TOP NAV'S system vertically — see the block
-   below for the two states — and stays in page flow, so it scrolls down
-   with the content instead of pinning.
+   APP SHELL v4 (v2.2) — THE LEFT MANAGEMENT PANEL.
+   One rail on every registered page: identity + main navigation (with
+   one-line descriptions) + the section's subtabs + management links +
+   language/theme + log out. Two widths switched by the fold button
+   ([data-folded]), STICKY on lg+ so it follows the reader down the page
+   and scrolls internally when the stack outgrows the viewport. On
+   mobile it degrades to the horizontal subtab capsule strip; management
+   lives in the nav's burger drawer there.
    ════════════════════════════════════════════════════════════════════════ */
 
 /* The page wrapper: nav clearance only — the shell owns the rest. */
 .world.app-page { padding-top: var(--nav-h); }
 
-/* ══ App shell v3 — the top nav's system, run vertically ══════════════
-   At rest (scroll ≤ 24px): a full-bleed solid strip flush to the left
-   edge — square corners, painted in --bg, merging into the page exactly
-   like the nav bar does at the top of the page.
-   Past 24px of scroll: the floating frosted-glass capsule the nav pill
-   becomes — margins appear, corners round, hairline border + blur + soft
-   shadow fade in (the nav's paint recipe, same .5s ease).
-   Unlike the fixed nav the rail is IN FLOW: scrolling down takes it with
-   the page. Tab size follows the subtab count (data-density on the
-   shell): ≤4 roomy "cozy" pills, 5-6 "regular", ≥7 "compact". */
 .app-shell {
   display: grid; grid-template-columns: minmax(0, 1fr);
   min-height: calc(100svh - var(--nav-h));
 }
 
+/* ── Mobile (< lg): the horizontal subtab capsule strip ──
+   Full-bleed solid strip at rest; past 24px of scroll the floating
+   frosted capsule (the nav pill's paint recipe). Management blocks are
+   desktop-only — [data-hassub="false"] pages (no subtabs) hide the
+   strip entirely so no empty pill appears. */
 .app-rail {
   position: relative; z-index: 5;
   margin: 0;
@@ -1333,7 +1345,10 @@ a.card:hover em svg { transform: translateX(3px); }
   box-shadow: var(--shadow-2);
   -webkit-backdrop-filter: blur(14.4px) saturate(1.45); backdrop-filter: blur(14.4px) saturate(1.45);
 }
-.app-rail-title { display: none; }
+.app-shell[data-hassub="false"] .app-rail { display: none; }
+
+.rail-id, .rail-cap, .rail-nav, .rail-foot, .rail-fold { display: none; }
+
 .app-rail-clip {
   overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain;
   scrollbar-width: none;
@@ -1343,9 +1358,6 @@ a.card:hover em svg { transform: translateX(3px); }
   display: flex; align-items: center; gap: .375rem;
   width: max-content; padding: .5rem 1rem;
 }
-
-/* Mobile pill shape — echoes the nav pill / filter chips. Base size is
-   "regular"; the density overrides below make it roomy or compact. */
 .app-tab {
   position: relative; display: inline-flex; align-items: center; gap: .5rem;
   height: 44px; padding: 0 1rem; border: 0; border-radius: 999px;
@@ -1360,69 +1372,184 @@ a.card:hover em svg { transform: translateX(3px); }
   background: color-mix(in srgb, var(--accent) 14%, transparent);
   color: var(--accent-text);
 }
-
-/* Density — the subtab count decides the pill size: few subtabs get big
-   touch targets, crowded stacks compress so everything fits. */
 .app-shell[data-density="cozy"] .app-tab { height: 48px; padding-inline: 1.125rem; font-size: .9375rem; }
 .app-shell[data-density="cozy"] .app-tab svg { width: 20px; height: 20px; }
 .app-shell[data-density="compact"] .app-tab { height: 40px; padding-inline: .875rem; font-size: .8125rem; }
 .app-shell[data-density="compact"] .app-tab svg { width: 16px; height: 16px; }
 
-/* The content column — children keep their own .wrap centering. */
 .app-main { min-width: 0; padding-block: clamp(1.25rem, 3.5vw, 2.5rem) clamp(2.5rem, 6vw, 4.5rem); }
 
-/* ── lg+: the same system as a side column ── */
+/* ══ lg+: the sticky management panel ═════════════════════════════════
+   A frosted rounded card pinned below the fixed nav: scrolling keeps it
+   in view, its clip column scrolls when the stack is taller than the
+   viewport. Grid column animates between the two widths. */
 @media (min-width: 64rem) {
   .app-shell {
-    grid-template-columns: 14rem minmax(0, 1fr);
+    --rail-w: 16rem;
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
     column-gap: 1.5rem;
+    transition: grid-template-columns .45s var(--nav-ease);
   }
-  /* In flow, capped at one fold: at rest the strip spans exactly from
-     below the nav to the bottom of the viewport. */
-  .app-rail {
+  .app-shell[data-folded="true"] { --rail-w: 4.75rem; }
+  .app-shell[data-hassub="false"] .app-rail { display: block; }
+
+  .app-rail, .app-shell[data-scrolled="true"] .app-rail {
+    position: sticky; top: calc(var(--nav-h) + .875rem);
     align-self: start;
-    height: calc(100svh - var(--nav-h));
+    max-height: calc(100svh - var(--nav-h) - 1.75rem);
+    display: flex; flex-direction: column;
+    margin: .875rem 0 1.5rem;
+    border: 1px solid var(--line); border-radius: var(--r-lg);
+    background: color-mix(in srgb, var(--raised) 88%, transparent);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
+    box-shadow: var(--shadow-1);
   }
-  /* The capsule detaches from the left edge — inset by the same
-     max(.75rem, 5vw) offset the floating nav pill uses, so the two
-     glass surfaces line up on every screen width. */
-  .app-shell[data-scrolled="true"] .app-rail {
-    margin: .75rem 0 0 max(.75rem, 5vw);
-    border-radius: var(--r-xl);
-  }
-  .app-rail-title {
-    display: block; margin: 0 0 .5rem 1rem;
-    font: 650 .75rem/1 var(--font-body); letter-spacing: .12em;
-    text-transform: uppercase; color: var(--muted);
-  }
+
   .app-rail-clip {
     overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
-    height: 100%;
+    flex: 1; min-height: 0;
     scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--ink) 18%, transparent) transparent;
   }
   .app-rail-clip::-webkit-scrollbar { display: block; width: 8px; }
   .app-rail-clip::-webkit-scrollbar-track { background: transparent; }
   .app-rail-clip::-webkit-scrollbar-thumb { border-radius: 999px; background: color-mix(in srgb, var(--ink) 18%, transparent); }
+
+  /* ── Identity ── */
+  .rail-id {
+    display: flex; align-items: center; gap: .625rem;
+    padding: .875rem .75rem .75rem 1rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .rail-avatar {
+    flex: none; width: 2.25rem; height: 2.25rem; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--wash); color: var(--accent-text);
+    font: 700 .8125rem/1 var(--font-body); letter-spacing: .02em;
+  }
+  .rail-id-meta { flex: 1; min-width: 0; display: grid; gap: 2px; }
+  .rail-id-meta b {
+    font: 650 .8125rem/1.2 var(--font-body); color: var(--ink);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .rail-id-meta span {
+    font: 400 .6875rem/1.2 var(--font-body); color: var(--muted);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .rail-fold {
+    flex: none; width: 1.875rem; height: 1.875rem; border-radius: var(--r-sm);
+  }
+  .rail-fold:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+
+  /* ── Group captions ── */
+  .rail-cap {
+    display: block; margin: 1rem 1rem .4rem;
+    font: 650 .6875rem/1 var(--font-body); letter-spacing: .14em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* ── Nav rows (main pages + management) ── */
+  .rail-nav { display: grid; gap: 2px; padding: 0 .625rem; }
+  .rail-item {
+    position: relative; display: flex; align-items: center; gap: .75rem;
+    width: 100%; min-height: 44px; padding: .4375rem .625rem;
+    border: 0; border-radius: var(--r-sm);
+    background: transparent; color: var(--muted); text-decoration: none;
+    text-align: left; cursor: pointer;
+    transition: background-color .18s, color .18s;
+  }
+  .rail-item > svg { flex: none; }
+  .rail-item .ri-meta { min-width: 0; display: grid; gap: 1px; }
+  .rail-item .ri-label {
+    font: 600 .8125rem/1.25 var(--font-body); color: var(--ink);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .rail-item .ri-desc {
+    font: 400 .6875rem/1.35 var(--font-body); color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .rail-item:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+  .rail-item[aria-current="page"] { background: var(--wash); }
+  .rail-item[aria-current="page"]::before {
+    content: ""; position: absolute; left: 0; top: 22%; bottom: 22%;
+    width: 3px; border-radius: 999px; background: var(--accent);
+  }
+  .rail-item[aria-current="page"] .ri-label { color: var(--accent-text); font-weight: 650; }
+
+  /* ── Section subtabs — the nested group ── */
   .app-tabs {
-    display: grid; gap: 2px; width: auto; padding: .875rem .625rem;
+    display: grid; gap: 2px; width: auto; padding: 0 .625rem;
     align-content: start;
   }
   .app-tab {
-    display: flex; align-items: center; gap: .75rem; width: 100%; height: 44px;
-    padding: 0 .875rem; border-radius: 999px;
-    font: 600 .875rem/1.25 var(--font-body); text-align: left;
+    display: flex; align-items: center; gap: .75rem; width: 100%; height: 40px;
+    padding: 0 .625rem 0 1.625rem; border-radius: var(--r-sm);
+    font: 600 .8125rem/1.25 var(--font-body); text-align: left;
   }
   .app-tab:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); color: var(--ink); }
   .app-tab[aria-selected="true"], .app-tab[aria-current="page"] {
-    background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent-text);
+    background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-text);
   }
-  /* Vertical stacks breathe differently per density: cozy rows are tall,
-     compact ones compress so seven subtabs still fit the fold. */
-  .app-shell[data-density="cozy"] .app-tab { height: 52px; padding-inline: 1rem; }
-  .app-shell[data-density="compact"] .app-tab { height: 38px; gap: .625rem; padding-inline: .75rem; }
-  /* Content starts level with the strip's top edge (the shell already
-   * sits below the fixed nav via .world.app-page padding). */
+  .app-shell[data-density="cozy"] .app-tab { height: 46px; padding-inline: 1rem 1rem; padding-left: 1.75rem; }
+  .app-shell[data-density="compact"] .app-tab { height: 36px; gap: .625rem; padding-inline: .5rem .5rem; padding-left: 1.5rem; }
+
+  /* ── Footer: preferences + log out — pinned outside the scrolling
+     clip, always visible at the card's bottom edge. ── */
+  .rail-foot {
+    flex: none; display: grid; gap: .5rem;
+    padding: .75rem .625rem .875rem;
+    border-top: 1px solid var(--line);
+  }
+  .rail-nav:last-child, .app-tabs:last-child { padding-bottom: .75rem; }
+  .rail-prefs { display: flex; align-items: center; gap: .5rem; }
+  .rail-lang { flex: 1; height: 2.5rem; }
+  .rail-lang button { flex: 1; height: 2rem; }
+  .rail-theme { flex: none; width: 2.5rem; height: 2.5rem; }
+  .rail-logout {
+    display: flex; align-items: center; gap: .625rem;
+    min-height: 40px; padding: 0 .625rem;
+    border: 1px solid color-mix(in srgb, #b3261e 22%, transparent); border-radius: var(--r-sm);
+    background: color-mix(in srgb, #b3261e 7%, transparent); color: #b3261e;
+    font: 600 .8125rem/1 var(--font-body); cursor: pointer;
+    transition: background-color .18s, border-color .18s;
+  }
+  .rail-logout:hover { background: color-mix(in srgb, #b3261e 13%, transparent); }
+  .rail-logout:disabled { opacity: .55; cursor: default; }
+  html.dark .rail-logout { color: #e58c86; border-color: color-mix(in srgb, #e58c86 26%, transparent); background: color-mix(in srgb, #e58c86 8%, transparent); }
+  html.dark .rail-logout:hover { background: color-mix(in srgb, #e58c86 15%, transparent); }
+
+  /* ── Folded (icon-only) mode ── */
+  .app-shell[data-folded="true"] .rail-id {
+    flex-direction: column; gap: .5rem;
+    padding: .875rem .5rem .75rem; align-items: center;
+  }
+  .app-shell[data-folded="true"] .rail-id-meta { display: none; }
+  .app-shell[data-folded="true"] .rail-cap {
+    height: 1px; margin: .75rem .875rem .375rem; padding: 0;
+    overflow: hidden; font-size: 0;
+    border-top: 1px solid var(--line); text-transform: none;
+  }
+  .app-shell[data-folded="true"] .rail-item {
+    justify-content: center; padding-inline: 0; min-height: 44px;
+  }
+  .app-shell[data-folded="true"] .rail-item[aria-current="page"]::before { left: -.375rem; }
+  .app-shell[data-folded="true"] .rail-item .ri-meta,
+  .app-shell[data-folded="true"] .app-tab .label {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  .app-shell[data-folded="true"] .app-tab {
+    justify-content: center; padding-inline: 0; gap: 0;
+  }
+  .app-shell[data-folded="true"] .rail-prefs { flex-direction: column; }
+  .app-shell[data-folded="true"] .rail-lang { display: grid; gap: 2px; height: auto; flex: none; width: 100%; }
+  .app-shell[data-folded="true"] .rail-lang button { height: 1.75rem; min-width: 2.25rem; }
+  .app-shell[data-folded="true"] .rail-logout { justify-content: center; padding-inline: 0; }
+  .app-shell[data-folded="true"] .rail-logout .label { display: none; }
+
+  /* Content starts level with the card's top edge; the wrap widens so
+   * wide screens don't drown in side gutters. */
   .app-main { padding-block: 1rem clamp(2.5rem, 6vw, 4.5rem); }
+  .app-main .wrap { max-width: 82rem; }
 }
 
 /* ── Panels ── */

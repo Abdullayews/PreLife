@@ -1,40 +1,45 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import {
-  AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat,
-  Circle, Dumbbell, Flower2, House, Landmark, Layers, LibraryBig, MapPin,
-  MonitorPlay, NotebookPen, Pill, Salad, Shirt, Users, Wind,
+  AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ChevronLeft,
+  ChevronRight, Circle, CircleHelp, Crown, Dumbbell, FileText, Flower2, House,
+  Landmark, Layers, LibraryBig, LogOut, MapPin, MonitorPlay, Moon, NotebookPen,
+  Pill, Salad, ScrollText, Settings, Shirt, Sun, UserRound, Users, Wind,
   type LucideIcon,
 } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import { routing } from "@/i18n/routing";
+import { sections } from "@/lib/shell";
+import { apiUrl } from "@/lib/api-url";
+import { hasConsent, setThemeChoice } from "@/lib/consent";
+import { saveUserPref } from "@/lib/user-prefs";
 
 /**
- * The registered-surface shell every section app sits in — v3, running the
- * TOP NAV'S system vertically:
+ * AppShell v4 — THE left management panel (v2.2).
  *
- * • the rail mirrors the nav pill's two states — at rest a full-bleed
- *   solid strip flush to the left edge (it merges into the page exactly
- *   like the nav does at the top), and past 24px of scroll the same
- *   floating frosted-glass capsule: margins appear, corners round,
- *   border + blur + shadow fade in.
+ * One rail, three jobs, present on every registered-user page:
  *
- * • Unlike the fixed nav, the rail is IN FLOW — when the page scrolls
- *   down, the rail scrolls down with it (no pinning, no internal sticky).
+ * • IDENTITY — the signed-in account (avatar, name, email) with the
+ *   fold button right beside it.
+ * • NAVIGATION — the main pages (Home · Gym · Diet · Psychology ·
+ *   Books · Subscription), each with a one-line description; when the
+ *   page belongs to a section, its subtabs nest underneath as their own
+ *   group (link mode = real routes, tab mode = in-page tablist).
+ * • MANAGEMENT — everything account-related used to live in scattered
+ *   places (the top-right user dropdown, the nav's language/theme
+ *   toggles); it now lives here: Profile, Settings, Help, Terms, Rules,
+ *   the language segment, the theme toggle and Log out.
  *
- * • Tab size follows the subtab count (data-density): sections with few
- *   subtabs get roomy pills, crowded sections get compact ones so the
- *   stack always fits.
+ * Two widths, one button: fully open (labels + descriptions) or
+ * icon-only. The choice is remembered post-consent (localStorage).
  *
- * Two modes:
- * • "link" — the tabs are routes (diet/meditation subpages); the active
- *   tab renders aria-current="page" and next-intl navigates.
- * • "tab" — the tabs switch panels in-page (the gym app); real
- *   tablist/tab semantics with aria-selected and roving arrows.
- *
- * Tabs arrive pre-translated from the server — icon is a registry key
- * (serializable across the RSC boundary) or a LucideIcon component when
- * the parent is itself a client component.
+ * The rail is STICKY on lg+: scrolling the page keeps the panel in
+ * view (it follows the reader down), with its own internal scroll when
+ * the stack outgrows the viewport. On mobile it degrades to the
+ * horizontal subtab capsule strip — management stays in the burger
+ * drawer there.
  */
 const RAIL_ICONS: Record<string, LucideIcon> = {
   audio: AudioLines, backpack: Backpack, book: BookOpen, brain: Brain,
@@ -59,10 +64,11 @@ export type ShellUi = {
   close: string;
   /** "Current:" — screen-reader prefix before the active tab name. */
   current: string;
-  /** The section's display name ("Diet", "Gym"…) — the small uppercase
-   *  caption at the top of the sidebar capsule (lg+ only). */
+  /** The section's display name — the caption above its subtab group. */
   title?: string;
 };
+
+export type ShellUser = { name: string | null; email: string };
 
 type Props = {
   mode: "link" | "tab";
@@ -73,24 +79,54 @@ type Props = {
   /** tab mode — called after a tab button activates. */
   onSelect?: (id: string) => void;
   ui: ShellUi;
-  /** Kept for API compatibility — the v2 rail no longer collapses. */
+  /** The signed-in account — when present the management groups render. */
+  user?: ShellUser | null;
+  /** Kept for API compatibility — v2.2 has its own fold state. */
   storageKey?: string;
   children: ReactNode;
 };
 
-/* The section rail — the top nav's shrink system translated into a side
- * column on the site's token system: solid and flush at rest, a floating
- * frosted capsule once the page scrolls; on the site's own tokens, and in
- * page flow so it travels with the content. */
+/** Where the fold choice is remembered (only after cookie consent). */
+const FOLD_KEY = "pl_rail_fold";
 
 export function AppShell({
-  mode, tabs, activeId, hrefs, onSelect, ui, children,
+  mode, tabs, activeId, hrefs, onSelect, ui, user, children,
 }: Props) {
   const listRef = useRef<HTMLUListElement>(null);
   const [scrolled, setScrolled] = useState(false);
+  const [folded, setFolded] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  /* The same scroll signal the top nav uses (24px threshold): past it the
-   * surfaces morph into floating frosted pills — the rail joins in. */
+  const t = useTranslations("sidePanel");
+  const th = useTranslations("welcomePage");
+  const ts = useTranslations("sections");
+  const ta = useTranslations("accountMenu");
+  const tm = useTranslations("moduleCommon");
+  const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  /* Fold state: the stored choice returns post-consent, otherwise the
+   * panel starts fully open (and stays in memory only). */
+  useEffect(() => {
+    if (!hasConsent()) return;
+    try {
+      if (localStorage.getItem(FOLD_KEY) === "1") setFolded(true);
+    } catch { /* storage unavailable */ }
+  }, []);
+
+  const fold = () => {
+    setFolded((v) => {
+      const next = !v;
+      if (hasConsent()) {
+        try { localStorage.setItem(FOLD_KEY, next ? "1" : "0"); } catch { /* ignore */ }
+      }
+      return next;
+    });
+  };
+
+  /* The same scroll signal the top nav uses (24px threshold): on mobile
+   * the horizontal strip morphs into the floating frosted capsule. */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
@@ -102,9 +138,7 @@ export function AppShell({
    * section's stack fits its column. (≤4 cozy · 5-6 regular · ≥7 compact) */
   const density = tabs.length >= 7 ? "compact" : tabs.length >= 5 ? "regular" : "cozy";
 
-  /* Roving focus across the tab list: arrows walk it, Home/End jump.
-   * Applies in tab mode (tablist semantics); link mode is plain
-   * Tab-order navigation. */
+  /* Roving focus across the subtab list (tab mode). */
   const onKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
     const list = listRef.current;
     if (!list) return;
@@ -128,14 +162,115 @@ export function AppShell({
   const iconOf = (icon: ShellTab["icon"]): LucideIcon =>
     typeof icon !== "string" ? icon : (RAIL_ICONS[icon] ?? Circle);
 
+  const on = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+
+  /* Main pages — Home first, the four sections, Subscription last. */
+  const mainNav: { href: string; label: string; icon: LucideIcon; desc: string }[] = [
+    { href: "/home", label: th("tabs.home"), icon: House, desc: t("desc.home") },
+    ...sections.map((s) => ({
+      href: s.href as string, label: ts(`${s.id}.name`), icon: s.icon, desc: t(`desc.${s.id}`),
+    })),
+    { href: "/subscription", label: th("header.drawerSubscription"), icon: Crown, desc: t("desc.subscription") },
+  ];
+
+  /* Management links — the old top-right dropdown, now panel rows. */
+  const manageNav = [
+    { href: "/profile", label: ta("profile"), icon: UserRound },
+    { href: "/settings", label: ta("settings"), icon: Settings },
+    { href: "/help", label: ta("help"), icon: CircleHelp },
+    { href: "/terms", label: ta("terms"), icon: FileText },
+    { href: "/rules", label: ta("rules"), icon: ScrollText },
+  ] as const;
+
+  const initials =
+    user && (user.name?.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("") ??
+      user.email.slice(0, 2)).toUpperCase();
+
+  const logout = async () => {
+    setBusy(true);
+    try {
+      await fetch(apiUrl("/api/auth/logout"), { method: "POST" });
+      router.replace("/welcome");
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const switchLocale = (loc: string) => {
+    router.replace(pathname, { locale: loc });
+    if (hasConsent()) {
+      document.cookie = `NEXT_LOCALE=${loc}; path=/; max-age=31536000; samesite=lax`;
+    }
+    if (user) saveUserPref({ locale: loc });
+  };
+
+  const toggleTheme = () => {
+    const dark = document.documentElement.classList.toggle("dark");
+    setThemeChoice(dark);
+    if (user) saveUserPref({ theme: dark ? "dark" : "light" });
+  };
+
+  const ariaCurrent = (href: string) =>
+    on(href) ? ("page" as const) : undefined;
+
   return (
-    <div className="app-shell" data-scrolled={scrolled} data-density={density}>
-      {/* ── The rail: the nav pill's system as a side column — solid
-          full-bleed strip at rest, floating frosted capsule past 24px of
-          scroll. In flow, so it scrolls down with the page. ── */}
-      <nav className="app-rail" aria-label={ui.label}>
+    <div
+      className="app-shell"
+      data-scrolled={scrolled}
+      data-density={density}
+      data-folded={folded}
+      data-hassub={tabs.length > 0 ? "true" : "false"}
+    >
+      {/* ── The rail: on lg+ the sticky management panel; on mobile the
+          horizontal subtab capsule strip. ── */}
+      <nav className="app-rail" aria-label={user ? t("navLabel") : ui.label}>
         <div className="app-rail-clip">
-          {ui.title && <p className="app-rail-title">{ui.title}</p>}
+          {/* Identity + the fold button (lg+, signed in) */}
+          {user && (
+            <div className="rail-id">
+              <span className="rail-avatar" aria-hidden>{initials}</span>
+              <span className="rail-id-meta">
+                <b>{user.name ?? user.email}</b>
+                <span>{user.email}</span>
+              </span>
+              <button
+                type="button"
+                className="icon-btn rail-fold"
+                aria-label={folded ? t("expand") : t("collapse")}
+                title={folded ? t("expand") : t("collapse")}
+                onClick={fold}
+              >
+                {folded ? <ChevronRight size={16} aria-hidden /> : <ChevronLeft size={16} aria-hidden />}
+              </button>
+            </div>
+          )}
+
+          {/* Main pages */}
+          <p className="rail-cap" aria-hidden>{t("mainCaption")}</p>
+          <ul className="rail-nav">
+            {mainNav.map(({ href, label, icon: Icon, desc }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className="rail-item"
+                  aria-current={ariaCurrent(href)}
+                  title={label}
+                >
+                  <Icon size={18} aria-hidden />
+                  <span className="ri-meta">
+                    <span className="ri-label">{label}</span>
+                    <span className="ri-desc">{desc}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {/* The section's subtabs (when the page has any) */}
+          {tabs.length > 0 && ui.title && (
+            <p className="rail-cap" aria-hidden>{ui.title}</p>
+          )}
           <ul
             className="app-tabs"
             ref={listRef}
@@ -144,24 +279,24 @@ export function AppShell({
               ? { role: "tablist" as const, onKeyDown }
               : {})}
           >
-            {tabs.map((t) => {
-              const Icon = iconOf(t.icon);
-              const isActive = t.id === activeId;
+            {tabs.map((tab) => {
+              const Icon = iconOf(tab.icon);
+              const isActive = tab.id === activeId;
               const srCurrent = isActive && mode === "link"
                 ? <span className="sr-only">{ui.current} </span>
                 : null;
               return (
-                <li key={t.id}>
+                <li key={tab.id}>
                   {mode === "link" ? (
                     <Link
-                      href={hrefs[t.id] ?? "#"}
+                      href={hrefs[tab.id] ?? "#"}
                       className="app-tab"
                       aria-current={isActive ? "page" : undefined}
-                      title={t.label}
-                      onClick={() => onSelect?.(t.id)}
+                      title={tab.label}
+                      onClick={() => onSelect?.(tab.id)}
                     >
                       <Icon size={18} aria-hidden />
-                      <span className="label">{srCurrent}{t.label}</span>
+                      <span className="label">{srCurrent}{tab.label}</span>
                     </Link>
                   ) : (
                     <button
@@ -170,18 +305,75 @@ export function AppShell({
                       className="app-tab"
                       aria-selected={isActive}
                       aria-controls="app-panel"
-                      title={t.label}
-                      onClick={() => onSelect?.(t.id)}
+                      title={tab.label}
+                      onClick={() => onSelect?.(tab.id)}
                     >
                       <Icon size={18} aria-hidden />
-                      <span className="label">{srCurrent}{t.label}</span>
+                      <span className="label">{srCurrent}{tab.label}</span>
                     </button>
                   )}
                 </li>
               );
             })}
           </ul>
+
+          {/* Management (lg+, signed in) */}
+          {user && (
+            <ul className="rail-nav rail-manage">
+              {manageNav.map(({ href, label, icon: Icon }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="rail-item"
+                    aria-current={ariaCurrent(href)}
+                    title={label}
+                  >
+                    <Icon size={18} aria-hidden />
+                    <span className="ri-meta">
+                      <span className="ri-label">{label}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
+
+        {/* Preferences + log out — pinned to the card's bottom edge so
+            they stay reachable even when the nav groups scroll. */}
+        {user && (
+          <div className="rail-foot">
+            <div className="rail-prefs">
+              <div role="group" aria-label={t("langLabel")} className="seg rail-lang">
+                {routing.locales.map((loc) => (
+                  <button
+                    key={loc}
+                    type="button"
+                    aria-pressed={loc === locale}
+                    title={loc.toUpperCase()}
+                    onClick={() => switchLocale(loc)}
+                  >
+                    {loc}
+                  </button>
+                ))}
+              </div>
+              <button
+                type="button"
+                className="icon-btn rail-theme"
+                aria-label={tm("navThemeToggle")}
+                title={tm("navThemeToggle")}
+                onClick={toggleTheme}
+              >
+                <Sun aria-hidden className="ico-sun" size={16} />
+                <Moon aria-hidden className="ico-moon" size={16} />
+              </button>
+            </div>
+            <button type="button" className="rail-logout" onClick={logout} disabled={busy}>
+              <LogOut size={16} aria-hidden />
+              <span className="label">{ta("logout")}</span>
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* ── The section's content — keeps its own .wrap centering ── */}

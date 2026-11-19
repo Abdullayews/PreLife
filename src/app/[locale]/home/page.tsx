@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { bakuParts } from "@/lib/psychology";
 import { GYM_TABS, isShopTab } from "@/lib/gym";
 import { AiChatFab } from "@/components/AiChatFab";
+import { AppPageShell } from "@/components/AppPageShell";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -53,7 +54,7 @@ export default async function HomePage({ params }: Props) {
   const shopTabs = GYM_TABS.filter((tab) => isShopTab(tab.id));
 
   return (
-    <div data-world="shell" className="world page">
+    <AppPageShell locale={locale}>
       <AiChatFab />
       <div className="wrap">
         <header className="page-head">
@@ -141,6 +142,6 @@ export default async function HomePage({ params }: Props) {
           </div>
         </section>
       </div>
-    </div>
+    </AppPageShell>
   );
 }

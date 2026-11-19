@@ -38,10 +38,10 @@ export default async function LibraryPage({ params, searchParams }: Props) {
   const { locale } = await params;
   const sp = await searchParams;
   setRequestLocale(locale);
-  await requireUser(locale, "/library");
 
   const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
   const active = tabParam && isTabId(tabParam) ? tabParam : "collections";
+  const user = await requireUser(locale, "/library");
 
   const t = await getTranslations({ locale, namespace: "libraryApp" });
   const tr = await getTranslations({ locale, namespace: "libraryHome" });
@@ -67,6 +67,7 @@ export default async function LibraryPage({ params, searchParams }: Props) {
         tabs={tabs}
         activeId={active}
         hrefs={hrefs}
+        user={{ name: user.name, email: user.email }}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("library.name") }}
         storageKey="pl:rail:library"
       >

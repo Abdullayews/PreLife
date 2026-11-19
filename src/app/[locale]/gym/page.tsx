@@ -29,7 +29,7 @@ export default async function GymPage({ params, searchParams }: Props) {
   const { locale } = await params;
   const sp = await searchParams;
   setRequestLocale(locale);
-  await requireUser(locale, "/gym");
+  const user = await requireUser(locale, "/gym");
 
   const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
   const initialTab: GymTabId = tabParam && isGymTabId(tabParam) ? tabParam : "plan";
@@ -239,6 +239,7 @@ export default async function GymPage({ params, searchParams }: Props) {
         initialPlan={initialPlan}
         linked={linked}
         strings={strings}
+        user={{ name: user.name, email: user.email }}
       >
         <header className="page-head">
           <p className="eyebrow"><i />PreLife Gym</p>
