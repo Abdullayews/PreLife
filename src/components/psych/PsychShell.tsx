@@ -44,7 +44,6 @@ export async function PsychShell({
         hrefs={hrefs}
         user={user ? { name: user.name, email: user.email } : null}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("meditation.name") }}
-        storageKey="pl:rail:meditation"
       >
         {children}
       </AppShell>

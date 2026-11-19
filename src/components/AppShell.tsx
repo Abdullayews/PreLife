@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect, useRef, useState, useSyncExternalStore, type ReactNode,
+} from "react";
 import { useLocale, useTranslations } from "next-intl";
 import {
-  AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ChevronLeft,
-  ChevronRight, Circle, CircleHelp, Crown, Dumbbell, FileText, Flower2, House,
-  Landmark, Layers, LibraryBig, LogOut, MapPin, MonitorPlay, Moon, NotebookPen,
-  Pill, Salad, ScrollText, Settings, Shirt, Sun, UserRound, Users, Wind,
+  AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ChevronsUpDown,
+  Circle, CircleHelp, Crown, Dumbbell, FileText, Flower2, House, Landmark, Layers,
+  LibraryBig, LogOut, MapPin, Menu, MonitorPlay, Moon, NotebookPen, Pill,
+  Salad, ScrollText, Settings, Shirt, Sun, UserRound, Users, Wind,
   type LucideIcon,
 } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -17,29 +19,27 @@ import { hasConsent, setThemeChoice } from "@/lib/consent";
 import { saveUserPref } from "@/lib/user-prefs";
 
 /**
- * AppShell v4 — THE left management panel (v2.2).
+ * AppShell v5 — the İdman glass rail, global for every logged-in page.
  *
- * One rail, three jobs, present on every registered-user page:
+ * The v2.2 flat management panel is restyled (and re-architected on mobile)
+ * after the İdman v3 design the team shipped for the gym surface — now the
+ * ONE design language for the registered-user app:
  *
- * • IDENTITY — the signed-in account (avatar, name, email) with the
- *   fold button right beside it.
- * • NAVIGATION — the main pages (Home · Gym · Diet · Psychology ·
- *   Books · Subscription), each with a one-line description; when the
- *   page belongs to a section, its subtabs nest underneath as their own
- *   group (link mode = real routes, tab mode = in-page tablist).
- * • MANAGEMENT — everything account-related used to live in scattered
- *   places (the top-right user dropdown, the nav's language/theme
- *   toggles); it now lives here: Profile, Settings, Help, Terms, Rules,
- *   the language segment, the theme toggle and Log out.
- *
- * Two widths, one button: fully open (labels + descriptions) or
- * icon-only. The choice is remembered post-consent (localStorage).
- *
- * The rail is STICKY on lg+: scrolling the page keeps the panel in
- * view (it follows the reader down), with its own internal scroll when
- * the stack outgrows the viewport. On mobile it degrades to the
- * horizontal subtab capsule strip — management stays in the burger
- * drawer there.
+ * • GLASS — backdrop blur(22px) saturate(1.6), 28px radius, 82% surface,
+ *   inset highlight — a floating card, not a strip.
+ * • TWO WIDTHS — fully open (labels + one-line descriptions) or icon-only
+ *   (4.75rem), switched by the fold button beside the brand, remembered
+ *   post-consent. The grid column animates .45s.
+ * • STICKY — on lg+ the card follows the reader down the page and scrolls
+ *   internally when the stack outgrows the viewport.
+ * • NO TOP NAV for signed-in users (v2.2): the rail carries the brand,
+ *   identity, navigation, management, preferences and log out. When the
+ *   offsets honest.
+ * • NESTED SUBTABS — the current section's row becomes the group head
+ *   (caret, collapsible); its subtabs nest underneath (link mode = real
+ *   routes, tab mode = in-page tablist), exactly like the İdman group.
+ * • MOBILE — the rail becomes the İdman overlay: floating glass panel +
+ *   scrim + bottom-left FAB, Escape closes, routes close.
  */
 const RAIL_ICONS: Record<string, LucideIcon> = {
   audio: AudioLines, backpack: Backpack, book: BookOpen, brain: Brain,
@@ -64,7 +64,7 @@ export type ShellUi = {
   close: string;
   /** "Current:" — screen-reader prefix before the active tab name. */
   current: string;
-  /** The section's display name — the caption above its subtab group. */
+  /** The section's display name — the nested group's aria-label. */
   title?: string;
 };
 
@@ -81,20 +81,34 @@ type Props = {
   ui: ShellUi;
   /** The signed-in account — when present the management groups render. */
   user?: ShellUser | null;
-  /** Kept for API compatibility — v2.2 has its own fold state. */
-  storageKey?: string;
+  /** Whether the TOP nav renders for this visit. Derived from `user`
+   *  (no session → the Nav shows) unless the page knows better (some
+   *  surfaces render the rail while the guest
+   *  Nav stays on screen). */
+  topnav?: boolean;
   children: ReactNode;
 };
 
 /** Where the fold choice is remembered (only after cookie consent). */
 const FOLD_KEY = "pl_rail_fold";
 
+/* The live breakpoint — an external store, no effect state dance. */
+const MOBILE_MQ = "(max-width: 63.9rem)";
+const subscribeMobile = (cb: () => void) => {
+  const mq = window.matchMedia(MOBILE_MQ);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
+const getMobileSnapshot = () => window.matchMedia(MOBILE_MQ).matches;
+const getMobileServer = () => false;
+
 export function AppShell({
-  mode, tabs, activeId, hrefs, onSelect, ui, user, children,
+  mode, tabs, activeId, hrefs, onSelect, ui, user, topnav, children,
 }: Props) {
   const listRef = useRef<HTMLUListElement>(null);
-  const [scrolled, setScrolled] = useState(false);
   const [folded, setFolded] = useState(false);
+  const [mobOpen, setMobOpen] = useState(false);
+  const [groupOpen, setGroupOpen] = useState(true);
   const [busy, setBusy] = useState(false);
 
   const t = useTranslations("sidePanel");
@@ -106,8 +120,11 @@ export function AppShell({
   const pathname = usePathname();
   const router = useRouter();
 
-  /* Fold state: the stored choice returns post-consent, otherwise the
-   * panel starts fully open (and stays in memory only). */
+  const mobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServer);
+  const expanded = mobile ? mobOpen : !folded;
+
+  /* The stored fold choice returns post-consent; otherwise the rail starts
+   * fully open (and stays in memory only). */
   useEffect(() => {
     if (!hasConsent()) return;
     try {
@@ -115,7 +132,21 @@ export function AppShell({
     } catch { /* storage unavailable */ }
   }, []);
 
-  const fold = () => {
+  /* Overlay hygiene: a route change closes the mobile drawer. */
+  useEffect(() => { setMobOpen(false); }, [pathname]);
+
+  /* Escape closes the mobile overlay. */
+  useEffect(() => {
+    if (!mobile) return;
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobOpen(false);
+    };
+    document.addEventListener("keydown", key);
+    return () => document.removeEventListener("keydown", key);
+  }, [mobile]);
+
+  const toggleRail = () => {
+    if (mobile) { setMobOpen((v) => !v); return; }
     setFolded((v) => {
       const next = !v;
       if (hasConsent()) {
@@ -125,26 +156,11 @@ export function AppShell({
     });
   };
 
-  /* The same scroll signal the top nav uses (24px threshold): on mobile
-   * the horizontal strip morphs into the floating frosted capsule. */
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  /* Density: few subtabs → roomy pills, many → compact ones, so every
-   * section's stack fits its column. (≤4 cozy · 5-6 regular · ≥7 compact) */
-  const density = tabs.length >= 7 ? "compact" : tabs.length >= 5 ? "regular" : "cozy";
-
   /* Roving focus across the subtab list (tab mode). */
   const onKeyDown = (e: React.KeyboardEvent<HTMLUListElement>) => {
     const list = listRef.current;
     if (!list) return;
-    const items = Array.from(
-      list.querySelectorAll<HTMLElement>(".app-tab"),
-    );
+    const items = Array.from(list.querySelectorAll<HTMLElement>(".rail-tab"));
     if (!items.length) return;
     const i = items.indexOf(document.activeElement as HTMLElement);
     const len = items.length;
@@ -186,6 +202,15 @@ export function AppShell({
     user && (user.name?.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("") ??
       user.email.slice(0, 2)).toUpperCase();
 
+  /* The section whose row becomes the nested group head (when the page
+   * carries subtabs): the current section, matched by route prefix. */
+  const groupHref = tabs.length > 0
+    ? mainNav.find(({ href }) => on(href))?.href
+    : undefined;
+  const plainNav = groupHref
+    ? mainNav.filter(({ href }) => href !== groupHref)
+    : mainNav;
+
   const logout = async () => {
     setBusy(true);
     try {
@@ -214,128 +239,202 @@ export function AppShell({
   const ariaCurrent = (href: string) =>
     on(href) ? ("page" as const) : undefined;
 
+  /* A main-nav row (icon + label + one-line description). */
+  const row = ({
+    href, label, icon: Icon, desc,
+  }: { href: string; label: string; icon: LucideIcon; desc?: string },
+  ) => (
+    <li key={href}>
+      <Link
+        href={href}
+        className={`rail-item${on(href) ? " active" : ""}`}
+        aria-current={ariaCurrent(href)}
+        title={!expanded ? label : undefined}
+      >
+        <span className="rail-ic" aria-hidden><Icon size={19} strokeWidth={2} /></span>
+        {expanded && (
+          <span className="ri-meta">
+            <span className="ri-label">{label}</span>
+            {desc && <span className="ri-desc">{desc}</span>}
+          </span>
+        )}
+      </Link>
+    </li>
+  );
+
+  /* The current section's nested subtab group (İdman semantics: the row
+   * becomes a collapsible head; the rail expands first when folded). */
+  const groupHead = groupHref
+    ? mainNav.find(({ href }) => href === groupHref)!
+    : null;
+
+  const onGroupClick = () => {
+    if (!expanded) {
+      if (mobile) setMobOpen(true);
+      else setFolded(false);
+      return;
+    }
+    setGroupOpen((v) => !v);
+  };
+
   return (
     <div
       className="app-shell"
-      data-scrolled={scrolled}
-      data-density={density}
-      data-folded={folded}
+      data-open={expanded ? "open" : "closed"}
+      data-topnav={topnav ?? !user ? "on" : "off"}
       data-hassub={tabs.length > 0 ? "true" : "false"}
     >
-      {/* ── The rail: on lg+ the sticky management panel; on mobile the
-          horizontal subtab capsule strip. ── */}
+      {/* Mobile scrim */}
+      {mobile && expanded && (
+        <button
+          type="button"
+          className="rail-scrim"
+          aria-label={t("collapse")}
+          onClick={() => setMobOpen(false)}
+        />
+      )}
+
+      {/* ── The glass rail ── */}
       <nav className="app-rail" aria-label={user ? t("navLabel") : ui.label}>
+        <div className="rail-top">
+          <Link href={user ? "/home" : "/welcome"} aria-label={tm("navHome")} className="rail-brand">
+            <span className="rail-brand-ic" aria-hidden><Dumbbell size={19} strokeWidth={2.2} /></span>
+            {expanded && <span className="rail-brand-txt">Pre<em>Life</em></span>}
+          </Link>
+          <button
+            type="button"
+            className="rail-fold"
+            onClick={toggleRail}
+            aria-label={expanded ? t("collapse") : t("expand")}
+            aria-expanded={expanded}
+          >
+            <ChevronsUpDown size={16} aria-hidden />
+          </button>
+        </div>
+
         <div className="app-rail-clip">
-          {/* Identity + the fold button (lg+, signed in) */}
+          {/* Identity */}
           {user && (
             <div className="rail-id">
               <span className="rail-avatar" aria-hidden>{initials}</span>
-              <span className="rail-id-meta">
-                <b>{user.name ?? user.email}</b>
-                <span>{user.email}</span>
-              </span>
-              <button
-                type="button"
-                className="icon-btn rail-fold"
-                aria-label={folded ? t("expand") : t("collapse")}
-                title={folded ? t("expand") : t("collapse")}
-                onClick={fold}
-              >
-                {folded ? <ChevronRight size={16} aria-hidden /> : <ChevronLeft size={16} aria-hidden />}
-              </button>
+              {expanded && (
+                <span className="rail-id-meta">
+                  <b>{user.name ?? user.email}</b>
+                  <span>{user.email}</span>
+                </span>
+              )}
             </div>
           )}
 
-          {/* Main pages */}
           <p className="rail-cap" aria-hidden>{t("mainCaption")}</p>
-          <ul className="rail-nav">
-            {mainNav.map(({ href, label, icon: Icon, desc }) => (
-              <li key={href}>
-                <Link
-                  href={href}
-                  className="rail-item"
-                  aria-current={ariaCurrent(href)}
-                  title={label}
+          <ul className="rail-list">
+            {/* The current section: group head + nested subtabs */}
+            {groupHead && (
+              <li className="rail-group">
+                <button
+                  type="button"
+                  className={`rail-item rail-group-head${on(groupHead.href) ? " active" : ""}`}
+                  onClick={onGroupClick}
+                  aria-expanded={groupOpen}
+                  title={!expanded ? groupHead.label : undefined}
                 >
-                  <Icon size={18} aria-hidden />
-                  <span className="ri-meta">
-                    <span className="ri-label">{label}</span>
-                    <span className="ri-desc">{desc}</span>
+                  <span className="rail-ic" aria-hidden>
+                    <groupHead.icon size={19} strokeWidth={2} />
                   </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {/* The section's subtabs (when the page has any) */}
-          {tabs.length > 0 && ui.title && (
-            <p className="rail-cap" aria-hidden>{ui.title}</p>
-          )}
-          <ul
-            className="app-tabs"
-            ref={listRef}
-            aria-label={ui.label}
-            {...(mode === "tab"
-              ? { role: "tablist" as const, onKeyDown }
-              : {})}
-          >
-            {tabs.map((tab) => {
-              const Icon = iconOf(tab.icon);
-              const isActive = tab.id === activeId;
-              const srCurrent = isActive && mode === "link"
-                ? <span className="sr-only">{ui.current} </span>
-                : null;
-              return (
-                <li key={tab.id}>
-                  {mode === "link" ? (
-                    <Link
-                      href={hrefs[tab.id] ?? "#"}
-                      className="app-tab"
-                      aria-current={isActive ? "page" : undefined}
-                      title={tab.label}
-                      onClick={() => onSelect?.(tab.id)}
-                    >
-                      <Icon size={18} aria-hidden />
-                      <span className="label">{srCurrent}{tab.label}</span>
-                    </Link>
-                  ) : (
-                    <button
-                      type="button"
-                      role="tab"
-                      className="app-tab"
-                      aria-selected={isActive}
-                      aria-controls="app-panel"
-                      title={tab.label}
-                      onClick={() => onSelect?.(tab.id)}
-                    >
-                      <Icon size={18} aria-hidden />
-                      <span className="label">{srCurrent}{tab.label}</span>
-                    </button>
+                  {expanded && (
+                    <>
+                      <span className="ri-meta">
+                        <span className="ri-label">{groupHead.label}</span>
+                      </span>
+                      <ChevronsUpDown
+                        size={14} aria-hidden
+                        className="rail-caret"
+                        style={{ transform: groupOpen ? "rotate(180deg)" : "none" }}
+                      />
+                    </>
                   )}
-                </li>
-              );
-            })}
+                </button>
+                <div className={`rail-sub${groupOpen && expanded ? " open" : ""}`}>
+                  <ul
+                    aria-label={ui.title ?? ui.label}
+                    ref={listRef}
+                    {...(mode === "tab"
+                      ? { role: "tablist" as const, onKeyDown }
+                      : {})}
+                  >
+                    {tabs.map((tab) => {
+                      const Icon = iconOf(tab.icon);
+                      const isActive = tab.id === activeId;
+                      const srCurrent = isActive && mode === "link"
+                        ? <span className="sr-only">{ui.current} </span>
+                        : null;
+                      return (
+                        <li key={tab.id}>
+                          {mode === "link" ? (
+                            <Link
+                              href={hrefs[tab.id] ?? "#"}
+                              className={`rail-tab${isActive ? " active" : ""}`}
+                              aria-current={isActive ? "page" : undefined}
+                              title={!expanded ? tab.label : undefined}
+                              onClick={() => onSelect?.(tab.id)}
+                            >
+                              <span className="rail-ic" aria-hidden><Icon size={18} strokeWidth={2} /></span>
+                              {expanded && <span className="label">{srCurrent}{tab.label}</span>}
+                            </Link>
+                          ) : (
+                            <button
+                              type="button"
+                              role="tab"
+                              className={`rail-tab${isActive ? " active" : ""}`}
+                              aria-selected={isActive}
+                              aria-controls="app-panel"
+                              title={!expanded ? tab.label : undefined}
+                              onClick={() => onSelect?.(tab.id)}
+                            >
+                              <span className="rail-ic" aria-hidden><Icon size={18} strokeWidth={2} /></span>
+                              {expanded && <span className="label">{srCurrent}{tab.label}</span>}
+                            </button>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </li>
+            )}
+            {plainNav.map(row)}
           </ul>
 
-          {/* Management (lg+, signed in) */}
+          {/* Management (signed in) */}
           {user && (
-            <ul className="rail-nav rail-manage">
-              {manageNav.map(({ href, label, icon: Icon }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    className="rail-item"
-                    aria-current={ariaCurrent(href)}
-                    title={label}
-                  >
-                    <Icon size={18} aria-hidden />
-                    <span className="ri-meta">
-                      <span className="ri-label">{label}</span>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <>
+              <p className="rail-cap" aria-hidden>{t("manageCaption")}</p>
+              <ul className="rail-list">
+                {manageNav.map(({ href, label, icon: Icon }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className={`rail-item${on(href) ? " active" : ""}`}
+                      aria-current={ariaCurrent(href)}
+                      title={!expanded ? label : undefined}
+                    >
+                      <span className="rail-ic" aria-hidden><Icon size={19} strokeWidth={2} /></span>
+                      {expanded && (
+                        <span className="ri-meta">
+                          <span className="ri-label">{label}</span>
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {expanded && (
+                <div className="rail-card">
+                  <p className="rail-card-t">{t("noteTitle")}</p>
+                  <p className="rail-card-b">{t("noteBody")}</p>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -359,7 +458,7 @@ export function AppShell({
               </div>
               <button
                 type="button"
-                className="icon-btn rail-theme"
+                className="rail-theme"
                 aria-label={tm("navThemeToggle")}
                 title={tm("navThemeToggle")}
                 onClick={toggleTheme}
@@ -370,13 +469,25 @@ export function AppShell({
             </div>
             <button type="button" className="rail-logout" onClick={logout} disabled={busy}>
               <LogOut size={16} aria-hidden />
-              <span className="label">{ta("logout")}</span>
+              {expanded && <span className="label">{ta("logout")}</span>}
             </button>
           </div>
         )}
       </nav>
 
-      {/* ── The section's content — keeps its own .wrap centering ── */}
+      {/* Mobile floating open button */}
+      {mobile && !expanded && (
+        <button
+          type="button"
+          className="rail-fab"
+          onClick={() => setMobOpen(true)}
+          aria-label={tm("navMenu")}
+        >
+          <Menu size={19} aria-hidden />
+        </button>
+      )}
+
+      {/* ── The page content — keeps its own .wrap centering ── */}
       <div className="app-main">{children}</div>
     </div>
   );

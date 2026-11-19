@@ -69,7 +69,6 @@ export default async function LibraryPage({ params, searchParams }: Props) {
         hrefs={hrefs}
         user={{ name: user.name, email: user.email }}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("library.name") }}
-        storageKey="pl:rail:library"
       >
         <div className="wrap">
           {active === "collections" && (
