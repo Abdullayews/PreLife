@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { authAdminCreateUser, supabaseConfigured, userFromAuth } from "@/lib/server/supa";
+import { authAdminCreateUser, supabaseConfigured, supaUpdate, userFromAuth } from "@/lib/server/supa";
 import { originFrom } from "@/lib/server/session";
 import { createVerification } from "@/lib/server/verification";
 import { jsonError, readJson } from "@/lib/server/route-helpers";
@@ -42,6 +42,14 @@ export async function POST(req: NextRequest) {
   }
   const user = userFromAuth(created);
   if (!user) return jsonError(500, "generic");
+
+  // The profile starts in the visitor's language (the handle_new_user
+  // trigger defaults to 'en') — so the first signed-in visit does not
+  // fight the locale the user signed up in.
+  const lang = locale === "en" ? "en" : locale === "ru" ? "ru" : "az";
+  if (lang !== "en") {
+    await supaUpdate("profiles", [["id", `eq.${user.id}`]], { lang }).catch(() => {});
+  }
 
   try {
     const { devLink } = await createVerification(
