@@ -19,9 +19,10 @@ import { DEVICE_ICON_KEYS } from "@/lib/devices";
  * visible panel at a time; on phones the category list becomes a
  * horizontal chip row above the panel).
  *
- * Base settings: account info (read-only), devices (active sessions with
- * per-device name + icon), theme (light/dark, consent-aware persistence),
- * interface language (az/en/ru) and three notification toggles.
+ * Base settings: account info (read-only + log out), devices (active
+ * sessions with per-device name + icon), theme (light/dark,
+ * consent-aware persistence), interface language (az/en/ru) and three
+ * notification toggles.
  */
 
 const CATS = [
@@ -257,6 +258,7 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
   // null until mount — avoids a hydration mismatch on the pressed state.
   const [dark, setDark] = useState<boolean | null>(null);
   const [notify, setNotify] = useState<NotifyState>(DEFAULT_NOTIFY);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     setDark(document.documentElement.classList.contains("dark"));
@@ -292,6 +294,20 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
       }
       return next;
     });
+  };
+
+  /* Log out — lives HERE since the rail dropped it (v6): ends this
+   * device's session and returns to the welcome surface. */
+  const logout = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await fetch(apiUrl("/api/auth/logout"), { method: "POST" });
+      router.replace("/welcome");
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -339,6 +355,15 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
                 <div className="set-row">
                   <span className="set-info"><b>{t("account.plan")}</b></span>
                   <span className="set-val">{t("account.planFree")}</span>
+                </div>
+                <div className="set-row">
+                  <span className="set-info">
+                    <b>{t("account.logout")}</b>
+                    <span>{t("account.logoutHint")}</span>
+                  </span>
+                  <button type="button" className="set-logout" onClick={logout} disabled={busy}>
+                    <LogOut size={15} aria-hidden />{t("account.logout")}
+                  </button>
                 </div>
               </div>
               <p className="set-note"><Info size={15} aria-hidden />{t("account.note")}</p>

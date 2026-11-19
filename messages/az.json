@@ -566,7 +566,6 @@
     "subscription": "Abunəlik",
     "terms": "Şərtlər",
     "rules": "Qaydalar",
-    "logout": "Çıxış",
     "signIn": "Daxil ol"
   },
   "cookieBar": {
@@ -636,6 +635,8 @@
       "email": "E-poçt",
       "plan": "Plan",
       "planFree": "Pulsuz (demo)",
+      "logout": "Çıxış",
+      "logoutHint": "Bu cihazdakı sessiyanı bitirir və welcome səhifəsinə qaytarır.",
       "note": "Məlumatların redaktəsi tam hesab sistemi ilə birlikdə gələcək."
     },
     "appearance": {
@@ -1378,12 +1379,9 @@
   "sidePanel": {
     "navLabel": "Sol idarəetmə paneli",
     "mainCaption": "Bölmələr",
-    "manageCaption": "İdarəetmə",
+    "accountMenuLabel": "Hesab menyusu",
     "expand": "Paneli genişləndir",
     "collapse": "Paneli darald",
-    "langLabel": "Dili dəyişin",
-    "noteTitle": "Yeniliklər",
-    "noteBody": "Yeni İdman paneli: plan, zallar, alətlər və kataloqlar — bir yerdə.",
     "desc": {
       "home": "Günün xülasəsi və seçimlər",
       "gym": "Plan, məşq cədvəli, mağaza",

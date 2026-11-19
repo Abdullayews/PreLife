@@ -566,7 +566,6 @@
     "subscription": "Subscription",
     "terms": "Terms",
     "rules": "Rules",
-    "logout": "Log out",
     "signIn": "Sign in"
   },
   "cookieBar": {
@@ -636,6 +635,8 @@
       "email": "Email",
       "plan": "Plan",
       "planFree": "Free (demo)",
+      "logout": "Log out",
+      "logoutHint": "Ends this device's session and returns you to the welcome page.",
       "note": "Editing your details arrives together with the full account system."
     },
     "appearance": {
@@ -1378,12 +1379,9 @@
   "sidePanel": {
     "navLabel": "Management panel",
     "mainCaption": "Sections",
-    "manageCaption": "Account",
+    "accountMenuLabel": "Account menu",
     "expand": "Expand panel",
     "collapse": "Collapse panel",
-    "langLabel": "Change language",
-    "noteTitle": "What's new",
-    "noteBody": "The new Gym panel: plans, halls, equipment and catalogs — all in one place.",
     "desc": {
       "home": "Today's summary and picks",
       "gym": "Plan, workouts, shop",
