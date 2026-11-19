@@ -40,7 +40,6 @@ export async function DietShell({
         hrefs={hrefs}
         user={user ? { name: user.name, email: user.email } : null}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("diet.name") }}
-        storageKey="pl:rail:diet"
       >
         {children}
       </AppShell>
