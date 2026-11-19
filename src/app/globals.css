@@ -2016,7 +2016,10 @@ dialog.modal-panel::backdrop {
   z-index: 56;
   display: flex; flex-direction: column;
   width: min(23.5rem, calc(100vw - 2.2rem));
-  max-height: min(34rem, calc(100svh - 8rem));
+  /* v2.3: a taller chat — the log keeps a generous floor (17rem) so the
+     panel opens tall even before the conversation grows, and long
+     threads get 44rem of room on tall screens. */
+  max-height: min(44rem, calc(100svh - 7rem));
   border: 1px solid var(--line); border-radius: var(--r-lg);
   background: var(--surface); box-shadow: var(--shadow-3);
   overflow: hidden;
@@ -2038,7 +2041,7 @@ dialog.modal-panel::backdrop {
 }
 .ai-fab-x:hover { color: var(--ink); border-color: color-mix(in srgb, var(--ink) 30%, transparent); transform: rotate(90deg); }
 .ai-fab-log {
-  flex: 1; min-height: 7rem; overflow-y: auto;
+  flex: 1; min-height: 17rem; overflow-y: auto;
   display: flex; flex-direction: column; gap: .55rem;
   padding: .9rem 1rem;
   scrollbar-width: thin;
