@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/AppShell";
+import { getSessionUser } from "@/lib/auth";
 
 /**
  * The psychology section's shell: the shared left rail (link mode — each
@@ -29,6 +30,7 @@ export async function PsychShell({
   const t = await getTranslations({ locale, namespace: "psychApp" });
   const r = await getTranslations({ locale, namespace: "sectionRail" });
   const s = await getTranslations({ locale, namespace: "sections" });
+  const user = await getSessionUser();
 
   const tabs = TABS.map(({ id, icon }) => ({ id, label: t(`rail_${id}`), icon }));
   const hrefs = Object.fromEntries(TABS.map(({ id, href }) => [id, href]));
@@ -40,6 +42,7 @@ export async function PsychShell({
         tabs={tabs}
         activeId={active}
         hrefs={hrefs}
+        user={user ? { name: user.name, email: user.email } : null}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("meditation.name") }}
         storageKey="pl:rail:meditation"
       >

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Crown, Settings } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { AppPageShell } from "@/components/AppPageShell";
 import { requireUser } from "@/lib/auth";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -25,7 +26,7 @@ export default async function ProfilePage({ params }: Props) {
       user.email.slice(0, 2)).toUpperCase();
 
   return (
-    <div data-world="shell" className="world page">
+    <AppPageShell locale={locale}>
       <div className="wrap profile-wrap">
         <header className="page-head">
           <p className="eyebrow"><i />{t("eyebrow")}</p>
@@ -71,6 +72,6 @@ export default async function ProfilePage({ params }: Props) {
           <p className="set-note">{t("note")}</p>
         </section>
       </div>
-    </div>
+    </AppPageShell>
   );
 }

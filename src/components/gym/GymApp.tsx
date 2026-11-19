@@ -185,6 +185,8 @@ type Props = {
    *  remembered tab: shareable deep links always win. */
   linked: boolean;
   strings: GymAppStrings;
+  /** The signed-in account — rides to the rail for the management panel. */
+  user: { name: string | null; email: string };
   /** The server-rendered page header (title) — sits above the panels. */
   children: ReactNode;
 };
@@ -239,7 +241,7 @@ const fillSession = (tpl: string, done: number, total: number) =>
 
 /* ── Shell ─────────────────────────────────────────────────────────────── */
 
-export function GymApp({ initialTab, initialPlan, linked, strings, children }: Props) {
+export function GymApp({ initialTab, initialPlan, linked, strings, user, children }: Props) {
   const [tab, setTab] = useState<GymTabId>(initialTab);
   const [activePlan, setActivePlan] = useState(initialPlan);
   const [shopSort, setShopSort] = useState<ShopSort>("popular");
@@ -283,6 +285,7 @@ export function GymApp({ initialTab, initialPlan, linked, strings, children }: P
       activeId={tab}
       hrefs={{}}
       onSelect={(id) => selectTab(id as GymTabId)}
+      user={user}
       ui={{
         label: strings.railLabel,
         open: strings.railOpen,

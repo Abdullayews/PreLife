@@ -48,6 +48,7 @@ export default async function LocaleLayout({
     sections: all.sections,
     authPage: all.authPage,
     accountMenu: all.accountMenu,
+    sidePanel: all.sidePanel,
     cookieBar: all.cookieBar,
     settingsPage: all.settingsPage,
     notFoundPage: all.notFoundPage,

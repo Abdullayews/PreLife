@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ChevronDown, Mail } from "lucide-react";
+import { AppPageShell } from "@/components/AppPageShell";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -19,7 +20,7 @@ export default async function HelpPage({ params }: Props) {
   const faqs = ["q1", "q2", "q3", "q4"] as const;
 
   return (
-    <div data-world="shell" className="world page">
+    <AppPageShell locale={locale}>
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i />{t("eyebrow")}</p>
@@ -53,6 +54,6 @@ export default async function HelpPage({ params }: Props) {
           </div>
         </section>
       </div>
-    </div>
+    </AppPageShell>
   );
 }

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import type { ReactNode } from "react";
 import { AppShell } from "@/components/AppShell";
+import { getSessionUser } from "@/lib/auth";
 
 /**
  * The nutrition section's shell: the shared left rail (link mode — each
@@ -25,6 +26,7 @@ export async function DietShell({
   const t = await getTranslations({ locale, namespace: "dietApp" });
   const r = await getTranslations({ locale, namespace: "sectionRail" });
   const s = await getTranslations({ locale, namespace: "sections" });
+  const user = await getSessionUser();
 
   const tabs = TABS.map(({ id, icon }) => ({ id, label: t(`rail_${id}`), icon }));
   const hrefs = Object.fromEntries(TABS.map(({ id, href }) => [id, href]));
@@ -36,6 +38,7 @@ export async function DietShell({
         tabs={tabs}
         activeId={active}
         hrefs={hrefs}
+        user={user ? { name: user.name, email: user.email } : null}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("diet.name") }}
         storageKey="pl:rail:diet"
       >

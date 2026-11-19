@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SettingsPage } from "@/components/SettingsPage";
+import { AppPageShell } from "@/components/AppPageShell";
 import { requireUser } from "@/lib/auth";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -18,8 +19,8 @@ export default async function SettingsRoute({ params }: Props) {
   const user = await requireUser(locale, "/settings");
 
   return (
-    <div data-world="shell" className="world page">
+    <AppPageShell locale={locale}>
       <SettingsPage user={{ name: user.name, email: user.email }} />
-    </div>
+    </AppPageShell>
   );
 }

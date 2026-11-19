@@ -1116,5 +1116,21 @@ export const en = {
         socks: "Training socks (set)",
         tights: "Training tights"
       }
+    },
+  sidePanel: {
+    navLabel: "Management panel",
+    mainCaption: "Sections",
+    manageCaption: "Account",
+    expand: "Expand panel",
+    collapse: "Collapse panel",
+    langLabel: "Change language",
+    desc: {
+      home: "Today's summary and picks",
+      gym: "Plan, workouts, shop",
+      diet: "Plans, recipes, places",
+      meditation: "Psychologists, mood, journal",
+      library: "Collections, notes, reading",
+      subscription: "Tiers and payments"
     }
-  };
+  }
+};

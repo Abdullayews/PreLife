@@ -1116,5 +1116,21 @@ export const az = {
         socks: "İdman corabı (dəst)",
         tights: "İdman taytları"
       }
+    },
+  sidePanel: {
+    navLabel: "Sol idarəetmə paneli",
+    mainCaption: "Bölmələr",
+    manageCaption: "İdarəetmə",
+    expand: "Paneli genişləndir",
+    collapse: "Paneli darald",
+    langLabel: "Dili dəyişin",
+    desc: {
+      home: "Günün xülasəsi və seçimlər",
+      gym: "Plan, məşq cədvəli, mağaza",
+      diet: "Planlar, reseptlər, iaşə",
+      meditation: "Psixoloqlar, əhval, gündəlik",
+      library: "Kolleksiyalar, qeydlər, oxu",
+      subscription: "Tariflər və ödənişlər"
     }
-  };
+  }
+};
