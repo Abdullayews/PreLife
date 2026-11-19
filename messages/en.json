@@ -90,6 +90,8 @@
     "statPlanLabel": "plan week",
     "statStreakLabel": "day streak",
     "statMembershipLabel": "membership",
+    "statWeightLabel": "weight (kg)",
+    "statMembershipFree": "Free",
     "statsHint": "V1 demo figures — real tracking is on the way.",
     "today": {
       "eyebrow": "Today",

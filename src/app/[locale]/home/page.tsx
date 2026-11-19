@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ArrowRight, Crown } from "lucide-react";
+import { ArrowRight, Crown, Dumbbell } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { sections, sectionById, type SectionId } from "@/lib/shell";
 import { requireUser } from "@/lib/auth";
 import { bakuParts } from "@/lib/psychology";
 import { GYM_TABS, isShopTab } from "@/lib/gym";
-import { AiChatFab } from "@/components/AiChatFab";
+import { getActivePlan } from "@/lib/server/user-plans";
+import { getProfileView } from "@/lib/server/profile";
+import { listCustomPackages } from "@/lib/server/packages";
 import { AppPageShell } from "@/components/AppPageShell";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -16,15 +18,6 @@ const PICKS: { key: string; section: SectionId; href: string }[] = [
   { key: "pick1", section: "gym", href: "/gym?tab=plan" },
   { key: "pick2", section: "diet", href: "/diet" },
   { key: "pick3", section: "meditation", href: "/meditation" },
-];
-
-/** V1 mock dashboard values — replaced by real tracking later.
- *  Each stat is a link into the surface it describes. */
-const STATS: { key: string; num: string; labelKey: string; href: string }[] = [
-  { key: "workouts", num: "3/4", labelKey: "statWorkoutsLabel", href: "/gym?tab=plan" },
-  { key: "planWeek", num: "5/12", labelKey: "statPlanLabel", href: "/gym?tab=plan" },
-  { key: "streak", num: "6", labelKey: "statStreakLabel", href: "/gym?tab=plan" },
-  { key: "membership", num: "Premium", labelKey: "statMembershipLabel", href: "/subscription" },
 ];
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -42,6 +35,14 @@ export default async function HomePage({ params }: Props) {
   const tm = await getTranslations({ locale, namespace: "welcomePage.modules" });
   const tg = await getTranslations({ locale, namespace: "gymApp" });
 
+  // Real account data (the AI tools and the plan tab read the same rows).
+  const [plan, profile, packages] = await Promise.all([
+    getActivePlan(user.id),
+    getProfileView(user.id),
+    listCustomPackages(user.id),
+  ]);
+  const hasActivePackage = packages.some((p) => p.status === "active");
+
   // Baku wall-clock drives the greeting; the date line renders in-locale.
   const now = new Date();
   const hour = bakuParts(now).hour;
@@ -53,16 +54,76 @@ export default async function HomePage({ params }: Props) {
 
   const shopTabs = GYM_TABS.filter((tab) => isShopTab(tab.id));
 
+  /* This week at a glance — the user's REAL numbers, each deep-linking on. */
+  const STATS: { key: string; num: string; labelKey: string; href: string }[] = [
+    {
+      key: "planWeek",
+      num: plan ? `${plan.week}/${plan.total}` : "—",
+      labelKey: "statPlanLabel",
+      href: "/gym?tab=plan",
+    },
+    {
+      key: "workouts",
+      num: plan ? String(plan.days.length) : "0",
+      labelKey: "statWorkoutsLabel",
+      href: "/gym?tab=plan",
+    },
+    {
+      key: "weight",
+      num: profile.weightKg !== null ? String(profile.weightKg) : "—",
+      labelKey: "statWeightLabel",
+      href: "/profile",
+    },
+    {
+      key: "membership",
+      num: hasActivePackage ? "Premium" : t("statMembershipFree"),
+      labelKey: "statMembershipLabel",
+      href: "/subscription",
+    },
+  ];
+
   return (
     <AppPageShell locale={locale}>
-      <AiChatFab />
       <div className="wrap">
         <header className="page-head">
           <p className="eyebrow"><i />{dateLine}</p>
           <h1 className="display sm">{greeting}{user.name ? `, ${user.name}` : ""}</h1>
         </header>
 
-        {/* This week at a glance — V1 mock numbers, each deep-linking on. */}
+        {/* Your workout plan — the account's active plan (default starter
+            until the questionnaire/AI builds a personal one). */}
+        <section aria-label={t("planEyebrow")} className="blk">
+          <h2 className="eyebrow"><i />{t("planEyebrow")}</h2>
+          {plan ? (
+            <div className="banner">
+              <span className="chip-ico solid"><Dumbbell size={20} aria-hidden /></span>
+              <div>
+                <h3 className="h3">{plan.title}</h3>
+                <p>
+                  {t("planWeek", { week: plan.week, total: plan.total})}
+                  {" · "}
+                  {t("planPerWeek", { days: plan.days.length })}
+                  {" · "}
+                  {plan.source === "ai" ? t("planSourceAi") : t("planSourceDefault")}
+                </p>
+              </div>
+              <Link href="/gym?tab=plan" className="btn">
+                {profile.planOnboardingDone ? t("planOpen") : t("planCta")}
+              </Link>
+            </div>
+          ) : (
+            <div className="banner">
+              <span className="chip-ico solid"><Dumbbell size={20} aria-hidden /></span>
+              <div>
+                <h3 className="h3">{t("planNone")}</h3>
+                <p>{t("planNoneText")}</p>
+              </div>
+              <Link href="/gym?tab=plan" className="btn">{t("planCta")}</Link>
+            </div>
+          )}
+        </section>
+
+        {/* This week at a glance — real numbers, each deep-linking on. */}
         <section aria-label={t("statsEyebrow")} className="blk">
           <h2 className="eyebrow"><i />{t("statsEyebrow")}</h2>
           <ul className="mini-stats cols4">

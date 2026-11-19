@@ -35,6 +35,10 @@ export default async function SubscriptionPage({ params }: Props) {
     id: tier.id, name: t(tier.nameKey), price: tier.price, features: tier.features,
   }));
 
+  /* discountNote / quoteTotal keep their "{pct}" / "{total}"
+   * placeholders — the client fills them once the duration (or the
+   * saved row's total) is known. t.raw() hands them over un-formatted
+   * (t() without values would log a FORMATTING_ERROR server-side). */
   const ui = {
     perMonth: t("perMonth"),
     templateTag: t("templateTag"),
@@ -43,9 +47,20 @@ export default async function SubscriptionPage({ params }: Props) {
     customDesc: t("customDesc"),
     total: t("total"),
     included: t("includedFree"),
-    customCta: t("customCta"),
     tierCta: t("choose"),
     current: t("current"),
+    months: t("months"),
+    monthsUnit: t("monthsUnit"),
+    discountNote: String(t.raw("discountNote")),
+    requestCta: t("requestCta"),
+    requesting: t("requesting"),
+    requested: t("requested"),
+    requestedNote: t("requestedNote"),
+    myTitle: t("myTitle"),
+    myEmpty: t("myEmpty"),
+    statusRequested: t("statusRequested"),
+    statusActive: t("statusActive"),
+    quoteTotal: String(t.raw("quoteTotal")),
   };
 
   return (

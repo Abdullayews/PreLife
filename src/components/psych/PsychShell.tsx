@@ -42,7 +42,12 @@ export async function PsychShell({
         tabs={tabs}
         activeId={active}
         hrefs={hrefs}
-        user={user ? { name: user.name, email: user.email } : null}
+        user={user ? {
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar ?? null,
+          railFolded: user.railFolded ?? false,
+        } : null}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("meditation.name") }}
       >
         {children}

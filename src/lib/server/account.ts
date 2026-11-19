@@ -15,18 +15,19 @@ import type { CurrentSession } from "./session";
 
 type Row = Record<string, unknown>;
 
-/* ── User preferences (language + theme on the profiles row) ────────────── */
+/* ── User preferences (language + theme + rail fold on the profiles row) ── */
 
 function prefsView(row: Row | null): Record<string, unknown> {
   return {
     locale: typeof row?.lang === "string" ? row.lang : "en",
     theme: typeof row?.theme === "string" ? row.theme : "light",
+    railFolded: row?.rail_folded === true,
   };
 }
 
 export async function preferencesGet(user: { id: string }) {
   const row = await supaSelectOne("profiles", [
-    ["select", "lang,theme"],
+    ["select", "lang,theme,rail_folded"],
     ["id", `eq.${user.id}`],
   ]);
   return prefsView(row);
@@ -42,10 +43,23 @@ export async function preferencesUpdate(user: { id: string }, body: Row) {
     if (!["light", "dark"].includes(body.theme)) throw badRequest();
     patch.theme = body.theme;
   }
+  if (body.railFolded !== undefined) {
+    if (typeof body.railFolded !== "boolean") throw badRequest();
+    patch.rail_folded = body.railFolded;
+  }
   if (Object.keys(patch).length === 0) {
     throw new ApiCode(400, "nothing_to_update");
   }
   const rows = await supaUpdate("profiles", [["id", `eq.${user.id}`]], patch);
+
+  // v3.3: the rail fold also rides on the session rows so the next server
+  // render of any page picks it up with zero extra lookups.
+  if (typeof patch.rail_folded === "boolean") {
+    await supaUpdate("sessions", [["user_id", `eq.${user.id}`]], {
+      user_folded: patch.rail_folded,
+    }).catch(() => {});
+  }
+
   return prefsView(rows[0] ?? null);
 }
 

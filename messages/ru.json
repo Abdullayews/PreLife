@@ -90,6 +90,8 @@
     "statPlanLabel": "неделя плана",
     "statStreakLabel": "дней подряд",
     "statMembershipLabel": "подписка",
+    "statWeightLabel": "вес (кг)",
+    "statMembershipFree": "Бесплатно",
     "statsHint": "Демо-показатели v1 — реальный учёт в пути.",
     "today": {
       "eyebrow": "Сегодня",

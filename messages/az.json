@@ -90,6 +90,8 @@
     "statPlanLabel": "plan həftəsi",
     "statStreakLabel": "günlük seriya",
     "statMembershipLabel": "abunəlik",
+    "statWeightLabel": "çəki (kq)",
+    "statMembershipFree": "Pulsuz",
     "statsHint": "V1 demo göstəriciləridir — real izləmə yoldadır.",
     "today": {
       "eyebrow": "Bu gün",

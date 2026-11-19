@@ -51,7 +51,12 @@ export default async function GymPage({ params, searchParams }: Props) {
   return (
     <div data-world="gym" className="world app-page">
       <IdmanPage
-        user={{ name: user.name ?? user.email, email: user.email }}
+        user={{
+          name: user.name ?? user.email,
+          email: user.email,
+          avatar: user.avatar ?? null,
+          railFolded: user.railFolded ?? false,
+        }}
         initialTab={initialTab}
         tabs={[...tabs]}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("gym.name") }}
