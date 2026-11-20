@@ -5,7 +5,11 @@ import {
   supaUpdate,
 } from "./supa";
 import { ApiCode, badRequest, notFound } from "./psych-data";
-import type { CurrentSession } from "./session";
+import {
+  sessionCacheDropSession,
+  sessionCacheDropUser,
+  type CurrentSession,
+} from "./session";
 
 /**
  * Account endpoints — devices (Settings → Devices) and the account-tier
@@ -18,6 +22,14 @@ type Row = Record<string, unknown>;
 /* ── User preferences (language + theme + rail fold + content location on
  * the profiles row) ── */
 
+/* v4.1: UserPrefsSync pulls GET /api/me/preferences after every page
+ * navigation, so the profiles read is cached for 30s per user — the
+ * session cookie is validated from the session cache too, which turns
+ * the once-per-pageview REST fan-out into zero calls on the hot path.
+ * PATCH drops the entry, so a saved change is visible immediately. */
+const PREFS_CACHE_TTL_MS = 30_000;
+const prefsCache = new Map<string, { at: number; v: Record<string, unknown> }>();
+
 function prefsView(row: Row | null): Record<string, unknown> {
   return {
     locale: typeof row?.lang === "string" ? row.lang : "en",
@@ -28,11 +40,21 @@ function prefsView(row: Row | null): Record<string, unknown> {
 }
 
 export async function preferencesGet(user: { id: string }) {
+  const hit = prefsCache.get(user.id);
+  if (hit && Date.now() - hit.at < PREFS_CACHE_TTL_MS) return hit.v;
   const row = await supaSelectOne("profiles", [
     ["select", "lang,theme,rail_folded,content_location"],
     ["id", `eq.${user.id}`],
   ]);
-  return prefsView(row);
+  const v = prefsView(row);
+  prefsCache.set(user.id, { at: Date.now(), v });
+  return v;
+}
+
+/** Drop the cached preferences view for one user — profile PATCHes can
+ * change lang / theme through /api/me/profile too. */
+export function prefsCacheDrop(userId: string): void {
+  prefsCache.delete(userId);
 }
 
 export async function preferencesUpdate(user: { id: string }, body: Row) {
@@ -57,6 +79,11 @@ export async function preferencesUpdate(user: { id: string }, body: Row) {
     throw new ApiCode(400, "nothing_to_update");
   }
   const rows = await supaUpdate("profiles", [["id", `eq.${user.id}`]], patch);
+
+  // v4.1: both caches must drop — the prefs view reads the same profiles
+  // row, and the session cache holds copies of the mirrored fields.
+  prefsCache.delete(user.id);
+  sessionCacheDropUser(user.id);
 
   // v3.3: the rail fold also rides on the session rows so the next server
   // render of any page picks it up with zero extra lookups.
@@ -144,11 +171,15 @@ export async function deviceUpdate(
   const rows = await supaUpdate("sessions", [["id", `eq.${targetId}`]], patch);
   const row = rows[0];
   if (!row) throw notFound();
+  // The cached session for that row still carries the old name/icon.
+  sessionCacheDropSession(targetId);
   return { device: deviceView(row, current.sessionId) };
 }
 
 export async function deviceRevoke(current: CurrentSession, id: string) {
   await ownSession(current, id);
   await supaDelete("sessions", [["id", `eq.${id}`]]);
+  // Drop the revoked row's cached entry so its cookie dies instantly.
+  sessionCacheDropSession(id);
   return { ok: true, current: id === current.sessionId };
 }

@@ -1,5 +1,7 @@
 import { supaSelect, supaSelectOne, supaUpdate, supaInsert } from "./supa";
 import { ApiCode } from "./psych-data";
+import { sessionCacheDropUser } from "./session";
+import { prefsCacheDrop } from "./account";
 
 /**
  * The user's own data — the profiles row (name, avatar, body metrics,
@@ -248,6 +250,12 @@ export async function updateProfile(userId: string, body: ProfilePatchIn): Promi
   }
 
   await supaUpdate("profiles", [["id", `eq.${userId}`]], patch);
+
+  // v4.1: the session cache holds copies of the mirrored fields and the
+  // preferences cache reads lang/theme off this same row — drop both so
+  // the very next request sees the new values.
+  sessionCacheDropUser(userId);
+  prefsCacheDrop(userId);
 
   // Mirror identity + preference changes onto the session rows (the rail
   // and the content filter read them). v3.4: content_location →
