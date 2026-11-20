@@ -159,7 +159,12 @@ export function gotrueUser(u: Row): Row {
     confirmed_at: u.email_confirmed === true ? u.created_at ?? null : null,
     last_sign_in_at: u.last_sign_in_at ?? null,
     user_metadata: u.user_metadata ?? {},
-    app_metadata: { provider: "email", providers: ["email"] },
+    // Rows created by the OAuth consent dance carry their provider set
+    // ({ provider: "google", providers: ["google"] }); everyone else is
+    // a classic e-mail account.
+    app_metadata: u.app_metadata && typeof u.app_metadata === "object"
+      ? (u.app_metadata as Row)
+      : { provider: "email", providers: ["email"] },
     created_at: u.created_at ?? null,
     updated_at: u.updated_at ?? u.created_at ?? null,
   };

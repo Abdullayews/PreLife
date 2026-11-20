@@ -18,10 +18,16 @@ function sha256B64url(s: string): string {
 }
 
 /**
- * GET /api/auth/oauth/{google|apple}?locale — starts the OAuth flow:
- * mints a PKCE verifier (kept with the locale in a short-lived
- * HttpOnly cookie), then redirects to Supabase's /authorize. Provider
- * credentials live in Supabase (Authentication → Providers).
+ * GET /api/auth/oauth/{google|apple}?locale&mode — starts the OAuth
+ * flow: mints a PKCE verifier (kept with the locale AND the origin page
+ * in a short-lived HttpOnly cookie), then redirects to Supabase's
+ * /authorize. Provider credentials live in Supabase (Authentication →
+ * Providers).
+ *
+ * v4.4 `mode`: where the button was pressed — "signup" lets the
+ * callback complete a brand-new registration through the provider,
+ * "login" (default) sends unknown e-mails back to the login page for
+ * the mail registration.
  */
 export async function GET(
   req: NextRequest,
@@ -37,6 +43,7 @@ export async function GET(
   const redirectTo = `${origin}/api/auth/callback`;
   const localeRaw = req.nextUrl.searchParams.get("locale") ?? "az";
   const locale = localeRaw === "en" || localeRaw === "ru" ? localeRaw : "az";
+  const mode = req.nextUrl.searchParams.get("mode") === "signup" ? "signup" : "login";
 
   const verifier = randomBytes(48).toString("base64url"); // 64 chars — inside 43..128
   const challenge = sha256B64url(verifier);
@@ -46,6 +53,6 @@ export async function GET(
     + `&code_challenge=${challenge}&code_challenge_method=S256`;
 
   const res = NextResponse.redirect(url, 302);
-  res.cookies.set(oauthCookie(verifier, isSecure(req.headers), locale));
+  res.cookies.set(oauthCookie(verifier, isSecure(req.headers), locale, mode));
   return res;
 }

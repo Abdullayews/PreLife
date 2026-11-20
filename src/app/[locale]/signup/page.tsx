@@ -26,16 +26,16 @@ export default async function SignupPage({ params, searchParams }: Props) {
 
   const sp = await searchParams;
   const raw = Array.isArray(sp.next) ? sp.next[0] : sp.next;
-  // v4.3: e-mail prefills — from the login form (no account + password
-  // typed) or from a Google/Apple login that found no account.
+  // v4.3: e-mail prefill from the login form (no account + password
+  // typed). v4.4: a Google/Apple signup never bounces here anymore —
+  // the provider registration completes in the callback itself.
   const prefillRaw = Array.isArray(sp.email) ? sp.email[0] : sp.email;
   const prefillEmail = typeof prefillRaw === "string" ? prefillRaw.trim().slice(0, 120) : "";
-  const notice = sp.notice === "oauth_new" ? "oauth_new" : null;
 
   return (
     <div data-world="shell" className="world page">
       <div className="wrap auth-wrap">
-        <AuthForm mode="signup" next={safeNext(raw)} prefillEmail={prefillEmail} notice={notice} />
+        <AuthForm mode="signup" next={safeNext(raw)} prefillEmail={prefillEmail} />
       </div>
     </div>
   );

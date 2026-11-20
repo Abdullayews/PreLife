@@ -548,7 +548,7 @@
   "authPage": {
     "passwordOptional": "Hesab\u0131n\u0131z yoxdursa yaln\u0131z e-po\u00e7tu yaz\u0131b davam edin \u2014 t\u0259sdiq linki g\u00f6nd\u0259ril\u0259c\u0259k.",
     "loginNeedsPassword": "Bu e-po\u00e7tla hesab var \u2014 \u015fifr\u0259nizi daxil edin.",
-    "oauthNewNotice": "Google/Apple hesab\u0131n\u0131zla PreLife hesab\u0131 tap\u0131lmad\u0131. E-po\u00e7tunuz a\u015fa\u011f\u0131da doldurulub \u2014 ad v\u0259 \u015fifr\u0259 il\u0259 qeydiyyat\u0131 tamamlay\u0131n.",
+    "oauthLoginNotice": "Google/Apple il\u0259 bu e-po\u00e7ta hesab tap\u0131lmad\u0131. E-po\u00e7tunuz a\u015fa\u011f\u0131da doldurulub \u2014 \u00abDavam et\u00bb d\u00fcym\u0259sini bas\u0131n, qeydiyyat \u00fc\u00e7\u00fcn t\u0259sdiq linki g\u00f6nd\u0259ril\u0259c\u0259k.",
     "prefillNote": "E-po\u00e7t v\u0259 \u015fifr\u0259niz giri\u015f formundan g\u0259tirildi.",
     "loginTitle": "Xo\u015f g\u0259lmisiniz",
     "loginSubtitle": "PreLife-\u0131n\u0131z\u0131 a\u00e7maq \u00fc\u00e7\u00fcn daxil olun.",
@@ -583,6 +583,7 @@
       "invalid_credentials": "E-po\u00e7t v\u0259 ya \u015fifr\u0259 yanl\u0131\u015fd\u0131r.",
       "email_taken": "Bu e-po\u00e7tla hesab art\u0131q m\u00f6vcuddur.",
       "generic": "Bir x\u0259ta ba\u015f verdi. Yenid\u0259n c\u0259hd edin.",
+      "oauth": "Google/Apple il\u0259 giri\u015f al\u0131nmad\u0131 \u2014 bir azdan yenid\u0259n c\u0259hd edin v\u0259 ya e-po\u00e7tla davam edin.",
       "email_unverified": "E-po\u00e7t t\u0259sdiql\u0259nm\u0259yib. G\u0259l\u0259nl\u0259r qutusunu yoxlay\u0131n v\u0259 ya linki yenid\u0259n g\u00f6nd\u0259rin."
     },
     "signupOkTitle": "E-po\u00e7tunuzu yoxlay\u0131n",
