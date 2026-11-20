@@ -548,7 +548,7 @@
   "authPage": {
     "passwordOptional": "No account yet? Enter just your e-mail and continue \u2014 we'll send a confirmation link.",
     "loginNeedsPassword": "An account exists for this e-mail \u2014 enter your password.",
-    "oauthNewNotice": "No PreLife account was found for your Google/Apple e-mail. Your address is filled in below \u2014 complete the registration with a name and password.",
+    "oauthLoginNotice": "No account was found via Google/Apple for this e-mail. Your address is filled in below \u2014 press Continue and the confirmation link will be on its way.",
     "prefillNote": "Your e-mail and password were carried over from the login form.",
     "loginTitle": "Welcome back",
     "loginSubtitle": "Sign in to open your PreLife.",
@@ -584,6 +584,7 @@
       "invalid_credentials": "Wrong email or password.",
       "email_taken": "An account with this email already exists.",
       "generic": "Something went wrong. Please try again.",
+      "oauth": "The Google/Apple sign-in did not go through \u2014 try again in a moment, or continue with e-mail.",
       "email_unverified": "E-mail not confirmed. Check your inbox or resend the link."
     },
     "signupOkTitle": "Check your inbox",

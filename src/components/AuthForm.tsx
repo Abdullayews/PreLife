@@ -41,8 +41,9 @@ function DevLinkBox({ note, open, href }: { note: string; open: string; href: st
   );
 }
 
-/** The banner shown when a visitor arrives from a Google/Apple login
- * that found no account (the callback redirected them here). */
+/** The banner shown when a visitor arrives back on the LOGIN page
+ * from a Google/Apple login that found no account (the callback
+ * redirects them here with the e-mail prefilled — v4.4). */
 function NoticeBox({ text }: { text: string }) {
   return <output className="set-note">{text}</output>;
 }
@@ -62,8 +63,16 @@ function NoticeBox({ text }: { text: string }) {
  *   • Login with e-mail + password on an unknown address moves the
  *     visitor to /signup with both fields auto-filled (the password
  *     travels via sessionStorage, never the URL).
- *   • A Google/Apple login that finds no account bounces to /signup
- *     with the e-mail prefilled (the notice explains why).
+ *
+ * v4.4 provider rules (the origin page rides through the OAuth flow):
+ *   • A Google/Apple SIGNUP with no account registers right there —
+ *     the provider vouches for the e-mail, the account is created and
+ *     the visitor lands in the app. The provider button on /signup is
+ *     a registration, never a bounce to the e-mail form.
+ *   • A Google/Apple LOGIN with no account lands back HERE with the
+ *     e-mail prefilled: the mail registration starts right where the
+ *     visitor is (press Continue → confirmation link). The mail
+ *     hand-off lives at the login place only.
  */
 export function AuthForm({
   mode,
@@ -218,8 +227,11 @@ export function AuthForm({
   const otherHref = (mode === "login" ? "/signup" : "/login") + (next ? `?next=${encodeURIComponent(next)}` : "");
 
   // Full page navigation — the OAuth redirect chain cannot run in fetch.
+  // v4.4: the mode rides along so the callback knows whether a brand-new
+  // provider account completes the registration (signup) or comes back
+  // here for the mail flow (login).
   const startOauth = (provider: "google" | "apple") => {
-    window.location.href = apiUrl(`/api/auth/oauth/${provider}?locale=${locale}`);
+    window.location.href = apiUrl(`/api/auth/oauth/${provider}?locale=${locale}&mode=${mode}`);
   };
 
   // Signup (or the login-page mail start) succeeded — "check your inbox".
@@ -259,10 +271,10 @@ export function AuthForm({
         <p className="lede">{mode === "login" ? t("loginSubtitle") : t("signupSubtitle")}</p>
       </div>
 
-      {mode === "signup" && notice === "oauth_new" && (
-        <NoticeBox text={t("oauthNewNotice")} />
+      {mode === "login" && notice === "oauth_new" && (
+        <NoticeBox text={t("oauthLoginNotice")} />
       )}
-      {mode === "signup" && password && !notice && (
+      {mode === "signup" && password && (
         <NoticeBox text={t("prefillNote")} />
       )}
 

@@ -363,16 +363,20 @@ export function tokenFromCookieHeader(raw: string | null): string | null {
 }
 
 /** The pl_oauth verifier from a raw Cookie header value, if present.
- * v4.3 packs the locale in front ("az.<verifier>") so the OAuth
- * callback can bounce to the right signup page; bare verifiers from a
- * mid-flow upgrade still parse. */
+ * v4.3 packed the locale in front ("az.<verifier>"); v4.4 packs the
+ * origin page and a mint stamp too
+ * ("az.login.<minted-ms>.<verifier>"). Bare verifiers from a mid-flow
+ * upgrade still parse. */
 export function oauthVerifierFromCookieHeader(raw: string | null): string | null {
   if (!raw) return null;
   for (const part of raw.split(";")) {
     const p = part.trim();
     if (!p.startsWith(`${OAUTH_COOKIE}=`)) continue;
     const v = p.slice(OAUTH_COOKIE.length + 1);
-    return v.match(/^[a-z]{2}\./) ? v.slice(3) : v;
+    return v
+      .replace(/^[a-z]{2}\.(login|signup)\.\d{11,}\./, "")
+      .replace(/^[a-z]{2}\.(login|signup)\./, "")
+      .replace(/^[a-z]{2}\./, "");
   }
   return null;
 }
@@ -436,10 +440,21 @@ export function clearedOAuthCookie(secure: boolean) {
   };
 }
 
-export function oauthCookie(verifier: string, secure: boolean, locale = "az") {
+/** v4.4: the cookie value is "<locale>.<mode>.<minted-ms>.<verifier>" —
+ * the mode (login | signup) records which page started the dance, and
+ * the mint stamp (when the button was pressed) lets the callback tell
+ * "the provider row this dance just created" apart from "a provider
+ * account registered earlier" — provider signups leave real rows
+ * behind now, and those must never be deleted as phantoms. */
+export function oauthCookie(
+  verifier: string,
+  secure: boolean,
+  locale = "az",
+  mode: "login" | "signup" = "login",
+) {
   return {
     name: OAUTH_COOKIE,
-    value: `${locale}.${verifier}`,
+    value: `${locale}.${mode}.${Date.now()}.${verifier}`,
     path: "/",
     maxAge: OAUTH_TTL_S,
     httpOnly: true,

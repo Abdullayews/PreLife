@@ -29,11 +29,23 @@ export default async function LoginPage({ params, searchParams }: Props) {
   // /api/auth/callback redirects here with ?error=oauth when the Google /
   // Apple flow fails (provider not configured in Supabase, denied consent…).
   const oauthError = sp.error === "oauth";
+  // v4.4: it also redirects here with ?email=…&notice=oauth_new when a
+  // Google/Apple LOGIN found no account — the mail registration starts
+  // right on this page (the e-mail arrives prefilled).
+  const prefillRaw = Array.isArray(sp.email) ? sp.email[0] : sp.email;
+  const prefillEmail = typeof prefillRaw === "string" ? prefillRaw.trim().slice(0, 120) : "";
+  const notice = sp.notice === "oauth_new" ? "oauth_new" : null;
 
   return (
     <div data-world="shell" className="world page">
       <div className="wrap auth-wrap">
-        <AuthForm mode="login" next={safeNext(raw)} oauthError={oauthError} />
+        <AuthForm
+          mode="login"
+          next={safeNext(raw)}
+          oauthError={oauthError}
+          prefillEmail={prefillEmail}
+          notice={notice}
+        />
       </div>
     </div>
   );
