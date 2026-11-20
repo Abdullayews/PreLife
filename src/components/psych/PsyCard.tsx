@@ -47,7 +47,7 @@ export function PsyCard({
   return (
     <li className="psy-card">
       <div className="psy-main">
-        <img className="psy-photo" src={psy.image} alt="" width={640} height={640} loading="lazy" decoding="async" />
+        <img className="psy-photo" src={psy.image} alt={psy.name} width={640} height={640} loading="lazy" decoding="async" />
         <div className="psy-id">
           <div className="place-top">
             <h3>{psy.name}</h3>
@@ -88,7 +88,7 @@ export function PsyCard({
       >
         <div className="psy-about">
           <div className="psy-about-head">
-            <img className="psy-photo" src={psy.image} alt="" width={640} height={640} loading="lazy" decoding="async" />
+            <img className="psy-photo" src={psy.image} alt={psy.name} width={640} height={640} loading="lazy" decoding="async" />
             <div className="psy-about-id">
               <span className="tag tinted">{psy.title}</span>
               <span className="score">

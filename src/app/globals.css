@@ -1237,10 +1237,10 @@ a.card:hover em svg { transform: translateX(3px); }
 .psy-filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
 .psy-filter-row > .lbl { font-size: .8125rem; font-weight: 650; color: var(--muted); margin-right: .35rem; }
 .timepick { display: inline-flex; align-items: center; gap: .45rem; }
-.timepick input { width: 4.6rem; height: 2.25rem; padding-inline: .6rem; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); font: inherit; font-size: .8125rem; font-variant-numeric: tabular-nums; }
+.timepick input { width: 4.6rem; height: 2.25rem; padding-inline: .6rem; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); font: inherit; font-size: .8125rem; font-variant-numeric: tabular-nums; }
 .timepick input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
 .daypick { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
-.daypick button { min-width: 2.7rem; height: 2.25rem; padding-inline: .5rem; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: .8125rem; font-weight: 600; color: var(--muted); transition: border-color .2s, background-color .2s, color .2s, transform var(--t-press) var(--ease-out); }
+.daypick button { min-width: 2.7rem; height: 2.25rem; padding-inline: .5rem; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-size: .8125rem; font-weight: 600; color: var(--muted); transition: border-color .2s, background-color .2s, color .2s, transform var(--t-press) var(--ease-out); }
 .daypick button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .psy-list { display: grid; gap: 1.25rem; margin-top: 1.25rem; }
 .psy-card { overflow: hidden; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); }
@@ -1794,7 +1794,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .gprod:hover { transform: translateY(-2px); box-shadow: var(--shadow-2); }
 .gprod .card-top .tag { margin-left: auto; }
 .gprod-brand { color: var(--muted); font-size: .875rem; }
-.gprod-buy { margin-top: .3rem; font-size: .7rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.gprod-buy { margin-top: .3rem; font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
 .buy-list { display: grid; gap: .45rem; margin-top: auto; }
 .buy-list a {
   position: relative;
@@ -1805,7 +1805,7 @@ a.card:hover em svg { transform: translateX(3px); }
 }
 .buy-list a:hover { border-color: color-mix(in srgb, var(--accent) 50%, transparent); color: var(--accent-text); transform: translateY(-1px); }
 .buy-list b { font-weight: 650; white-space: nowrap; }
-.buy-kind { font-size: .7rem; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .08rem .5rem; white-space: nowrap; }
+.buy-kind { font-size: .75rem; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .08rem .5rem; white-space: nowrap; }
 .buy-price { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
 .buy-list a > svg { color: var(--muted); transition: color .2s, transform .2s var(--ease); }
 .buy-list a:hover > svg { color: var(--accent-text); transform: translate(1px, -1px); }
@@ -1973,7 +1973,6 @@ a.card:hover em svg { transform: translateX(3px); }
    ::backdrop scrim; we style the chrome. */
 dialog.modal-panel {
   width: min(34rem, 100%); max-height: min(86svh, 46rem);
-  display: flex; flex-direction: column; overflow: hidden;
   padding: 0; border: 1px solid var(--line); border-radius: var(--r-xl);
   background: var(--surface); box-shadow: var(--shadow-3);
   color: var(--ink);
@@ -1984,6 +1983,13 @@ dialog.modal-panel {
   transition: opacity var(--t-base) var(--ease-out), transform var(--t-base) var(--ease-out),
     display var(--t-base) allow-discrete, overlay var(--t-base) allow-discrete;
   margin: auto; /* centers in the dialog box, incl. overflow scrolling */
+}
+/* Flex chrome ONLY while open. Unscoped, `display: flex` would override
+   the UA's `dialog:not([open]) { display: none }` and every closed modal
+   would stay on screen as an invisible, click-intercepting layer. The
+   allow-discrete transition above keeps the exit animation working. */
+dialog.modal-panel[open] {
+  display: flex; flex-direction: column; overflow: hidden;
 }
 dialog.modal-panel:not([open]) { opacity: 0; transform: translateY(10px) scale(.97); }
 @starting-style { dialog.modal-panel { opacity: 0; transform: translateY(14px) scale(.97); } }
@@ -2210,7 +2216,7 @@ dialog.modal-panel:not([open])::backdrop { opacity: 0; }
 }
 .ai-fab-send:hover:not(:disabled) { transform: scale(1.06); }
 .ai-fab-send:disabled { opacity: .45; cursor: default; }
-.ai-fab-note { padding: 0 1rem .7rem; font-size: .7rem; color: var(--muted); }
+.ai-fab-note { padding: 0 1rem .7rem; font-size: .75rem; color: var(--muted); }
 
 @media (prefers-reduced-motion: reduce) {
   .modal-root, .modal-panel, .gex, .gex-check, .ai-fab-panel, .ai-fab-btn,
@@ -2475,7 +2481,7 @@ html.dark .idman {
   width: var(--inav-w-closed);
   max-height: calc(100svh - var(--nav-h) - 2rem);
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: 22px;
   background: color-mix(in srgb, var(--surface) 82%, transparent);
   -webkit-backdrop-filter: blur(22px) saturate(1.6);
   backdrop-filter: blur(22px) saturate(1.6);
@@ -2497,12 +2503,12 @@ html.dark .idman {
 .inav-brand em { color: var(--accent-text); font-style: normal; }
 .inav-brand-ic {
   display: grid; place-items: center; flex: none;
-  width: 38px; height: 38px; border-radius: 13px;
+  width: 38px; height: 38px; border-radius: 12px;
   background: var(--deep); color: var(--deep-ink);
 }
 .inav-fold {
   display: grid; place-items: center; flex: none;
-  width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 10px;
+  width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 12px;
   background: color-mix(in srgb, var(--ink) 4%, transparent); color: var(--muted);
   cursor: pointer; transition: color .2s, background-color .2s;
 }
@@ -2548,7 +2554,7 @@ html.dark .idman {
 .inav-row, .inav-group-head, .inav-foot-btn {
   display: flex; align-items: center; gap: .65rem;
   width: 100%; min-height: 46px; padding: 0 .6rem;
-  border: 0; border-radius: 13px;
+  border: 0; border-radius: 12px;
   background: transparent; color: var(--muted);
   font: 600 .9rem/1.15 var(--font-body); text-align: left; text-decoration: none;
   cursor: pointer;
@@ -2625,7 +2631,7 @@ html.dark .idman {
 .inav-fab {
   position: fixed; left: 1rem; bottom: 1rem; z-index: 38;
   display: grid; place-items: center;
-  width: 52px; height: 52px; border: 1px solid var(--line); border-radius: 18px;
+  width: 52px; height: 52px; border: 1px solid var(--line); border-radius: 16px;
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   -webkit-backdrop-filter: blur(14px) saturate(1.5);
   backdrop-filter: blur(14px) saturate(1.5);
@@ -2717,7 +2723,7 @@ html.dark .idman {
 .iplan-stats > div {
   display: grid; gap: .1rem; justify-items: center;
   padding: .65rem .3rem;
-  border: 1px solid var(--line); border-radius: 14px;
+  border: 1px solid var(--line); border-radius: 12px;
   background: color-mix(in srgb, var(--tint) 55%, transparent);
 }
 .iplan-stats b { font: 700 1.25rem/1 var(--font-display); font-variant-numeric: tabular-nums; }
@@ -2758,7 +2764,7 @@ html.dark .idman {
 
 .iplan-cards { display: grid; gap: 1rem; min-width: 0; }
 .iplan-next-hint {
-  padding: .65rem .9rem; border-radius: 14px;
+  padding: .65rem .9rem; border-radius: 12px;
   background: var(--tint); color: var(--muted); font-size: .875rem;
 }
 
@@ -2768,7 +2774,7 @@ html.dark .idman {
 }
 .iex {
   display: grid; grid-template-rows: auto 1fr;
-  border: 1px solid var(--line); border-radius: 20px;
+  border: 1px solid var(--line); border-radius: 22px;
   background: var(--surface); box-shadow: var(--shadow-1);
   overflow: hidden;
   animation: idman-in .5s var(--inav-ease) both;
@@ -2821,7 +2827,7 @@ html.dark .idman {
 .iplan-week-day {
   display: grid; gap: .2rem; justify-items: center;
   padding: .55rem .2rem;
-  border: 1px solid var(--line); border-radius: 13px;
+  border: 1px solid var(--line); border-radius: 12px;
   background: color-mix(in srgb, var(--tint) 40%, transparent);
 }
 .iplan-week-day.work {
@@ -2841,7 +2847,7 @@ html.dark .idman {
 }
 .iplan-plan {
   display: grid; grid-template-rows: auto 1fr;
-  border: 1px solid var(--line); border-radius: 20px;
+  border: 1px solid var(--line); border-radius: 22px;
   background: var(--surface); box-shadow: var(--shadow-1);
   overflow: hidden;
   transition: border-color .25s, box-shadow .25s;
@@ -2920,7 +2926,7 @@ html.dark .idman {
 
 .iprod {
   display: grid; grid-template-rows: auto 1fr;
-  border: 1px solid var(--line); border-radius: 18px;
+  border: 1px solid var(--line); border-radius: 22px;
   background: var(--surface); box-shadow: var(--shadow-1);
   overflow: hidden;
   animation: idman-in .5s var(--inav-ease) both;
@@ -2934,7 +2940,7 @@ html.dark .idman {
 }
 .iprod-body { display: grid; gap: .35rem; padding: .9rem 1rem 1rem; align-content: start; }
 .iprod-brand {
-  font-size: .7rem; font-weight: 700; letter-spacing: .06em;
+  font-size: .75rem; font-weight: 700; letter-spacing: .06em;
   text-transform: uppercase; color: var(--muted);
 }
 .iprod-name { font: 650 .98rem/1.25 var(--font-display); }
@@ -2945,12 +2951,12 @@ html.dark .idman {
 .iprod-rate b { font-variant-numeric: tabular-nums; }
 .iprod-price { font-size: .95rem; font-weight: 750; font-variant-numeric: tabular-nums; }
 .iprod-offers { display: grid; gap: .3rem; margin-top: .35rem; padding-top: .6rem; border-top: 1px solid var(--line); }
-.iprod-offers-t { font-size: .72rem; font-weight: 650; color: var(--muted); }
+.iprod-offers-t { font-size: .75rem; font-weight: 650; color: var(--muted); }
 .iprod-offer {
   display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto;
   align-items: center; gap: .45rem;
   padding: .38rem .55rem;
-  border: 1px solid var(--line); border-radius: 10px;
+  border: 1px solid var(--line); border-radius: 12px;
   text-decoration: none; color: var(--ink);
   font-size: .78rem;
   transition: border-color .2s, background-color .2s;
@@ -2961,9 +2967,9 @@ html.dark .idman {
   background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 .iprod-offer-name { font-weight: 650; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.iprod-offer-kind { color: var(--muted); font-size: .72rem; }
+.iprod-offer-kind { color: var(--muted); font-size: .75rem; }
 .iprod-offer-price { font-weight: 700; font-variant-numeric: tabular-nums; }
-.iprod-offer .itag { padding: .1rem .5rem; font-size: .64rem; }
+.iprod-offer .itag { padding: .1rem .5rem; font-size: .75rem; }
 
 /* ── video tile ─────────────────────────────────────────────────────────── */
 
@@ -2992,7 +2998,7 @@ html.dark .idman {
 .izal { display: grid; gap: .9rem; }
 .izal-card {
   display: grid; grid-template-rows: auto 1fr;
-  border: 1px solid var(--line); border-radius: 20px;
+  border: 1px solid var(--line); border-radius: 22px;
   background: var(--surface); box-shadow: var(--shadow-1);
   overflow: hidden;
   animation: idman-in .5s var(--inav-ease) both;
@@ -3050,7 +3056,7 @@ html.dark .idman {
 .iempty {
   display: grid; justify-items: center; gap: .6rem;
   padding: 3rem 1rem;
-  border: 1px dashed var(--line); border-radius: 18px;
+  border: 1px dashed var(--line); border-radius: 22px;
   color: var(--muted); text-align: center;
 }
 

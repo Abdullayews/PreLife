@@ -41,7 +41,10 @@ export default async function LibraryPage({ params, searchParams }: Props) {
 
   const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
   const active = tabParam && isTabId(tabParam) ? tabParam : "collections";
-  const user = await requireUser(locale, "/library");
+  const user = await requireUser(
+    locale,
+    tabParam ? `/library?tab=${encodeURIComponent(Array.isArray(tabParam) ? tabParam[0] : tabParam)}` : "/library",
+  );
 
   const t = await getTranslations({ locale, namespace: "libraryApp" });
   const tr = await getTranslations({ locale, namespace: "libraryHome" });
@@ -90,7 +93,7 @@ export default async function LibraryPage({ params, searchParams }: Props) {
                 {libraryCollections.map((c) => (
                   <li key={c.id} className="card dplan-card">
                     <div className="dplan-img">
-                      <img src={c.image} alt="" width={800} height={500} loading="lazy" decoding="async" />
+                      <img src={c.image} alt={t(c.nameKey)} width={800} height={500} loading="lazy" decoding="async" />
                     </div>
                     <div className="dplan-body">
                       <span className="card-top">
@@ -117,7 +120,8 @@ export default async function LibraryPage({ params, searchParams }: Props) {
                 <p className="lede">{t("booksSubtitle")}</p>
               </header>
               <ul className="drecipes">
-                {libraryBooks.map((b) => {
+                {/* detail rows are DB-driven — skip items without details */}
+                {libraryBooks.filter((b) => BOOK_DETAILS[b.id]).map((b) => {
                   const d = BOOK_DETAILS[b.id]!;
                   const BookIcon = iconByName(b.icon);
                   return (
@@ -149,13 +153,14 @@ export default async function LibraryPage({ params, searchParams }: Props) {
                 <p className="lede">{t("venuesSubtitle")}</p>
               </header>
               <ul className="gyms-grid">
-                {libraryPlaces.map((place) => {
+                {/* detail rows are DB-driven — skip items without details */}
+                {libraryPlaces.filter((place) => LIB_VENUE_DETAILS[place.id]).map((place) => {
                   const d = LIB_VENUE_DETAILS[place.id]!;
                   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.mapQuery)}`;
                   return (
                     <li key={place.id} className="gplace">
                       <div className="gplace-img">
-                        <img src={place.image} alt="" width={800} height={533} loading="lazy" decoding="async" />
+                        <img src={place.image} alt={t(place.nameKey)} width={800} height={533} loading="lazy" decoding="async" />
                       </div>
                       <div className="gplace-body">
                         <div className="place-top">

@@ -1,3 +1,9 @@
+> **STATUS (v5.0, 2026-11-21): partially dated.** The current `scripts/
+> warm.mjs` warms PUBLIC pages + login-redirect compiles only — no demo
+> sign-in, no cookie-scoped warming, and the `123/123` demo account was
+> removed in schema v3.1 (the emulator demo is `muhemmed@prelife.net`).
+> The parity analysis below still holds.
+
 # Sandbox ↔ Render parity
 
 **The problem it solves** (reported 2026-11-17): the app deployed on Render

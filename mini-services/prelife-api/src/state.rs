@@ -51,6 +51,10 @@ pub struct AppState {
     pub rate: Mutex<HashMap<String, RateBucket>>,
     pub ttl: Mutex<HashMap<String, (Instant, Value)>>,
     pub prefs_cache: Mutex<HashMap<String, (Instant, Value)>>,
+    /// Serializes check-then-insert critical sections (booking, mood/weight
+    /// upserts) against TOCTOU double-inserts; coarse but correct at this
+    /// scale. tokio::Mutex because the guard is held across awaits.
+    pub write_lock: tokio::sync::Mutex<()>,
     pub started_at: Instant,
 }
 
@@ -66,6 +70,7 @@ impl AppState {
             rate: Mutex::new(HashMap::new()),
             ttl: Mutex::new(HashMap::new()),
             prefs_cache: Mutex::new(HashMap::new()),
+            write_lock: tokio::sync::Mutex::new(()),
             started_at: Instant::now(),
         }
     }
@@ -73,10 +78,15 @@ impl AppState {
     /* ── the 60s TTL cache (content + i18n + AI settings) ─────────────── */
 
     pub fn ttl_get(&self, key: &str) -> Option<Value> {
-        let map = self.ttl.lock().unwrap();
+        let mut map = self.ttl.lock().unwrap();
         match map.get(key) {
             Some((at, v)) if at.elapsed() < Duration::from_secs(60) => Some(v.clone()),
-            _ => None,
+            // Expired: drop it instead of letting stale entries linger forever.
+            Some(_) => {
+                map.remove(key);
+                None
+            }
+            None => None,
         }
     }
 
@@ -113,12 +123,15 @@ impl AppState {
         }
     }
 
-    /// The caller's best-effort IP (x-forwarded-for first hop, then
-    /// x-real-ip, then "unknown").
+    /// The caller's best-effort IP. Behind the edge proxy the client IP is
+    /// the LAST x-forwarded-for hop — proxies append, so an attacker-supplied
+    /// first hop is ignored; a direct connection (no trusted proxy) falls
+    /// back to x-real-ip, then "unknown". The service must not be reachable
+    /// from the public internet except through the trusted proxy.
     pub fn client_ip(headers: &axum::http::HeaderMap) -> String {
         if let Some(fwd) = headers.get("x-forwarded-for").and_then(|v| v.to_str().ok()) {
-            if let Some(first) = fwd.split(',').next() {
-                let t = first.trim();
+            if let Some(last) = fwd.split(',').next_back() {
+                let t = last.trim();
                 if !t.is_empty() {
                     return t.to_string();
                 }
@@ -133,9 +146,53 @@ impl AppState {
     }
 
     /// The shared mail-send guard: 20/hour per IP, 5/hour per address.
+    /// Checked together: a rejected request consumes neither bucket.
     pub fn mail_send_allowed(&self, ip: &str, email: &str) -> bool {
-        self.rate_allow(&format!("mail:ip:{ip}"), 20, Duration::from_secs(3600))
-            && self.rate_allow(&format!("mail:em:{email}"), 5, Duration::from_secs(3600))
+        self.rate_allow_all(&[
+            (format!("mail:ip:{ip}"), 20, Duration::from_secs(3600)),
+            (format!("mail:em:{email}"), 5, Duration::from_secs(3600)),
+        ])
+    }
+
+    /// Multi-bucket allow: counts every bucket ONLY when all of them have
+    /// head-room — a rejection consumes nothing (mirrors rate_allow).
+    pub fn rate_allow_all(&self, checks: &[(String, u32, Duration)]) -> bool {
+        let now = Instant::now();
+        let mut map = self.rate.lock().unwrap();
+        if map.len() > 10_000 {
+            map.retain(|_, b| b.reset_at > now);
+        }
+        // Peek: every bucket must have head-room.
+        for (key, limit, _) in checks {
+            if let Some(b) = map.get(key) {
+                if b.reset_at > now && b.count >= *limit {
+                    return false;
+                }
+            }
+        }
+        // All clear — count once in each.
+        for (key, _, window) in checks {
+            match map.get_mut(key) {
+                Some(b) if b.reset_at > now => b.count += 1,
+                _ => {
+                    map.insert(key.clone(), RateBucket { count: 1, reset_at: now + *window });
+                }
+            }
+        }
+        true
+    }
+
+    /// The bounded prefs cache put: evicts stale entries when the map grows
+    /// past its cap instead of growing with the user count forever.
+    pub fn prefs_cache_put(&self, user_id: &str, v: Value) {
+        let mut map = self.prefs_cache.lock().unwrap();
+        if map.len() > 5_000 {
+            map.retain(|_, (at, _)| at.elapsed() < Duration::from_secs(30));
+            if map.len() > 5_000 {
+                map.clear(); // pathological: start over rather than grow unbounded
+            }
+        }
+        map.insert(user_id.to_string(), (Instant::now(), v));
     }
 
     /* ── session-cache invalidation ───────────────────────────────────── */

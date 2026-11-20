@@ -163,13 +163,16 @@ pub async fn create_session(
     let mut psych_slug: Option<String> = None;
     let mut location = "global".to_string();
 
-    if let Some(prof) = st
-        .supa
-        .select_one("profiles", &vec![("select".into(), "*".into()), ("id".into(), format!("eq.{uid}"))])
-        .await
-        .ok()
-        .flatten()
-    {
+    // Profile lookup: a transient transport failure must not silently mint a
+    // role-less session (a psychologist would lose console access until
+    // re-login) — retry once, then propagate the error to a clean 500.
+    let prof_params = vec![("select".to_string(), "*".to_string()), ("id".to_string(), format!("eq.{uid}"))];
+    let prof = match st.supa.select_one("profiles", &prof_params).await {
+        Ok(p) => Ok(p),
+        Err(_) => st.supa.select_one("profiles", &prof_params).await,
+    }
+    .map_err(DomainError::from_supa)?;
+    if let Some(prof) = prof {
         let pv = Value::Object(prof);
         avatar = s_opt(&pv, "avatar_url");
         rail_folded = is_true(&pv, "rail_folded");
@@ -181,13 +184,13 @@ pub async fn create_session(
         }
     }
     if role == "psychologist" {
-        if let Some(psy) = st
-            .supa
-            .select_one("psychologists_v2", &vec![("select".into(), "slug".into()), ("owner_id".into(), format!("eq.{uid}"))])
-            .await
-            .ok()
-            .flatten()
-        {
+        let psy_params = vec![("select".to_string(), "slug".to_string()), ("owner_id".to_string(), format!("eq.{uid}"))];
+        let psy = match st.supa.select_one("psychologists_v2", &psy_params).await {
+            Ok(p) => Ok(p),
+            Err(_) => st.supa.select_one("psychologists_v2", &psy_params).await,
+        }
+        .map_err(DomainError::from_supa)?;
+        if let Some(psy) = psy {
             let pv = Value::Object(psy);
             psych_slug = s_opt(&pv, "slug");
         }
@@ -342,7 +345,14 @@ pub async fn revoke_token_session(st: &St, token: &str) {
 /* ── cookies ───────────────────────────────────────────────────────────── */
 
 pub fn is_secure(headers: &HeaderMap) -> bool {
-    headers.get("x-forwarded-proto").and_then(|v| v.to_str().ok()) == Some("https")
+    // Proxies send "https, http" or "HTTPS" — accept the case-insensitive
+    // first hop being https instead of an exact string match.
+    headers
+        .get("x-forwarded-proto")
+        .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.split(',').next())
+        .map(|hop| hop.trim().eq_ignore_ascii_case("https"))
+        .unwrap_or(false)
 }
 
 pub fn session_cookie(token: &str, secure: bool) -> String {

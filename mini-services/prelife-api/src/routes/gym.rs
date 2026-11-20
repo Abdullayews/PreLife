@@ -55,7 +55,17 @@ pub async fn plan_post(State(st): State<St>, headers: HeaderMap, body: Bytes) ->
     if !answers.is_object() || answers.as_object().map(|o| o.is_empty()).unwrap_or(true) {
         return Err(err(400, "invalid"));
     }
+    // The AI cost ceiling — plan generation calls Gemini, same class as
+    // /api/ai/chat: 10/min per signed-in user.
     let uid = s(&cs.user, "id");
+    if !st.rate_allow(&format!("ai:plan:{}", uid), 10, std::time::Duration::from_secs(60)) {
+        return Err(err(429, "rate_limited"));
+    }
+    // The raw answers go into the model prompt — bound them so a huge body
+    // can't blow up the request cost.
+    if serde_json::to_string(&answers).map(|s| s.len() > 4096).unwrap_or(true) {
+        return Err(err(400, "invalid"));
+    }
     let (plan, source) = crate::user_plans::generate_plan(&st, &uid, &answers, &locale).await?;
     let _ = crate::profile::update_profile(&st, &uid, &json!({ "planOnboardingDone": true })).await;
     Ok(json_ok(serde_json::json!({ "plan": plan, "source": source, "onboardingDone": true })))

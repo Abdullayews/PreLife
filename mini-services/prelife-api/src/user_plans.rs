@@ -541,7 +541,9 @@ fn rule_based_plan(answers: &Value, locale: &str, reg: &[(String, String, String
     let obj = out.as_object_mut().unwrap();
     obj.insert("title".into(), json!(title));
     obj.insert("level".into(), json!(level));
-    obj.insert("source".into(), json!("ai"));
+    // Rule-based fallback: label the PERSISTED row honestly — the route
+    // reports source:"rules" separately, so the stored row must match.
+    obj.insert("source".into(), json!("rules"));
     if !focus_line.is_empty() {
         obj.insert("focus".into(), json!(focus_line));
     }

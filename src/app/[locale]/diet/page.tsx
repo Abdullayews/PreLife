@@ -35,11 +35,13 @@ export default async function DietOverviewPage({ params }: Props) {
   const greeting =
     hour < 12 ? t("greetMorning") : hour < 18 ? t("greetAfternoon") : t("greetEvening");
 
-  /* Deterministic pick of the day — stable per day, server-rendered. */
+  /* Deterministic pick of the day — stable per day, server-rendered. The
+   * detail row is DB-driven too: a recipe without details degrades to a
+   * neutral default instead of a NaN index crash. */
   const pickId = recipeOfTheDay(diet.recipes);
-  const pick = diet.recipes.find((r) => r.id === pickId)!;
-  const pickDetail = diet.recipeDetails[pickId]!;
-  const PickIcon = RECIPE_ICONS[pickId] ?? ChefHat;
+  const pick = diet.recipes.find((r) => r.id === pickId) ?? diet.recipes[0]!;
+  const pickDetail = diet.recipeDetails[pick.id] ?? { id: pick.id, minutes: 0, kcal: 0, ingredients: [] as string[] };
+  const PickIcon = RECIPE_ICONS[pick.id] ?? ChefHat;
 
   const SUBPAGES = [
     { href: "/diet/plans", key: "subPlans", icon: CalendarDays, title: t("subPlansTitle"), desc: t("subPlansDesc") },

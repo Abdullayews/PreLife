@@ -72,7 +72,12 @@ export default async function MeditationPage({ params }: Props) {
   // Deterministic "pick of the day": the date's digit sum mod the audio
   // count — stable per day, no hydration concerns (server-rendered).
   // Non-digit separators are stripped first so the sum can never be NaN.
+  // A catalog with videos but ZERO audio items would index NaN → crash, so
+  // it degrades to the unavailable shell like an empty pool.
   const audioItems = MEDIA.filter((m) => m.kind === "audio");
+  if (audioItems.length === 0) {
+    return <ContentUnavailable locale={locale} />;
+  }
   const digitSum = [...today].reduce((a, ch) => a + (/\d/.test(ch) ? Number(ch) : 0), 0);
   const pick = audioItems[digitSum % audioItems.length]!;
   const promptKey = dayRotated(content.promptKeys);

@@ -52,8 +52,13 @@ export function AudioPlayerCard({ id, src, title, desc }: { id: string; src: str
     const audio = ref.current;
     if (!audio) return;
     if (audio.paused) {
-      void audio.play();
-      setPlaying(true);
+      // The play() promise settles BEFORE the playing event fires — wait
+      // for it, or a 404 / slow decode leaves the Pause icon on while
+      // nothing sounds.
+      audio
+        .play()
+        .then(() => setPlaying(true))
+        .catch(() => setPlaying(false));
     } else {
       audio.pause();
       setPlaying(false);

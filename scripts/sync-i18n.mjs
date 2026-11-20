@@ -5,8 +5,10 @@
  *
  * The DB layer wins per-key over the bundled static files, so the table
  * must contain EVERY key — otherwise stale DB rows override fresh static
- * strings. This script makes the table an exact mirror: delete all rows,
- * insert every flattened dotted key with its az/en/ru values.
+ * strings. This script UPSERTS every flattened dotted key with its
+ * az/en/ru values (merge-duplicates on the primary key) — a failed chunk
+ * can never leave the table partially EMPTIED, the way delete-then-insert
+ * could.
  *
  * Usage:
  *   SUPABASE_URL=https://<ref>.supabase.co \
@@ -57,28 +59,24 @@ for (const loc of locales) {
 const rows = [...map.values()];
 console.log(`catalog: ${rows.length} keys`);
 
-/* 1. Delete all rows (service key bypasses RLS; PostgREST needs a WHERE). */
-let res = await fetch(`${REST}/i18n_messages?key=not.is.null`, { method: "DELETE", headers: HDRS });
-if (!res.ok) {
-  console.error(`delete failed ${res.status}: ${await res.text()}`);
-  process.exit(1);
-}
-
-/* 2. Insert in chunks of 300. */
+/* Upsert in chunks of 300 — merge-duplicates overwrites existing keys and
+ * inserts new ones; nothing is deleted first, so a network hiccup mid-run
+ * degrades to "some rows stale", never "catalog half gone". */
 const CHUNK = 300;
 let done = 0;
+let res;
 for (let i = 0; i < rows.length; i += CHUNK) {
   const chunk = rows.slice(i, i + CHUNK);
-  res = await fetch(`${REST}/i18n_messages`, {
+  res = await fetch(`${REST}/i18n_messages?on_conflict=key`, {
     method: "POST",
-    headers: HDRS,
+    headers: { ...HDRS, prefer: "resolution=merge-duplicates,return=minimal" },
     body: JSON.stringify(chunk),
   });
   if (!res.ok) {
-    console.error(`insert failed ${res.status}: ${await res.text()}`);
+    console.error(`upsert failed ${res.status}: ${await res.text()}`);
     process.exit(1);
   }
   done += chunk.length;
-  process.stdout.write(`\rinserted ${done}/${rows.length}`);
+  process.stdout.write(`\rupserted ${done}/${rows.length}`);
 }
-console.log(`\nOK — i18n_messages now mirrors the catalog exactly.`);
+console.log(`\nOK — i18n_messages covers the whole catalog (stale extras, if any, remain harmless).`);

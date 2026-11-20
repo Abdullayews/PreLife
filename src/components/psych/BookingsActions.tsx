@@ -31,10 +31,13 @@ export function BookingsActions({
         body: JSON.stringify({ id }),
       });
       setBusy(null);
-      if (!res.ok && kind === "pay") {
-        // e.g. 409 not_confirmed — the row changed under us; say so.
+      if (!res.ok) {
+        // e.g. 409 not_confirmed — the row changed under us; say so. A code
+        // the catalog has no string for falls back to the generic message
+        // instead of rendering a raw i18n key.
         const data = (await res.json().catch(() => ({}))) as { error?: string };
-        toast(t(`bookError_${data.error ?? "generic"}`), "error");
+        const code = data.error && t.has(`bookError_${data.error}`) ? `bookError_${data.error}` : "errorGeneric";
+        toast(t(code), "error");
       }
       router.refresh();
     });

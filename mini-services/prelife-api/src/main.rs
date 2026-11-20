@@ -83,7 +83,25 @@ fn main() {
         let emu_for_shutdown = st.emu.clone();
         axum::serve(listener, app)
             .with_graceful_shutdown(async move {
-                let _ = tokio::signal::ctrl_c().await;
+                // SIGINT (ctrl-c) AND SIGTERM (how deploy platforms stop us)
+                // both trigger the persist-on-exit path.
+                let sigterm = async {
+                    #[cfg(unix)]
+                    {
+                        match tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()) {
+                            Ok(mut s) => {
+                                s.recv().await;
+                            }
+                            Err(_) => std::future::pending::<()>().await,
+                        }
+                    }
+                    #[cfg(not(unix))]
+                    std::future::pending::<()>().await;
+                };
+                tokio::select! {
+                    _ = tokio::signal::ctrl_c() => {}
+                    _ = sigterm => {}
+                }
                 println!("[prelife-api] shutting down — persisting the emu store…");
                 if let Some(store) = emu_for_shutdown {
                     store.persist_now();

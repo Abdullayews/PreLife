@@ -318,7 +318,7 @@ function LocationPanel() {
         <p>{tl("subtitle")}</p>
       </div>
 
-      {error && <p className="field-error" role="alert">{t("devices.error")}</p>}
+      {error && <p className="field-error" role="alert">{t("actionFailed")}</p>}
 
       <div className="subtiers" role="radiogroup" aria-label={tl("title")}>
         {LOCATION_OPTIONS.map(({ id, icon: Icon, titleKey, descKey }) => {
@@ -388,7 +388,9 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
 
   const chooseLocale = (next: string) => {
     if (next === locale) return;
-    router.replace(pathname, { locale: next });
+    // Keep the query (?tab= etc.) across the language switch.
+    const query = typeof window === "undefined" ? "" : window.location.search;
+    router.replace(query ? `${pathname}${query}` : pathname, { locale: next });
     if (hasConsent()) persistLocale(next);
     // Account tier (v3.2) — Settings is signed-in only.
     saveUserPref({ locale: next });

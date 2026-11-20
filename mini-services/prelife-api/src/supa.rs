@@ -58,6 +58,35 @@ fn qs(params: &Params) -> String {
     build_query(params)
 }
 
+/// Defense-in-depth for every mutating call: each filter value must carry a
+/// PostgREST operator prefix (`eq.`, `lt.`, `in.`, …). A bare value would be
+/// silently DROPPED by the emulator's parser (→ an empty filter list matches
+/// ALL rows — mass delete/update) and rejected by real PostgREST; fail loudly
+/// instead so the bug can never ship again.
+fn guard_filters(filters: &Params) -> Result<(), SupaError> {
+    const OPS: &[&str] = &[
+        "eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "is", "isnot", "in", "not",
+        "contains", "overlaps", "cs", "cd", "sl", "sr", "nxl", "nxr", "adj", "fts", "plfts",
+        "phfts", "wfts", "or", "and", "match",
+    ];
+    for (k, v) in filters {
+        if matches!(k.as_str(), "select" | "order" | "limit" | "offset" | "on_conflict") {
+            continue;
+        }
+        let ok = v
+            .split_once('.')
+            .map(|(op, _)| OPS.contains(&op))
+            .unwrap_or(false);
+        if !ok {
+            return Err(SupaError::rest(
+                500,
+                format!("filter `{k}={v}` has no operator prefix — refusing unbounded mutation"),
+            ));
+        }
+    }
+    Ok(())
+}
+
 impl Supa {
     pub fn http(base: &str, key: &str, client: reqwest::Client) -> Self {
         let root = base.trim_end_matches('/');
@@ -153,6 +182,7 @@ impl Supa {
 
     /// PATCH rows matching the filters — the updated rows.
     pub async fn update(&self, table: &str, filters: &Params, body: &Value) -> Result<Vec<Row>, SupaError> {
+        guard_filters(filters)?;
         match self {
             Supa::Emu(store) => {
                 let body = body.as_object().cloned().unwrap_or_default();
@@ -185,6 +215,7 @@ impl Supa {
 
     /// DELETE rows matching the filters.
     pub async fn delete(&self, table: &str, filters: &Params) -> Result<(), SupaError> {
+        guard_filters(filters)?;
         match self {
             Supa::Emu(store) => {
                 store.rest_delete(table, filters);
@@ -329,7 +360,8 @@ impl Supa {
                     let v: Value = serde_json::from_str(&text).ok()?;
                     v.get("users").and_then(|u| u.as_array().cloned())
                 }
-                // Primary: exact-match emails filter.
+                // Primary: exact-match emails filter (supported by hosted
+                // GoTrue; ignored by stock — we exact-match locally anyway).
                 if let Some(users) =
                     try_list(client, auth, key, format!("emails={}&per_page=1", uri_encode(&mail))).await
                 {
@@ -340,16 +372,46 @@ impl Supa {
                         return hit.as_object().cloned();
                     }
                 }
-                // Fallback: substring filter + exact match on our side.
+                // Second: the dashboard-style `query` search (supported by
+                // hosted GoTrue, ignored by stock — then it just lists page 1
+                // and the local exact match still filters it).
                 if let Some(users) =
-                    try_list(client, auth, key, format!("filter={}&per_page=50", uri_encode(&mail))).await
+                    try_list(client, auth, key, format!("query={}&per_page=50", uri_encode(&mail))).await
                 {
-                    return users
+                    if let Some(hit) = users
                         .iter()
                         .find(|u| u.get("email").and_then(|e| e.as_str()) == Some(mail.as_str()))
-                        .and_then(|u| u.as_object().cloned());
+                    {
+                        return hit.as_object().cloned();
+                    }
                 }
-                None
+                // Last resort: page through the WHOLE directory — a 50-row
+                // window would silently hide every later user and make them
+                // permanently unloginnable.
+                let per_page = 200;
+                let mut page = 1u32;
+                loop {
+                    let Some(users) = try_list(
+                        client,
+                        auth,
+                        key,
+                        format!("page={page}&per_page={per_page}"),
+                    )
+                    .await
+                    else {
+                        return None;
+                    };
+                    if let Some(hit) = users
+                        .iter()
+                        .find(|u| u.get("email").and_then(|e| e.as_str()) == Some(mail.as_str()))
+                    {
+                        return hit.as_object().cloned();
+                    }
+                    if users.len() < per_page {
+                        return None;
+                    }
+                    page += 1;
+                }
             }
         }
     }

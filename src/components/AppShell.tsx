@@ -158,7 +158,8 @@ export function AppShell({
     setAcctOpen(false);
   }, [pathname]);
 
-  /* Escape closes the mobile overlay. */
+  /* Escape closes the mobile overlay and the account dropdown; a pointer
+   * press outside the rail account block closes the dropdown too. */
   useEffect(() => {
     if (!mobile) return;
     const key = (e: KeyboardEvent) => {
@@ -167,6 +168,23 @@ export function AppShell({
     document.addEventListener("keydown", key);
     return () => document.removeEventListener("keydown", key);
   }, [mobile]);
+
+  useEffect(() => {
+    if (!acctOpen) return;
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setAcctOpen(false);
+    };
+    const press = (e: PointerEvent) => {
+      const el = e.target instanceof Element ? e.target.closest(".rail-account") : null;
+      if (!el) setAcctOpen(false);
+    };
+    document.addEventListener("keydown", key);
+    document.addEventListener("pointerdown", press);
+    return () => {
+      document.removeEventListener("keydown", key);
+      document.removeEventListener("pointerdown", press);
+    };
+  }, [acctOpen]);
 
   const toggleRail = () => {
     if (mobile) { setMobOpen((v) => !v); return; }
@@ -412,7 +430,7 @@ export function AppShell({
                     type="button"
                     className={`rail-item rail-group-head${on(item.href) ? " active" : ""}`}
                     onClick={onGroupClick}
-                    aria-expanded={groupOpen}
+                    aria-expanded={expanded && groupOpen}
                     title={!expanded ? item.label : undefined}
                   >
                     <span className="rail-ic" aria-hidden>

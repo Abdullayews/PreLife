@@ -521,7 +521,7 @@ function PlanCard({
     : null;
   return (
     <li className="iplan-plan" style={{ "--i": i } as CSSProperties}>
-      <img src={plan.image} alt="" width={640} height={360} loading="lazy" decoding="async" />
+      <img src={plan.image} alt={plan.name} width={640} height={360} loading="lazy" decoding="async" />
       <div className="iplan-plan-body">
         <div className="iplan-plan-top">
           <h3>{plan.name}</h3>
@@ -915,7 +915,7 @@ function ProductCard({ p, i }: { p: GymAppProduct; i: number }) {
         <VideoTile src={video} label={`${p.name} — demo`} />
       ) : (
         <div className="iprod-img">
-          <img src={p.image} alt="" width={480} height={360} loading="lazy" decoding="async" />
+          <img src={p.image} alt={p.name} width={480} height={360} loading="lazy" decoding="async" />
         </div>
       )}
       <div className="iprod-body">
@@ -1047,7 +1047,7 @@ function HallCard({ h, i }: { h: GymAppPlace; i: number }) {
   return (
     <li className="izal-card" style={{ "--i": i } as CSSProperties}>
       <div className="izal-img">
-        <img src={h.image} alt="" width={800} height={533} loading="lazy" decoding="async" />
+        <img src={h.image} alt={h.name} width={800} height={533} loading="lazy" decoding="async" />
         {h.rating !== null && (
           <span className="izal-score" role="img" aria-label={t("ratingA11y", { score: h.rating.toFixed(1) })}>
             <Star size={14} fill="currentColor" aria-hidden />{h.rating.toFixed(1)}
@@ -1104,7 +1104,7 @@ function HallCard({ h, i }: { h: GymAppPlace; i: number }) {
               <span key={`${label}-${idx}`} className="itag">{label}</span>
             ))}
             {more > 0 && (
-              <button type="button" className="itag itag-more" onClick={() => setEqOpen(true)}>
+              <button type="button" className="itag itag-more" onClick={() => setEqOpen(true)} aria-label={t("gyms.equipMore", { count: more })}>
                 +{more}
               </button>
             )}
