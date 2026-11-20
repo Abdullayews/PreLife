@@ -198,9 +198,40 @@ export async function createSession(
   };
 }
 
+/* ── Session lookup cache (v4.1) ────────────────────────────────────────
+ *
+ * Every request — the [locale] layout, the page server component AND each
+ * /api route — validated pl_session with a fresh SELECT on public.sessions.
+ * One page view meant 4–7 identical REST calls (2 session selects per
+ * render + 1 per client API call + the hourly renew write), which is what
+ * made the Supabase "total requests" graph climb so steeply. This
+ * per-process cache collapses the hot path to ~1 lookup per 30s window:
+ *
+ *  • valid sessions cache for 30s, unknown/expired tokens for 10s
+ *    (negative entries protect the DB from cookie scanners);
+ *  • concurrent lookups of the same token share one in-flight promise;
+ *  • every writer that touches session rows (logout, device revoke /
+ *    rename, profile & preference mirrors) drops the affected entries,
+ *    so changes made by THIS process are visible on the very next
+ *    request. A revocation issued by another process is honoured as soon
+ *    as the short TTL lapses. */
+
+const SESSION_CACHE_TTL_MS = 30_000;
+const SESSION_CACHE_NEG_TTL_MS = 10_000;
+const SESSION_CACHE_MAX = 5_000;
+
+type SessionCacheEntry = {
+  at: number;
+  cs: CurrentSession | null;
+  inflight?: Promise<CurrentSession | null>;
+};
+
+const sessionCache = new Map<string, SessionCacheEntry>();
+
 /** Validates the cookie token: rejects unknown/expired sessions (deleting
- * the dead row) and slides the expiry forward past the throttle window. */
-export async function loadSession(token: string): Promise<CurrentSession | null> {
+ * the dead row) and slides the expiry forward past the throttle window.
+ * Uncached — callers go through loadSession(). */
+async function loadSessionRow(token: string): Promise<CurrentSession | null> {
   let row: Record<string, unknown> | null;
   try {
     row = await supaSelectOne("sessions", [
@@ -258,6 +289,65 @@ export async function loadSession(token: string): Promise<CurrentSession | null>
       location: row.user_location === "az" ? "az" : "global",
     },
   };
+}
+
+/** Cached session validation — see the cache block above. */
+export async function loadSession(token: string): Promise<CurrentSession | null> {
+  const key = sha256Hex(token);
+  const hit = sessionCache.get(key);
+  if (hit) {
+    const ttl = hit.cs ? SESSION_CACHE_TTL_MS : SESSION_CACHE_NEG_TTL_MS;
+    if (Date.now() - hit.at < ttl) return hit.cs; // fresh answer
+    if (hit.inflight) return hit.inflight; // stale, refresh already running
+  }
+
+  // Someone else may have started the refresh between the two reads above.
+  const running = sessionCache.get(key)?.inflight;
+  if (running) return running;
+
+  const inflight = loadSessionRow(token).then((cs) => {
+    sessionCache.set(key, { at: Date.now(), cs });
+    // Hard cap — unknown tokens (scanners, stale cookies) must not grow
+    // the map without bound. Map keeps insertion order, so evict the
+    // oldest entry that is not the one we just wrote.
+    if (sessionCache.size > SESSION_CACHE_MAX) {
+      for (const k of sessionCache.keys()) {
+        if (k === key) continue;
+        sessionCache.delete(k);
+        break;
+      }
+    }
+    return cs;
+  });
+  // Keep the previous answer (at its original timestamp) for callers that
+  // race with the refresh — they should queue on the promise, not treat
+  // the stale copy as fresh for another full window.
+  sessionCache.set(key, { at: hit?.at ?? 0, cs: hit?.cs ?? null, inflight });
+  return inflight;
+}
+
+/* Cache invalidation — called by every writer that touches session rows. */
+
+/** Drop the cached answer for one cookie token (logout). */
+export function sessionCacheDropToken(token: string): void {
+  sessionCache.delete(sha256Hex(token));
+}
+
+/** Drop every cached entry that points at one session row (device revoke /
+ * rename — the row id, not the token, identifies it). */
+export function sessionCacheDropSession(sessionId: string): void {
+  if (!sessionId) return;
+  for (const [k, v] of sessionCache) {
+    if (v.cs?.sessionId === sessionId) sessionCache.delete(k);
+  }
+}
+
+/** Drop every cached entry of one user (profile / preference mirrors that
+ * rewrite all their session rows at once). */
+export function sessionCacheDropUser(userId: string): void {
+  for (const [k, v] of sessionCache) {
+    if (v.cs?.user.id === userId) sessionCache.delete(k);
+  }
 }
 
 /* ── Cookie helpers ─────────────────────────────────────────────────────── */
@@ -355,6 +445,7 @@ export function oauthCookie(verifier: string, secure: boolean) {
 
 /** Delete the session row behind a cookie token (logout). */
 export async function revokeTokenSession(token: string): Promise<void> {
+  sessionCacheDropToken(token);
   try {
     await supaDelete("sessions", [["token_hash", `eq.${sha256Hex(token)}`]]);
   } catch {
