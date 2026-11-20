@@ -14,6 +14,7 @@ import { SwRegister } from "@/components/SwRegister";
 import { ConnectionNotice } from "@/components/ConnectionNotice";
 import { HtmlLang } from "@/components/HtmlLang";
 import { AiChatFab } from "@/components/AiChatFab";
+import { Toaster } from "@/components/Toaster";
 import { getSessionUser } from "@/lib/auth";
 import { CONSENT_COOKIE } from "@/lib/consent";
 
@@ -56,6 +57,7 @@ export default async function LocaleLayout({
     connection: all.connection,
     psychApp: all.psychApp,
     dietApp: all.dietApp,
+    gymApp: all.gymApp,
     subscription: all.subscription,
     aiChat: all.aiChat,
     profilePage: all.profilePage,
@@ -76,6 +78,10 @@ export default async function LocaleLayout({
         <UserPrefsSync userId={user?.id ?? null} />
         <SwRegister />
         <ConnectionNotice />
+        {/* v4: the global action-feedback layer — toast() from any client
+            component lands here (profile saves, package requests,
+            bookings, mood check-ins). */}
+        <Toaster />
         {/* v6.1: the AI assistant follows the signed-in user EVERYWHERE —
             every tab and subtab renders the floating chat (context-aware,
             account tools enabled). Guests meet it on /welcome. */}

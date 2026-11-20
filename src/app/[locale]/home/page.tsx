@@ -126,7 +126,7 @@ export default async function HomePage({ params }: Props) {
         {/* This week at a glance — real numbers, each deep-linking on. */}
         <section aria-label={t("statsEyebrow")} className="blk">
           <h2 className="eyebrow"><i />{t("statsEyebrow")}</h2>
-          <ul className="mini-stats cols4">
+          <ul className="mini-stats cols4 stag">
             {STATS.map((s) => (
               <li key={s.key}>
                 <Link href={s.href} className="mini-stat stat-link">
@@ -140,7 +140,7 @@ export default async function HomePage({ params }: Props) {
 
         <section aria-labelledby="today" className="blk">
           <h2 id="today" className="eyebrow">{t("today.eyebrow")}</h2>
-          <ul className="cards3">
+          <ul className="cards3 stag">
             {PICKS.map(({ key, section, href }) => {
               const s = sectionById(section);
               return (

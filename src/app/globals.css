@@ -37,6 +37,13 @@
   --step-eyebrow: .75rem;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --nav-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* v4 motion family (emilkowalski doctrine): strong curves and a
+     duration ladder. UI transitions stay ≤300ms; presses answer at
+     160ms; overlays 200-500ms; ease-in is never used on UI. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --t-press: 160ms; --t-fast: 200ms; --t-base: 250ms; --t-slow: 300ms;
   color-scheme: light;
 }
 html.dark { color-scheme: dark; }
@@ -137,7 +144,13 @@ html.dark body, html.dark [data-world] {
 
 /* ── Base ─────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+/* v4 interaction baseline: no 300ms tap delay on controls, a consistent
+   focus ring on every interactive element, and a tinted selection. */
+button, a, [role="button"], summary, label { touch-action: manipulation; }
+button, [role="button"] { user-select: none; -webkit-user-select: none; }
+:focus-visible { outline: 2px solid color-mix(in srgb, var(--accent) 70%, transparent); outline-offset: 2px; }
+::selection { background: color-mix(in srgb, var(--accent) 24%, transparent); }
 
 /* v2 (Apple HIG): clean, texture-free surfaces — the paper-grain layer
    is gone; depth comes from the layer stack, hairlines and soft shadows
@@ -206,12 +219,14 @@ small, .note { font-size: var(--step-small); color: var(--muted); }
   /* Labels wrap instead of overflowing on narrow screens (long RU strings);
      min-height (not height) lets the pill grow a line when they do. */
   white-space: normal; max-width: 100%;
-  transition: transform .2s var(--ease), filter .2s, background-color .2s, border-color .2s;
+  transition: transform var(--t-press) var(--ease-out), filter .2s var(--ease-out), background-color .2s, border-color .2s;
 }
 .btn { box-shadow: var(--shadow-1); }
 .btn-ghost, .btn-quiet { box-shadow: none; }
 .btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
-.btn:active { transform: none; box-shadow: inset 0 1px 2px color-mix(in srgb, var(--ink) 22%, transparent); }
+/* v4: every press answers on pointer-down with scale(.97) (doctrine:
+   respond on press, never on release). */
+.btn:active { transform: translateY(0) scale(.97); box-shadow: inset 0 1px 2px color-mix(in srgb, var(--ink) 22%, transparent); }
 .btn:disabled { opacity: .5; cursor: not-allowed; filter: none; transform: none; }
 .btn-sm { min-height: 2.5rem; padding-inline: clamp(.85rem, 3vw, 1.15rem); font-size: .875rem; }
 .btn-lg { min-height: 3.25rem; padding-inline: clamp(1.1rem, 5vw, 2rem); font-size: 1rem; }
@@ -221,7 +236,8 @@ small, .note { font-size: var(--step-small); color: var(--muted); }
 .btn-light { background: var(--deep-ink); color: var(--deep); }
 .icon-btn {
   display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 999px;
-  border: 1px solid var(--line); background: transparent; color: var(--ink); transition: background-color .2s;
+  border: 1px solid var(--line); background: transparent; color: var(--ink);
+  transition: background-color .2s, color .2s, transform var(--t-press) var(--ease-out);
 }
 .icon-btn:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
 .ico-moon { display: none; } .ico-sun { display: block; }
@@ -415,8 +431,10 @@ html.dark .panel-logout:hover { background: color-mix(in srgb, #e58c86 15%, tran
 .user-pop {
   position: absolute; top: calc(100% + .6rem); right: 0; z-index: 60; min-width: 14.5rem;
   display: grid; padding: .5rem; border: 1px solid var(--line); border-radius: var(--r-md);
-  background: var(--raised); box-shadow: var(--shadow-3); animation: rise .25s var(--ease) both;
+  background: var(--raised); box-shadow: var(--shadow-3);
+  transform-origin: 100% top; animation: pop-in .22s var(--ease-out);
 }
+@keyframes pop-in { from { opacity: 0; transform: translateY(-4px) scale(.97); } }
 .user-label { display: grid; gap: .1rem; padding: .5rem .75rem .65rem; margin-bottom: .35rem; border-bottom: 1px solid var(--line); }
 .user-label b { font-size: .9rem; }
 .user-label span { font-size: .75rem; color: var(--muted); word-break: break-all; }
@@ -659,6 +677,7 @@ html.dark .set-logout:hover { background: color-mix(in srgb, #e58c86 15%, transp
 .faq summary svg { flex: none; color: var(--muted); transition: rotate .25s var(--ease); }
 .faq[open] summary svg { rotate: 180deg; }
 .faq p { padding: 0 1.25rem 1.1rem; color: var(--muted); font-size: .9375rem; max-width: 42rem; }
+.faq[open] p { animation: rise .3s var(--ease-out); }
 
 /* ── 404 (custom not-found) ────────────────────────────────────────────── */
 .nf { gap: 1.15rem; }
@@ -729,7 +748,7 @@ html.dark .set-logout:hover { background: color-mix(in srgb, #e58c86 15%, transp
 .stars { display: inline-flex; gap: 2px; color: var(--accent); }
 .actions { display: flex; flex-wrap: wrap; gap: .75rem; }
 .hero-stats { display: grid; grid-auto-flow: column; gap: clamp(1.25rem, 3vw, 2.5rem); padding-left: 1.5rem; border-left: 1px solid var(--line); }
-.hero-stats dd { font: 600 clamp(1.9rem, 4vw, 2.75rem)/1 var(--font-display); }
+.hero-stats dd { font: 600 clamp(1.9rem, 4vw, 2.75rem)/1 var(--font-display); font-variant-numeric: tabular-nums; }
 .hero-stats dt { margin-top: .35rem; max-width: 9rem; font-size: .8125rem; color: var(--muted); }
 @media (max-width: 40rem) { .hero-stats { padding-left: 0; border-left: 0; padding-top: 1.25rem; border-top: 1px solid var(--line); width: 100%; grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); } }
 
@@ -750,10 +769,10 @@ html.dark .set-logout:hover { background: color-mix(in srgb, #e58c86 15%, transp
 .gal-dots [aria-current="true"]:hover span { background: var(--accent); }
 
 /* ── Motion (CSS only) ────────────────────────────────────────────────── */
-@keyframes rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: no-preference) {
-  .rise { animation: rise .9s var(--ease) both; }
-  .rise.d1 { animation-delay: .08s; } .rise.d2 { animation-delay: .18s; } .rise.d3 { animation-delay: .3s; }
+  .rise { animation: rise .7s var(--ease-out) both; }
+  .rise.d1 { animation-delay: .06s; } .rise.d2 { animation-delay: .13s; } .rise.d3 { animation-delay: .22s; }
   @supports (animation-timeline: view()) {
     .rv { animation: rise linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
   }
@@ -993,7 +1012,7 @@ html.dark .set-logout:hover { background: color-mix(in srgb, #e58c86 15%, transp
 .blk { margin-top: 3.25rem; display: grid; gap: 1rem; }
 
 .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem 1.5rem; }
-.stats b { display: block; font: 600 clamp(2.2rem, 5vw, 3.5rem)/1 var(--font-display); color: var(--accent); }
+.stats b { display: block; font: 600 clamp(2.2rem, 5vw, 3.5rem)/1 var(--font-display); color: var(--accent); font-variant-numeric: tabular-nums; }
 .stats span { color: var(--muted); font-size: .9rem; }
 @media (min-width: 48rem) { .stats { grid-template-columns: repeat(4, 1fr); } }
 
@@ -1035,7 +1054,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .tier { position: relative; display: flex; flex-direction: column; gap: .6rem; padding: 2rem 1.6rem; text-align: center; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); }
 .tier[data-featured] { border: 2px solid var(--accent); box-shadow: var(--shadow-2); }
 .tier > .tag { position: absolute; top: -.8rem; left: 50%; transform: translateX(-50%); }
-.price { font: 600 2.75rem/1 var(--font-display); margin-top: .5rem; }
+.price { font: 600 2.75rem/1 var(--font-display); margin-top: .5rem; font-variant-numeric: tabular-nums; }
 .per { color: var(--muted); font-size: .8125rem; margin-top: -.3rem; }
 .tier > p:not(.price):not(.per) { color: var(--muted); font-size: .9375rem; }
 .checks { display: grid; gap: .6rem; margin: 1rem 0 1.5rem; text-align: left; font-size: .9375rem; }
@@ -1202,7 +1221,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .timepick input { width: 4.6rem; height: 2.25rem; padding-inline: .6rem; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); font: inherit; font-size: .8125rem; font-variant-numeric: tabular-nums; }
 .timepick input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
 .daypick { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
-.daypick button { min-width: 2.7rem; height: 2.25rem; padding-inline: .5rem; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: .8125rem; font-weight: 600; color: var(--muted); transition: all .2s; }
+.daypick button { min-width: 2.7rem; height: 2.25rem; padding-inline: .5rem; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: .8125rem; font-weight: 600; color: var(--muted); transition: border-color .2s, background-color .2s, color .2s, transform var(--t-press) var(--ease-out); }
 .daypick button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .psy-list { display: grid; gap: 1.25rem; margin-top: 1.25rem; }
 .psy-card { overflow: hidden; background: var(--raised); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-1); }
@@ -1344,7 +1363,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .world.app-page:has(.app-shell[data-topnav="off"]) { padding-top: 0; }
 
 .app-shell {
-  --rail-ease: cubic-bezier(.22, 1, .36, 1);
+  --rail-ease: cubic-bezier(.32, .72, 0, 1); /* v4: the drawer curve */
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   min-height: calc(100svh - var(--nav-h));
@@ -1478,12 +1497,23 @@ a.card:hover em svg { transform: translateX(3px); }
 
 /* The downward-opening account menu (the same collapse animation the
    section subtab group uses). */
+/* v4: origin-aware dropdown — scales from the trigger (the avatar row)
+   instead of a bare max-height crawl. grid-template-rows 0fr→1fr gives
+   the height collapse; opacity/transform keep it in the ease-out family. */
 .rail-acct {
-  max-height: 0; overflow: hidden;
-  transition: max-height .35s var(--rail-ease), padding .35s var(--rail-ease);
+  display: grid; grid-template-rows: 0fr;
+  opacity: 0; transform: translateY(-4px) scale(.98);
+  transform-origin: 1.4rem top;
+  visibility: hidden; pointer-events: none;
+  transition: grid-template-rows .3s var(--ease-out), opacity .18s var(--ease-out),
+    transform .3s var(--ease-out), padding .3s var(--ease-out), visibility 0s .3s;
 }
-.rail-acct.open { max-height: 20rem; padding: .3rem 0 .45rem; }
-.rail-acct ul { display: grid; gap: .15rem; }
+.rail-acct > ul { overflow: hidden; min-height: 0; display: grid; gap: .15rem; }
+.rail-acct.open {
+  grid-template-rows: 1fr; opacity: 1; transform: none;
+  visibility: visible; pointer-events: auto;
+  padding: .3rem 0 .45rem; transition-delay: 0s;
+}
 .rail-acct .rail-item { min-height: 42px; }
 
 /* ── Group captions ── */
@@ -1528,12 +1558,22 @@ a.card:hover em svg { transform: translateX(3px); }
   margin-left: auto; flex: none;
   transition: transform .3s var(--rail-ease);
 }
+/* v4: same origin-aware collapse as the account menu — the subtab group
+   grows downward from its head row. */
 .rail-sub {
-  display: grid; gap: .15rem;
-  max-height: 0; overflow: hidden;
-  transition: max-height .35s var(--rail-ease);
+  display: grid; gap: .15rem; grid-template-rows: 0fr;
+  opacity: 0; transform: translateY(-4px) scale(.98);
+  transform-origin: 1.75rem top;
+  visibility: hidden; pointer-events: none;
+  transition: grid-template-rows .3s var(--ease-out), opacity .18s var(--ease-out),
+    transform .3s var(--ease-out), padding .3s var(--ease-out), visibility 0s .3s;
 }
-.rail-sub.open { max-height: 34rem; padding: .15rem 0 .3rem; }
+.rail-sub > ul { overflow: hidden; min-height: 0; }
+.rail-sub.open {
+  grid-template-rows: 1fr; opacity: 1; transform: none;
+  visibility: visible; pointer-events: auto;
+  padding: .15rem 0 .3rem; transition-delay: 0s;
+}
 .rail-tab {
   display: flex; align-items: center; gap: .65rem;
   width: 100%; min-height: 42px; padding: 0 .6rem .6rem .85rem;
@@ -1895,17 +1935,26 @@ dialog.modal-panel {
   padding: 0; border: 1px solid var(--line); border-radius: var(--r-xl);
   background: var(--surface); box-shadow: var(--shadow-3);
   color: var(--ink);
-  animation: modal-pop .3s var(--ease);
+  /* v4: transitioned open AND close — @starting-style covers the entry,
+     :not([open]) + allow-discrete covers the exit (the dialog element
+     persists while closing). Exits run slightly smaller and faster. */
+  opacity: 1; transform: none;
+  transition: opacity var(--t-base) var(--ease-out), transform var(--t-base) var(--ease-out),
+    display var(--t-base) allow-discrete, overlay var(--t-base) allow-discrete;
   margin: auto; /* centers in the dialog box, incl. overflow scrolling */
 }
+dialog.modal-panel:not([open]) { opacity: 0; transform: translateY(10px) scale(.97); }
+@starting-style { dialog.modal-panel { opacity: 0; transform: translateY(14px) scale(.97); } }
 dialog.modal-panel.modal-wide { width: min(56rem, 100%); }
 dialog.modal-panel::backdrop {
   background: color-mix(in srgb, var(--ink) 42%, transparent);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  animation: modal-in .22s var(--ease);
+  opacity: 1;
+  transition: opacity var(--t-base) var(--ease-out),
+    display var(--t-base) allow-discrete, overlay var(--t-base) allow-discrete;
 }
-@keyframes modal-in { from { opacity: 0; } }
-@keyframes modal-pop { from { transform: translateY(16px) scale(.97); opacity: 0; } }
+dialog.modal-panel:not([open])::backdrop { opacity: 0; }
+@starting-style { dialog.modal-panel::backdrop { opacity: 0; } }
 .modal-head {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
   padding: 1rem 1.2rem; border-bottom: 1px solid var(--line);
@@ -2041,9 +2090,22 @@ dialog.modal-panel::backdrop {
   border: 1px solid var(--line); border-radius: var(--r-lg);
   background: var(--surface); box-shadow: var(--shadow-3);
   overflow: hidden;
-  animation: ai-fab-in .3s var(--ease);
+  /* v4: the panel stays mounted; data-open drives an origin-aware
+     entrance from the FAB corner. Exits run ~30% faster than entries. */
+  transform-origin: 100% 100%;
+  opacity: 0; transform: translateY(10px) scale(.96);
+  visibility: hidden; pointer-events: none;
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out),
+    visibility 0s 180ms;
 }
-@keyframes ai-fab-in { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+.ai-fab-panel[data-open="true"] {
+  opacity: 1; transform: none;
+  visibility: visible; pointer-events: auto;
+  transition: opacity var(--t-base) var(--ease-out), transform var(--t-base) var(--ease-out),
+    visibility 0s;
+}
+@keyframes msg-in { from { opacity: 0; transform: translateY(6px); } }
+.ai-fab-msg { animation: msg-in .25s var(--ease-out) both; }
 .ai-fab-head {
   display: flex; align-items: center; gap: .7rem;
   padding: .85rem 1rem; border-bottom: 1px solid var(--line);
@@ -3091,4 +3153,281 @@ html.dark .idman {
   margin-top: .45rem; padding-top: .55rem;
   border-top: 1px dashed var(--line);
   font-size: .8125rem;
+}
+
+/* ══ v4 MOTION & POLISH LAYER ═════════════════════════════════════════════
+   The emilkowalski + XIAS pass: universal press feedback, touch-hover
+   suppression, staggered entrances for occasional surfaces, the toast
+   system, elegant scrollbars and a global reduced-motion guard. */
+
+/* Press feedback — every pressable answers on pointer-down. Small
+   controls scale to .96, large rows to .98 (bounce scales inversely
+   with element size). */
+:is(.seg button, .filter, .daypick button, .mood-dots button, .quiz-opts button,
+.icon-grid button, .cell-free, .chat-chips button, .ai-fab-chips button,
+.social-btn, .gex-check, .icon-btn, .user-btn, .rail-fold, .pw-toggle,
+.set-cat, .faq summary, .nav-signin):active { transform: scale(.96); }
+:is(.ai-fab-btn, .rail-fab, .ai-fab-send):active { transform: scale(.93); }
+:is(.rail-item, .rail-tab, .nav-links a, .nav-tabs a, .panel-links a,
+.user-pop a, .user-pop button):active { transform: scale(.98); }
+
+/* Transform transitions for the rows that lacked them (press release). */
+.rail-item, .rail-tab, .user-pop a, .user-pop button, .user-btn, .rail-fold {
+  transition: transform var(--t-press) var(--ease-out), background-color .2s, color .2s;
+}
+
+/* Touch devices: no phantom hover states — transform/filter hovers are
+   suppressed; color hovers are harmless. */
+@media (hover: none), (pointer: coarse) {
+  :is(.btn, .ai-fab-btn, .rail-fab, .player-play, .nav-start):hover { transform: none; filter: none; }
+  .explore a:hover, .mood-dots button:hover, .cell-free:hover,
+  a.card:hover { transform: none; }
+  .gprod:hover .gprod-img img { transform: none; }
+}
+
+/* Staggered group entrance — occasional surfaces only (welcome, first
+   run, empty states). Gaps shrink as the group goes on; total < 400ms. */
+@media (prefers-reduced-motion: no-preference) {
+  .stag > * { animation: rise .6s var(--ease-out) both; }
+  .stag > *:nth-child(1) { animation-delay: 0ms; }
+  .stag > *:nth-child(2) { animation-delay: 55ms; }
+  .stag > *:nth-child(3) { animation-delay: 95ms; }
+  .stag > *:nth-child(4) { animation-delay: 130ms; }
+  .stag > *:nth-child(5) { animation-delay: 160ms; }
+  .stag > *:nth-child(6) { animation-delay: 185ms; }
+  .stag > *:nth-child(7) { animation-delay: 205ms; }
+  .stag > *:nth-child(n+8) { animation-delay: 220ms; }
+}
+
+/* Toasts — the global action-feedback layer (bottom-center, above the
+   safe area). Enter: rise + scale from below, 300ms ease-out; exit
+   faster. Kind rides on data-kind; the icon carries the color. */
+.pl-toaster {
+  position: fixed; z-index: 80;
+  left: 50%; transform: translateX(-50%);
+  bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px));
+  display: grid; gap: .5rem; width: min(26rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+.pl-toast {
+  display: flex; align-items: flex-start; gap: .6rem;
+  padding: .75rem 1rem; border-radius: var(--r-md);
+  background: var(--deep); color: var(--deep-ink);
+  box-shadow: var(--shadow-3);
+  font: 600 .875rem/1.35 var(--font-body);
+  opacity: 1; transform: none;
+  transition: opacity .3s var(--ease-out), transform .3s var(--ease-out);
+  pointer-events: auto;
+}
+@starting-style { .pl-toast { opacity: 0; transform: translateY(10px) scale(.98); } }
+.pl-toast[data-out] { opacity: 0; transform: translateY(6px) scale(.98); transition-duration: 180ms; }
+.pl-toast svg { flex: none; margin-top: .1rem; }
+.pl-toast[data-kind="success"] svg { color: #8fd6a8; }
+.pl-toast[data-kind="error"] svg { color: #f0a9a4; }
+.pl-toast[data-kind="info"] svg { color: color-mix(in srgb, var(--deep-ink) 72%, transparent); }
+
+/* Elegant thin scrollbars everywhere (the pill thumb is inset with a
+   transparent border so it never touches content edges). */
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--ink) 22%, transparent) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--ink) 22%, transparent);
+  border: 3px solid transparent; background-clip: padding-box; border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background-color: color-mix(in srgb, var(--ink) 34%, transparent); }
+
+/* Global reduced-motion guard: animations collapse to their end state,
+   transitions become near-instant. Feedback never disappears — color
+   and opacity changes still read, only movement is gone. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* ── v4 idman: DB-wired + motion (append-only) ─────────────────────────────
+   The İdman v4 pass: the surface renders from the DB catalog (server-
+   resolved props) and gains the app-wide motion doctrine — transform +
+   opacity only, ease-out entrances, direction-aware panel/quiz slides,
+   one-shot check-draw on exercise completion, press feedback everywhere,
+   hover lifts only on genuinely interactive cards and only under a real
+   pointer. Motion tokens come from :root (lead's token pass) with local
+   fallbacks so this block stays correct even before that pass lands. */
+
+/* Direction-aware in-page tab switch — the entering panel slides 10px
+   from the travel direction (forward = right, back = left), 220ms. */
+@keyframes idman-panel-fwd {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes idman-panel-back {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: none; }
+}
+.ipanel-fwd { animation: idman-panel-fwd 220ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)); }
+.ipanel-back { animation: idman-panel-back 220ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)); }
+
+/* Quiz step transitions — direction-aware slide, 250ms, fade + 12px. */
+@keyframes idman-quiz-fwd {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes idman-quiz-back {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: none; }
+}
+.iquiz-step-fwd { animation: idman-quiz-fwd 250ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)); }
+.iquiz-step-back { animation: idman-quiz-back 250ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)); }
+
+/* The quiz progress bar — linear width tracking is correct for progress. */
+.iquiz-bar {
+  width: 100%; max-width: 420px; height: .4rem;
+  border-radius: 999px; background: var(--tint); overflow: hidden;
+}
+.iquiz-bar i {
+  display: block; height: 100%; border-radius: inherit;
+  background: var(--accent);
+  transition: width 250ms linear;
+}
+
+/* Exercise check-off — the check draws itself once (~400ms ease-out,
+   stroke delayed ~100ms after the pop), and the card gets a soft wash. */
+.iex-check {
+  width: 15px; height: 15px; flex: none;
+  animation: idman-check-pop 250ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+.iex-check path {
+  fill: none; stroke: currentColor;
+  stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 24; stroke-dashoffset: 24;
+  animation: idman-check-draw 400ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 100ms forwards;
+}
+@keyframes idman-check-pop {
+  from { opacity: 0; transform: scale(.55); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes idman-check-draw {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes idman-wash {
+  from { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+  to { background: var(--surface); }
+}
+.iex.done { animation: idman-wash 450ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)); }
+
+/* The weekly strip's current-day cell — a one-time soft highlight. */
+@keyframes idman-today {
+  from { background: color-mix(in srgb, var(--accent) 22%, transparent); }
+  to { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+}
+.iplan-week-day.today {
+  animation: idman-today 600ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+
+/* No stagger on high-frequency lists — the entrance plays immediately. */
+.iex-grid .iex, .ishop-grid .iprod, .izal-grid .izal-card { animation-delay: 0ms; }
+
+/* Entrance fill "backwards" instead of "both": visually identical for the
+   entrance, but the finished animation no longer pins `transform`, so the
+   hover lifts below actually work. */
+.iex, .iprod, .izal-card { animation-fill-mode: backwards; }
+
+/* Press feedback on every pressable element — scale(.97), 160ms ease-out.
+   (These full transition overrides replace the older shorthand so the
+   press transform joins the existing color/shadow phases.) */
+.idman .ibtn {
+  transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+    filter 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+    background-color 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+.idman .ichip, .idman .iseg button, .idman .isearch-x {
+  transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+    background-color 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+    color 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+    border-color 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+.idman .inav-row, .idman .inav-group-head, .idman .inav-foot-btn, .idman .inav-fold {
+  transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+    background-color 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+    color 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+.idman .iprod-offer, .idman .itag-more, .idman .inav-fab {
+  transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+    background-color 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+    border-color 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+.idman .ibtn:active, .idman .ichip:active, .idman .iseg button:active,
+.idman .isearch-x:active, .idman .itag-more:active, .idman .iprod-offer:active,
+.idman .inav-row:active, .idman .inav-group-head:active,
+.idman .inav-foot-btn:active, .idman .inav-fold:active,
+.idman .inav-fab:active {
+  transform: scale(.97);
+}
+
+/* Hover lifts — genuinely interactive cards only, and only under a real
+   pointer: translateY(-2px) plus one shadow step. */
+@media (hover: hover) and (pointer: fine) {
+  .iprod, .izal-card, .iplan-plan {
+    transition: transform 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+      box-shadow 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)),
+      border-color 200ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+  }
+  .iprod:hover, .izal-card:hover, .iplan-plan:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+  }
+}
+
+/* The plan-catalog cards' expandable day details. */
+.iplan-plan-days { display: grid; gap: .45rem; margin-top: .2rem; }
+.iplan-plan-day {
+  display: grid; gap: .35rem;
+  padding: .55rem .7rem;
+  border: 1px solid var(--line); border-radius: 12px;
+  background: color-mix(in srgb, var(--tint) 40%, transparent);
+}
+.iplan-plan-day h5 {
+  margin: 0; font: 700 .7rem/1.2 var(--font-body);
+  letter-spacing: .09em; text-transform: uppercase; color: var(--muted);
+}
+.iplan-plan-day ul {
+  display: grid; gap: .2rem; list-style: none; margin: 0; padding: 0;
+}
+.iplan-plan-day li {
+  display: flex; align-items: baseline; justify-content: space-between; gap: .6rem;
+  font-size: .8rem;
+}
+.iplan-plan-day li span { color: var(--muted); }
+.iplan-plan-day li b { flex: none; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+
+/* Reduced motion: everything added above degrades to opacity-only or
+   nothing — instant panels, instant checks, no lifts, no press scale. */
+@media (prefers-reduced-motion: reduce) {
+  .ipanel-fwd, .ipanel-back, .iquiz-step-fwd, .iquiz-step-back,
+  .iex-check, .iex.done, .iplan-week-day.today {
+    animation: none !important;
+  }
+  .iex-check path { animation: none !important; stroke-dashoffset: 0; }
+  .iquiz-bar i { transition: none !important; }
+  .idman .ibtn, .idman .ichip, .idman .iseg button, .idman .isearch-x,
+  .idman .inav-row, .idman .inav-group-head, .idman .inav-foot-btn,
+  .idman .inav-fold, .idman .iprod-offer, .idman .itag-more, .idman .inav-fab,
+  .iprod, .izal-card, .iplan-plan {
+    transition: none !important;
+  }
+  .idman .ibtn:active, .idman .ichip:active, .idman .iseg button:active,
+  .idman .isearch-x:active, .idman .itag-more:active, .idman .iprod-offer:active,
+  .idman .inav-row:active, .idman .inav-group-head:active,
+  .idman .inav-foot-btn:active, .idman .inav-fold:active,
+  .idman .inav-fab:active {
+    transform: none !important;
+  }
+  .iprod:hover, .izal-card:hover, .iplan-plan:hover {
+    transform: none !important;
+  }
 }

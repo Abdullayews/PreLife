@@ -1,5 +1,7 @@
-import { EXERCISES } from "@/components/idman/data";
+import { getMessages } from "next-intl/server";
+import { msgPath, type MessageTree } from "@/lib/gym";
 import { supaSelectOne, supaUpdate, supaInsert } from "./supa";
+import { gymCatalog } from "./content";
 import { getAiPrompt, getAiSettings } from "./ai-config";
 import { geminiGenerate, toGeminiContents } from "./ai-gemini";
 
@@ -10,8 +12,9 @@ import { geminiGenerate, toGeminiContents } from "./ai-gemini";
  * user gets the DEFAULT starter plan automatically; the questionnaire on
  * the plan tab (or a chat with the AI) replaces it with a personal,
  * AI-generated plan. Exercise entries carry a registry CODE when they map
- * to the İdman exercise pool (so the plan tab can render the demo video,
- * target muscles and guide) plus the display strings the model wrote.
+ * to the İdman exercise pool (gym_exercises, so the plan tab can render
+ * the demo video, target muscles and guide) plus the display strings the
+ * model wrote.
  */
 
 type Row = Record<string, unknown>;
@@ -56,14 +59,51 @@ export type PlanAnswers = {
 
 /* ── The exercise registry (code → display strings) ─────────────────────── */
 
-export const EXERCISE_REGISTRY = Object.values(EXERCISES).map((e) => ({
-  code: e.code, name: e.name, target: e.target,
-}));
+export type ExerciseRegEntry = { code: string; name: string; target: string };
+export type ExerciseRegistry = Map<string, ExerciseRegEntry>;
 
-const REGISTRY_BY_CODE = new Map(EXERCISE_REGISTRY.map((e) => [e.code, e]));
+/** Minimal static fallback — code + a safe generic name — kept ONLY for
+ *  when the content DB is unreachable, so the starter plan and the AI
+ *  prompt still function. Everything else reads gym_exercises. */
+export const EXERCISE_REGISTRY: readonly ExerciseRegEntry[] = [
+  "run", "stretch", "squat", "deadlift", "bench", "pullup", "row", "ohp",
+  "lunge", "plank", "swing", "legpress", "latpull", "bicep", "triceps",
+].map((code) => ({ code, name: code, target: "" }));
 
-export function registryBlock(): string {
-  return EXERCISE_REGISTRY.map((e) => `${e.code} — ${e.name} (${e.target})`).join("; ");
+const fallbackRegistry = (): ExerciseRegistry =>
+  new Map(EXERCISE_REGISTRY.map((e) => [e.code, e]));
+
+/**
+ * The live registry: gym_exercises through the content layer (TTL-cached),
+ * with name/target resolved to the requested locale at call time.
+ */
+export async function loadExerciseRegistry(locale: string): Promise<ExerciseRegistry> {
+  try {
+    const cat = await gymCatalog();
+    const ex = cat?.exercises as
+      | Record<string, { nameKey: string; targetKey: string }>
+      | undefined;
+    if (ex && Object.keys(ex).length > 0) {
+      const all = (await getMessages({ locale })) as MessageTree;
+      const app = (all.gymApp ?? {}) as MessageTree;
+      const reg: ExerciseRegistry = new Map();
+      for (const [code, ref] of Object.entries(ex)) {
+        reg.set(code, {
+          code,
+          name: msgPath(app, ref.nameKey) ?? code,
+          target: msgPath(app, ref.targetKey) ?? "",
+        });
+      }
+      return reg;
+    }
+  } catch {
+    /* content DB unreachable — the static fallback keeps plans working */
+  }
+  return fallbackRegistry();
+}
+
+export function registryBlock(reg: ExerciseRegistry): string {
+  return [...reg.values()].map((e) => `${e.code} — ${e.name} (${e.target})`).join("; ");
 }
 
 /* ── Reading ────────────────────────────────────────────────────────────── */
@@ -115,10 +155,10 @@ const DEFAULT_COPY: Record<string, { title: string; focus: string; levels: strin
   ru: { title: "Стартовый план", focus: "Сила всего тела и привычка", levels: ["Начальный", "Средний", "Продвинутый"] },
 };
 
-function defaultPlan(locale: string): Omit<UserPlan, "id" | "createdAt" | "updatedAt"> {
+function defaultPlan(locale: string, reg: ExerciseRegistry): Omit<UserPlan, "id" | "createdAt" | "updatedAt"> {
   const copy = DEFAULT_COPY[locale] ?? DEFAULT_COPY.az;
   const ex = (code: string, sets: number, reps: string, rest: number, note?: string): PlanExercise => {
-    const r = REGISTRY_BY_CODE.get(code);
+    const r = reg.get(code);
     return { ex: code, name: r?.name ?? code, sets, reps, rest, note };
   };
   return {
@@ -176,7 +216,11 @@ function str(v: unknown, max: number, dflt = ""): string {
   return typeof v === "string" && v.trim() ? v.trim().slice(0, max) : dflt;
 }
 
-export function normalizePlanInput(raw: unknown, locale: string): Omit<UserPlan, "id" | "createdAt" | "updatedAt"> | null {
+export function normalizePlanInput(
+  raw: unknown,
+  locale: string,
+  reg: ExerciseRegistry,
+): Omit<UserPlan, "id" | "createdAt" | "updatedAt"> | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
   const daysRaw = Array.isArray(r.days) ? r.days : [];
@@ -195,9 +239,9 @@ export function normalizePlanInput(raw: unknown, locale: string): Omit<UserPlan,
     for (const eRaw of exRaw.slice(0, 10)) {
       if (!eRaw || typeof eRaw !== "object") continue;
       const e = eRaw as Record<string, unknown>;
-      const code = typeof e.ex === "string" && REGISTRY_BY_CODE.has(e.ex) ? e.ex : "";
-      const reg = code ? REGISTRY_BY_CODE.get(code)! : null;
-      const name = str(e.name, 60) || reg?.name || (locale === "en" ? "Exercise" : locale === "ru" ? "Упражнение" : "Hərəkət");
+      const code = typeof e.ex === "string" && reg.has(e.ex) ? e.ex : "";
+      const regEx = code ? reg.get(code)! : null;
+      const name = str(e.name, 60) || regEx?.name || (locale === "en" ? "Exercise" : locale === "ru" ? "Упражнение" : "Hərəkət");
       exercises.push({
         ex: code,
         name,
@@ -214,7 +258,7 @@ export function normalizePlanInput(raw: unknown, locale: string): Omit<UserPlan,
   days.sort((a, b) => a.day - b.day);
 
   return {
-    title: str(r.title, 80) || defaultPlan(locale).title,
+    title: str(r.title, 80) || defaultPlan(locale, reg).title,
     level: str(r.level, 20) || null,
     source: r.source === "default" ? "default" : "ai",
     week: 1,
@@ -253,7 +297,8 @@ export async function ensureDefaultPlan(userId: string, locale: string): Promise
   const existing = await getActivePlan(userId);
   if (existing) return existing;
   try {
-    return await insertActive(userId, { ...defaultPlan(locale), source: "default" });
+    const reg = await loadExerciseRegistry(locale);
+    return await insertActive(userId, { ...defaultPlan(locale, reg), source: "default" });
   } catch (e) {
     console.error("[plans] default plan insert failed:", e);
     return null;
@@ -275,7 +320,10 @@ export async function generatePlan(
   locale: string,
 ): Promise<{ plan: UserPlan | null; source: "ai" | "rules" }> {
   const lang = LANG_NAME[locale] ?? "Azerbaijani";
-  const settings = await getAiSettings();
+  const [settings, reg] = await Promise.all([
+    getAiSettings(),
+    loadExerciseRegistry(locale),
+  ]);
 
   if (settings) {
     try {
@@ -283,7 +331,7 @@ export async function generatePlan(
       const user = [
         `Questionnaire answers (JSON): ${JSON.stringify(answers)}`,
         `Answer language: ${lang} — every user-facing string must be in ${lang}.`,
-        `EXERCISE REGISTRY (code — name — target): ${registryBlock()}.`,
+        `EXERCISE REGISTRY (code — name — target): ${registryBlock(reg)}.`,
       ].join("\n");
       const out = await geminiGenerate({
         apiKey: settings.apiKey,
@@ -295,7 +343,7 @@ export async function generatePlan(
       });
       const cleaned = out.text.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/i, "").trim();
       const parsed = JSON.parse(cleaned) as unknown;
-      const plan = normalizePlanInput({ ...(parsed as Row), source: "ai" }, locale);
+      const plan = normalizePlanInput({ ...(parsed as Row), source: "ai" }, locale, reg);
       if (plan) {
         const saved = await insertActive(userId, plan);
         if (saved) return { plan: saved, source: "ai" };
@@ -305,25 +353,30 @@ export async function generatePlan(
     }
   }
 
-  const fallback = ruleBasedPlan(answers, locale);
+  const fallback = ruleBasedPlan(answers, locale, reg);
   const saved = await insertActive(userId, fallback);
   return { plan: saved, source: "rules" };
 }
 
 /** Deterministic fallback so the questionnaire ALWAYS produces a plan,
  *  even when the AI provider is unreachable. */
-function ruleBasedPlan(answers: PlanAnswers, locale: string): Omit<UserPlan, "id" | "createdAt" | "updatedAt"> {
-  const base = defaultPlan(locale);
+function ruleBasedPlan(
+  answers: PlanAnswers,
+  locale: string,
+  reg: ExerciseRegistry,
+): Omit<UserPlan, "id" | "createdAt" | "updatedAt"> {
+  const base = defaultPlan(locale, reg);
+  const exName = (code: string): string => reg.get(code)?.name ?? code;
   const daysWanted = clamp(Number(answers.days), 2, 6, 3);
   const experience = (answers.experience ?? "").toLowerCase();
   const goal = (answers.goal ?? "").toLowerCase();
 
-  const level = experience.includes("adv") || experience.includes("ileri")
+  const level = experience.includes("adv") || experience.includes("ileri") || experience.includes("продолж")
     ? (locale === "en" ? "Advanced" : locale === "ru" ? "Продвинутый" : "İleri")
-    : experience.includes("int") || experience.includes("orta")
+    : experience.includes("int") || experience.includes("orta") || experience.includes("средн")
       ? (locale === "en" ? "Intermediate" : locale === "ru" ? "Средний" : "Orta")
       : (locale === "en" ? "Beginner" : locale === "ru" ? "Начальный" : "Başlanğıc");
-  const strengthBias = goal.includes("muscle") || goal.includes("güc") || goal.includes("mass") || goal.includes("kütlə");
+  const strengthBias = goal.includes("muscle") || goal.includes("güc") || goal.includes("mass") || goal.includes("kütlə") || goal.includes("мышц") || goal.includes("масс");
 
   const extra: PlanDay[] = [];
   if (daysWanted >= 4) {
@@ -331,10 +384,10 @@ function ruleBasedPlan(answers: PlanAnswers, locale: string): Omit<UserPlan, "id
       day: 2,
       focus: locale === "ru" ? "Верх тела" : locale === "en" ? "Upper body" : "Bədənin üstü",
       exercises: [
-        { ex: "pullup", name: REGISTRY_BY_CODE.get("pullup")!.name, sets: 4, reps: "6–10", rest: 90 },
-        { ex: "ohp", name: REGISTRY_BY_CODE.get("ohp")!.name, sets: 4, reps: "8–10", rest: 90 },
-        { ex: "latpull", name: REGISTRY_BY_CODE.get("latpull")!.name, sets: 3, reps: "10–12", rest: 75 },
-        { ex: "triceps", name: REGISTRY_BY_CODE.get("triceps")!.name, sets: 3, reps: "10–12", rest: 60 },
+        { ex: "pullup", name: exName("pullup"), sets: 4, reps: "6–10", rest: 90 },
+        { ex: "ohp", name: exName("ohp"), sets: 4, reps: "8–10", rest: 90 },
+        { ex: "latpull", name: exName("latpull"), sets: 3, reps: "10–12", rest: 75 },
+        { ex: "triceps", name: exName("triceps"), sets: 3, reps: "10–12", rest: 60 },
       ],
     });
   }
@@ -343,16 +396,16 @@ function ruleBasedPlan(answers: PlanAnswers, locale: string): Omit<UserPlan, "id
       day: 4,
       focus: locale === "ru" ? "Низ тела" : locale === "en" ? "Lower body" : "Bədənin altı",
       exercises: [
-        { ex: "deadlift", name: REGISTRY_BY_CODE.get("deadlift")!.name, sets: 4, reps: "6–8", rest: 120 },
-        { ex: "legpress", name: REGISTRY_BY_CODE.get("legpress")!.name, sets: 4, reps: "10–12", rest: 90 },
-        { ex: "lunge", name: REGISTRY_BY_CODE.get("lunge")!.name, sets: 3, reps: "10 (hər ayaq)", rest: 75 },
-        { ex: "plank", name: REGISTRY_BY_CODE.get("plank")!.name, sets: 3, reps: "40 s", rest: 60 },
+        { ex: "deadlift", name: exName("deadlift"), sets: 4, reps: "6–8", rest: 120 },
+        { ex: "legpress", name: exName("legpress"), sets: 4, reps: "10–12", rest: 90 },
+        { ex: "lunge", name: exName("lunge"), sets: 3, reps: "10 (hər ayaq)", rest: 75 },
+        { ex: "plank", name: exName("plank"), sets: 3, reps: "40 s", rest: 60 },
       ],
     });
   }
 
   const focusLine = [
-    answers.focus, strengthBias ? (locale === "en" ? "strength focus" : "güc fokuslu") : null,
+    answers.focus, strengthBias ? (locale === "en" ? "strength focus" : locale === "ru" ? "силовой фокус" : "güc fokuslu") : null,
   ].filter(Boolean).join(" · ");
 
   return {
@@ -373,7 +426,8 @@ export async function saveChatPlan(
   raw: unknown,
   locale: string,
 ): Promise<UserPlan | null> {
-  const plan = normalizePlanInput({ ...(raw as Row), source: "ai" }, locale);
+  const reg = await loadExerciseRegistry(locale);
+  const plan = normalizePlanInput({ ...(raw as Row), source: "ai" }, locale, reg);
   if (!plan) return null;
   return insertActive(userId, plan);
 }
