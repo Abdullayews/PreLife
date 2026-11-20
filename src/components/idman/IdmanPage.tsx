@@ -21,7 +21,7 @@ import type { GymAppContent } from "@/lib/gym";
 export function IdmanPage({
   user, catalog, initialTab, tabs, ui, topnav,
 }: {
-  user: { name: string; email: string; avatar?: string | null; railFolded?: boolean };
+  user: { name: string; email: string; avatar?: string | null; railFolded?: boolean; role?: "user" | "psychologist"; psychSlug?: string | null };
   /** Server-resolved gym catalog (lib/api.ts getGymAppContent). */
   catalog: GymAppContent;
   initialTab?: IdmanTabId;

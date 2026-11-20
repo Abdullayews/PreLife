@@ -29,16 +29,27 @@ export default async function GymPage({ params, searchParams }: Props) {
    * İdman surface still renders out of the box — in that case the guest
    * top Nav stays on screen, so the rail must keep its nav clearance. */
   const session = await getSessionUser();
+  // The demo account carries the v3.4 session-user fields except
+  // `location` — guests (supabase unconfigured, no session) see the
+  // unfiltered, global catalog.
   const user = supabaseConfigured
     ? await requireUser(locale, "/gym")
-    : session ?? { id: "demo", email: "demo@prelife.app", name: "Nigar", avatar: null, railFolded: false };
+    : session ?? {
+      id: "demo", email: "demo@prelife.app", name: "Nigar", avatar: null,
+      railFolded: false, role: "user" as const, psychSlug: null,
+    };
   const topnav = !(supabaseConfigured ? user : session);
 
   /* The whole İdman surface renders from the DB catalog (gym_* content
    * tables, resolved into final locale strings server-side). When the
    * content backend is unreachable, degrade to the shared unavailable
-   * shell — same as the other section pages. */
-  const catalog = await getGymAppContent(locale);
+   * shell — same as the other section pages. The demo fallback account
+   * (supabase unconfigured, no session) has no location choice — guests
+   * see the unfiltered catalog. */
+  const catalog = await getGymAppContent(
+    locale,
+    "location" in user ? user.location : undefined,
+  );
   if (!catalog || catalog.halls.length === 0) return <ContentUnavailable locale={locale} />;
 
   const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
@@ -66,6 +77,8 @@ export default async function GymPage({ params, searchParams }: Props) {
           email: user.email,
           avatar: user.avatar ?? null,
           railFolded: user.railFolded ?? false,
+          role: user.role ?? "user",
+          psychSlug: user.psychSlug ?? null,
         }}
         catalog={catalog}
         initialTab={initialTab}

@@ -32,6 +32,12 @@ export type SessionUser = AuthUser & {
   avatar?: string | null;
   /** The rail fold choice riding on the session row (v3.3). */
   railFolded?: boolean;
+  /** v3.4: account role — 'psychologist' links to a psychologists_v2 row. */
+  role?: "user" | "psychologist" | null;
+  /** v3.4: the psychologist slug when role === 'psychologist'. */
+  psychSlug?: string | null;
+  /** v3.4: the content-scope choice (global | az) from the profile row. */
+  location?: string | null;
 };
 
 export type CurrentSession = {
@@ -43,8 +49,14 @@ export type CurrentSession = {
 
 export function userView(u: SessionUser): {
   id: string; email: string; name: string | null; avatar: string | null; railFolded: boolean;
+  role: "user" | "psychologist"; psychSlug: string | null; location: "global" | "az";
 } {
-  return { id: u.id, email: u.email, name: u.name, avatar: u.avatar ?? null, railFolded: u.railFolded ?? false };
+  return {
+    id: u.id, email: u.email, name: u.name, avatar: u.avatar ?? null, railFolded: u.railFolded ?? false,
+    role: u.role === "psychologist" ? "psychologist" : "user",
+    psychSlug: u.role === "psychologist" && typeof u.psychSlug === "string" ? u.psychSlug : null,
+    location: u.location === "az" ? "az" : "global",
+  };
 }
 
 /* ── Device identification (mirrors src/lib/devices.ts) ─────────────────── */
@@ -100,7 +112,7 @@ function sha256Hex(s: string): string {
 export async function createSession(
   user: AuthUser,
   userAgent: string | null,
-): Promise<string> {
+): Promise<{ token: string; user: SessionUser }> {
   const token = randomBytes(32).toString("base64url");
   const ua = userAgent ?? "";
   const { name, icon } = defaultDevice(ua);
@@ -109,10 +121,15 @@ export async function createSession(
 
   // v3.3: the avatar + rail-fold choice ride on the session row too (read
   // from the profiles row at login) so the shell renders them with zero
-  // extra lookups on the hot path. `select=*` keeps this working on
-  // databases where the v3.3 profiles columns do not exist yet.
+  // extra lookups on the hot path. v3.4 adds the role (user |
+  // psychologist), the linked psychologist slug and the content-location
+  // choice the same way. `select=*` keeps this working on databases where
+  // the v3.3/v3.4 profiles columns do not exist yet.
   let avatar: string | null = null;
   let railFolded = false;
+  let role: "user" | "psychologist" = "user";
+  let psychSlug: string | null = null;
+  let location = "global";
   try {
     const prof = await supaSelectOne("profiles", [
       ["select", "*"],
@@ -121,6 +138,16 @@ export async function createSession(
     if (prof) {
       avatar = typeof prof.avatar_url === "string" ? prof.avatar_url : null;
       railFolded = prof.rail_folded === true;
+      role = prof.role === "psychologist" ? "psychologist" : "user";
+      location = prof.content_location === "az" ? "az" : "global";
+    }
+    if (role === "psychologist") {
+      const psy = await supaSelectOne("psychologists_v2", [
+        ["select", "slug"],
+        ["owner_id", `eq.${user.id}`],
+      ]);
+      psychSlug = psy && typeof psy.slug === "string" ? psy.slug : null;
+      if (!psychSlug) role = "user"; // not actually linked — plain user
     }
   } catch {
     /* profile row may lag — the session still works */
@@ -132,6 +159,9 @@ export async function createSession(
     user_name: user.name,
     user_avatar: avatar,
     user_folded: railFolded,
+    user_role: role,
+    user_psych: psychSlug,
+    user_location: location,
     token_hash: sha256Hex(token),
     device_name: name,
     device_icon: icon,
@@ -142,13 +172,30 @@ export async function createSession(
     await supaInsert("sessions", row);
   } catch {
     /* Pre-v3.3 databases have no user_avatar/user_folded columns — drop
-     * them and retry so login still works before the migration runs. */
+     * the newer ones and retry so login still works before the migration
+     * runs. */
     const legacy = { ...row };
     delete legacy.user_avatar;
     delete legacy.user_folded;
+    delete legacy.user_role;
+    delete legacy.user_psych;
+    delete legacy.user_location;
     await supaInsert("sessions", legacy);
   }
-  return token;
+  /* The enriched session user — the same shape loadSession() returns, so
+   * the login/signup/verify responses carry the real avatar, fold, role
+   * and location instead of the GoTrue-only defaults. */
+  return {
+    token,
+    user: {
+      ...user,
+      avatar,
+      railFolded,
+      role,
+      psychSlug,
+      location,
+    },
+  };
 }
 
 /** Validates the cookie token: rejects unknown/expired sessions (deleting
@@ -206,6 +253,9 @@ export async function loadSession(token: string): Promise<CurrentSession | null>
       name: typeof row.user_name === "string" ? row.user_name : null,
       avatar: typeof row.user_avatar === "string" ? row.user_avatar : null,
       railFolded: row.user_folded === true,
+      role: row.user_role === "psychologist" ? "psychologist" : "user",
+      psychSlug: typeof row.user_psych === "string" ? row.user_psych : null,
+      location: row.user_location === "az" ? "az" : "global",
     },
   };
 }

@@ -148,6 +148,14 @@ export async function authAdminCreateUser(
   return JSON.parse(text) as Record<string, unknown>;
 }
 
+/** Admin fetch — one auth user by id (for e.g. the client's e-mail). */
+export async function authAdminGetUser(id: string): Promise<Record<string, unknown>> {
+  const res = await fetch(`${AUTH}/admin/users/${id}`, { headers: HDRS, cache: "no-store" });
+  const text = await res.text();
+  if (!res.ok) throw new Error(`gotrue ${res.status}: ${text}`);
+  return JSON.parse(text) as Record<string, unknown>;
+}
+
 /** Admin update — e.g. { email_confirm: true } after the verification
  * link is followed, or new user_metadata. Returns the updated user. */
 export async function authAdminUpdateUser(

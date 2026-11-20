@@ -15,19 +15,21 @@ import type { CurrentSession } from "./session";
 
 type Row = Record<string, unknown>;
 
-/* ── User preferences (language + theme + rail fold on the profiles row) ── */
+/* ── User preferences (language + theme + rail fold + content location on
+ * the profiles row) ── */
 
 function prefsView(row: Row | null): Record<string, unknown> {
   return {
     locale: typeof row?.lang === "string" ? row.lang : "en",
     theme: typeof row?.theme === "string" ? row.theme : "light",
     railFolded: row?.rail_folded === true,
+    contentLocation: row?.content_location === "az" ? "az" : "global",
   };
 }
 
 export async function preferencesGet(user: { id: string }) {
   const row = await supaSelectOne("profiles", [
-    ["select", "lang,theme,rail_folded"],
+    ["select", "lang,theme,rail_folded,content_location"],
     ["id", `eq.${user.id}`],
   ]);
   return prefsView(row);
@@ -47,6 +49,10 @@ export async function preferencesUpdate(user: { id: string }, body: Row) {
     if (typeof body.railFolded !== "boolean") throw badRequest();
     patch.rail_folded = body.railFolded;
   }
+  if (body.contentLocation !== undefined) {
+    if (body.contentLocation !== "global" && body.contentLocation !== "az") throw badRequest();
+    patch.content_location = body.contentLocation;
+  }
   if (Object.keys(patch).length === 0) {
     throw new ApiCode(400, "nothing_to_update");
   }
@@ -57,6 +63,15 @@ export async function preferencesUpdate(user: { id: string }, body: Row) {
   if (typeof patch.rail_folded === "boolean") {
     await supaUpdate("sessions", [["user_id", `eq.${user.id}`]], {
       user_folded: patch.rail_folded,
+    }).catch(() => {});
+  }
+
+  // v3.4: the content-scope choice rides on the session rows the same way —
+  // server pages filter halls/venues/stores/psychologists by it with zero
+  // extra lookups per render.
+  if (typeof patch.content_location === "string") {
+    await supaUpdate("sessions", [["user_id", `eq.${user.id}`]], {
+      user_location: patch.content_location,
     }).catch(() => {});
   }
 

@@ -56,12 +56,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const sessionToken = await createSession(
+    const session = await createSession(
       { id: userId, email, name },
       req.headers.get("user-agent"),
     );
     const res = bounce(`/${locale}/verify?status=ok`);
-    res.cookies.set(sessionCookie(sessionToken, isSecure(req.headers)));
+    res.cookies.set(sessionCookie(session.token, isSecure(req.headers)));
     return res;
   } catch (e) {
     console.error("[auth:verify session]", e);

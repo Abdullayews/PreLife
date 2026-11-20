@@ -29,14 +29,14 @@ export async function GET(req: NextRequest) {
   if (!verifier) return fail(req);
 
   try {
-    const session = await authPkceExchange(code, verifier);
-    const user = userFromAuth(session.user as Record<string, unknown>);
+    const exchanged = await authPkceExchange(code, verifier);
+    const user = userFromAuth(exchanged.user as Record<string, unknown>);
     if (!user) return fail(req);
 
-    const token = await createSession(user, req.headers.get("user-agent"));
+    const session = await createSession(user, req.headers.get("user-agent"));
     const origin = originFrom(req.headers);
     const res = NextResponse.redirect(`${origin}/home`, 302);
-    res.cookies.set(sessionCookie(token, isSecure(req.headers)));
+    res.cookies.set(sessionCookie(session.token, isSecure(req.headers)));
     res.cookies.set(clearedOAuthCookie(isSecure(req.headers)));
     return res;
   } catch (e) {

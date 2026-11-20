@@ -635,7 +635,8 @@ export const en = {
         devices: "Devices",
         appearance: "Appearance",
         language: "Language",
-        notifications: "Notifications"
+        notifications: "Notifications",
+        location: "Location"
       },
       devices: {
         title: "Devices",
@@ -675,7 +676,7 @@ export const en = {
         logout: "Log out",
         logoutHint: "Ends this device's session and returns you to the welcome page.",
         note: "Edit your name, photo, weight and goals on the Profile page.",
-        editProfile: "Edit profile data",
+        editProfile: "Edit profile",
         avatar: "Profile photo"
       },
       appearance: {
@@ -690,6 +691,16 @@ export const en = {
         title: "Language",
         subtitle: "Interface language — applies immediately.",
         hint: "Your choice is remembered after you accept cookies."
+      },
+      location: {
+        title: "Location",
+        subtitle: "Which places the sections show you.",
+        hint: "Global shows everything, including international venues and stores. Azerbaijan shows only what is available in Azerbaijan.",
+        global: "Global",
+        globalDesc: "Everything, worldwide",
+        az: "Azerbaijan only",
+        azDesc: "Halls, venues, stores and psychologists in Azerbaijan",
+        saved: "Location saved."
       },
       notifications: {
         title: "Notifications",
@@ -1557,7 +1568,9 @@ export const en = {
         meditation: "Psychologists, mood, journal",
         library: "Collections, notes, reading",
         subscription: "Tiers and payments"
-      }
+      },
+      console: "Psychologist console",
+      consoleDesc: "Confirm session requests"
     },
     aiChat: {
       chip1: "What can I do here?",
@@ -1573,7 +1586,9 @@ export const en = {
       subtitle: "Your guide",
       thinking: "Thinking…",
       title: "PreLife AI",
-      toolsHint: "You are signed in — I can also manage your account: weight, height, goal, workout plan, custom package. Just say: “set my weight to 78 kg”."
+      toolsHint: "You are signed in — I can also manage your account: name, weight, height, goal, theme, language, location, workout plan, custom package. Just say: “set my weight to 78 kg”.",
+      unavailable: "I could not think of an answer just now — the connection to my thinking dropped. Please try again.",
+      retry: "Try again"
     },
     libraryApp: {
       blurb: {
@@ -1669,7 +1684,7 @@ export const en = {
       bookConfirmTitle: "Confirm booking",
       bookError_double_booked: "You already have a session at that hour.",
       bookError_generic: "Booking failed — try again.",
-      bookOk: "Appointment booked.",
+      bookOk: "Request sent — the psychologist will confirm.",
       bookError_invalid: "The request looks wrong.",
       bookError_slot_closed: "That hour is not on the schedule.",
       bookError_slot_past: "That hour has already passed.",
@@ -2025,7 +2040,39 @@ export const en = {
       videoEyebrow: "Video materials",
       videoIntro: "Calm visuals for the eyes — to follow the breathing rhythm.",
       whatEyebrow: "What meditation is",
-      whatText: "Meditation is the practice of gathering the mind into the present moment. There is no opponent and no win: only breath, body and attention. Research shows a regular practice lowers stress hormones, lengthens attention span and improves sleep quality. Five minutes a day is enough to begin."
+      whatText: "Meditation is the practice of gathering the mind into the present moment. There is no opponent and no win: only breath, body and attention. Research shows a regular practice lowers stress hormones, lengthens attention span and improves sleep quality. Five minutes a day is enough to begin.",
+      reserve: "Reserve",
+      requestTitle: "Reserve this time",
+      requestHint: "Tell the psychologist what you want before the purchase — they confirm the time first, then you pay.",
+      messageLabel: "What do you want from the session?",
+      messagePlaceholder: "For example: I want to work on sleep and exam stress…",
+      customTitle: "Nothing fits? Request a custom time",
+      customHint: "Pick any date and hour in the next 60 days — the psychologist confirms or declines it.",
+      customDate: "Date",
+      customHour: "Hour",
+      sendRequest: "Send request",
+      requestSent: "Request sent — the psychologist will confirm.",
+      statusRequested: "Awaiting confirmation",
+      statusConfirmed: "Confirmed — payment due",
+      statusUpcoming: "Confirmed — paid",
+      payHint: "The psychologist confirmed this session — pay to lock it in.",
+      console: {
+        title: "Psychologist console",
+        subtitle: "Session requests for your listings — confirm the times you can take.",
+        pendingTitle: "Pending requests",
+        empty: "No pending requests right now.",
+        client: "Client",
+        wants: "Wants",
+        when: "When",
+        mode: "Format",
+        confirm: "Confirm",
+        decline: "Decline",
+        confirmedTitle: "Confirmed sessions",
+        confirmedEmpty: "No confirmed sessions yet.",
+        custom: "Custom time",
+        noAccess: "This console is for linked psychologist accounts only."
+      },
+      colActions: "Actions"
     },
     verifyPage: {
       title: "Verify e-mail",

@@ -6,7 +6,7 @@ import {
 import { useTranslations } from "next-intl";
 import {
   AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ChevronsUpDown,
-  Circle, CircleHelp, Crown, Dumbbell, FileText, Flower2, House, Landmark, Layers,
+  Circle, CircleHelp, ClipboardCheck, Crown, Dumbbell, FileText, Flower2, House, Landmark, Layers,
   LibraryBig, MapPin, Menu, MonitorPlay, NotebookPen, PanelLeftClose,
   PanelLeftOpen, Pill, Salad, ScrollText, Settings, Shirt, UserRound, Users,
   Wind, type LucideIcon,
@@ -82,6 +82,10 @@ export type ShellUser = {
   avatar?: string | null;
   /** The rail fold choice from the server (v6.1) — first-paint correct. */
   railFolded?: boolean;
+  /** v3.4: 'psychologist' shows the console link in the rail. */
+  role?: "user" | "psychologist";
+  /** v3.4: the linked psychologists_v2 slug (console guard). */
+  psychSlug?: string | null;
 };
 
 type Props = {
@@ -204,12 +208,17 @@ export function AppShell({
 
   const on = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
-  /* Main pages — Home first, the four sections, Subscription last. */
+  /* Main pages — Home first, the four sections, Subscription last.
+   * v3.4: linked psychologist accounts also get the console link right
+   * after the sections (their account surface for confirming requests). */
   const mainNav: { href: string; label: string; icon: LucideIcon; desc: string }[] = [
     { href: "/home", label: th("tabs.home"), icon: House, desc: t("desc.home") },
     ...sections.map((s) => ({
       href: s.href as string, label: ts(`${s.id}.name`), icon: s.icon, desc: t(`desc.${s.id}`),
     })),
+    ...(user?.role === "psychologist"
+      ? [{ href: "/meditation/console", label: t("console"), icon: ClipboardCheck, desc: t("consoleDesc") }]
+      : []),
     { href: "/subscription", label: th("header.drawerSubscription"), icon: Crown, desc: t("desc.subscription") },
   ];
 
@@ -309,7 +318,11 @@ export function AppShell({
         />
       )}
 
-      {/* ── The glass rail ── */}
+      {/* ── The glass rail ── the .rail-dock wrapper is display:contents
+         * on mobile (the nav is fixed) and becomes the sticky, exactly
+         * viewport-tall flex box that keeps the card VERTICALLY CENTERED
+         * on lg+ — re-centering live as the card grows/shrinks. ── */}
+      <div className="rail-dock">
       <nav className="app-rail" aria-label={user ? t("navLabel") : ui.label}>
         <div className="rail-top">
           <Link href={user ? "/home" : "/welcome"} aria-label={tm("navHome")} className="rail-brand">
@@ -470,6 +483,7 @@ export function AppShell({
           </ul>
         </div>
       </nav>
+      </div>
 
       {/* v6.1: the foot is gone — the light/dark toggle lives ONLY in
        * Settings → Appearance; language and log out also stay in

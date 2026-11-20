@@ -22,10 +22,10 @@ const cap = (l: string) => l[0]!.toUpperCase() + l.slice(1);
 export default async function DietRecipesPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requireUser(locale, "/diet/recipes");
+  const user = await requireUser(locale, "/diet/recipes");
 
   const t = await getTranslations({ locale, namespace: "dietApp" });
-  const dietContent = await getDietContent();
+  const dietContent = await getDietContent(user.location);
   if (!dietContent) return <ContentUnavailable locale={locale} />;
   const { recipes: dietRecipes, recipeDetails: RECIPE_DETAILS } = dietContent;
 

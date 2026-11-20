@@ -1,15 +1,19 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { assistantReply, parseChatBody } from "@/lib/server/ai";
 import { currentSession } from "@/lib/server/session";
-import { jsonError, readJson } from "@/lib/server/route-helpers";
+import { jsonError, readJson, toErrorResponse } from "@/lib/server/route-helpers";
 
 export const dynamic = "force-dynamic";
 
 /**
  * POST /api/ai/chat (public) — the site assistant. Guests get the plain
  * chat; signed-in users get the context-aware assistant with ACCOUNT
- * TOOLS (profile updates, personal workout plan, custom package) — see
- * lib/server/ai.ts for the Gemini → z-ai → canned provider chain.
+ * TOOLS (profile updates, preferences, workout plan, custom package) —
+ * see lib/server/ai.ts for the Gemini → z-ai provider chain.
+ *
+ * No canned replies, ever: when both providers fail the chain throws
+ * ApiCode(503, "ai_unavailable") and this route forwards it verbatim —
+ * the client shows an honest retry instead of a fake answer.
  */
 export async function POST(req: NextRequest) {
   const body = await readJson(req);
@@ -29,11 +33,17 @@ export async function POST(req: NextRequest) {
     /* guest — plain assistant */
   }
 
-  const out = await assistantReply({
-    locale: parsed.locale,
-    history: parsed.history,
-    page,
-    user,
-  });
-  return NextResponse.json(out);
+  try {
+    const out = await assistantReply({
+      locale: parsed.locale,
+      history: parsed.history,
+      page,
+      user,
+    });
+    return NextResponse.json(out);
+  } catch (e) {
+    // ApiCode (503 ai_unavailable, 400 …) keeps its status + code;
+    // anything unexpected logs and answers 500 generic. No invented text.
+    return toErrorResponse(e);
+  }
 }

@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { apiUrl } from "@/lib/api-url";
 import {
-  Bell, Briefcase, Check, Gamepad2, Headphones, Home, Info, Languages, Laptop,
-  LogOut, Monitor, Moon, Palette, Pencil, Smartphone, Sun, Tablet, Tv, UserRound,
-  Watch, X, type LucideIcon,
+  Bell, Briefcase, Check, Gamepad2, Globe, Headphones, Home, Info, Languages, Laptop,
+  LoaderCircle, LogOut, MapPin, Monitor, Moon, Palette, Pencil, Smartphone, Sun, Tablet, Tv,
+  UserRound, Watch, X, type LucideIcon,
 } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
@@ -14,6 +14,7 @@ import { routing } from "@/i18n/routing";
 import { hasConsent, persistLocale, setThemeChoice } from "@/lib/consent";
 import { saveUserPref } from "@/lib/user-prefs";
 import { DEVICE_ICON_KEYS } from "@/lib/devices";
+import { toast } from "@/components/Toaster";
 
 /**
  * Settings — categories on the LEFT, their content on the RIGHT (one
@@ -22,8 +23,9 @@ import { DEVICE_ICON_KEYS } from "@/lib/devices";
  *
  * Base settings: account info (read-only + log out), devices (active
  * sessions with per-device name + icon), theme (light/dark,
- * consent-aware persistence), interface language (az/en/ru) and three
- * notification toggles.
+ * consent-aware persistence), interface language (az/en/ru), content
+ * location (global / Azerbaijan only — v3.4) and three notification
+ * toggles.
  */
 
 const CATS = [
@@ -31,6 +33,7 @@ const CATS = [
   { id: "devices", icon: Monitor },
   { id: "appearance", icon: Palette },
   { id: "language", icon: Languages },
+  { id: "location", icon: MapPin },
   { id: "notifications", icon: Bell },
 ] as const;
 
@@ -247,10 +250,114 @@ function DevicesPanel() {
   );
 }
 
+/* ── Location (Settings → Location) ───────────────────────────────────── */
+
+const LOCATION_OPTIONS = [
+  { id: "global", icon: Globe, titleKey: "global", descKey: "globalDesc" },
+  { id: "az", icon: MapPin, titleKey: "az", descKey: "azDesc" },
+] as const;
+
+/** The content-scope choice (v3.4): which locations the content sections
+ *  show — everything, or Azerbaijan only. Saved on the profiles row and
+ *  mirrored to the session rows, so every server-rendered page filters
+ *  halls / venues / stores / psychologists by it. */
+function LocationPanel() {
+  const t = useTranslations("settingsPage");
+  const tl = useTranslations("settingsPage.location");
+  const router = useRouter();
+
+  // null until the profile row loads — the cards stay inert for that
+  // first beat and no hydration mismatch can flash a wrong checked state.
+  const [loc, setLoc] = useState<"global" | "az" | null>(null);
+  const [busy, setBusy] = useState<"global" | "az" | null>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await fetch(apiUrl("/api/me/preferences"), { cache: "no-store" });
+        if (!res.ok) throw new Error();
+        const body = (await res.json()) as { contentLocation?: string };
+        if (alive) setLoc(body.contentLocation === "az" ? "az" : "global");
+      } catch {
+        // Offline / signed out — the DB default is global.
+        if (alive) setLoc("global");
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  const choose = async (next: "global" | "az") => {
+    if (busy !== null || next === loc) return;
+    setBusy(next);
+    setError(false);
+    try {
+      const res = await fetch(apiUrl("/api/me/preferences"), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contentLocation: next }),
+      });
+      if (!res.ok) throw new Error();
+      setLoc(next);
+      toast(tl("saved"));
+      // The choice rides on the session rows — refresh re-renders the
+      // server pages so their content is filtered for it right away.
+      router.refresh();
+    } catch {
+      setError(true);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <section className="set-panel" aria-label={tl("title")}>
+      <div className="set-head">
+        <h2 className="h3">{tl("title")}</h2>
+        <p>{tl("subtitle")}</p>
+      </div>
+
+      {error && <p className="field-error" role="alert">{t("devices.error")}</p>}
+
+      <div className="subtiers" role="radiogroup" aria-label={tl("title")}>
+        {LOCATION_OPTIONS.map(({ id, icon: Icon, titleKey, descKey }) => {
+          const active = loc === id;
+          const saving = busy === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              role="radio"
+              aria-checked={active}
+              className="card subtier"
+              data-active={active || undefined}
+              onClick={() => choose(id)}
+              disabled={loc === null || busy !== null}
+            >
+              <span className="card-top">
+                <span className="chip-ico tinted"><Icon size={20} aria-hidden /></span>
+                <b>{tl(titleKey)}</b>
+                {saving
+                  ? <LoaderCircle size={16} className="spin" aria-hidden />
+                  : active && <Check size={16} aria-hidden />}
+              </span>
+              <p>{tl(descKey)}</p>
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="set-note"><Info size={15} aria-hidden />{tl("hint")}</p>
+    </section>
+  );
+}
+
 /* ── The settings shell ────────────────────────────────────────────────── */
 
 export function SettingsPage({ user }: { user: SettingsUser }) {
   const t = useTranslations("settingsPage");
+  const tl = useTranslations("settingsPage.location");
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -331,7 +438,9 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
               onClick={() => setCat(id)}
             >
               <Icon size={16} aria-hidden />
-              {t(`cats.${id}`)}
+              {/* cats.location has no key of its own — the section title
+               * ("Location") serves as the nav label. */}
+              {id === "location" ? tl("title") : t(`cats.${id}`)}
             </button>
           ))}
         </nav>
@@ -434,6 +543,8 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
               </div>
             </section>
           )}
+
+          {cat === "location" && <LocationPanel />}
 
           {cat === "notifications" && (
             <section className="set-panel" aria-label={t("notifications.title")}>

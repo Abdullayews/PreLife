@@ -6,9 +6,12 @@ import { ApiCode } from "./psych-data";
  * goal, activity) plus the weight history in user_weight_logs. Shared by
  * the /api/me/profile route, the AI account tools and the profile page.
  *
- * v3.3 columns: gender, birth_year, height_cm, goal, activity_level,
- * plan_onboarding_done, rail_folded (joining the v3 fitness_level /
- * workouts_per_week / avatar_url and the v3.2 lang / theme).
+ * v3.4 column: content_location (content scope: 'global' | 'az') —
+ * mirrored onto the session rows (user_location) so content filtering
+ * applies without a re-login. Joins the v3.3 gender, birth_year,
+ * height_cm, goal, activity_level, plan_onboarding_done, rail_folded
+ * (and v3 fitness_level / workouts_per_week / avatar_url) plus the
+ * v3.2 lang / theme.
  */
 
 type Row = Record<string, unknown>;
@@ -17,12 +20,16 @@ export const GENDERS = ["male", "female", "other"] as const;
 export const GOALS = ["lose", "maintain", "gain", "fitness"] as const;
 export const ACTIVITY_LEVELS = ["sedentary", "light", "moderate", "active", "athlete"] as const;
 export const FITNESS_LEVELS = ["beginner", "intermediate", "advanced"] as const;
+export const THEMES = ["light", "dark"] as const;
+export const LANGS = ["az", "en", "ru"] as const;
+export const CONTENT_LOCATIONS = ["global", "az"] as const;
 
 export type ProfileView = {
   name: string | null;
   avatarUrl: string | null;
   lang: string;
   theme: string;
+  contentLocation: "global" | "az";
   railFolded: boolean;
   gender: string | null;
   birthYear: number | null;
@@ -73,6 +80,7 @@ export async function getProfileView(userId: string): Promise<ProfileView> {
     avatarUrl: str(row.avatar_url),
     lang: str(row.lang) ?? "en",
     theme: str(row.theme) ?? "light",
+    contentLocation: row.content_location === "az" ? "az" : "global",
     railFolded: row.rail_folded === true,
     gender: str(row.gender),
     birthYear: num(row.birth_year),
@@ -88,7 +96,8 @@ export async function getProfileView(userId: string): Promise<ProfileView> {
   };
 }
 
-/** A compact one-line profile summary for the AI context prompt. */
+/** A compact one-line profile summary for the AI context prompt —
+ *  ends with the content scope so the model knows what the user sees. */
 export async function profileSummaryLine(userId: string): Promise<string> {
   try {
     const p = await getProfileView(userId);
@@ -99,7 +108,8 @@ export async function profileSummaryLine(userId: string): Promise<string> {
     if (p.activityLevel) parts.push(`activity: ${p.activityLevel}`);
     if (p.fitnessLevel) parts.push(`level: ${p.fitnessLevel}`);
     if (p.workoutsPerWeek !== null) parts.push(`${p.workoutsPerWeek}×/week`);
-    return parts.length ? parts.join(", ") : "not filled in yet";
+    const scope = p.contentLocation === "az" ? "; content scope: Azerbaijan only" : "; content scope: global";
+    return `${parts.length ? parts.join(", ") : "not filled in yet"}${scope}`;
   } catch {
     return "unavailable";
   }
@@ -126,13 +136,17 @@ export type ProfilePatchIn = {
   activityLevel?: unknown;
   fitnessLevel?: unknown;
   workoutsPerWeek?: unknown;
+  theme?: unknown;
+  lang?: unknown;
+  contentLocation?: unknown;
   railFolded?: unknown;
   planOnboardingDone?: unknown;
 };
 
 /** Validate + apply a partial profile update. Throws ApiCode on bad input.
- *  Name / avatar changes are mirrored onto the user's session rows so the
- *  rail re-renders correctly on the next server render. */
+ *  Name / avatar / rail-fold / content-location changes are mirrored onto
+ *  the user's session rows so the next server render picks them up
+ *  without a re-login. */
 export async function updateProfile(userId: string, body: ProfilePatchIn): Promise<ProfileView> {
   const patch: Row = {};
   const errors: string[] = [];
@@ -183,6 +197,21 @@ export async function updateProfile(userId: string, body: ProfilePatchIn): Promi
     if (!Number.isInteger(v) || v < 0 || v > 14) errors.push("workoutsPerWeek");
     else patch.workouts_per_week = v;
   }
+  if (body.theme !== undefined) {
+    const v = oneOf(THEMES, body.theme);
+    if (!v) errors.push("theme");
+    else patch.theme = v;
+  }
+  if (body.lang !== undefined) {
+    const v = oneOf(LANGS, body.lang);
+    if (!v) errors.push("lang");
+    else patch.lang = v;
+  }
+  if (body.contentLocation !== undefined) {
+    const v = oneOf(CONTENT_LOCATIONS, body.contentLocation);
+    if (!v) errors.push("contentLocation");
+    else patch.content_location = v;
+  }
   if (body.railFolded !== undefined) {
     if (typeof body.railFolded !== "boolean") errors.push("railFolded");
     else patch.rail_folded = body.railFolded;
@@ -220,11 +249,14 @@ export async function updateProfile(userId: string, body: ProfilePatchIn): Promi
 
   await supaUpdate("profiles", [["id", `eq.${userId}`]], patch);
 
-  // Mirror identity changes onto the session rows (the rail reads them).
+  // Mirror identity + preference changes onto the session rows (the rail
+  // and the content filter read them). v3.4: content_location →
+  // user_location so the az-only scope applies without a re-login.
   const sessionPatch: Row = {};
   if (typeof patch.full_name === "string") sessionPatch.user_name = patch.full_name;
   if ("avatar_url" in patch) sessionPatch.user_avatar = patch.avatar_url ?? null;
   if (typeof patch.rail_folded === "boolean") sessionPatch.user_folded = patch.rail_folded;
+  if (typeof patch.content_location === "string") sessionPatch.user_location = patch.content_location;
   if (Object.keys(sessionPatch).length) {
     await supaUpdate("sessions", [["user_id", `eq.${userId}`]], sessionPatch).catch(() => {});
   }
