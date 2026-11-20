@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { apiUrl } from "@/lib/api-url";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { safeNext } from "@/lib/next-url";
+
+/** sessionStorage key that carries the password from the login form to
+ * the signup form (never the URL — URLs end up in history and logs). */
+const PREFILL_KEY = "prelife:signup-prefill";
 
 function GoogleIcon() {
   return (
@@ -26,8 +30,8 @@ function AppleIcon() {
   );
 }
 
-/** The dashed dev box: SMTP is not configured in the sandbox, so the
- * verification link is surfaced right on screen instead of an e-mail. */
+/** The dashed dev box: no mail transport is configured in the sandbox,
+ * so the verification link is surfaced right on screen instead. */
 function DevLinkBox({ note, open, href }: { note: string; open: string; href: string }) {
   return (
     <div className="auth-demo">
@@ -37,6 +41,12 @@ function DevLinkBox({ note, open, href }: { note: string; open: string; href: st
   );
 }
 
+/** The banner shown when a visitor arrives from a Google/Apple login
+ * that found no account (the callback redirected them here). */
+function NoticeBox({ text }: { text: string }) {
+  return <output className="set-note">{text}</output>;
+}
+
 /**
  * Classic email + password form shared by /login and /signup, with
  * Google / Apple buttons wired to the real OAuth flow (GET
@@ -44,18 +54,57 @@ function DevLinkBox({ note, open, href }: { note: string; open: string; href: st
  * /api/auth/callback mints the session). The buttons are full page
  * navigations: the OAuth dance cannot run inside fetch.
  *
- * Signup no longer signs in: the account is created unconfirmed and the
- * card switches to a "check your inbox" state until the verification
- * link is opened. Login on an unconfirmed account (403
- * email_unverified) offers the resend button instead.
+ * v4.3 account-first rules:
+ *   • Signup keeps its "check your inbox" activation state (1-week link).
+ *   • Login accepts an e-mail WITHOUT a password: a new address starts
+ *     the registration right there (verification mail, account created
+ *     on confirm), an existing one asks for the password.
+ *   • Login with e-mail + password on an unknown address moves the
+ *     visitor to /signup with both fields auto-filled (the password
+ *     travels via sessionStorage, never the URL).
+ *   • A Google/Apple login that finds no account bounces to /signup
+ *     with the e-mail prefilled (the notice explains why).
  */
-export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup"; next?: string; oauthError?: boolean }) {
+export function AuthForm({
+  mode,
+  next,
+  oauthError,
+  prefillEmail,
+  notice,
+}: {
+  mode: "login" | "signup";
+  next?: string;
+  oauthError?: boolean;
+  prefillEmail?: string;
+  notice?: "oauth_new" | null;
+}) {
   const t = useTranslations("authPage");
   const locale = useLocale();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(oauthError ? "oauth" : null);
   const [showPw, setShowPw] = useState(false);
+
+  // v4.3: controlled e-mail + password (prefill support).
+  const [email, setEmail] = useState(prefillEmail ?? "");
+  const [password, setPassword] = useState("");
+  const pwRef = useRef<HTMLInputElement>(null);
+
+  // Signup: pull the password stashed by the login form (once, then
+  // drop it — sessionStorage is not a vault).
+  useEffect(() => {
+    if (mode !== "signup") return;
+    try {
+      const raw = sessionStorage.getItem(PREFILL_KEY);
+      if (!raw) return;
+      sessionStorage.removeItem(PREFILL_KEY);
+      const v = JSON.parse(raw) as { email?: string; password?: string };
+      if (typeof v.email === "string" && !prefillEmail) setEmail(v.email);
+      if (typeof v.password === "string") setPassword(v.password);
+    } catch {
+      /* corrupt stash — ignore */
+    }
+  }, [mode, prefillEmail]);
 
   // Signup success: the "check your inbox" state replaces the form.
   const [signedUp, setSignedUp] = useState<{ email: string; devLink: string | null } | null>(null);
@@ -69,27 +118,60 @@ export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup";
     e.preventDefault();
     setError(null);
     const data = new FormData(e.currentTarget);
-    const payload = Object.fromEntries(data.entries());
+    const name = String(data.get("name") ?? "");
     setBusy(true);
     try {
+      // The locale rides both calls so the verification e-mail matches.
       const res = await fetch(apiUrl(`/api/auth/${mode}`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Signup carries the locale so the verification e-mail matches.
-        body: JSON.stringify(mode === "signup" ? { ...payload, locale } : payload),
+        body: JSON.stringify(mode === "signup" ? { name, email, password, locale } : { email, password, locale }),
       });
       if (!res.ok) {
         const body = (await res.json().catch(() => ({}))) as { error?: string };
         if (mode === "login" && body.error === "email_unverified") {
-          setUnverifiedEmail(typeof payload.email === "string" ? payload.email : "");
+          setUnverifiedEmail(email);
+        }
+        if (mode === "login" && body.error === "password_required") {
+          pwRef.current?.focus();
         }
         setError(body.error ?? "generic");
         return;
       }
+
       if (mode === "signup") {
         const body = (await res.json().catch(() => ({}))) as { email?: string; devLink?: string };
         setSignedUp({
-          email: typeof body.email === "string" ? body.email : String(payload.email ?? ""),
+          email: typeof body.email === "string" ? body.email : email,
+          devLink: typeof body.devLink === "string" ? body.devLink : null,
+        });
+        return;
+      }
+
+      // Login — three success shapes.
+      const body = (await res.json().catch(() => ({}))) as {
+        user?: unknown;
+        action?: string;
+        email?: string;
+        devLink?: string | null;
+      };
+      if (body.action === "signup_prefill") {
+        // No account + password typed: continue on the signup form with
+        // the credentials carried over (password via sessionStorage).
+        try {
+          sessionStorage.setItem(PREFILL_KEY, JSON.stringify({ email, password }));
+        } catch {
+          /* private mode — the e-mail param still prefills */
+        }
+        const qs = new URLSearchParams({ email });
+        if (next) qs.set("next", next);
+        router.push(`/signup?${qs.toString()}`);
+        return;
+      }
+      if (body.action === "check_inbox") {
+        // No account + e-mail only: the registration mail just went out.
+        setSignedUp({
+          email: typeof body.email === "string" ? body.email : email,
           devLink: typeof body.devLink === "string" ? body.devLink : null,
         });
         return;
@@ -137,10 +219,10 @@ export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup";
 
   // Full page navigation — the OAuth redirect chain cannot run in fetch.
   const startOauth = (provider: "google" | "apple") => {
-    window.location.href = apiUrl(`/api/auth/oauth/${provider}`);
+    window.location.href = apiUrl(`/api/auth/oauth/${provider}?locale=${locale}`);
   };
 
-  // Signup succeeded — the card becomes the "check your inbox" state.
+  // Signup (or the login-page mail start) succeeded — "check your inbox".
   if (signedUp) {
     return (
       <div className="auth-card">
@@ -177,6 +259,13 @@ export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup";
         <p className="lede">{mode === "login" ? t("loginSubtitle") : t("signupSubtitle")}</p>
       </div>
 
+      {mode === "signup" && notice === "oauth_new" && (
+        <NoticeBox text={t("oauthNewNotice")} />
+      )}
+      {mode === "signup" && password && !notice && (
+        <NoticeBox text={t("prefillNote")} />
+      )}
+
       <form className="auth-form" onSubmit={onSubmit}>
         {mode === "signup" && (
           <div className="field">
@@ -186,7 +275,18 @@ export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup";
         )}
         <div className="field">
           <label htmlFor="email">{t("email")}</label>
-          <input id="email" name="email" type="email" inputMode="email" placeholder={t("emailPlaceholder")} autoComplete="email" required maxLength={120} />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            inputMode="email"
+            placeholder={t("emailPlaceholder")}
+            autoComplete="email"
+            required
+            maxLength={120}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </div>
         <div className="field">
           <div className="field-row">
@@ -197,14 +297,17 @@ export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup";
           </div>
           <div className="field-pw">
             <input
+              ref={pwRef}
               id="password"
               name="password"
               type={showPw ? "text" : "password"}
               placeholder={t("passwordPlaceholder")}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
-              required
+              required={mode === "signup"}
               minLength={mode === "signup" ? 8 : undefined}
               maxLength={100}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <button
               type="button"
@@ -216,11 +319,16 @@ export function AuthForm({ mode, next, oauthError }: { mode: "login" | "signup";
               {showPw ? <EyeOff size={17} aria-hidden /> : <Eye size={17} aria-hidden />}
             </button>
           </div>
+          {mode === "login" && <p className="set-note">{t("passwordOptional")}</p>}
         </div>
 
         {error && (
           <p className="field-error" role="alert">
-            {error === "email_unverified" ? t("loginUnverified") : t(`errors.${error}`)}
+            {error === "email_unverified"
+              ? t("loginUnverified")
+              : error === "password_required"
+                ? t("loginNeedsPassword")
+                : t(`errors.${error}`)}
           </p>
         )}
 

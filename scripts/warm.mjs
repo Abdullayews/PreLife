@@ -94,7 +94,8 @@ async function main() {
     "/api/gym/plan",
   ];
   const badPosts = [
-    "/api/auth/signup", "/api/auth/resend", "/api/psych/quiz", "/api/psych/book", "/api/psych/pay",
+    "/api/auth/login", "/api/auth/signup", "/api/auth/resend", "/api/auth/complete",
+    "/api/psych/quiz", "/api/psych/book", "/api/psych/pay",
     "/api/psych/cancel", "/api/psych/progress", "/api/psych/journal",
     "/api/psych/mood", "/api/ai/chat", "/api/psych/ai", "/api/gym/plan",
   ];

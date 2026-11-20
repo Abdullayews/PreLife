@@ -548,6 +548,10 @@ export const az = {
       ctaNote: "Hər kolleksiya ilə pulsuz redaktor konsultasiyası."
     },
     authPage: {
+      passwordOptional: "Hesabınız yoxdursa yalnız e-poçtu yazıb davam edin — təsdiq linki göndəriləcək.",
+      loginNeedsPassword: "Bu e-poçtla hesab var — şifrənizi daxil edin.",
+      oauthNewNotice: "Google/Apple hesabınızla PreLife hesabı tapılmadı. E-poçtunuz aşağıda doldurulub — ad və şifrə ilə qeydiyyatı tamamlayın.",
+      prefillNote: "E-poçt və şifrəniz giriş formundan gətirildi.",
       loginTitle: "Xoş gəlmisiniz",
       loginSubtitle: "PreLife-ınızı açmaq üçün daxil olun.",
       signupTitle: "Hesabınızı yaradın",
@@ -574,6 +578,7 @@ export const az = {
       socialSoonTitle: "{provider} ilə daxilolma",
       socialSoonDesc: "Tezliklə əlçatan olacaq — hələlik e-poçt və şifrədən istifadə edin.",
       errors: {
+        password_required: "Bu e-poçtla hesab var — şifrənizi daxil edin.",
         missing_fields: "Bütün xanaları doldurun.",
         invalid_email: "Düzgün e-poçt ünvanı daxil edin.",
         short_password: "Şifrə ən azı 8 simvoldan ibarət olmalıdır.",
@@ -2074,6 +2079,15 @@ export const az = {
       colActions: "Əməliyyatlar"
     },
     verifyPage: {
+      completeTitle: "Hesabınızı tamamlayın",
+      completeText: "E-poçtunuz təsdiqləndi. Giriş üçün adınızı və şifrənizi təyin edin.",
+      passwordRepeat: "Şifrə (təkrar)",
+      passwordMismatch: "Şifrələr üst-üstə düşmür.",
+      completeCta: "Tamamla və davam et",
+      completeFail: "Tamamlanmadı — yenidən cəhd edin.",
+      cancelledTitle: "Qeydiyyat ləğv olundu",
+      cancelledText: "Hesab 1 həftə ərzində təsdiqlənmədiyi üçün qeydiyyatınız ləğv olundu. Yenidən qeydiyyatdan keçə bilərsiniz.",
+      signupAgain: "Yenidən qeydiyyatdan keç",
       title: "E-poçt təsdiqi",
       checking: "Təsdiq yoxlanılır…",
       okTitle: "E-poçt təsdiqləndi!",

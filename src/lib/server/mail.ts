@@ -2,14 +2,14 @@ import nodemailer from "nodemailer";
 import { supaInsert } from "./supa";
 
 /**
- * Outgoing e-mail — SMTP when configured, a database outbox otherwise.
- *
- * Production sets SMTP_HOST/USER/PASS and mails go out through nodemailer.
- * The sandbox leaves them empty, so every message is written to the
- * mail_outbox table (visible in the emulator store) and the signup flow
- * surfaces the verification link directly on screen instead.
+ * Outgoing e-mail, three transports deep:
+ *   1. Brevo HTTP API (BREVO_API_KEY) — the primary production path;
+ *   2. SMTP via nodemailer (SMTP_HOST/USER/PASS) — legacy alternative;
+ *   3. the mail_outbox table — the dev sandbox catch-all. When nothing
+ *      sends, the signup flow surfaces the verification link on screen.
  */
 
+const BREVO_API_KEY = process.env.BREVO_API_KEY ?? "";
 const SMTP_HOST = process.env.SMTP_HOST ?? "";
 const SMTP_PORT = Number(process.env.SMTP_PORT ?? 587);
 const SMTP_USER = process.env.SMTP_USER ?? "";
@@ -21,6 +21,45 @@ export function smtpConfigured(): boolean {
   return Boolean(SMTP_HOST && SMTP_USER && SMTP_PASS);
 }
 
+/** True when mails can go out through the Brevo API. */
+export function brevoConfigured(): boolean {
+  return Boolean(BREVO_API_KEY);
+}
+
+/** Split MAIL_FROM ("PreLife <a@b.c>") into Brevo's sender shape. */
+function brevoSender(): { name: string; email: string } {
+  const m = MAIL_FROM.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  if (m && m[2]) return { name: m[1] || "PreLife", email: m[2] };
+  return { name: "PreLife", email: MAIL_FROM };
+}
+
+/** POST /v3/smtp/email — one message through Brevo's relay. */
+async function sendViaBrevo(msg: MailMessage): Promise<boolean> {
+  try {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": BREVO_API_KEY,
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({
+        sender: brevoSender(),
+        to: [{ email: msg.to }],
+        subject: msg.subject,
+        htmlContent: msg.html,
+      }),
+      cache: "no-store",
+    });
+    if (res.ok) return true;
+    console.error("[mail:brevo]", res.status, await res.text());
+    return false;
+  } catch (e) {
+    console.error("[mail:brevo]", e);
+    return false;
+  }
+}
+
 export type MailMessage = {
   to: string;
   subject: string;
@@ -28,8 +67,11 @@ export type MailMessage = {
   kind: string;
 };
 
-/** Send one message: SMTP first, outbox as the fallback. */
+/** Send one message: Brevo API, then SMTP, the outbox as the last resort. */
 export async function sendMail(msg: MailMessage): Promise<{ sent: boolean }> {
+  if (brevoConfigured() && (await sendViaBrevo(msg))) {
+    return { sent: true };
+  }
   if (smtpConfigured()) {
     try {
       const transport = nodemailer.createTransport({
@@ -75,21 +117,21 @@ const VERIFICATION_STRINGS: Record<
     heading: "E-poçtunu təsdiqlə",
     body: "Hesabınızı aktivləşdirmək üçün aşağıdakı düyməni açın.",
     cta: "Təsdiqlə",
-    footer: "Bu link 24 saat qüvvədədir.",
+    footer: "Bu link 1 həftə qüvvədədir. Bu müddətdə hesabınızı təsdiqləməsəniz, qeydiyyatınız avtomatik ləğv olunacaq.",
   },
   en: {
     subject: "Confirm your e-mail — PreLife",
     heading: "Confirm your e-mail",
     body: "Open the button below to activate your account.",
     cta: "Confirm",
-    footer: "This link is valid for 24 hours.",
+    footer: "This link is valid for 1 week. If you do not confirm your account within this period, your registration will be cancelled automatically.",
   },
   ru: {
     subject: "Подтвердите e-mail — PreLife",
     heading: "Подтвердите e-mail",
     body: "Откройте кнопку ниже, чтобы активировать аккаунт.",
     cta: "Подтвердить",
-    footer: "Ссылка действительна 24 часа.",
+    footer: "Ссылка действует 1 неделю. Если не подтвердить аккаунт в течение этого срока, регистрация будет автоматически отменена.",
   },
 };
 
