@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSessionUser, requireUser } from "@/lib/auth";
 import { supabaseConfigured } from "@/lib/server/supa";
+import { getGymAppContent } from "@/lib/api";
+import { ContentUnavailable } from "@/components/ContentUnavailable";
 import { IdmanPage } from "@/components/idman/IdmanPage";
 import { isIdmanTabId } from "@/components/idman/data";
 
@@ -32,6 +34,13 @@ export default async function GymPage({ params, searchParams }: Props) {
     : session ?? { id: "demo", email: "demo@prelife.app", name: "Nigar", avatar: null, railFolded: false };
   const topnav = !(supabaseConfigured ? user : session);
 
+  /* The whole İdman surface renders from the DB catalog (gym_* content
+   * tables, resolved into final locale strings server-side). When the
+   * content backend is unreachable, degrade to the shared unavailable
+   * shell — same as the other section pages. */
+  const catalog = await getGymAppContent(locale);
+  if (!catalog || catalog.halls.length === 0) return <ContentUnavailable locale={locale} />;
+
   const tabParam = Array.isArray(sp.tab) ? sp.tab[0] : sp.tab;
   const initialTab = tabParam && isIdmanTabId(tabParam) ? tabParam : undefined;
 
@@ -58,6 +67,7 @@ export default async function GymPage({ params, searchParams }: Props) {
           avatar: user.avatar ?? null,
           railFolded: user.railFolded ?? false,
         }}
+        catalog={catalog}
         initialTab={initialTab}
         tabs={[...tabs]}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("gym.name") }}

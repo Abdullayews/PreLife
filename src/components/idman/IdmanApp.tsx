@@ -1,27 +1,30 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   useCallback, useEffect, useMemo, useRef, useState,
   useSyncExternalStore,
   type CSSProperties, type ReactNode,
 } from "react";
 import {
-  Brain, BookOpen, CalendarDays, ChevronsUpDown, Clock, Crown,
+  BookOpen, Brain, CalendarDays, ChevronsUpDown, Clock, Crown,
   Dumbbell, House, LoaderCircle, MapPin, Moon, Pill, Play, Salad, Search,
   SearchX, Settings, Shirt, Star, Sun, Wand2, X,
   type LucideIcon,
 } from "lucide-react";
 import {
-  DAY_NAMES, DAY_SHORT, DEMO_PLAN, EQ_LABELS, EXERCISES, FILTER_GROUPS,
-  HALLS, IDMAN_TABS, QUIZ, STORES, STORE_KIND_LABEL, TAB_HEADS, UI,
-  isIdmanTabId, minPriceOf, minutesOf, muscleGroupsOf, productsOf,
-  totalSetsOf,
-  type ActivePlan, type Hall, type IdmanTabId, type PlanDay,
-  type PlanExercise, type Product, type QuizAnswers,
+  GROUP_ORDER, IDMAN_TABS, QUIZ_STEPS, exerciseVideo, groupOf,
+  isIdmanTabId, minutesOf, muscleGroupsOf, productVideo, totalSetsOf,
+  type ActivePlan, type IdmanTabId, type PlanDay, type PlanExercise,
+  type QuizAnswers, type QuizStep,
 } from "./data";
+import {
+  minPriceOf,
+  type GymAppContent, type GymAppExercise, type GymAppPlace, type GymAppProduct,
+} from "@/lib/gym";
 
 /**
- * İdman v3 — the redesigned gym surface.
+ * İdman v4 — the gym surface, fully DB-wired.
  *
  * Layout: a collapsible glass sidebar (the "menu" module) with the İdman
  * group (plan · qida əlavələri · aksesuarlar · zallar · alətlər) plus the
@@ -32,18 +35,16 @@ import {
  *    a STICKY summary panel (muscle groups, exercise list with sets ×
  *    reps) beside the day's exercise cards (a real demo video for
  *    registry moves, a placeholder for custom AI moves, the how-to guide
- *    and a completion toggle each) and the weekly strip. When the API is
- *    unreachable (offline, standalone demos) the client-side twin of the
- *    starter plan from ./data steps in.
+ *    and a completion toggle each), the weekly strip and the plan catalog
+ *    (from the gym_* content tables).
  *  • supplements / accessories / equipment — search + filter-chip + sort
  *    catalogs on a 4-column grid (equipment carries a real video per item).
  *  • gyms — hall cards: info & location on top, trainers below, then the
  *    hall's equipment floor.
  *
- * Self-contained by design: embedded data (./data.ts), its own CSS
- * (the "İdman v3" block in globals.css), zero app imports (only plain
- * relative /api/gym/plan fetches) — the same file
- * runs inside PreLife (/[locale]/gym) and in standalone demos.
+ * Every piece of content renders from the `catalog` prop (server-resolved,
+ * locale-final — lib/api.ts getGymAppContent) and every UI string comes
+ * from the gymApp message namespace; nothing is hardcoded per locale.
  */
 
 /* ── Props ──────────────────────────────────────────────────────────────── */
@@ -54,6 +55,8 @@ export type IdmanLinks = {
 
 export type IdmanAppProps = {
   user: { name: string; email?: string | null };
+  /** The server-resolved gym catalog (plain text, final locale). */
+  catalog: GymAppContent;
   initialTab?: IdmanTabId;
   /** Route hrefs for the non-gym sections (defaults to "#"). */
   links?: IdmanLinks;
@@ -90,10 +93,11 @@ const storeSet = (key: string, value: string): void => {
 const bakuToday = (): string =>
   new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Baku" }).format(new Date());
 
-const fill = (tpl: string, ...vals: (string | number)[]): string => {
-  let out = tpl;
-  vals.forEach((v) => { out = out.replace(/\{[^}]+\}/, String(v)); });
-  return out;
+/** Localized weekday name for the plan's 1..7 (1 = Monday): 2024-01-01
+ *  was a Monday, so Jan <planDay> is exactly that weekday. */
+const weekdayLabel = (locale: string, planDay: number, short: boolean): string => {
+  const d = new Date(2024, 0, Math.min(7, Math.max(1, planDay)));
+  return new Intl.DateTimeFormat(locale, { weekday: short ? "short" : "long" }).format(d);
 };
 
 /* ── Video tile — real footage, hover/tap to play ───────────────────────── */
@@ -171,33 +175,35 @@ function NavRow({
 
 /** JS getDay() (0 = Sunday) → the plan's 1..7 (1 = Monday, 7 = Sunday). */
 const planDayOf = (jsDay: number): number => (jsDay === 0 ? 7 : jsDay);
-/** The plan's 1..7 → JS numbering (the DAY_* label keys). */
-const jsDayOf = (planDay: number): number => (planDay === 7 ? 0 : planDay);
 
-type PlanStatus = "loading" | "quiz" | "ready";
+type PlanStatus = "loading" | "quiz" | "ready" | "error";
 
-function PlanPanel() {
+function PlanPanel({ catalog }: { catalog: GymAppContent }) {
+  const t = useTranslations("gymApp");
   const [plan, setPlan] = useState<ActivePlan | null>(null);
   const [status, setStatus] = useState<PlanStatus>("loading");
   const [busy, setBusy] = useState(false);
   const [offlineNote, setOfflineNote] = useState(false);
+  const planRef = useRef<ActivePlan | null>(null);
 
   /* Load the active plan — the server lazily creates the starter plan and
    * tells whether the questionnaire was already completed. When the API is
-   * unreachable (offline, standalone demos) the client-side twin of the
-   * starter plan steps in. */
+   * unreachable the panel shows its unavailable state + a retry. */
   const load = useCallback(async () => {
+    setStatus("loading");
     try {
-      const res = await fetch("/api/gym/plan?locale=az", { cache: "no-store" });
+      const res = await fetch(`/api/gym/plan?locale=${encodeURIComponent(catalog.locale)}`, {
+        cache: "no-store",
+      });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as { plan: ActivePlan | null; onboardingDone: boolean };
-      setPlan(data.plan ?? DEMO_PLAN);
-      setStatus(data.onboardingDone ? "ready" : "quiz");
+      planRef.current = data.plan;
+      setPlan(data.plan);
+      setStatus(data.onboardingDone || data.plan ? "ready" : "quiz");
     } catch {
-      setPlan(DEMO_PLAN);
-      setStatus("ready");
+      setStatus("error");
     }
-  }, []);
+  }, [catalog.locale]);
 
   useEffect(() => { void load(); }, [load]);
 
@@ -208,23 +214,23 @@ function PlanPanel() {
       const res = await fetch("/api/gym/plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale: "az", answers }),
+        body: JSON.stringify({ locale: catalog.locale, answers }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = (await res.json()) as { plan: ActivePlan | null };
       if (!data.plan) throw new Error("no plan");
+      planRef.current = data.plan;
       setPlan(data.plan);
       setOfflineNote(false);
       setStatus("ready");
     } catch {
-      /* offline — keep showing the standard plan + a small note */
+      /* offline — keep showing the current plan + a small note */
       setOfflineNote(true);
-      setPlan((p) => p ?? DEMO_PLAN);
-      setStatus("ready");
+      setStatus(planRef.current ? "ready" : "error");
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [catalog.locale]);
 
   /* Sıfırla — deactivate the plan; the reload recreates the starter plan
    * and the questionnaire becomes available again. */
@@ -244,18 +250,38 @@ function PlanPanel() {
   if (status === "loading") {
     return (
       <div className="iplan" aria-busy="true">
-        <p className="iplan-rest">{UI.planLoading}</p>
+        <p className="iplan-rest">{t("plan.loading")}</p>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="iplan" role="status">
+        <p className="iplan-rest">{t("plan.planUnavailable")}</p>
+        <div>
+          <button type="button" className="ibtn ibtn-sm" onClick={() => { void load(); }}>
+            {t("plan.retry")}
+          </button>
+        </div>
       </div>
     );
   }
 
   if (status === "quiz" || !plan) {
-    return <PlanQuiz busy={busy} onCancel={() => setStatus("ready")} onSubmit={build} />;
+    return (
+      <PlanQuiz
+        busy={busy}
+        onCancel={() => setStatus(planRef.current ? "ready" : "error")}
+        onSubmit={build}
+      />
+    );
   }
 
   return (
     <PlanView
       plan={plan}
+      catalog={catalog}
       busy={busy}
       note={offlineNote}
       onBuild={() => { setOfflineNote(false); setStatus("quiz"); }}
@@ -267,15 +293,17 @@ function PlanPanel() {
 /* ── The active plan view (hero + today's session + weekly strip) ───────── */
 
 function PlanView({
-  plan, busy, note, onBuild, onReset,
+  plan, catalog, busy, note, onBuild, onReset,
 }: {
   plan: ActivePlan;
+  catalog: GymAppContent;
   busy: boolean;
   /** the last personal-plan POST failed — show the offline note. */
   note: boolean;
   onBuild: () => void;
   onReset: () => void;
 }) {
+  const t = useTranslations("gymApp");
   const [weekday, setWeekday] = useState<number | null>(null);
   const [done, setDone] = useState<Set<string>>(new Set());
   const doneKey = useRef<string>("");
@@ -327,71 +355,70 @@ function PlanView({
   const total = day.exercises.length;
   const doneCount = day.exercises.filter((_, i) => done.has(String(i))).length;
   const allDone = total > 0 && doneCount === total;
-  const groups = muscleGroupsOf(day);
+  const groups = muscleGroupsOf(day, catalog.exercises);
   const minutes = minutesOf(day);
   const sets = totalSetsOf(day);
   const weekPct = Math.max(0, Math.min(100, Math.round((plan.week / Math.max(1, plan.total)) * 100)));
+  const dayName = weekdayLabel(catalog.locale, day.day, false);
 
   return (
     <div className="iplan">
       {/* Active plan header */}
       <div className="iplan-hero" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
         <div className="iplan-hero-body">
-          <p className="iplan-eyebrow"><span className="iplan-eyebrow-i" aria-hidden />{UI.activeEyebrow}</p>
+          <p className="iplan-eyebrow"><span className="iplan-eyebrow-i" aria-hidden />{t("plan.activeEyebrow")}</p>
           <h2 className="iplan-hero-title">{plan.title}</h2>
           {plan.focus && <p className="iplan-hero-desc">{plan.focus}</p>}
           <div className="iplan-hero-meta">
             {plan.level && <span className="itag itag-solid">{plan.level}</span>}
-            <span className="itag">{plan.source === "ai" ? UI.aiTag : UI.defaultTag}</span>
-            <span className="itag">{fill(UI.weekLabel, plan.week, plan.total)}</span>
-            <span className="itag">{fill(UI.daysPerWeek, plan.days.length)}</span>
+            <span className="itag">{plan.source === "ai" ? t("plan.aiTag") : t("plan.defaultTag")}</span>
+            <span className="itag">{t("plan.weekLabel", { week: plan.week, total: plan.total })}</span>
+            <span className="itag">{t("plan.daysPerWeek", { count: plan.days.length })}</span>
           </div>
           <div
             className="iplan-bar"
             role="progressbar"
             aria-valuenow={weekPct}
             aria-valuemin={0} aria-valuemax={100}
-            aria-label={fill(UI.weekLabel, plan.week, plan.total)}
+            aria-label={t("plan.progressA11y", { percent: weekPct })}
           >
             <i style={{ width: `${weekPct}%` }} />
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem", marginTop: ".2rem" }}>
             <button type="button" className="ibtn ibtn-sm" onClick={onBuild} disabled={busy}>
-              <Wand2 size={15} aria-hidden />{UI.buildCta}
+              <Wand2 size={15} aria-hidden />{t("plan.buildCta")}
             </button>
             <button type="button" className="ibtn ibtn-sm ibtn-ghost" onClick={onReset} disabled={busy}>
-              {UI.resetCta}
+              {t("plan.resetCta")}
             </button>
           </div>
-          {note && <p className="iplan-rest">{UI.offlineNote}</p>}
+          {note && <p className="iplan-rest">{t("plan.offlineNote")}</p>}
         </div>
       </div>
 
       {/* Today's session: sticky summary + exercise cards */}
       <div className="iplan-grid">
-        <aside className="iplan-side" aria-label={UI.sessionSummary}>
+        <aside className="iplan-side" aria-label={t("plan.sessionSummary")}>
           <div className="iplan-side-card">
             <p className="iplan-side-day">
-              {isToday ? UI.todayTitle : UI.nextSession}
+              {isToday ? t("plan.sessionTitle") : t("plan.nextSession")}
             </p>
-            <p className="iplan-side-date">
-              {DAY_NAMES[jsDayOf(day.day)] ?? ""}
-            </p>
+            <p className="iplan-side-date">{dayName}</p>
             {day.focus && (
               <p style={{ margin: 0, fontSize: ".8rem", fontWeight: 600, color: "var(--muted)" }}>
                 {day.focus}
               </p>
             )}
 
-            {!isToday && <p className="iplan-rest">{UI.restDay}</p>}
+            {!isToday && <p className="iplan-rest">{t("plan.restDay")}</p>}
 
             <div className="iplan-stats">
-              <div><b>{total}</b><span>hərəkət</span></div>
-              <div><b>{sets}</b><span>yanaşma</span></div>
-              <div><b>~{minutes}</b><span>dəqiqə</span></div>
+              <div><b>{total}</b><span>{t("plan.statExercises")}</span></div>
+              <div><b>{sets}</b><span>{t("plan.statSets")}</span></div>
+              <div><b>~{minutes}</b><span>{t("plan.statMinutes")}</span></div>
             </div>
 
-            <p className="iplan-side-sub">{UI.muscleGroups}</p>
+            <p className="iplan-side-sub">{t("plan.muscleGroups")}</p>
             <ul className="iplan-chips">
               {groups.map((g) => <li key={g} className="itag">{g}</li>)}
             </ul>
@@ -401,7 +428,7 @@ function PlanView({
                 <li key={i} className={done.has(String(i)) ? "done" : undefined}>
                   <span className="iplan-list-n" aria-hidden>{i + 1}</span>
                   <span className="iplan-list-name">{pe.name}</span>
-                  <span className="iplan-list-dose">{pe.sets} × {pe.reps}</span>
+                  <span className="iplan-list-dose">{t("plan.setsLine", { sets: pe.sets, reps: pe.reps })}</span>
                 </li>
               ))}
             </ol>
@@ -410,8 +437,8 @@ function PlanView({
               <div className="iplan-bar small" aria-hidden>
                 <i style={{ width: `${total ? Math.round((doneCount / total) * 100) : 0}%` }} />
               </div>
-              <p className="iplan-progress-txt">{fill(UI.sessionProgress, doneCount, total)}</p>
-              {allDone && <p className="iplan-finished">{UI.finished}</p>}
+              <p className="iplan-progress-txt">{t("plan.sessionProgress", { done: doneCount, total })}</p>
+              {allDone && <p className="iplan-finished">{t("plan.finished")}</p>}
             </div>
           </div>
         </aside>
@@ -419,7 +446,7 @@ function PlanView({
         <div className="iplan-cards">
           {!isToday && (
             <p className="iplan-next-hint">
-              {UI.restDay} — {UI.nextSession}: <b>{DAY_NAMES[jsDayOf(day.day)]}</b>
+              {t("plan.restDay")} — {t("plan.nextSession")}: <b>{dayName}</b>
             </p>
           )}
           <ul className="iex-grid">
@@ -428,6 +455,7 @@ function PlanView({
                 key={i}
                 index={i}
                 pe={pe}
+                ex={catalog.exercises[pe.ex]}
                 done={done.has(String(i))}
                 onToggle={() => toggleDone(String(i))}
               />
@@ -437,8 +465,8 @@ function PlanView({
       </div>
 
       {/* Weekly strip */}
-      <section className="iplan-week" aria-label={UI.weeklyTitle}>
-        <p className="iplan-side-sub">{UI.weeklyTitle}</p>
+      <section className="iplan-week" aria-label={t("plan.scheduleA11y")}>
+        <p className="iplan-side-sub">{t("plan.scheduleEyebrow")}</p>
         <ul className="iplan-week-row">
           {[1, 2, 3, 4, 5, 6, 0].map((d) => {
             const has = plan.days.some((pd) => pd.day === planDayOf(d));
@@ -453,14 +481,96 @@ function PlanView({
                 ].join(" ")}
                 aria-current={isTodayRow ? "date" : undefined}
               >
-                <span className="iplan-week-name">{DAY_SHORT[d]}</span>
-                <span className="iplan-week-tag">{has ? UI.workoutTag : UI.restTag}</span>
+                <span className="iplan-week-name">{weekdayLabel(catalog.locale, planDayOf(d), true)}</span>
+                <span className="iplan-week-tag">{has ? t("plan.workoutTag") : t("plan.restTag")}</span>
               </li>
             );
           })}
         </ul>
       </section>
+
+      {/* The plan catalog (gym_* content tables) */}
+      {catalog.plans.length > 0 && (
+        <section className="iplan-plans" aria-label={t("plan.plansEyebrow")}>
+          <p className="iplan-side-sub">{t("plan.plansEyebrow")}</p>
+          <ul className="iplan-plan-grid">
+            {catalog.plans.map((p, i) => (
+              <PlanCard key={p.id} plan={p} i={i} locale={catalog.locale} />
+            ))}
+          </ul>
+        </section>
+      )}
     </div>
+  );
+}
+
+/* ── A plan-catalog card: image, meta, progress + expandable day details ── */
+
+function PlanCard({
+  plan, i, locale,
+}: {
+  plan: GymAppContent["plans"][number];
+  i: number;
+  locale: string;
+}) {
+  const t = useTranslations("gymApp");
+  const [open, setOpen] = useState(false);
+  const pct = plan.week !== null && plan.total
+    ? Math.max(0, Math.min(100, Math.round((plan.week / plan.total) * 100)))
+    : null;
+  return (
+    <li className="iplan-plan" style={{ "--i": i } as CSSProperties}>
+      <img src={plan.image} alt="" width={640} height={360} loading="lazy" decoding="async" />
+      <div className="iplan-plan-body">
+        <div className="iplan-plan-top">
+          <h3>{plan.name}</h3>
+          {plan.level && <span className="itag">{plan.level}</span>}
+        </div>
+        <p>{plan.desc}</p>
+        <div className="iplan-hero-meta" style={{ marginTop: ".1rem" }}>
+          {plan.meta.map((m, mi) => <span key={mi} className="itag">{m}</span>)}
+          {pct !== null && (
+            <span className="itag itag-solid">
+              {plan.week}/{plan.total}
+            </span>
+          )}
+        </div>
+        {pct !== null && (
+          <div className="iplan-bar small" aria-hidden>
+            <i style={{ width: `${pct}%` }} />
+          </div>
+        )}
+        <button
+          type="button"
+          className="ibtn ibtn-sm ibtn-ghost"
+          aria-expanded={open}
+          onClick={() => setOpen((v) => !v)}
+        >
+          <ChevronsUpDown
+            size={14} aria-hidden
+            style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform .25s var(--ease-out, cubic-bezier(.23,1,.32,1))" }}
+          />
+          {t("plan.daysToggle", { count: plan.days.length })}
+        </button>
+        {open && (
+          <div className="iplan-plan-days">
+            {plan.days.map((d) => (
+              <div key={d.day} className="iplan-plan-day">
+                <h5>{weekdayLabel(locale, d.day, false)}</h5>
+                <ul>
+                  {d.exercises.map((pe, ei) => (
+                    <li key={ei}>
+                      <span>{pe.name}</span>
+                      <b>{pe.sets} × {pe.reps}</b>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </li>
   );
 }
 
@@ -473,26 +583,38 @@ function PlanQuiz({
   onCancel: () => void;
   onSubmit: (answers: QuizAnswers) => void;
 }) {
+  const t = useTranslations("gymApp");
   const [step, setStep] = useState(0);
-  /* one pick list per step (multi steps hold up to `multi` options) */
-  const [picked, setPicked] = useState<string[][]>(() => QUIZ.steps.map(() => []));
+  const [dir, setDir] = useState<1 | -1>(1);
+  /* one pick list per step (multi steps hold up to `cap` options) */
+  const [picked, setPicked] = useState<string[][]>(() => QUIZ_STEPS.map(() => []));
   const [text, setText] = useState("");
 
-  const s = QUIZ.steps[step] ?? QUIZ.steps[0];
-  const last = step === QUIZ.steps.length - 1;
+  const s: QuizStep = QUIZ_STEPS[step] ?? QUIZ_STEPS[0]!;
+  const last = step === QUIZ_STEPS.length - 1;
   const chosen = picked[step] ?? [];
-  const canNext = Boolean(s.free) || chosen.length > 0;
+  const canNext = s.kind === "free" || chosen.length > 0;
+  const question = t(`quiz.q_${s.id}`);
+  const options = useMemo(
+    () => Array.from({ length: s.options }, (_, i) => t(`quiz.q_${s.id}_o${i + 1}`)),
+    [s.id, s.options, t],
+  );
 
   const pick = (option: string) => {
     setPicked((prev) => prev.map((sel, i) => {
       if (i !== step) return sel;
       const has = sel.includes(option);
-      if (s.multi) {
+      if (s.cap) {
         return has ? sel.filter((o) => o !== option)
-          : sel.length >= s.multi ? sel : [...sel, option];
+          : sel.length >= s.cap ? sel : [...sel, option];
       }
       return has ? [] : [option];
     }));
+  };
+
+  const go = (next: number) => {
+    setDir(next > step ? 1 : -1);
+    setStep(next);
   };
 
   const next = () => {
@@ -508,85 +630,102 @@ function PlanQuiz({
       });
       return;
     }
-    setStep(step + 1);
+    go(step + 1);
   };
 
   return (
     <div className="iplan">
       <div className="iplan-hero" style={{ gridTemplateColumns: "minmax(0, 1fr)" }}>
         <div className="iplan-hero-body">
-          <p className="iplan-eyebrow"><span className="iplan-eyebrow-i" aria-hidden />{QUIZ.eyebrow}</p>
-          <h2 className="iplan-hero-title">{QUIZ.title}</h2>
-          <p className="iplan-hero-desc">{QUIZ.desc}</p>
-          <div className="iplan-hero-meta">
-            <span className="itag itag-solid">{fill(QUIZ.stepOf, step + 1, QUIZ.steps.length)}</span>
+          <p className="iplan-eyebrow"><span className="iplan-eyebrow-i" aria-hidden />{t("quiz.eyebrow")}</p>
+          <h2 className="iplan-hero-title">{t("quiz.title")}</h2>
+          <p className="iplan-hero-desc">{t("quiz.desc")}</p>
+
+          {/* the step progress bar — linear width, advancing with steps */}
+          <div
+            className="iquiz-bar"
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={QUIZ_STEPS.length}
+            aria-valuenow={step + 1}
+            aria-label={t("quiz.stepOf", { step: step + 1, total: QUIZ_STEPS.length })}
+          >
+            <i style={{ width: `${((step + 1) / QUIZ_STEPS.length) * 100}%` }} />
           </div>
 
-          <h3 style={{ margin: ".4rem 0 0", font: "600 1.15rem/1.3 var(--font-display)", letterSpacing: "-.01em" }}>
-            {s.q}
-          </h3>
+          <div key={step} className={dir === 1 ? "iquiz-step iquiz-step-fwd" : "iquiz-step iquiz-step-back"}>
+            <div className="iplan-hero-meta" style={{ marginTop: ".2rem" }}>
+              <span className="itag itag-solid">
+                {t("quiz.stepOf", { step: step + 1, total: QUIZ_STEPS.length })}
+              </span>
+            </div>
 
-          {s.free ? (
-            <>
-              <textarea
-                value={text}
-                rows={3}
-                placeholder={QUIZ.limitPlaceholder}
-                aria-label={s.q}
-                onChange={(e) => setText(e.target.value)}
-                disabled={busy}
-                style={{
-                  width: "100%", padding: ".7rem .9rem",
-                  border: "1px solid var(--line)", borderRadius: "14px",
-                  background: "var(--surface)", color: "var(--ink)",
-                  font: "500 .9rem/1.45 var(--font-body)", resize: "vertical",
-                }}
-              />
-              <ul className="ishop-chips">
-                <li>
-                  <button
-                    type="button"
-                    className="ichip"
-                    aria-pressed={text.trim() === ""}
-                    onClick={() => setText("")}
-                    disabled={busy}
-                  >
-                    {QUIZ.none}
-                  </button>
-                </li>
+            <h3 style={{ margin: ".4rem 0 0", font: "600 1.15rem/1.3 var(--font-display)", letterSpacing: "-.01em" }}>
+              {question}
+            </h3>
+
+            {s.kind === "free" ? (
+              <>
+                <textarea
+                  value={text}
+                  rows={3}
+                  placeholder={t("quiz.limitPlaceholder")}
+                  aria-label={question}
+                  onChange={(e) => setText(e.target.value)}
+                  disabled={busy}
+                  style={{
+                    width: "100%", padding: ".7rem .9rem",
+                    border: "1px solid var(--line)", borderRadius: "14px",
+                    background: "var(--surface)", color: "var(--ink)",
+                    font: "500 .9rem/1.45 var(--font-body)", resize: "vertical",
+                  }}
+                />
+                <ul className="ishop-chips">
+                  <li>
+                    <button
+                      type="button"
+                      className="ichip"
+                      aria-pressed={text.trim() === ""}
+                      onClick={() => setText("")}
+                      disabled={busy}
+                    >
+                      {t("quiz.none")}
+                    </button>
+                  </li>
+                </ul>
+              </>
+            ) : (
+              <ul className="ishop-chips" aria-label={question}>
+                {options.map((o) => (
+                  <li key={o}>
+                    <button
+                      type="button"
+                      className="ichip"
+                      aria-pressed={chosen.includes(o)}
+                      onClick={() => pick(o)}
+                      disabled={busy}
+                    >
+                      {o}
+                    </button>
+                  </li>
+                ))}
               </ul>
-            </>
-          ) : (
-            <ul className="ishop-chips" aria-label={s.q}>
-              {s.options.map((o) => (
-                <li key={o}>
-                  <button
-                    type="button"
-                    className="ichip"
-                    aria-pressed={chosen.includes(o)}
-                    onClick={() => pick(o)}
-                    disabled={busy}
-                  >
-                    {o}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+            )}
+          </div>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem", marginTop: ".3rem" }}>
             <button
               type="button"
               className="ibtn ibtn-ghost ibtn-sm"
-              onClick={step === 0 ? onCancel : () => setStep(step - 1)}
+              onClick={step === 0 ? onCancel : () => go(step - 1)}
               disabled={busy}
             >
-              {QUIZ.back}
+              {t("quiz.back")}
             </button>
             <button type="button" className="ibtn ibtn-sm" onClick={next} disabled={!canNext || busy}>
               {busy
-                ? <><LoaderCircle size={15} className="spin" aria-hidden />{QUIZ.busy}</>
-                : (last ? QUIZ.finish : QUIZ.next)}
+                ? <><LoaderCircle size={15} className="spin" aria-hidden />{t("quiz.busy")}</>
+                : (last ? t("quiz.finish") : t("quiz.next"))}
             </button>
           </div>
         </div>
@@ -595,42 +734,46 @@ function PlanQuiz({
   );
 }
 
+/* ── An exercise card of today's session ────────────────────────────────── */
+
 function ExerciseCard({
-  index, pe, done, onToggle,
+  index, pe, ex, done, onToggle,
 }: {
-  index: number; pe: PlanExercise; done: boolean; onToggle: () => void;
+  index: number; pe: PlanExercise; ex: GymAppExercise | undefined;
+  done: boolean; onToggle: () => void;
 }) {
-  const ex = EXERCISES[pe.ex]; // registry move? undefined → custom AI move
+  const t = useTranslations("gymApp");
+  const video = ex ? exerciseVideo(pe.ex) : null;
   const [open, setOpen] = useState(false);
   return (
     <li className={`iex${done ? " done" : ""}`}>
       <div
         className="iex-media"
-        style={ex ? undefined : {
+        style={video ? undefined : {
           /* custom AI move — no video: a centered dumbbell placeholder */
           aspectRatio: "16 / 10", background: "var(--tint)",
           display: "grid", placeItems: "center",
         }}
       >
-        {ex
-          ? <VideoTile src={ex.video} label={`${ex.name} — demo video`} tall />
+        {video
+          ? <VideoTile src={video} label={`${pe.name} — demo`} tall />
           : <Dumbbell size={30} strokeWidth={1.5} aria-hidden style={{ color: "var(--muted)" }} />}
         <span className="iex-n" aria-hidden>{index + 1}</span>
       </div>
       <div className="iex-body">
         <div className="iex-top">
           <h3 className="iex-name">{pe.name}</h3>
-          <span className="iex-dose">{pe.sets} × {pe.reps}</span>
+          <span className="iex-dose">{t("plan.setsLine", { sets: pe.sets, reps: pe.reps })}</span>
         </div>
         {ex && <p className="iex-target">{ex.target}</p>}
         {pe.note && <p className="iex-rest" style={{ fontStyle: "italic" }}>{pe.note}</p>}
         <p className="iex-rest">
           <Clock size={14} aria-hidden />
-          {pe.rest > 0 ? fill(UI.restLabel, pe.rest) : UI.flowLine}
+          {pe.rest > 0 ? t("plan.restLine", { count: pe.rest }) : t("plan.flowLine")}
         </p>
         {ex && (
           <details className="iex-guide" open={open} onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
-            <summary>{UI.howTo}</summary>
+            <summary>{t("plan.howTo")}</summary>
             <p>{ex.guide}</p>
           </details>
         )}
@@ -638,9 +781,17 @@ function ExerciseCard({
           type="button"
           className={`ibtn iex-done${done ? " done" : ""}`}
           aria-pressed={done}
+          title={done ? t("plan.doneUndo") : t("plan.done")}
           onClick={onToggle}
         >
-          {done ? <><X size={15} aria-hidden />{UI.done}</> : UI.done}
+          {done ? (
+            <>
+              <svg className="iex-check" viewBox="0 0 24 24" aria-hidden>
+                <path d="M4.5 12.5l5 5 10-11" />
+              </svg>
+              {t("plan.done")}
+            </>
+          ) : t("plan.done")}
         </button>
       </div>
     </li>
@@ -651,32 +802,44 @@ function ExerciseCard({
 
 type ShopTab = "supplements" | "accessories" | "equipment";
 
-function ShopPanel({ tab }: { tab: ShopTab }) {
+function ShopPanel({ tab, catalog }: { tab: ShopTab; catalog: GymAppContent }) {
+  const t = useTranslations("gymApp");
   const items = useMemo(
-    () => productsOf(tab === "accessories" ? ["accessories", "clothing"] : [tab]),
-    [tab],
+    () => catalog.products.filter((p) =>
+      tab === "accessories" ? (p.cat === "accessories" || p.cat === "clothing") : p.cat === tab),
+    [catalog.products, tab],
   );
 
   const [query, setQuery] = useState("");
   const [group, setGroup] = useState<string>("all");
   const [sort, setSort] = useState<"popular" | "cheap">("popular");
 
-  const groups = FILTER_GROUPS[tab];
+  /* The filter chips — category labels for accessories, group labels for
+   * the rest (both translated). */
+  const groups = useMemo(() => (
+    tab === "accessories"
+      ? [{ id: "accessories", label: t("tab_accessories") }, { id: "clothing", label: t("tab_clothing") }]
+      : GROUP_ORDER[tab].map((id) => ({ id: id as string, label: t(`group.${id}`) }))
+  ), [tab, t]);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
     let list = items.filter((p) => {
-      if (group !== "all" && p.group !== group) return false;
+      const g = groupOf(p);
+      const inGroup = tab === "accessories"
+        ? group === "all" || p.cat === group
+        : group === "all" || g === group;
+      if (!inGroup) return false;
       if (!q) return true;
       const hay = [
         p.name, p.brand,
-        ...p.at.map((a) => STORES[a.store]?.name ?? ""),
+        ...p.offers.map((a) => a.storeName),
       ].join(" ").toLowerCase();
       return hay.includes(q);
     });
-    if (sort === "cheap") list = [...list].sort((a, b) => minPriceOf(a) - minPriceOf(b));
+    if (sort === "cheap") list = [...list].sort((a, b) => minPriceOf(a.offers) - minPriceOf(b.offers));
     return list;
-  }, [items, query, group, sort]);
+  }, [items, query, group, sort, tab]);
 
   return (
     <div className="ishop">
@@ -686,49 +849,49 @@ function ShopPanel({ tab }: { tab: ShopTab }) {
           <input
             type="search"
             value={query}
-            placeholder={UI.searchPlaceholder}
-            aria-label={UI.searchLabel}
+            placeholder={t("searchPlaceholder")}
+            aria-label={t("searchLabel")}
             onChange={(e) => setQuery(e.target.value)}
           />
           {query !== "" && (
-            <button type="button" className="isearch-x" aria-label={UI.searchClear} onClick={() => setQuery("")}>
+            <button type="button" className="isearch-x" aria-label={t("searchClear")} onClick={() => setQuery("")}>
               <X size={14} aria-hidden />
             </button>
           )}
         </div>
-        <div className="iseg" role="group" aria-label={UI.sortLabel}>
-          <button type="button" aria-pressed={sort === "popular"} onClick={() => setSort("popular")}>{UI.sortPopular}</button>
-          <button type="button" aria-pressed={sort === "cheap"} onClick={() => setSort("cheap")}>{UI.sortCheap}</button>
+        <div className="iseg" role="group" aria-label={t("sortLabel")}>
+          <button type="button" aria-pressed={sort === "popular"} onClick={() => setSort("popular")}>{t("sortPopular")}</button>
+          <button type="button" aria-pressed={sort === "cheap"} onClick={() => setSort("cheap")}>{t("sortCheap")}</button>
         </div>
       </div>
 
-      <ul className="ishop-chips" aria-label={UI.filterLabel}>
+      <ul className="ishop-chips" aria-label={t("filterLabel")}>
         <li>
           <button type="button" className="ichip" aria-pressed={group === "all"} onClick={() => setGroup("all")}>
-            {UI.filterAll}
+            {t("filterAll")}
           </button>
         </li>
         {groups.map((g) => (
-          <li key={g}>
-            <button type="button" className="ichip" aria-pressed={group === g} onClick={() => setGroup(g)}>
-              {g}
+          <li key={g.id}>
+            <button type="button" className="ichip" aria-pressed={group === g.id} onClick={() => setGroup(g.id)}>
+              {g.label}
             </button>
           </li>
         ))}
       </ul>
 
       <output className="sr-only" aria-live="polite">
-        {fill(UI.resultsA11y, shown.length, items.length)}
+        {t("resultsA11y", { shown: shown.length, total: items.length })}
       </output>
 
-      <p className="ishop-note">{UI.shopNote}</p>
+      <p className="ishop-note">{t("shopNote")}</p>
 
       {shown.length === 0 ? (
         <div className="iempty">
           <SearchX size={22} aria-hidden />
-          <p><b>{UI.noResults}</b></p>
+          <p><b>{t("noResults")}</b></p>
           <button type="button" className="ibtn ibtn-sm ibtn-ghost" onClick={() => { setQuery(""); setGroup("all"); }}>
-            {UI.filterAll}
+            {t("filterAll")}
           </button>
         </div>
       ) : (
@@ -740,13 +903,15 @@ function ShopPanel({ tab }: { tab: ShopTab }) {
   );
 }
 
-function ProductCard({ p, i }: { p: Product; i: number }) {
-  const cheapest = minPriceOf(p);
-  const best = p.at.findIndex((a) => a.price === cheapest);
+function ProductCard({ p, i }: { p: GymAppProduct; i: number }) {
+  const t = useTranslations("gymApp");
+  const video = productVideo(p.id);
+  const cheapest = minPriceOf(p.offers);
+  const best = p.offers.findIndex((a) => a.price === cheapest);
   return (
     <li className="iprod" style={{ "--i": i } as CSSProperties}>
-      {p.video ? (
-        <VideoTile src={p.video} label={`${p.name} — demo video`} />
+      {video ? (
+        <VideoTile src={video} label={`${p.name} — demo`} />
       ) : (
         <div className="iprod-img">
           <img src={p.image} alt="" width={480} height={360} loading="lazy" decoding="async" />
@@ -755,32 +920,23 @@ function ProductCard({ p, i }: { p: Product; i: number }) {
       <div className="iprod-body">
         <p className="iprod-brand">{p.brand}</p>
         <h3 className="iprod-name">{p.name}</h3>
-        <div className="iprod-rate">
-          <Star size={13} fill="currentColor" aria-hidden />
-          <b>{p.rating.toFixed(1)}</b>
-          <span className="sr-only">{fill(UI.ratingA11y, p.rating.toFixed(1))}</span>
-        </div>
         <p className="iprod-price">{p.price[0]}–{p.price[1]} ₼</p>
         <div className="iprod-offers">
-          <p className="iprod-offers-t">{fill(UI.atCount, p.at.length)}</p>
-          {p.at.map((a, idx) => {
-            const s = STORES[a.store];
-            if (!s) return null;
-            return (
-              <a
-                key={a.store}
-                className={`iprod-offer${idx === best ? " best" : ""}`}
-                href={s.url}
-                target="_blank"
-                rel="noreferrer noopener"
-              >
-                <span className="iprod-offer-name">{s.name}</span>
-                <span className="iprod-offer-kind">{STORE_KIND_LABEL[s.kind]}</span>
-                <span className="iprod-offer-price">{a.price} ₼</span>
-                {idx === best && <span className="itag itag-solid">{UI.bestPrice}</span>}
-              </a>
-            );
-          })}
+          <p className="iprod-offers-t">{t("atCount", { count: p.offers.length })}</p>
+          {p.offers.map((a, idx) => (
+            <a
+              key={a.store}
+              className={`iprod-offer${idx === best ? " best" : ""}`}
+              href={a.url}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <span className="iprod-offer-name">{a.storeName}</span>
+              <span className="iprod-offer-kind">{a.kindLabel}</span>
+              <span className="iprod-offer-price">{a.price} ₼</span>
+              {idx === best && <span className="itag itag-solid">{t("bestPrice")}</span>}
+            </a>
+          ))}
         </div>
       </div>
     </li>
@@ -789,28 +945,34 @@ function ProductCard({ p, i }: { p: Product; i: number }) {
 
 /* ── Panel: halls (zallar) ──────────────────────────────────────────────── */
 
-function HallsPanel() {
+function HallsPanel({ catalog }: { catalog: GymAppContent }) {
+  const t = useTranslations("gymApp");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<"rating" | "price">("rating");
   const [active, setActive] = useState<string[]>([]);
 
+  const halls = catalog.halls;
+
+  /* The amenity chips — the resolved labels, in first-seen order. */
   const features = useMemo(() => {
     const set = new Set<string>();
-    for (const h of HALLS) for (const f of h.features) set.add(f);
+    for (const h of halls) for (const f of h.features) set.add(f);
     return [...set];
-  }, []);
+  }, [halls]);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list = HALLS.filter((h) => {
+    let list = halls.filter((h) => {
       if (active.length > 0 && !active.some((f) => h.features.includes(f))) return false;
       if (!q) return true;
       return `${h.name} ${h.desc} ${h.address}`.toLowerCase().includes(q);
     });
     list = [...list].sort((a, b) =>
-      sort === "rating" ? b.rating - a.rating : a.dayPrice - b.dayPrice);
+      sort === "rating"
+        ? (b.rating ?? 0) - (a.rating ?? 0)
+        : (a.dayPrice ?? 0) - (b.dayPrice ?? 0));
     return list;
-  }, [query, sort, active]);
+  }, [halls, query, sort, active]);
 
   const toggle = (f: string) =>
     setActive((prev) => prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]);
@@ -823,26 +985,26 @@ function HallsPanel() {
           <input
             type="search"
             value={query}
-            placeholder={UI.searchPlaceholder}
-            aria-label={UI.searchLabel}
+            placeholder={t("searchPlaceholder")}
+            aria-label={t("searchLabel")}
             onChange={(e) => setQuery(e.target.value)}
           />
           {query !== "" && (
-            <button type="button" className="isearch-x" aria-label={UI.searchClear} onClick={() => setQuery("")}>
+            <button type="button" className="isearch-x" aria-label={t("searchClear")} onClick={() => setQuery("")}>
               <X size={14} aria-hidden />
             </button>
           )}
         </div>
-        <div className="iseg" role="group" aria-label={UI.sortLabel}>
-          <button type="button" aria-pressed={sort === "rating"} onClick={() => setSort("rating")}>{UI.sortRating}</button>
-          <button type="button" aria-pressed={sort === "price"} onClick={() => setSort("price")}>{UI.sortPrice}</button>
+        <div className="iseg" role="group" aria-label={t("sortLabel")}>
+          <button type="button" aria-pressed={sort === "rating"} onClick={() => setSort("rating")}>{t("gyms.sortRating")}</button>
+          <button type="button" aria-pressed={sort === "price"} onClick={() => setSort("price")}>{t("gyms.sortPrice")}</button>
         </div>
       </div>
 
-      <ul className="ishop-chips" aria-label={UI.filterLabel}>
+      <ul className="ishop-chips" aria-label={t("gyms.filterLabel")}>
         <li>
           <button type="button" className="ichip" aria-pressed={active.length === 0} onClick={() => setActive([])}>
-            {UI.filterAll}
+            {t("gyms.filterAll")}
           </button>
         </li>
         {features.map((f) => (
@@ -855,15 +1017,15 @@ function HallsPanel() {
       </ul>
 
       <output className="sr-only" aria-live="polite">
-        {fill(UI.resultsA11y, shown.length, HALLS.length)}
+        {t("resultsA11y", { shown: shown.length, total: halls.length })}
       </output>
 
       {shown.length === 0 ? (
         <div className="iempty">
           <SearchX size={22} aria-hidden />
-          <p><b>{UI.gymsNoResults}</b></p>
+          <p><b>{t("gyms.gymsNoResults")}</b></p>
           <button type="button" className="ibtn ibtn-sm ibtn-ghost" onClick={() => { setQuery(""); setActive([]); }}>
-            {UI.filterAll}
+            {t("gyms.filterAll")}
           </button>
         </div>
       ) : (
@@ -875,7 +1037,8 @@ function HallsPanel() {
   );
 }
 
-function HallCard({ h, i }: { h: Hall; i: number }) {
+function HallCard({ h, i }: { h: GymAppPlace; i: number }) {
+  const t = useTranslations("gymApp");
   const [eqOpen, setEqOpen] = useState(false);
   const eqShown = eqOpen ? h.equipment : h.equipment.slice(0, 8);
   const more = h.equipment.length - eqShown.length;
@@ -884,9 +1047,11 @@ function HallCard({ h, i }: { h: Hall; i: number }) {
     <li className="izal-card" style={{ "--i": i } as CSSProperties}>
       <div className="izal-img">
         <img src={h.image} alt="" width={800} height={533} loading="lazy" decoding="async" />
-        <span className="izal-score" role="img" aria-label={fill(UI.ratingA11y, h.rating.toFixed(1))}>
-          <Star size={14} fill="currentColor" aria-hidden />{h.rating.toFixed(1)}
-        </span>
+        {h.rating !== null && (
+          <span className="izal-score" role="img" aria-label={t("ratingA11y", { score: h.rating.toFixed(1) })}>
+            <Star size={14} fill="currentColor" aria-hidden />{h.rating.toFixed(1)}
+          </span>
+        )}
       </div>
       <div className="izal-body">
         <h3 className="izal-name">{h.name}</h3>
@@ -894,7 +1059,7 @@ function HallCard({ h, i }: { h: Hall; i: number }) {
         <div className="izal-meta">
           <span><MapPin size={15} aria-hidden />{h.address}</span>
           <span>
-            <span className="sr-only">{UI.openHoursSr}: </span>
+            <span className="sr-only">{t("gyms.openHoursSr")}: </span>
             <Clock size={15} aria-hidden />{h.hours}
           </span>
         </div>
@@ -902,36 +1067,40 @@ function HallCard({ h, i }: { h: Hall; i: number }) {
           {h.features.map((f) => <span key={f} className="itag">{f}</span>)}
         </div>
         <div className="izal-foot">
-          <span className="itag itag-solid">{UI.dayPass} · {h.dayPrice} ₼</span>
+          {h.dayPrice !== null && (
+            <span className="itag itag-solid">{t("gyms.dayPass")} · {h.dayPrice} ₼</span>
+          )}
           <a className="ibtn ibtn-sm" href={maps} target="_blank" rel="noreferrer noopener">
-            <MapPin size={14} aria-hidden />{UI.mapsCta}
+            <MapPin size={14} aria-hidden />{t("gyms.mapsCta")}
           </a>
         </div>
 
         {/* Trainers */}
-        <section className="izal-sec" aria-label={UI.trainersTitle}>
-          <h4>{UI.trainersTitle}</h4>
-          <ul className="izal-coaches">
-            {h.trainers.map((t) => (
-              <li key={t.name}>
-                <span className="izal-avatar" aria-hidden>
-                  {t.name.charAt(0).toLocaleUpperCase("az")}
-                </span>
-                <span className="izal-coach-txt">
-                  <b>{t.name}</b>
-                  <small>{t.spec} · {fill(UI.trainerYears, t.years)}</small>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
+        {h.trainers.length > 0 && (
+          <section className="izal-sec" aria-label={t("gyms.trainersTitle")}>
+            <h4>{t("gyms.trainersTitle")}</h4>
+            <ul className="izal-coaches">
+              {h.trainers.map((tr) => (
+                <li key={tr.name}>
+                  <span className="izal-avatar" aria-hidden>
+                    {tr.name.charAt(0).toLocaleUpperCase("az")}
+                  </span>
+                  <span className="izal-coach-txt">
+                    <b>{tr.name}</b>
+                    <small>{tr.spec} · {t("gyms.trainerYears", { count: tr.years })}</small>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {/* Equipment */}
-        <section className="izal-sec" aria-label={UI.equipTitle}>
-          <h4>{UI.equipTitle}</h4>
+        <section className="izal-sec" aria-label={t("gyms.equipTitle")}>
+          <h4>{t("gyms.equipTitle")}</h4>
           <div className="izal-eq">
-            {eqShown.map((code) => (
-              <span key={code} className="itag">{EQ_LABELS[code] ?? code}</span>
+            {eqShown.map((label, idx) => (
+              <span key={`${label}-${idx}`} className="itag">{label}</span>
             ))}
             {more > 0 && (
               <button type="button" className="itag itag-more" onClick={() => setEqOpen(true)}>
@@ -956,16 +1125,17 @@ const subscribeMobile = (cb: () => void) => {
 const getMobileSnapshot = () => window.matchMedia(MOBILE_MQ).matches;
 const getMobileServer = () => false;
 
-const SECTION_LINKS: { key: keyof IdmanLinks; label: string; icon: LucideIcon }[] = [
-  { key: "home", label: "Ana səhifə", icon: House },
-  { key: "diet", label: "Qidalanma", icon: Salad },
-  { key: "meditation", label: "Psixologiya", icon: Brain },
-  { key: "library", label: "Kitablar", icon: BookOpen },
+const SECTION_LINKS: { key: keyof IdmanLinks; labelKey: string; icon: LucideIcon }[] = [
+  { key: "home", labelKey: "nav.home", icon: House },
+  { key: "diet", labelKey: "nav.diet", icon: Salad },
+  { key: "meditation", labelKey: "nav.meditation", icon: Brain },
+  { key: "library", labelKey: "nav.library", icon: BookOpen },
 ];
 
 export function IdmanApp({
-  user, initialTab = "plan", links, onThemeChange, embedded = false, tab, onTabChange,
+  user, catalog, initialTab = "plan", links, onThemeChange, embedded = false, tab, onTabChange,
 }: IdmanAppProps) {
+  const t = useTranslations("gymApp");
   const [ownTab, setOwnTab] = useState<IdmanTabId>(initialTab);
   const activeTab = embedded ? (tab ?? ownTab) : ownTab;
   const setTab = (id: IdmanTabId) => {
@@ -976,6 +1146,18 @@ export function IdmanApp({
   const [mobOpen, setMobOpen] = useState(false);
   const [groupOpen, setGroupOpen] = useState(true);
   const [dark, setDark] = useState(false);
+
+  /* Direction-aware panel transitions — compare the tab order during
+   * render (the "adjust state when props change" pattern) so the entering
+   * panel carries the right class on its very first frame. */
+  const [prevTab, setPrevTab] = useState<IdmanTabId>(activeTab);
+  const [dir, setDir] = useState(1);
+  if (prevTab !== activeTab) {
+    const from = IDMAN_TABS.findIndex((x) => x.id === prevTab);
+    const to = IDMAN_TABS.findIndex((x) => x.id === activeTab);
+    setDir(to >= from ? 1 : -1);
+    setPrevTab(activeTab);
+  }
 
   /* The live breakpoint — an external store, no effect state dance. */
   const mobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServer);
@@ -1034,15 +1216,28 @@ export function IdmanApp({
     onThemeChange?.(dark);
   };
 
-  const head = TAB_HEADS[activeTab];
   const initial = (user.name || "S").charAt(0).toLocaleUpperCase("az");
 
   const panels: Record<IdmanTabId, ReactNode> = {
-    plan: <PlanPanel />,
-    supplements: <ShopPanel tab="supplements" />,
-    accessories: <ShopPanel tab="accessories" />,
-    gyms: <HallsPanel />,
-    equipment: <ShopPanel tab="equipment" />,
+    plan: <PlanPanel catalog={catalog} />,
+    supplements: <ShopPanel tab="supplements" catalog={catalog} />,
+    accessories: <ShopPanel tab="accessories" catalog={catalog} />,
+    gyms: <HallsPanel catalog={catalog} />,
+    equipment: <ShopPanel tab="equipment" catalog={catalog} />,
+  };
+
+  /* The animated panel host — keyed by tab so each switch remounts and
+   * enters from the travel direction (fade + 10px slide, 220ms). */
+  const panelNode = (
+    <div key={activeTab} className={dir === 1 ? "ipanel ipanel-fwd" : "ipanel ipanel-back"}>
+      {panels[activeTab]}
+    </div>
+  );
+
+  const head = {
+    eyebrow: t(`heads.${activeTab}.eyebrow`),
+    title: t(`heads.${activeTab}.title`),
+    lede: t(`heads.${activeTab}.lede`),
   };
 
   /* ── Embedded: the main column only — the global AppShell owns the
@@ -1056,7 +1251,7 @@ export function IdmanApp({
             <h1 className="ihead-title">{head.title}</h1>
             <p className="ihead-lede">{head.lede}</p>
           </header>
-          {panels[activeTab]}
+          {panelNode}
         </div>
       </div>
     );
@@ -1066,11 +1261,11 @@ export function IdmanApp({
     <div className="idman" data-open={expanded ? "open" : "closed"}>
       {/* Mobile scrim */}
       {mobile && expanded && (
-        <button type="button" className="inav-scrim" aria-label={UI.railClose} onClick={() => setMobOpen(false)} />
+        <button type="button" className="inav-scrim" aria-label={t("nav.railClose")} onClick={() => setMobOpen(false)} />
       )}
 
       {/* ── The glass sidebar ── */}
-      <aside className="inav" aria-label={UI.railLabel} data-open={expanded ? "open" : "closed"}>
+      <aside className="inav" aria-label={t("nav.railLabel")} data-open={expanded ? "open" : "closed"}>
         <div className="inav-top">
           <a className="inav-brand" href={links?.home ?? "#"} aria-label="PreLife">
             <span className="inav-brand-ic" aria-hidden><Dumbbell size={19} strokeWidth={2.2} /></span>
@@ -1080,7 +1275,7 @@ export function IdmanApp({
             type="button"
             className="inav-fold"
             onClick={toggleRail}
-            aria-label={expanded ? UI.railClose : UI.railOpen}
+            aria-label={expanded ? t("nav.railClose") : t("nav.railOpen")}
             aria-expanded={expanded}
           >
             <ChevronsUpDown size={16} aria-hidden />
@@ -1095,7 +1290,7 @@ export function IdmanApp({
               <span className="inav-profile-txt">
                 <b>{user.name}</b>
                 <small>
-                  <Crown size={11} aria-hidden /> {UI.premium}
+                  <Crown size={11} aria-hidden /> {t("nav.premium")}
                 </small>
               </span>
             )}
@@ -1109,12 +1304,12 @@ export function IdmanApp({
                 className="inav-group-head"
                 onClick={onGroupClick}
                 aria-expanded={groupOpen}
-                title={!expanded ? "İdman" : undefined}
+                title={!expanded ? t("nav.group") : undefined}
               >
                 <span className="inav-ic" aria-hidden><Dumbbell size={19} strokeWidth={2} /></span>
                 {expanded && (
                   <>
-                    <span className="inav-row-label">İdman</span>
+                    <span className="inav-row-label">{t("nav.group")}</span>
                     <ChevronsUpDown
                       size={14} aria-hidden
                       className="inav-caret"
@@ -1124,14 +1319,14 @@ export function IdmanApp({
                 )}
               </button>
               <div className={`inav-sub${groupOpen && expanded ? " open" : ""}`}>
-                {IDMAN_TABS.map((t) => (
+                {IDMAN_TABS.map((tb) => (
                   <NavRow
-                    key={t.id}
-                    icon={tabIcon(t.id)}
-                    label={t.label}
+                    key={tb.id}
+                    icon={tabIcon(tb.id)}
+                    label={t(`tab_${tb.id}`)}
                     open={expanded}
-                    active={activeTab === t.id}
-                    onClick={() => pick(t.id)}
+                    active={activeTab === tb.id}
+                    onClick={() => pick(tb.id)}
                   />
                 ))}
               </div>
@@ -1142,7 +1337,7 @@ export function IdmanApp({
               <NavRow
                 key={s.key}
                 icon={s.icon}
-                label={s.label}
+                label={t(s.labelKey)}
                 open={expanded}
                 href={links?.[s.key] ?? "#"}
               />
@@ -1152,8 +1347,8 @@ export function IdmanApp({
           {/* Notice card */}
           {expanded && (
             <div className="inav-card">
-              <p className="inav-card-t">{UI.newsTitle}</p>
-              <p className="inav-card-b">{UI.newsBody}</p>
+              <p className="inav-card-t">{t("nav.newsTitle")}</p>
+              <p className="inav-card-b">{t("nav.newsBody")}</p>
             </div>
           )}
         </div>
@@ -1163,17 +1358,17 @@ export function IdmanApp({
             type="button"
             className="inav-foot-btn"
             onClick={toggleTheme}
-            aria-label={UI.themeToggle}
-            title={UI.themeToggle}
+            aria-label={t("nav.themeToggle")}
+            title={t("nav.themeToggle")}
           >
             <span className="inav-ic" aria-hidden>
               {dark ? <Sun size={18} /> : <Moon size={18} />}
             </span>
-            {expanded && <span className="inav-row-label">{dark ? UI.themeLight : UI.themeDark}</span>}
+            {expanded && <span className="inav-row-label">{dark ? t("nav.themeLight") : t("nav.themeDark")}</span>}
           </button>
-          <a className="inav-foot-btn" href={links?.settings ?? "#"} aria-label={UI.settings} title={UI.settings}>
+          <a className="inav-foot-btn" href={links?.settings ?? "#"} aria-label={t("nav.settings")} title={t("nav.settings")}>
             <span className="inav-ic" aria-hidden><Settings size={18} /></span>
-            {expanded && <span className="inav-row-label">{UI.settings}</span>}
+            {expanded && <span className="inav-row-label">{t("nav.settings")}</span>}
           </a>
         </div>
       </aside>
@@ -1184,7 +1379,7 @@ export function IdmanApp({
           type="button"
           className="inav-fab"
           onClick={() => setMobOpen(true)}
-          aria-label={UI.railOpen}
+          aria-label={t("nav.railOpen")}
         >
           <Dumbbell size={18} aria-hidden />
         </button>
@@ -1197,7 +1392,7 @@ export function IdmanApp({
           <h1 className="ihead-title">{head.title}</h1>
           <p className="ihead-lede">{head.lede}</p>
         </header>
-        {panels[activeTab]}
+        {panelNode}
       </div>
     </div>
   );

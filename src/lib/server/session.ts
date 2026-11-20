@@ -109,12 +109,13 @@ export async function createSession(
 
   // v3.3: the avatar + rail-fold choice ride on the session row too (read
   // from the profiles row at login) so the shell renders them with zero
-  // extra lookups on the hot path.
+  // extra lookups on the hot path. `select=*` keeps this working on
+  // databases where the v3.3 profiles columns do not exist yet.
   let avatar: string | null = null;
   let railFolded = false;
   try {
     const prof = await supaSelectOne("profiles", [
-      ["select", "avatar_url,rail_folded"],
+      ["select", "*"],
       ["id", `eq.${user.id}`],
     ]);
     if (prof) {
@@ -125,7 +126,7 @@ export async function createSession(
     /* profile row may lag — the session still works */
   }
 
-  await supaInsert("sessions", {
+  const row: Record<string, unknown> = {
     user_id: user.id,
     user_email: user.email,
     user_name: user.name,
@@ -136,7 +137,17 @@ export async function createSession(
     device_icon: icon,
     user_agent: ua ? ua.slice(0, 300) : null,
     expires_at: expires.toISOString(),
-  });
+  };
+  try {
+    await supaInsert("sessions", row);
+  } catch {
+    /* Pre-v3.3 databases have no user_avatar/user_folded columns — drop
+     * them and retry so login still works before the migration runs. */
+    const legacy = { ...row };
+    delete legacy.user_avatar;
+    delete legacy.user_folded;
+    await supaInsert("sessions", legacy);
+  }
   return token;
 }
 

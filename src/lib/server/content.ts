@@ -270,6 +270,19 @@ export async function gymCatalog(): Promise<Record<string, unknown> | null> {
     };
   });
 
+  /* Equipment master + trainer specialities — label-key registries the
+   * page resolves per locale (gymApp.hallEq.<code> / hallSpec.<code>). */
+  const eqMaster = await sel("gym_equipment", [
+    ["select", "code,name_key"], ["order", "sort_order.asc"],
+  ]);
+  const specMaster = await sel("gym_trainer_specs", [
+    ["select", "code,name_key"], ["order", "sort_order.asc"],
+  ]);
+  const equipmentRegistry: Record<string, unknown> = {};
+  for (const e of eqMaster) equipmentRegistry[s(e, "code")] = { nameKey: s(e, "name_key") };
+  const trainerSpecs: Record<string, unknown> = {};
+  for (const sp of specMaster) trainerSpecs[s(sp, "code")] = { nameKey: s(sp, "name_key") };
+
   const stores = await sel("gym_stores", [["select", "*"], ["order", "sort_order.asc"]]);
   const storesMap: Record<string, unknown> = {};
   for (const st of stores) {
@@ -382,6 +395,8 @@ export async function gymCatalog(): Promise<Record<string, unknown> | null> {
     schedule: world.schedule,
     places: placesJson,
     stores: storesMap,
+    equipmentRegistry,
+    trainerSpecs,
     catalog,
     exercises: exMap,
     workouts,

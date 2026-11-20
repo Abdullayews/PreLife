@@ -224,7 +224,10 @@ const TOOL_DECLS: GeminiFunctionDecl[] = [
           type: "array",
           items: { type: "string", enum: ["gym", "diet", "psych", "library", "ai", "videos", "coaching", "family"] },
         },
-        months: { type: "integer", enum: [1, 3, 6, 12] },
+        /* Integer enums are rejected by Gemini's function schema — the
+         * valid set lives in the description and is enforced by the DB
+         * CHECK constraint + quotePackage on the server. */
+        months: { type: "integer", description: "Package duration in months. Must be one of: 1, 3, 6 or 12." },
       },
       required: ["features", "months"],
     },

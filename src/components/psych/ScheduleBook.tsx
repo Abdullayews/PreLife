@@ -5,6 +5,7 @@ import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { apiUrl } from "@/lib/api-url";
 import { LoaderCircle } from "lucide-react";
+import { toast } from "@/components/Toaster";
 import type { DayColumn, SlotState } from "@/lib/psychology";
 
 type Props = {
@@ -52,6 +53,7 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
       });
       if (res.ok) {
         setPicked(null);
+        toast(t("bookOk"));
         router.refresh();
       } else {
         const data = (await res.json()) as { error?: string };

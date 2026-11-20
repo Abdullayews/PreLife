@@ -29,21 +29,27 @@ export function Modal({
   const closeRef = useRef<HTMLButtonElement>(null);
 
   /* Open/close the native dialog after it mounts/updates. Layout effect
-   * so showModal() runs before the browser paints — no flash. */
+   * so showModal() runs before the browser paints — no flash. The dialog
+   * element PERSISTS while closing, so the v4 allow-discrete exit
+   * transition (see globals.css) actually gets to play. */
   useLayoutEffect(() => {
     const dlg = dialogRef.current;
     if (!dlg) return;
     if (open && !dlg.open) dlg.showModal();
+    if (!open && dlg.open) dlg.close();
   }, [open]);
 
   /* Body scroll lock while open (native dialogs block interaction, not
    * the background scroll). */
+  /* Focus lands on the close button right after the dialog opens — it's
+   * the safest destination (the header is always present). */
   useEffect(() => {
     if (!open) return;
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
+    const id = window.setTimeout(() => closeRef.current?.focus(), 60);
     return () => {
+      window.clearTimeout(id);
       document.body.style.overflow = prevOverflow;
     };
   }, [open]);
@@ -70,8 +76,8 @@ export function Modal({
     return () => dlg.removeEventListener("click", onBackdrop);
   }, [onClose]);
 
-  if (!open) return null;
-
+  /* The dialog stays mounted (closed = display:none from the UA
+   * stylesheet) — that is what lets the CSS exit transition run. */
   return (
     <dialog
       ref={dialogRef}

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { Viewport } from "next";
 import { THEME_KEY } from "@/lib/shell";
 import "./globals.css";
 
@@ -28,6 +29,16 @@ import "./globals.css";
  * attribute mismatches.
  */
 const themeScript = `try{if(localStorage.getItem('${THEME_KEY}')==='dark')document.documentElement.classList.add('dark');var p=location.pathname.split('/')[1];if(p==='az'||p==='en'||p==='ru')document.documentElement.lang=p}catch(e){}`;
+
+/* v4 mobile baseline: safe-area-aware viewport + per-scheme theme color
+   matched to the page top (not the brand color). */
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f5f7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0d0f" },
+  ],
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

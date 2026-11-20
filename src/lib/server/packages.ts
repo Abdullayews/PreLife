@@ -115,11 +115,18 @@ export async function createCustomPackage(
 }
 
 export async function listCustomPackages(userId: string): Promise<CustomPackageView[]> {
-  const rows = (await supaSelect("custom_packages", [
-    ["select", "*"],
-    ["user_id", `eq.${userId}`],
-    ["order", "created_at.desc"],
-  ])) as Row[];
+  let rows: Row[];
+  try {
+    rows = (await supaSelect("custom_packages", [
+      ["select", "*"],
+      ["user_id", `eq.${userId}`],
+      ["order", "created_at.desc"],
+    ])) as Row[];
+  } catch {
+    /* The table lives behind the v3.3 migration — before it is applied
+     * (or during an outage) the user simply has no custom packages. */
+    return [];
+  }
   return rows.map((r) => ({
     id: typeof r.id === "string" ? r.id : "",
     features: Array.isArray(r.features) ? (r.features as string[]) : [],
