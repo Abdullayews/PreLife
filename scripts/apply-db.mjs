@@ -89,6 +89,15 @@ if (mode === "v3.3") {
   process.exit(0);
 }
 
+/* v3.4: booking-request workflow (requested→confirmed→upcoming), account
+   location preference + country tags, psychologist accounts (role/owner).
+   See db/schema-v3.4.sql. */
+if (mode === "v3.4") {
+  await run(readFileSync(new URL("db/schema-v3.4.sql", root), "utf8"), "schema-v3.4.sql");
+  console.log("done.");
+  process.exit(0);
+}
+
 if (mode === "all" || mode === "schema") {
   await run(readFileSync(new URL("db/schema.sql", root), "utf8"), "schema.sql");
 }

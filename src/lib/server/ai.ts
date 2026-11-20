@@ -1,4 +1,5 @@
 import ZAI from "z-ai-web-dev-sdk";
+import { ApiCode } from "./psych-data";
 import { getAiPrompt, getAiSettings } from "./ai-config";
 import { geminiGenerate, toGeminiContents, type GeminiContent, type GeminiFunctionDecl } from "./ai-gemini";
 import { getProfileView, profileSummaryLine, updateProfile, type ProfilePatchIn } from "./profile";
@@ -6,59 +7,25 @@ import { getActivePlan, planSummaryLine, saveChatPlan } from "./user-plans";
 import { createCustomPackage, listCustomPackages, packageSummaryLine } from "./packages";
 
 /**
- * AI chat — the provider chain (v3.3):
+ * AI chat — the provider chain (v4, honest answers only):
  *
  *   1. GEMINI (ai_settings: key + gemini-flash-lite-latest) — the primary
  *      provider. For signed-in users the assistant carries FUNCTION TOOLS
- *      that actually change the account (profile data, workout plan,
- *      custom package), looping until the model answers with text.
+ *      that actually change the account (profile data, preferences,
+ *      workout plan, custom package), looping until the model answers
+ *      with text.
  *   2. z-ai-web-dev-sdk — the fallback when Gemini is unreachable (the
  *      sandbox egress region is not supported by Google; production on
  *      Render calls Gemini directly). Plain chat, no tools.
- *   3. Canned replies per locale — the last resort, same as before.
+ *
+ * There is NO third step. Canned / locally invented replies are FORBIDDEN:
+ * when both providers fail, assistantReply/psychReply throw
+ * ApiCode(503, "ai_unavailable") and the routes surface that honestly —
+ * the client shows a retry button instead of a fake answer.
  *
  * System prompts come from the ai_prompts table (editable in the DB) with
  * the constants in ai-prompts.ts as code fallback.
  */
-
-export const SYSTEM_CHAT = ""; // kept for import compatibility — see PROMPT_ASSISTANT
-export const SYSTEM_PSY = ""; // kept for import compatibility — see PROMPT_PSYCH
-
-export const FALLBACK_CHAT: Record<string, string[]> = {
-  az: [
-    "Sualını dinlədim. PreLife dörd dünyanı birləşdirir: idman, qidalanma, psixologiya və kitab. İstədiyin bölməni seç — orada nələr edə biləcəyini addım-addım göstərərəm.",
-    "Yaxşı sualdır. Qısa cavab: idman planı üçün İdman bölməsi, sağlam qidalanma üçün Qidalanma, sakitlik üçün Psixologiya, böyümək üçün Kitablar bölməsi var. Hansından başlamaq istəyirsən?",
-    "Bir neçə yol var: bugünkü təlimə başlamaq, yeni resept tapmaq, əhvalını qeyd etmək və ya bir psixoloqla görüş ayırmaq. Özünə yaxın hiss edəni seç — qalanını birlikdə gəzərik.",
-  ],
-  en: [
-    "I hear you. PreLife brings four worlds together: fitness, nutrition, psychology and reading. Pick the one you care about and I'll walk you through what you can do there.",
-    "Good question. In short: the Gym section for training plans, Nutrition for meal plans and recipes, Psychology for calm and support, Books for growth. Where would you like to start?",
-    "There are a few paths: start today's workout, find a new recipe, log how you feel, or book a psychologist. Choose what feels closest — we'll explore the rest together.",
-  ],
-  ru: [
-    "Я вас услышал. PreLife объединяет четыре мира: фитнес, питание, психологию и чтение. Выберите близкий — и я расскажу, что там можно делать.",
-    "Хороший вопрос. Коротко: раздел «Спорт» — планы тренировок, «Питание» — планы и рецепты, «Психология» — спокойствие и поддержка, «Книги» — рост. С чего начнём?",
-    "Путей несколько: начать сегодняшнюю тренировку, найти рецепт, отметить настроение или записаться к психологу. Выберите близкое — остальное изучим вместе.",
-  ],
-};
-
-export const FALLBACK_PSY: Record<string, string[]> = {
-  az: [
-    "Səni dinlədim. Əvvəlcə bir dəqiqə nəfəsini almağa çalış: 4 saniyə nəfəs al, 7 saxla, 8 saniyə burax. Bu dövrəni dörd dəfə təkrarlasan, gərginlik hissəli şəkildə düşür.",
-    "Bəzən ən sakit addım ən balacadır — bugün üçün bir kiçik məqsəd seç: bir stəkan su, qısa gəzinti və ya bir səhifə kitab. Bu kiçik hərəkət zehni yerə qaytarır.",
-    "Bu hissəni yazmaq çox dəyərlidir. Jurnal bölməsindəki promptlardan birini aç və fikirlərini boş sahəyə tök — yazmaq emosiyanı nizamlamağa kömək edir.",
-  ],
-  en: [
-    "I hear you. Start with one minute of breathing: inhale 4 seconds, hold 7, exhale 8. Four rounds usually settle the tension noticeably.",
-    "Sometimes the calmest step is the smallest — pick one tiny goal for today: a glass of water, a short walk, or one page of a book. Small motion returns the mind to the ground.",
-    "Writing this down is valuable. Open one of the journal prompts and pour your thoughts into it — writing helps regulate emotion.",
-  ],
-  ru: [
-    "Я вас услышал. Начните с одной минуты дыхания: вдох 4 секунды, задержка 7, выдох 8. Четыре цикла обычно заметно снижают напряжение.",
-    "Иногда самый спокойный шаг — самый маленький: выберите одну маленькую цель на сегодня — стакан воды, короткую прогулку или страницу книги. Маленькое движение возвращает мыслям опору.",
-    "Записать это — уже ценно. Откройте один из подсказок дневника и вылейте мысли на страницу — письмо помогает упорядочить эмоции.",
-  ],
-};
 
 /* ── Shared request shape ────────────────────────────────────────────────── */
 
@@ -89,11 +56,6 @@ export function parseChatBody(body: Record<string, unknown>): ParsedChatRequest 
 }
 
 type Row2 = { role?: unknown; content?: unknown };
-
-function pickFallback(bank: Record<string, string[]>, locale: string): string {
-  const arr = bank[locale] ?? bank.en;
-  return arr[Math.floor(Math.random() * arr.length)] ?? arr[0]!;
-}
 
 /* ── Provider 2: z-ai (backend-only SDK) ─────────────────────────────────── */
 
@@ -134,14 +96,15 @@ export async function chatViaProvider(
   return { reply: await zaiChat(system, history), source: "zai" };
 }
 
-/** The psychology companion: provider chain + canned last resort. */
-export async function psychReply(locale: string, history: Msg[]): Promise<{ reply: string; source: string }> {
+/** The psychology companion: provider chain with an HONEST failure —
+ *  no canned text is ever invented locally. */
+export async function psychReply(history: Msg[]): Promise<{ reply: string; source: "gemini" | "zai" }> {
   const system = await getAiPrompt("psych");
   try {
     return await chatViaProvider(system, history);
   } catch (e) {
-    console.error("[ai] psych fallback to canned:", e);
-    return { reply: pickFallback(FALLBACK_PSY, locale), source: "canned" };
+    console.error("[ai] psych: both providers failed → honest 503:", e);
+    throw new ApiCode(503, "ai_unavailable");
   }
 }
 
@@ -157,7 +120,7 @@ const TOOL_DECLS: GeminiFunctionDecl[] = [
   },
   {
     name: "update_my_profile",
-    description: "Update the user's own profile data. Only include the fields to change. Weight changes are logged to history automatically.",
+    description: "Update the user's own profile data and account preferences: body metrics, goal, activity, app theme, interface language, content location (global or Azerbaijan-only). Only include the fields to change. Weight changes are logged to history automatically.",
     parameters: {
       type: "object",
       properties: {
@@ -170,6 +133,9 @@ const TOOL_DECLS: GeminiFunctionDecl[] = [
         activityLevel: { type: "string", enum: ["sedentary", "light", "moderate", "active", "athlete"] },
         fitnessLevel: { type: "string", enum: ["beginner", "intermediate", "advanced"] },
         workoutsPerWeek: { type: "integer", description: "Planned workouts per week (0-14)" },
+        theme: { type: "string", enum: ["light", "dark"], description: "App color theme" },
+        lang: { type: "string", enum: ["az", "en", "ru"], description: "Interface language" },
+        contentLocation: { type: "string", enum: ["global", "az"], description: "Content scope: global, or Azerbaijan-only" },
       },
     },
   },
@@ -259,7 +225,7 @@ async function runTool(
       case "update_my_profile": {
         const patch: ProfilePatchIn = {};
         for (const key of ["name", "weightKg", "heightCm", "birthYear", "gender", "goal",
-          "activityLevel", "fitnessLevel", "workoutsPerWeek"] as const) {
+          "activityLevel", "fitnessLevel", "workoutsPerWeek", "theme", "lang", "contentLocation"] as const) {
           if (args[key] !== undefined) patch[key] = args[key];
         }
         const profile = await updateProfile(user.id, patch);
@@ -333,14 +299,14 @@ async function buildContextBlock(user: ToolUser, page?: string | null): Promise<
     .replaceAll("{package}", pkg);
 }
 
-/* ── The main assistant (provider chain + tools + canned last resort) ───── */
+/* ── The main assistant (provider chain + tools, honest failure) ────────── */
 
 export async function assistantReply(opts: {
   locale: string;
   history: Msg[];
   page?: string | null;
   user?: ToolUser | null;
-}): Promise<{ reply: string; source: "gemini" | "zai" | "canned" }> {
+}): Promise<{ reply: string; source: "gemini" | "zai" }> {
   const system = await getAiPrompt("assistant");
   const context = opts.user ? `\n\n${await buildContextBlock(opts.user, opts.page)}` : "";
   const fullSystem = `${system}${context}`;
@@ -384,7 +350,7 @@ export async function assistantReply(opts: {
     const reply = await zaiChat(fullSystem, opts.history);
     return { reply, source: "zai" };
   } catch (e) {
-    console.error("[ai] z-ai failed → canned reply:", e);
-    return { reply: pickFallback(FALLBACK_CHAT, opts.locale), source: "canned" };
+    console.error("[ai] z-ai failed → honest 503 (no canned replies):", e);
+    throw new ApiCode(503, "ai_unavailable");
   }
 }

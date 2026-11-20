@@ -6,7 +6,9 @@ import { guardConfigured, jsonError, readJson, toErrorResponse } from "@/lib/ser
 export const dynamic = "force-dynamic";
 
 /** POST /api/psych/ai (auth) — the in-app psychology companion
- *  (Gemini → z-ai → canned, no account tools by design). */
+ *  (Gemini → z-ai, no account tools by design). No canned replies:
+ *  when both providers fail, psychReply throws ApiCode(503,
+ *  "ai_unavailable") and toErrorResponse forwards it verbatim. */
 export async function POST(req: NextRequest) {
   const blocked = guardConfigured();
   if (blocked) return blocked;
@@ -20,7 +22,7 @@ export async function POST(req: NextRequest) {
     } catch {
       return jsonError(400, "invalid");
     }
-    const out = await psychReply(parsed.locale, parsed.history);
+    const out = await psychReply(parsed.history);
     return NextResponse.json(out);
   } catch (e) {
     return toErrorResponse(e);

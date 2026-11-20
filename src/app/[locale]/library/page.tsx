@@ -48,7 +48,8 @@ export default async function LibraryPage({ params, searchParams }: Props) {
   const r = await getTranslations({ locale, namespace: "sectionRail" });
   const s = await getTranslations({ locale, namespace: "sections" });
 
-  const libraryContent = await getLibraryContent();
+  // v3.4: venues respect the user's location choice (global / Azerbaijan).
+  const libraryContent = await getLibraryContent(user.location);
   if (!libraryContent) return <ContentUnavailable locale={locale} />;
   const {
     collections: libraryCollections, books: libraryBooks, places: libraryPlaces,
@@ -72,6 +73,8 @@ export default async function LibraryPage({ params, searchParams }: Props) {
           email: user.email,
           avatar: user.avatar ?? null,
           railFolded: user.railFolded ?? false,
+          role: user.role ?? "user",
+          psychSlug: user.psychSlug ?? null,
         }}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current"), title: s("library.name") }}
       >

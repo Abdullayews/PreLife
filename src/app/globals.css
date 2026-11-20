@@ -1612,37 +1612,60 @@ a.card:hover em svg { transform: translateX(3px); }
 
 /* ══ lg+: the floating glass panel — same card, docked into the grid,
    always visible, two animated widths, VERTICALLY CENTERED beside the
-   content (equal air above and below). ═════════════════════════════ */
+   content. v3.4 centering: the .rail-dock grid child is a sticky,
+   exactly-viewport-tall flex box (align-items: center) — the card
+   re-centers LIVE as it grows (account dropdown) or shrinks, on short
+   pages and tall ones alike (the old top:50svh + translateY(-50%) clamp
+   broke on pages shorter than ~viewport + card height). ═════════════ */
+.rail-dock { display: contents; }
+
 @media (min-width: 64rem) {
   .app-shell {
     --rail-w: 17.5rem;
     grid-template-columns: var(--rail-w) minmax(0, 1fr);
+    grid-template-rows: minmax(100svh, auto);
     column-gap: 1.5rem;
     padding-inline: .75rem .5rem;
     transition: grid-template-columns .45s var(--rail-ease);
   }
   .app-shell[data-open="closed"] { --rail-w: 4.75rem; }
 
-  /* Sticky at the viewport's middle + translateY(-50%) centers the
-   * auto-height card and KEEPS it centered while the page scrolls. At
-   * the max height the card spans a symmetric 1rem…100svh-1rem. The
-   * topnav variant recenters inside the space left under the fixed
-   * guest Nav. */
+  /* The dock: full-viewport sticky column that centers the card with
+   * flexbox — the exact middle, kept during growth/shrink/scroll. The
+   * topnav variant centers within the space left under the fixed guest
+   * Nav. */
+  .rail-dock {
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+  .app-shell[data-topnav="on"] .rail-dock {
+    top: var(--nav-h);
+    height: calc(100svh - var(--nav-h));
+  }
+
+  /* The card itself: a plain flex child of the dock — no transforms, no
+   * sticky math. max-height caps growth; the inner .app-rail-clip
+   * scrolls when the content exceeds it. */
   .app-rail,
   .app-shell[data-open="open"] .app-rail,
   .app-shell[data-topnav="off"] .app-rail {
-    position: sticky;
-    top: 50svh;
-    align-self: start;
+    position: relative;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    align-self: auto;
     width: auto; max-height: calc(100svh - 2rem);
     margin: 0;
     visibility: visible;
-    transform: translateY(-50%);
+    transform: none;
     pointer-events: auto;
     transition: width .45s var(--rail-ease);
   }
   .app-shell[data-topnav="on"] .app-rail {
-    top: calc(50svh + var(--nav-h) / 2);
     max-height: calc(100svh - var(--nav-h) - 2rem);
   }
   .rail-scrim, .rail-fab { display: none; }

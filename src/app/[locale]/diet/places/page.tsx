@@ -18,10 +18,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DietPlacesPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requireUser(locale, "/diet/places");
+  const user = await requireUser(locale, "/diet/places");
 
   const t = await getTranslations({ locale, namespace: "dietApp" });
-  const dietContent = await getDietContent();
+  // v3.4: venues respect the user's location choice (global / Azerbaijan).
+  const dietContent = await getDietContent(user.location);
   if (!dietContent) return <ContentUnavailable locale={locale} />;
   const { places: dietPlaces, venueDetails: VENUE_DETAILS } = dietContent;
 

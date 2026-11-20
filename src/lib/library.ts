@@ -25,10 +25,15 @@ export type LibVenueDetail = {
   mapQuery: string;
 };
 
+/** A library venue (world_places row) carrying its v3.4 country tag — the
+ *  account location preference (az) filters on this; undefined rows
+ *  count as AZ. */
+export type LibraryPlace = Place & { country?: string | null };
+
 export type LibraryContent = {
   collections: Plan[];
   books: Item[];
-  places: Place[];
+  places: LibraryPlace[];
   bookDetails: Record<string, BookDetail>;
   venueDetails: Record<string, LibVenueDetail>;
 };

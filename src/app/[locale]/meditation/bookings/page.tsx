@@ -35,8 +35,11 @@ export default async function BookingsPage({ params }: Props) {
     startAt: new Date(r.startAt),
   }));
 
-  const upcoming = rows
-    .filter((r) => r.status === "upcoming" && r.startAt.getTime() > now.getTime())
+  // v3.4 statuses: requested (awaiting the psychologist), confirmed
+  // (payment due), upcoming (paid) — every future row is "active"; the
+  // past list keeps cancelled + already-started sessions.
+  const active = rows
+    .filter((r) => ["requested", "confirmed", "upcoming"].includes(r.status) && r.startAt.getTime() > now.getTime())
     .sort((a, b) => a.startAt.getTime() - b.startAt.getTime());
   const past = rows.filter((r) => r.status === "cancelled" || r.startAt.getTime() <= now.getTime());
 
@@ -44,12 +47,18 @@ export default async function BookingsPage({ params }: Props) {
     weekday: "short", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Baku",
   });
   const spent = rows.filter((r) => r.payment === "paid").reduce((sum, r) => sum + r.price, 0);
-  const unpaid = upcoming.filter((r) => r.payment === "unpaid").length;
+  const unpaid = active.filter((r) => r.payment === "unpaid").length;
 
   const psyName = (slug: string) => {
     const psy = psyBySlug(psychologists, slug);
     return psy ? t(psy.nameKey) : slug;
   };
+
+  const statusKey = (s: string) =>
+    s === "requested" ? "statusRequested"
+    : s === "confirmed" ? "statusConfirmed"
+    : s === "upcoming" ? "statusUpcoming"
+    : "statusCancelled";
 
   return (
     <PsychShell locale={locale} active="bookings">
@@ -62,7 +71,7 @@ export default async function BookingsPage({ params }: Props) {
 
         <section aria-label={t("statsEyebrow")}>
           <dl className="mini-stats">
-            <div className="mini-stat"><dt>{t("bookingsUpcomingCount")}</dt><dd>{upcoming.length}</dd></div>
+            <div className="mini-stat"><dt>{t("bookingsUpcomingCount")}</dt><dd>{active.length}</dd></div>
             <div className="mini-stat"><dt>{t("bookingsUnpaidCount")}</dt><dd>{unpaid}</dd></div>
             <div className="mini-stat"><dt>{t("bookingsSpent")}</dt><dd>{spent} AZN</dd></div>
           </dl>
@@ -70,7 +79,7 @@ export default async function BookingsPage({ params }: Props) {
 
         <section aria-labelledby="up-h" className="blk">
           <h2 id="up-h" className="eyebrow"><b>01</b>{t("bookingsUpcoming")}</h2>
-          {upcoming.length === 0 ? (
+          {active.length === 0 ? (
             <p className="lede">{t("bookingsEmptyUpcoming")}</p>
           ) : (
             <div className="bk-scroll">
@@ -86,15 +95,20 @@ export default async function BookingsPage({ params }: Props) {
                   </tr>
                 </thead>
                 <tbody>
-                  {upcoming.map((r) => (
+                  {active.map((r) => (
                     <tr key={r.id}>
                       <td><b>{fmt.format(r.startAt)}</b></td>
                       <td>{psyName(r.psychologistSlug)}</td>
                       <td>{t(`format_${r.mode}`)}</td>
                       <td>{r.price} AZN</td>
-                      <td><span className="paytag" data-pay={r.payment}>{t(r.payment === "paid" ? "payPaid" : "payUnpaid")}</span></td>
                       <td>
-                        <BookingsActions id={r.id} payment={r.payment} canCancel />
+                        <span className="paytag">{t(statusKey(r.status))}</span>
+                        {r.status === "upcoming" && (
+                          <>{" "}<span className="paytag" data-pay={r.payment}>{t(r.payment === "paid" ? "payPaid" : "payUnpaid")}</span></>
+                        )}
+                      </td>
+                      <td>
+                        <BookingsActions id={r.id} payment={r.payment} status={r.status} canCancel />
                       </td>
                     </tr>
                   ))}
@@ -129,10 +143,13 @@ export default async function BookingsPage({ params }: Props) {
                       <td>{r.price} AZN</td>
                       <td>
                         <span className="paytag" data-pay={r.status === "cancelled" ? undefined : r.payment}>
-                          {r.status === "cancelled" ? t("statusCancelled") : t("statusCompleted")}
+                          {r.status === "cancelled" ? t("statusCancelled")
+                            : r.status === "upcoming" ? t("statusCompleted")
+                            : t(statusKey(r.status))}
                         </span>
-                        {" "}
-                        <span className="paytag" data-pay={r.payment}>{t(r.payment === "paid" ? "payPaid" : "payUnpaid")}</span>
+                        {r.status !== "cancelled" && (
+                          <>{" "}<span className="paytag" data-pay={r.payment}>{t(r.payment === "paid" ? "payPaid" : "payUnpaid")}</span></>
+                        )}
                       </td>
                     </tr>
                   ))}

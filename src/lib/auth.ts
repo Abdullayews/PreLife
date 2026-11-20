@@ -17,6 +17,12 @@ export type SessionUser = {
   avatar: string | null;
   /** The rail fold choice riding on the session row (v3.3). */
   railFolded: boolean;
+  /** v3.4: account role — 'psychologist' links to a psychologists_v2 row. */
+  role: "user" | "psychologist";
+  /** v3.4: the linked psychologist slug (when role === 'psychologist'). */
+  psychSlug: string | null;
+  /** v3.4: content-scope choice (global | az) riding on the session row. */
+  location: "global" | "az";
 };
 
 export async function getSessionUser(): Promise<SessionUser | null> {
@@ -30,6 +36,9 @@ export async function getSessionUser(): Promise<SessionUser | null> {
         name: cs.user.name,
         avatar: cs.user.avatar ?? null,
         railFolded: cs.user.railFolded ?? false,
+        role: cs.user.role ?? "user",
+        psychSlug: cs.user.psychSlug ?? null,
+        location: cs.user.location === "az" ? "az" : "global",
       }
       : null;
   } catch {

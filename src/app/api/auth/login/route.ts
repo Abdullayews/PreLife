@@ -35,9 +35,9 @@ export async function POST(req: NextRequest) {
   if (!user) return jsonError(500, "generic");
 
   try {
-    const token = await createSession(user, req.headers.get("user-agent"));
-    const res = NextResponse.json({ user: userView(user) });
-    res.cookies.set(sessionCookie(token, isSecure(req.headers)));
+    const session = await createSession(user, req.headers.get("user-agent"));
+    const res = NextResponse.json({ user: userView(session.user) });
+    res.cookies.set(sessionCookie(session.token, isSecure(req.headers)));
     return res;
   } catch (e) {
     console.error("[auth:login session]", e);

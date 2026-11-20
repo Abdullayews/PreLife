@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { getMessages } from "next-intl/server";
 import type { WorldsResponse } from "./worlds";
-import type { GymContent, GymAppContent, GymAppPlan, GymAppPlace, GymAppProduct, MessageTree } from "./gym";
+import type { GymContent, GymAppContent, GymAppPlan, GymAppPlace, GymAppProduct, GymAppStore, MessageTree } from "./gym";
 import { fillMsg, msgPath, repsLabelKey, type Reps } from "./gym";
 import type { DietContent } from "./nutrition";
 import type { LibraryContent } from "./library";
@@ -37,6 +37,26 @@ import { currentSessionFromHeaders } from "./server/session";
 export const getWorlds = () => worldsCatalog() as Promise<WorldsResponse | null>;
 export const getGymContent = () => gymCatalog() as Promise<GymContent | null>;
 
+/* ── Account location scope (v3.4) ── */
+
+export type ContentLocation = "global" | "az";
+
+/**
+ * Filter content rows by the signed-in user's location choice. "az" keeps
+ * only rows tagged country='AZ'; rows without a country tag count as AZ
+ * (every seeded row is AZ, and the catalog builders do not all carry the
+ * tag through yet). "global", undefined and null return the list
+ * unchanged. Pure per-call post-processing — the shared 60s TTL catalogs
+ * are never filtered inside the cache.
+ */
+export function filterByLocation<T extends { country?: string | null }>(
+  rows: T[],
+  location?: ContentLocation | null,
+): T[] {
+  if (location !== "az") return rows;
+  return rows.filter((r) => (r.country ?? "AZ") === "AZ");
+}
+
 /* ── Gym — the page-facing, locale-resolved catalog ─────────────────────── */
 
 /** Render a structured prescription through the gymApp.rep* templates. */
@@ -59,7 +79,10 @@ function repsLabel(app: MessageTree, r: Reps): string {
  * through the gymApp.rep* templates. Returns null when the content backend
  * is unreachable (pages degrade to ContentUnavailable).
  */
-export async function getGymAppContent(locale: string): Promise<GymAppContent | null> {
+export async function getGymAppContent(
+  locale: string,
+  location?: ContentLocation | null,
+): Promise<GymAppContent | null> {
   const cat = await getGymContent();
   if (!cat) return null;
 
@@ -91,7 +114,7 @@ export async function getGymAppContent(locale: string): Promise<GymAppContent | 
     const nameKey = cat.trainerSpecs[code]?.nameKey;
     return nameKey ? label(app, nameKey, code) : code;
   };
-  const halls: GymAppPlace[] = cat.places.map((p) => {
+  const halls: GymAppPlace[] = filterByLocation(cat.places.map((p) => {
     const tree = p.ns === "gymHome" ? home : app;
     return {
       id: p.id,
@@ -109,17 +132,21 @@ export async function getGymAppContent(locale: string): Promise<GymAppContent | 
         spec: specLabel(t.spec),
         years: t.years,
       })),
+      country: p.country,
     };
-  });
+  }), location);
 
-  /* Stores — kind labels resolved for the offer rows. */
-  const stores = Object.values(cat.stores).map((s) => ({
+  /* Stores — kind labels resolved for the offer rows, filtered by the
+   * account location BEFORE the offers join so products never point at
+   * a store the user's location choice excludes. */
+  const stores: GymAppStore[] = filterByLocation(Object.values(cat.stores).map((s) => ({
     slug: s.slug,
     name: s.name,
     kind: s.kind,
     kindLabel: label(app, `kind_${s.kind}`, s.kind),
     url: s.url,
-  }));
+    country: s.country,
+  })), location);
   const storeBySlug = new Map(stores.map((s) => [s.slug, s]));
 
   /* Products — names resolved per category namespace, offers joined. */
@@ -183,9 +210,38 @@ export async function getGymAppContent(locale: string): Promise<GymAppContent | 
   return { locale, halls, stores, products, exercises, plans };
 }
 
-export const getDietContent = () => dietCatalog() as Promise<DietContent | null>;
-export const getMeditationContent = () => meditationCatalog() as Promise<MeditationContent | null>;
-export const getLibraryContent = () => libraryCatalog() as Promise<LibraryContent | null>;
+/** Diet content, with `places` filtered by the account location choice
+ *  ("az" keeps only Azerbaijan venues). */
+export async function getDietContent(
+  location?: ContentLocation | null,
+): Promise<DietContent | null> {
+  const content = (await dietCatalog()) as DietContent | null;
+  if (!content || location !== "az") return content;
+  return { ...content, places: filterByLocation(content.places, location) };
+}
+
+/** Meditation content, with `psychologists` filtered by the account
+ *  location choice ("az" keeps only Azerbaijan psychologists). */
+export async function getMeditationContent(
+  location?: ContentLocation | null,
+): Promise<MeditationContent | null> {
+  const content = (await meditationCatalog()) as MeditationContent | null;
+  if (!content || location !== "az") return content;
+  return {
+    ...content,
+    psychologists: filterByLocation(content.psychologists, location),
+  };
+}
+
+/** Library content, with `places` (venues) filtered by the account
+ *  location choice ("az" keeps only Azerbaijan venues). */
+export async function getLibraryContent(
+  location?: ContentLocation | null,
+): Promise<LibraryContent | null> {
+  const content = (await libraryCatalog()) as LibraryContent | null;
+  if (!content || location !== "az") return content;
+  return { ...content, places: filterByLocation(content.places, location) };
+}
 
 export type SubscriptionFeatureRow = { id: string; nameKey: string; price: number };
 export type SubscriptionTierRow = { id: string; nameKey: string; price: number; features: string[] };

@@ -28,10 +28,15 @@ export type VenueDetail = {
   mapQuery: string;
 };
 
+/** A diet venue (world_places row) carrying its v3.4 country tag — the
+ *  account location preference (az) filters on this; undefined rows
+ *  count as AZ. */
+export type DietPlace = Place & { country?: string | null };
+
 export type DietContent = {
   plans: Plan[];
   recipes: Item[];
-  places: Place[];
+  places: DietPlace[];
   recipeDetails: Record<string, RecipeDetail>;
   venueDetails: Record<string, VenueDetail>;
 };

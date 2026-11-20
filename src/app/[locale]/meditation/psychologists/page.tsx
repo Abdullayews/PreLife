@@ -28,7 +28,7 @@ const WEEKDAYS: PsyWeekday[] = [1, 2, 3, 4, 5, 6];
 export default async function PsychologistsPage({ params, searchParams }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  await requireUser(locale, "/meditation/psychologists");
+  const user = await requireUser(locale, "/meditation/psychologists");
 
   const t = await getTranslations({ locale, namespace: "psychApp" });
   const tm = await getTranslations({ locale, namespace: "meditationHome" });
@@ -48,8 +48,9 @@ export default async function PsychologistsPage({ params, searchParams }: Props)
 
   // Scored most→least suitable; zero-fit cut when a day filter is active.
   // The catalog and the 14-day booking window both come from the Rust API.
+  // v3.4: the psychologist list respects the user's location choice.
   const [contentData, windowData] = await Promise.all([
-    getMeditationContent(), getScheduleWindow(),
+    getMeditationContent(user.location), getScheduleWindow(),
   ]);
   const PSYCHOLOGISTS = contentData?.psychologists ?? [];
   const results = fitAll(PSYCHOLOGISTS, { days, from, to, specialty, format });

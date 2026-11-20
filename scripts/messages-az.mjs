@@ -634,7 +634,8 @@ export const az = {
         devices: "Cihazlar",
         appearance: "Görünüş",
         language: "Dil",
-        notifications: "Bildirişlər"
+        notifications: "Bildirişlər",
+        location: "Lokasiya"
       },
       devices: {
         title: "Cihazlar",
@@ -674,7 +675,7 @@ export const az = {
         logout: "Çıxış",
         logoutHint: "Bu cihazdakı sessiyanı bitirir və welcome səhifəsinə qaytarır.",
         note: "Ad, şəkil, çəki və məqsədlərinizi Profil səhifəsindən redaktə edin.",
-        editProfile: "Profil məlumatlarını redaktə et",
+        editProfile: "Profilə düzəliş",
         avatar: "Profil şəkli"
       },
       appearance: {
@@ -689,6 +690,16 @@ export const az = {
         title: "Dil",
         subtitle: "İnterfeys dili — dərhal tətbiq olunur.",
         hint: "Seçiminiz cookie-lər qəbul edildikdən sonra yadda saxlanılır."
+      },
+      location: {
+        title: "Lokasiya",
+        subtitle: "Bölmələr sənə hansı yerləri göstərsin.",
+        hint: "Qlobal hər şeyi göstərir — beynəlxalq məkanlar və mağazalar da daxil. Azərbaycan yalnız Azərbaycanda olanları göstərir.",
+        global: "Qlobal",
+        globalDesc: "Hər şey, dünyanın hər yerindən",
+        az: "Yalnız Azərbaycan",
+        azDesc: "Azərbaycandakı zallar, məkanlar, mağazalar və psixoloqlar",
+        saved: "Lokasiya yadda saxlanıldı."
       },
       notifications: {
         title: "Bildirişlər",
@@ -1556,7 +1567,9 @@ export const az = {
         meditation: "Psixoloqlar, əhval, gündəlik",
         library: "Kolleksiyalar, qeydlər, oxu",
         subscription: "Tariflər və ödənişlər"
-      }
+      },
+      console: "Psixoloq paneli",
+      consoleDesc: "Seans sorğularını təsdiqlə"
     },
     aiChat: {
       chip1: "Nələr edə bilərəm?",
@@ -1572,7 +1585,9 @@ export const az = {
       subtitle: "Sənin bələdçin",
       thinking: "Düşünür…",
       title: "PreLife AI",
-      toolsHint: "Daxil olmusunuz — mən həm də hesabınızı idarə edə bilirəm: çəki, boy, məqsəd, idman planı, xüsusi paket. Sadəcə yazın: “çəkim 78 kq olsun”."
+      toolsHint: "Daxil olmusan — hesabını da idarə edə bilirəm: ad, çəki, boy, məqsəd, tema, dil, lokasiya, təlim planı, fərdi paket. Sadəcə de: “çəkimi 78 kq et”.",
+      unavailable: "İndi cavabı düşünə bilmədim — düşüncə bağlantım kəsildi. Zəhmət olmasa yenidən cəhd et.",
+      retry: "Yenidən cəhd et"
     },
     libraryApp: {
       blurb: {
@@ -1668,7 +1683,7 @@ export const az = {
       bookConfirmTitle: "Rezervi təsdiqlə",
       bookError_double_booked: "Bu saatda artıq seansınız var.",
       bookError_generic: "Rezerv alınmadı — yenidən cəhd et.",
-      bookOk: "Görüşunuz təsdiqləndi.",
+      bookOk: "Sorğu göndərildi — psixoloq təsdiqləyəcək.",
       bookError_invalid: "Sorğu düzgün deyil.",
       bookError_slot_closed: "Bu saat cədvəldə yoxdur.",
       bookError_slot_past: "Bu saat artıq keçib.",
@@ -2024,7 +2039,39 @@ export const az = {
       videoEyebrow: "Video materiallar",
       videoIntro: "Gözlə üçün sakit rəsmlər — nəfəs ritmi izləmək üçün.",
       whatEyebrow: "Meditasiya nədir",
-      whatText: "Meditasiya — zehni indiki ana toplamaq praktikasıdır. Rəqibin yoxdur, uduş yoxdur: yalnız nəfəs, bədən və diqqət. Elmi araşdırmalar müntəzəm praktikanın stress hormonunu azaltdığını, diqqət müddətini uzatdığını və yuxu keyfiyyətini yaxşılaşdırdığını göstərir. Gündə beş dəqiqə belə başlamaq üçün kifayətdir."
+      whatText: "Meditasiya — zehni indiki ana toplamaq praktikasıdır. Rəqibin yoxdur, uduş yoxdur: yalnız nəfəs, bədən və diqqət. Elmi araşdırmalar müntəzəm praktikanın stress hormonunu azaltdığını, diqqət müddətini uzatdığını və yuxu keyfiyyətini yaxşılaşdırdığını göstərir. Gündə beş dəqiqə belə başlamaq üçün kifayətdir.",
+      reserve: "Rezerv et",
+      requestTitle: "Bu vaxtı rezerv et",
+      requestHint: "Almadan əvvəl psixoloqa nə istədiyini bildir — o, əvvəlcə vaxtı təsdiqləyir, sonra ödəyirsən.",
+      messageLabel: "Seansdan nə istəyirsən?",
+      messagePlaceholder: "Məsələn: yuxu və imtahan stresi üzərində işləmək istəyirəm…",
+      customTitle: "Uyğun vaxt yoxdur? Öz vaxtını tələb et",
+      customHint: "Növbəti 60 gün içindən istənilən tarix və saatı seç — psixoloq təsdiqləyir və ya rədd edir.",
+      customDate: "Tarix",
+      customHour: "Saat",
+      sendRequest: "Sorğunu göndər",
+      requestSent: "Sorğu göndərildi — psixoloq təsdiqləyəcək.",
+      statusRequested: "Təsdiq gözlənir",
+      statusConfirmed: "Təsdiqləndi — ödəniş gözlənir",
+      statusUpcoming: "Təsdiqləndi — ödənilib",
+      payHint: "Psixoloq bu seansı təsdiqlədi — saxlamaq üçün ödə.",
+      console: {
+        title: "Psixoloq paneli",
+        subtitle: "Siyahılarındakı seans sorğuları — qəbul edə bildiyin vaxtları təsdiqlə.",
+        pendingTitle: "Gözləyən sorğular",
+        empty: "Hal-hazırda gözləyən sorğu yoxdur.",
+        client: "Müştəri",
+        wants: "İstəyi",
+        when: "Vaxt",
+        mode: "Format",
+        confirm: "Təsdiqlə",
+        decline: "Rədd et",
+        confirmedTitle: "Təsdiqlənmiş seanslar",
+        confirmedEmpty: "Hələ təsdiqlənmiş seans yoxdur.",
+        custom: "Öz vaxtı",
+        noAccess: "Bu panel yalnız əlaqələndirilmiş psixoloq hesabları üçündür."
+      },
+      colActions: "Əməliyyatlar"
     },
     verifyPage: {
       title: "E-poçt təsdiqi",

@@ -33,6 +33,8 @@ export async function AppPageShell({
           email: user.email,
           avatar: user.avatar ?? null,
           railFolded: user.railFolded ?? false,
+          role: user.role ?? "user",
+          psychSlug: user.psychSlug ?? null,
         } : null}
         ui={{ label: r("label"), open: r("open"), close: r("close"), current: r("current") }}
       >

@@ -6,7 +6,7 @@ import { usePathname } from "@/i18n/navigation";
 import { apiUrl } from "@/lib/api-url";
 import { LoaderCircle, Send, Sparkles, X } from "lucide-react";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Msg = { role: "user" | "assistant"; content: string; failed?: boolean };
 
 /**
  * The floating PreLife AI assistant — a round action button pinned to
@@ -19,7 +19,12 @@ type Msg = { role: "user" | "assistant"; content: string };
  * welcome surface for guests. The current page rides along with every
  * request, so the backend builds a context-aware system prompt — and
  * for signed-in users the assistant can ACT on the account (profile,
- * plan, package) through the Gemini function tools.
+ * preferences, plan, package) through the Gemini function tools.
+ *
+ * Honest-failure UX: when the assistant cannot think of an answer
+ * (HTTP failure — esp. 503 ai_unavailable), NO fake reply is shown.
+ * The user's message stays in the log and a failure bubble appears
+ * with a retry button that re-sends the last user message.
  *
  * v4 motion: the panel stays MOUNTED and flips data-open — an
  * origin-aware entrance (scale .96 from the FAB corner, 250ms in /
@@ -64,6 +69,19 @@ export function AiChatFab({ signedIn = false }: { signedIn?: boolean }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+  /** POST the wire history (failure bubbles never go on the wire) and
+   *  return the reply text — or null when the assistant could not think,
+   *  so the caller can show the honest failure bubble instead. */
+  const post = async (wire: Msg[]): Promise<string | null> => {
+    const res = await fetch(apiUrl("/api/ai/chat"), {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ locale, messages: wire, page: pathname }),
+    });
+    const data = (await res.json().catch(() => null)) as { reply?: string } | null;
+    return res.ok && typeof data?.reply === "string" && data.reply ? data.reply : null;
+  };
+
   const send = async (text: string) => {
     const content = text.trim();
     if (!content || busy) return;
@@ -72,18 +90,42 @@ export function AiChatFab({ signedIn = false }: { signedIn?: boolean }) {
     setInput("");
     setBusy(true);
     try {
-      const res = await fetch(apiUrl("/api/ai/chat"), {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ locale, messages: next, page: pathname }),
-      });
-      const data = (await res.json()) as { reply?: string };
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: data.reply ?? t("error") },
-      ]);
+      const reply = await post(next.filter((m) => !m.failed));
+      if (reply === null) {
+        setMessages((prev) => [...prev, { role: "assistant", content: t("unavailable"), failed: true }]);
+        return;
+      }
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
     } catch {
-      setMessages((prev) => [...prev, { role: "assistant", content: t("error") }]);
+      setMessages((prev) => [...prev, { role: "assistant", content: t("unavailable"), failed: true }]);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /** Re-send the LAST user message after a failure. On success the
+   *  trailing failure bubble is replaced by the real reply; on failure
+   *  it stays as-is (retry stays available) — nothing is invented. */
+  const retry = async () => {
+    if (busy) return;
+    let lastUser = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i]!.role === "user") { lastUser = i; break; }
+    }
+    if (lastUser === -1) return;
+    const wire = messages.slice(0, lastUser + 1).filter((m) => !m.failed);
+    setBusy(true);
+    try {
+      const reply = await post(wire);
+      if (reply !== null) {
+        setMessages((prev) => {
+          const trimmed = [...prev];
+          while (trimmed.length > 0 && trimmed[trimmed.length - 1]!.failed) trimmed.pop();
+          return [...trimmed, { role: "assistant", content: reply }];
+        });
+      }
+    } catch {
+      /* the failure bubble + retry button stay — the user can try again */
     } finally {
       setBusy(false);
     }
@@ -125,9 +167,23 @@ export function AiChatFab({ signedIn = false }: { signedIn?: boolean }) {
                   {signedIn && <p className="ai-fab-intro dim">{t("toolsHint")}</p>}
                 </>
               )}
-              {messages.map((m, i) => (
-                <p key={i} className={`ai-fab-msg ${m.role === "user" ? "user" : "ai"}`}>{m.content}</p>
-              ))}
+              {messages.map((m, i) =>
+                m.failed ? (
+                  <p key={i} className="ai-fab-msg ai">
+                    <span>{m.content}</span>
+                    <button
+                      type="button"
+                      className="btn btn-sm"
+                      onClick={() => void retry()}
+                      disabled={busy}
+                    >
+                      {t("retry")}
+                    </button>
+                  </p>
+                ) : (
+                  <p key={i} className={`ai-fab-msg ${m.role === "user" ? "user" : "ai"}`}>{m.content}</p>
+                ),
+              )}
               {busy && (
                 <p className="ai-fab-msg ai" aria-live="polite">
                   <LoaderCircle size={14} className="spin" aria-hidden /> {t("thinking")}

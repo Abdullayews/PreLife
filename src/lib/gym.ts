@@ -47,6 +47,9 @@ export type StoreRef = {
   name: string;
   kind: StoreKind;
   url: string;
+  /** v3.4: ISO 3166-1 alpha-2 country tag — the account location
+   *  preference (az) filters on this; undefined rows count as AZ. */
+  country?: string | null;
 };
 
 /* ── Products (shop tabs) ──────────────────────────────────────────────── */
@@ -96,6 +99,8 @@ export type GymPlace = {
   /** Equipment codes (gym_equipment registry order). */
   equipment: string[];
   trainers: HallTrainer[];
+  /** v3.4: ISO 3166-1 alpha-2 country tag (location filter); undefined = AZ. */
+  country?: string | null;
 };
 
 /* ── Workout sessions (the plan catalog's day details) ─────────────────── */
@@ -192,6 +197,8 @@ export type GymAppPlace = {
   /** Resolved equipment labels, registry order. */
   equipment: string[];
   trainers: GymAppTrainer[];
+  /** v3.4: ISO 3166-1 alpha-2 country tag (location filter); undefined = AZ. */
+  country?: string | null;
 };
 
 export type GymAppStore = {
@@ -200,6 +207,8 @@ export type GymAppStore = {
   kind: StoreKind;
   kindLabel: string;
   url: string;
+  /** v3.4: ISO 3166-1 alpha-2 country tag (location filter); undefined = AZ. */
+  country?: string | null;
 };
 
 export type GymAppOffer = {

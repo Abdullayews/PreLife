@@ -65,6 +65,9 @@ export type Psychologist = {
   eduKey: string;
   certKeys: string[];
   rulesKey: string;
+  /** v3.4: ISO 3166-1 alpha-2 country tag — the account location
+   *  preference (az) filters on this; undefined rows count as AZ. */
+  country?: string | null;
 };
 
 export const psyBySlug = (list: Psychologist[], slug: string) =>

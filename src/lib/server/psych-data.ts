@@ -1,11 +1,18 @@
+import { getMessages } from "next-intl/server";
 import { bakuInstant, bakuParts, weekdayOf } from "./baku";
 import {
+  authAdminGetUser,
   supaDelete,
   supaInsert,
   supaSelect,
   supaSelectOne,
   supaUpdate,
 } from "./supa";
+import {
+  buildPaymentDueMail,
+  buildRequestDeclinedMail,
+  sendMail,
+} from "./mail";
 import type { SessionUser } from "./session";
 
 /**
@@ -76,6 +83,8 @@ function appointmentView(r: Row) {
     status: r.status,
     payment: r.payment,
     createdAt: r.created_at,
+    message: typeof r.message === "string" ? r.message : null,
+    respondedAt: typeof r.responded_at === "string" ? r.responded_at : null,
   };
 }
 
@@ -239,11 +248,19 @@ export async function bookCount() {
   return { count: rows.length };
 }
 
+/** Day-shift of a "YYYY-MM-DD" string (UTC arithmetic — dates only). */
+function plusDays(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
 export async function book(user: SessionUser, body: Row) {
   const slug = typeof body.slug === "string" ? body.slug : "";
   const date = typeof body.date === "string" ? body.date : "";
   const hourRaw = body.hour;
   const mode = body.mode === "office" ? "office" : "online";
+  const custom = body.custom === true;
 
   if (typeof hourRaw !== "number" || !Number.isInteger(hourRaw) || hourRaw < 0 || hourRaw > 23) {
     throw badRequest();
@@ -251,27 +268,45 @@ export async function book(user: SessionUser, body: Row) {
   const hour = hourRaw;
   if (date.length !== 10 || !/^\d{4}-\d{2}-\d{2}$/.test(date)) throw badRequest();
 
+  // v3.4 request workflow: the client states what they want up front —
+  // the psychologist confirms from their own console before any payment.
+  const rawMessage = typeof body.message === "string" ? body.message : "";
+  const message = rawMessage.trim();
+  const messageLen = [...message].length;
+  if (messageLen < 1 || messageLen > 1000) throw badRequest();
+
   const psy = await supaSelectOne("psychologists_v2", [
     ["select", "slug,price"], ["slug", `eq.${slug}`],
   ]);
   if (!psy) throw badRequest();
 
-  // The slot must fall into a weekly working block (Baku wall-clock).
   const startMs = bakuInstant(date, hour);
   if (startMs === null) throw badRequest();
   if (bakuParts(startMs).date !== date) throw badRequest();
-  const weekday = weekdayOf(date);
-  if (weekday === null) throw badRequest();
-  const avail = await sel("psychologist_availability", [
-    ["select", "day,from_hour,to_hour"],
-    ["psychologist_slug", `eq.${slug}`],
-  ]);
-  const inBlock = avail.some((b) =>
-    b.day === weekday
-    && hour >= (typeof b.from_hour === "number" ? b.from_hour : -1)
-    && hour < (typeof b.to_hour === "number" ? b.to_hour : -1),
-  );
-  if (!inBlock) throw new ApiCode(409, "slot_closed");
+
+  if (!custom) {
+    // The slot must fall into a weekly working block (Baku wall-clock).
+    const weekday = weekdayOf(date);
+    if (weekday === null) throw badRequest();
+    const avail = await sel("psychologist_availability", [
+      ["select", "day,from_hour,to_hour"],
+      ["psychologist_slug", `eq.${slug}`],
+    ]);
+    const inBlock = avail.some((b) =>
+      b.day === weekday
+      && hour >= (typeof b.from_hour === "number" ? b.from_hour : -1)
+      && hour < (typeof b.to_hour === "number" ? b.to_hour : -1),
+    );
+    if (!inBlock) throw new ApiCode(409, "slot_closed");
+  } else {
+    // Custom time: the psychologist decides — skip the weekly blocks, but
+    // keep sane bounds (06:00–23:00, within the next 60 days from Baku
+    // today; yesterday and earlier reads as a past slot).
+    if (hour < 6 || hour > 23) throw badRequest();
+    const today = bakuParts().date;
+    if (date < today) throw new ApiCode(409, "slot_past");
+    if (date > plusDays(today, 60)) throw badRequest();
+  }
   if (startMs <= Date.now()) throw new ApiCode(409, "slot_past");
 
   const startIso = new Date(startMs).toISOString();
@@ -296,10 +331,11 @@ export async function book(user: SessionUser, body: Row) {
     start_at: startIso,
     mode,
     price: psy.price,
-    status: "upcoming",
+    status: "requested",
     payment: "unpaid",
+    message,
   });
-  return { id: row?.id };
+  return { id: row?.id, status: "requested" };
 }
 
 export async function cancel(user: SessionUser, body: Row) {
@@ -321,11 +357,227 @@ export async function pay(user: SessionUser, body: Row) {
   const id = typeof body.id === "string" ? body.id : "";
   if (!id) throw badRequest();
   const row = await supaSelectOne("appointments", [
-    ["select", "id,user_id"], ["id", `eq.${id}`],
+    ["select", "id,user_id,status"], ["id", `eq.${id}`],
   ]);
   if (!row || row.user_id !== user.id) throw notFound();
-  await supaUpdate("appointments", [["id", `eq.${String(row.id)}`]], { payment: "paid" });
+  // v3.4: payment only opens AFTER the psychologist confirmed the request.
+  if (row.status !== "confirmed") throw new ApiCode(409, "not_confirmed");
+  await supaUpdate("appointments", [["id", `eq.${String(row.id)}`]], {
+    payment: "paid",
+    status: "upcoming",
+  });
   return { ok: true };
+}
+
+/* ── Psychologist console (v3.4 request workflow) ───────────────────────── */
+
+/** The console guard: only a linked psychologist account gets through. */
+function requirePsychConsole(user: SessionUser): string {
+  if (user.role !== "psychologist" || typeof user.psychSlug !== "string" || !user.psychSlug) {
+    throw unauthorized();
+  }
+  return user.psychSlug;
+}
+
+/** "12 dekabr 2026, 15:00" — a Baku wall-clock label in the client's own
+ * locale (built from Intl parts so every locale keeps its word order). */
+function bakuLabel(locale: string, startAt: string): string {
+  const fmt = new Intl.DateTimeFormat(locale, {
+    day: "numeric", month: "long", year: "numeric",
+    hour: "2-digit", minute: "2-digit", timeZone: "Asia/Baku",
+  });
+  const parts = fmt.formatToParts(new Date(startAt));
+  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
+  return `${get("day")} ${get("month")} ${get("year")}, ${get("hour")}:${get("minute")}`;
+}
+
+/** The psychologist's display name in the CLIENT's locale: the catalog's
+ * name_key resolved against the psychApp message tree (the exact key the
+ * psychologists page renders through t(psy.nameKey)). Falls back to the
+ * slug when the catalog or the key is unavailable. */
+async function psyDisplayName(locale: string, slug: string): Promise<string> {
+  try {
+    const psy = await supaSelectOne("psychologists_v2", [
+      ["select", "name_key"], ["slug", `eq.${slug}`],
+    ]);
+    const nameKey = psy && typeof psy.name_key === "string" ? psy.name_key : "";
+    if (!nameKey) return slug;
+    const messages = (await getMessages({ locale })) as Record<string, unknown>;
+    const tree = messages.psychApp as Record<string, unknown> | undefined;
+    const name = tree?.[nameKey];
+    return typeof name === "string" && name ? name : slug;
+  } catch {
+    return slug;
+  }
+}
+
+/** One client of the console: e-mail from auth.users, name from profiles. */
+async function clientOf(userId: string): Promise<{ name: string | null; email: string | null }> {
+  let email: string | null = null;
+  let name: string | null = null;
+  try {
+    const au = await authAdminGetUser(userId);
+    if (typeof au.email === "string") email = au.email;
+  } catch {
+    /* auth lookup failed — the row still renders with a null e-mail */
+  }
+  try {
+    const prof = await supaSelectOne("profiles", [
+      ["select", "full_name"], ["id", `eq.${userId}`],
+    ]);
+    if (prof && typeof prof.full_name === "string" && prof.full_name) name = prof.full_name;
+  } catch {
+    /* profile row may lag */
+  }
+  return { name, email };
+}
+
+/** GET /api/psych/console — the linked psychologist's three queues. */
+export async function consoleList(user: SessionUser) {
+  const slug = requirePsychConsole(user);
+
+  const [pending, confirmed, upcoming, avail] = await Promise.all([
+    sel("appointments", [
+      ["select", "*"],
+      ["psychologist_slug", `eq.${slug}`],
+      ["status", "eq.requested"],
+      ["order", "start_at.asc"],
+      ["limit", "20"],
+    ]),
+    sel("appointments", [
+      ["select", "*"],
+      ["psychologist_slug", `eq.${slug}`],
+      ["status", "eq.confirmed"],
+      ["order", "start_at.asc"],
+      ["limit", "10"],
+    ]),
+    sel("appointments", [
+      ["select", "*"],
+      ["psychologist_slug", `eq.${slug}`],
+      ["status", "eq.upcoming"],
+      ["start_at", `gt.${nowIso()}`],
+      ["order", "start_at.asc"],
+      ["limit", "10"],
+    ]),
+    sel("psychologist_availability", [
+      ["select", "day,from_hour,to_hour"],
+      ["psychologist_slug", `eq.${slug}`],
+    ]),
+  ]);
+
+  // Client lookups (auth + profile), deduplicated per user id.
+  const clients = new Map<string, { name: string | null; email: string | null }>();
+  const lookup = async (userId: string) => {
+    const hit = clients.get(userId);
+    if (hit) return hit;
+    const out = await clientOf(userId);
+    clients.set(userId, out);
+    return out;
+  };
+
+  // A slot outside every weekly working block = a custom-time request.
+  const isCustom = (r: Row): boolean => {
+    const ts = Date.parse(String(r.start_at));
+    if (!Number.isFinite(ts)) return false;
+    const { hour, weekday } = bakuParts(ts);
+    return !avail.some((b) =>
+      b.day === weekday
+      && hour >= (typeof b.from_hour === "number" ? b.from_hour : -1)
+      && hour < (typeof b.to_hour === "number" ? b.to_hour : -1),
+    );
+  };
+
+  const view = async (r: Row) => ({
+    ...appointmentView(r),
+    custom: isCustom(r),
+    client: await lookup(String(r.user_id)),
+  });
+
+  const mapWith = async (rows: Row[]) => {
+    const out: Awaited<ReturnType<typeof view>>[] = [];
+    for (const r of rows) out.push(await view(r));
+    return out;
+  };
+
+  return {
+    slug,
+    pending: await mapWith(pending),
+    confirmed: await mapWith(confirmed),
+    upcoming: await mapWith(upcoming),
+  };
+}
+
+/** POST /api/psych/console { id, action } — confirm / decline a request.
+ * Confirming sends the payment-due e-mail; declining the polite refusal. */
+export async function consoleRespond(user: SessionUser, body: Row, origin: string) {
+  const slug = requirePsychConsole(user);
+
+  const id = typeof body.id === "string" ? body.id : "";
+  const action = body.action === "confirm" ? "confirm" : body.action === "decline" ? "decline" : "";
+  if (!id || !action) throw badRequest();
+
+  const row = await supaSelectOne("appointments", [
+    ["select", "*"], ["id", `eq.${id}`],
+  ]);
+  if (!row || row.psychologist_slug !== slug) throw notFound();
+  if (row.status !== "requested") throw new ApiCode(409, "not_confirmed");
+
+  const now = nowIso();
+  if (action === "confirm") {
+    await supaUpdate("appointments", [["id", `eq.${id}`]], {
+      status: "confirmed",
+      responded_at: now,
+    });
+  } else {
+    await supaUpdate("appointments", [["id", `eq.${id}`]], {
+      status: "cancelled",
+      responded_at: now,
+    });
+  }
+
+  // Best-effort outcome mail — a mail failure never fails the response.
+  try {
+    const userId = String(row.user_id);
+    const { email } = await clientOf(userId);
+    if (email) {
+      let locale = "az";
+      try {
+        const prof = await supaSelectOne("profiles", [
+          ["select", "lang"], ["id", `eq.${userId}`],
+        ]);
+        if (prof && (prof.lang === "en" || prof.lang === "ru" || prof.lang === "az")) {
+          locale = prof.lang;
+        }
+      } catch {
+        /* default az */
+      }
+      const psychologist = await psyDisplayName(locale, slug);
+      const startAtLabel = bakuLabel(locale, String(row.start_at));
+      if (action === "confirm") {
+        await sendMail({
+          to: email,
+          kind: "session_confirmed",
+          ...buildPaymentDueMail(locale, {
+            psychologist,
+            startAtLabel,
+            mode: row.mode === "office" ? "office" : "online",
+            price: typeof row.price === "number" ? row.price : null,
+            link: `${origin}/meditation/bookings`,
+          }),
+        });
+      } else {
+        await sendMail({
+          to: email,
+          kind: "session_declined",
+          ...buildRequestDeclinedMail(locale, { psychologist, startAtLabel }),
+        });
+      }
+    }
+  } catch (e) {
+    console.error("[psych:console mail]", e);
+  }
+
+  return { ok: true, status: action === "confirm" ? "confirmed" : "cancelled" };
 }
 
 /* ── Meditation media progress ───────────────────────────────────────────── */
@@ -387,10 +639,12 @@ export async function overview(user: SessionUser) {
     ["limit", "60"],
   ]);
 
+  // v3.4: the dashboard's "nearest sessions" strip also carries pending
+  // (requested/confirmed) requests, not only paid-up upcoming ones.
   const upcoming = await sel("appointments", [
     ["select", "*"],
     ["user_id", `eq.${user.id}`],
-    ["status", "eq.upcoming"],
+    ["status", "in.(requested,confirmed,upcoming)"],
     ["start_at", `gt.${now}`],
     ["order", "start_at.asc"],
     ["limit", "3"],
