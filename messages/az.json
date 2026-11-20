@@ -588,15 +588,16 @@
       "email_unverified": "E-po\u00e7t t\u0259sdiql\u0259nm\u0259yib. G\u0259l\u0259nl\u0259r qutusunu yoxlay\u0131n v\u0259 ya linki yenid\u0259n g\u00f6nd\u0259rin."
     },
     "signupOkTitle": "E-po\u00e7tunuzu yoxlay\u0131n",
-    "signupOkText": "{email} \u00fcnvan\u0131na t\u0259sdiq linki g\u00f6nd\u0259rdik \u2014 linki a\u00e7d\u0131qdan sonra hesab\u0131n\u0131z aktivl\u0259\u015f\u0259c\u0259k.",
-    "signupOkNote": "Link 24 saat q\u00fcvv\u0259d\u0259dir. G\u0259lm\u0259dis\u0259 spam qovlu\u011funa bax\u0131n.",
-    "devLinkNote": "SMTP h\u0259l\u0259 qurulmay\u0131b \u2014 test \u00fc\u00e7\u00fcn t\u0259sdiq linki:",
+    "signupOkText": "{email} \u00fcnvan\u0131na t\u0259sdiq linki g\u00f6nd\u0259rdik \u2014 link ilk giri\u015finizdir: a\u00e7d\u0131qda hesab\u0131n\u0131z aktivl\u0259\u015fir v\u0259 avtomatik daxil olursunuz.",
+    "signupOkNote": "Link 1 h\u0259ft\u0259 q\u00fcvv\u0259d\u0259dir. G\u0259lm\u0259dis\u0259 spam qovlu\u011funa bax\u0131n.",
+    "devLinkNote": "S\u0131naq rejimind\u0259 real mail g\u00f6nd\u0259rilmir \u2014 t\u0259sdiq linki birba\u015fa burada:",
     "devLinkOpen": "T\u0259sdiq linkini a\u00e7",
-    "loginUnverified": "Bu e-po\u00e7t h\u0259l\u0259 t\u0259sdiql\u0259nm\u0259yib \u2014 g\u0259l\u0259nl\u0259r qutusunu yoxlay\u0131n.",
+    "loginUnverified": "Bu hesab h\u0259l\u0259 t\u0259sdiql\u0259nm\u0259yib \u2014 hesab\u0131n\u0131z\u0131 t\u0259sdiql\u0259m\u0259k \u00fc\u00e7\u00fcn mail\u0259 bax\u0131n: g\u00f6nd\u0259ril\u0259n link ilk giri\u015finizdir.",
     "resendCta": "T\u0259sdiq m\u0259ktubunu yenid\u0259n g\u00f6nd\u0259r",
     "resendOk": "Yeni t\u0259sdiq m\u0259ktubu g\u00f6nd\u0259rildi.",
     "resendFail": "G\u00f6nd\u0259rm\u0259 al\u0131nmad\u0131 \u2014 bir azdan yenid\u0259n c\u0259hd edin.",
-    "resendUnknown": "Bu e-po\u00e7tl\u0259 g\u00f6zl\u0259y\u0259n qeydiyyat tap\u0131lmad\u0131."
+    "resendUnknown": "Bu e-po\u00e7tl\u0259 g\u00f6zl\u0259y\u0259n qeydiyyat tap\u0131lmad\u0131.",
+    "unconfirmedNotice": "Bu hesab h\u0259l\u0259 t\u0259sdiql\u0259nm\u0259yib \u2014 ilk giri\u015f yaln\u0131z e-po\u00e7tunuza g\u00f6nd\u0259ril\u0259n t\u0259sdiq linki il\u0259 m\u00fcmk\u00fcnd\u00fcr. Mail\u0259 bax\u0131n."
   },
   "accountMenu": {
     "signedInAs": "Daxil olmusunuz",

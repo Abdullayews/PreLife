@@ -32,9 +32,17 @@ export default async function LoginPage({ params, searchParams }: Props) {
   // v4.4: it also redirects here with ?email=…&notice=oauth_new when a
   // Google/Apple LOGIN found no account — the mail registration starts
   // right on this page (the e-mail arrives prefilled).
+  // v4.5: ?email=…&notice=unconfirmed when a provider login hit an
+  // existing but still-unconfirmed e-mail account — the first sign-in
+  // is the mail link, so the visitor is sent back to check the inbox.
   const prefillRaw = Array.isArray(sp.email) ? sp.email[0] : sp.email;
   const prefillEmail = typeof prefillRaw === "string" ? prefillRaw.trim().slice(0, 120) : "";
-  const notice = sp.notice === "oauth_new" ? "oauth_new" : null;
+  const notice =
+    sp.notice === "oauth_new"
+      ? "oauth_new"
+      : sp.notice === "unconfirmed"
+        ? "unconfirmed"
+        : null;
 
   return (
     <div data-world="shell" className="world page">

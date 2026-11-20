@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import {
   authAdminDeleteUser,
+  authAdminFindUserByEmail,
   authPkceExchange,
+  isConfirmedUser,
   supaUpdate,
   supabaseConfigured,
   userFromAuth,
@@ -80,7 +82,12 @@ function parseOauthCookie(
  *     place only — never on the signup page.
  *
  *   • an existing account (e-mail provider on the row) links to the
- *     provider and just logs in, from either page.
+ *     provider and just logs in, from either page — but ONLY when the
+ *     e-mail account is already confirmed. A pending registration is
+ *     NEVER enterable: the first sign-in is the e-mail link, even when
+ *     Google/Apple already linked the identity during the dance (v4.5).
+ *     The visitor bounces to the login page with an "unconfirmed"
+ *     notice; once the mail link is opened, provider logins work too.
  */
 export async function GET(req: NextRequest) {
   if (!supabaseConfigured) {
@@ -153,6 +160,32 @@ export async function GET(req: NextRequest) {
       );
       res.cookies.set(clearedOAuthCookie(isSecure(req.headers)));
       return res;
+    }
+
+    // An e-mail account behind the provider button? It must already be
+    // CONFIRMED — a pending registration is only ever activated by the
+    // e-mail link (the first sign-in). The authoritative check is the
+    // admin view; the raw exchange shape is the fallback.
+    if (providers.includes("email")) {
+      let account: Record<string, unknown> | null = null;
+      try {
+        account = await authAdminFindUserByEmail(user.email);
+      } catch {
+        /* fall back to the raw shape below */
+      }
+      const confirmed = account
+        ? isConfirmedUser(account)
+        : isConfirmedUser(raw);
+      if (!confirmed) {
+        const res = NextResponse.redirect(
+          `${origin}/${locale}/login`
+            + `?email=${encodeURIComponent(user.email)}`
+            + `&notice=unconfirmed`,
+          302,
+        );
+        res.cookies.set(clearedOAuthCookie(isSecure(req.headers)));
+        return res;
+      }
     }
 
     const session = await createSession(user, req.headers.get("user-agent"));
