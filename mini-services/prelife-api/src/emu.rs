@@ -118,6 +118,19 @@ impl EmuStore {
             .filter_map(|v| v.as_object().cloned())
             .collect();
 
+        // Secret hygiene: the emu REST surface is intentionally open, so the
+        // live Gemini key must NEVER sit in the readable ai_settings row —
+        // mask it here (covers stores persisted by older builds too).
+        if !gemini_key.is_empty() {
+            if let Some(rows) = data.tables.get_mut("ai_settings") {
+                for row in rows.iter_mut() {
+                    if row.get("api_key").and_then(|k| k.as_str()) == Some(gemini_key) {
+                        row.insert("api_key".into(), json!("(env GEMINI_API_KEY)"));
+                    }
+                }
+            }
+        }
+
         seed_base_rows(&mut data, prompt_seeds, gemini_key, gemini_model);
 
         let store = Self {
@@ -1123,7 +1136,10 @@ fn seed_base_rows(data: &mut EmuData, prompt_seeds: &[AiPromptSeed], gemini_key:
         let mut row = Row::new();
         row.insert("id".into(), json!(uuid_v4()));
         row.insert("provider".into(), json!("gemini"));
-        row.insert("api_key".into(), json!(gemini_key));
+        // Masked: the real key lives in GEMINI_API_KEY (env) — get_ai_settings
+        // reads it from config first, this row is only a readable mirror and
+        // must never hold the live secret.
+        row.insert("api_key".into(), json!(if gemini_key.is_empty() { "" } else { "(env GEMINI_API_KEY)" }));
         row.insert("model".into(), json!(gemini_model));
         row.insert("is_active".into(), json!(true));
         row.insert("created_at".into(), json!(now));

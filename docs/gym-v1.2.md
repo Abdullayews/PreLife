@@ -1,3 +1,9 @@
+> **STATUS (v5.0, 2026-11-21): dated history.** The code it references has
+> moved on — `src/components/gym/GymApp.tsx` is now
+> `src/components/idman/IdmanApp.tsx`, the static data registries live in
+> Supabase (the Rust backend serves them).
+> Read for context, not as current behavior.
+
 # Gym v1.2 (2026-11-18) — "daha da yaxşılaşdır" (ikinci tur)
 
 Follow-up to `gym-v1.1.md`. The v1.1 surface is unchanged; this pass makes

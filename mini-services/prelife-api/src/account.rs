@@ -37,10 +37,7 @@ pub async fn preferences_get(st: &St, user_id: &str) -> Res<Value> {
         .await
         .map_err(DomainError::from_supa)?;
     let view = prefs_view(row.as_ref());
-    st.prefs_cache
-        .lock()
-        .unwrap()
-        .insert(user_id.to_string(), (std::time::Instant::now(), view.clone()));
+    st.prefs_cache_put(user_id, view.clone());
     Ok(view)
 }
 
@@ -187,7 +184,7 @@ pub async fn device_update(st: &St, current: &CurrentSession, id: &str, body: &V
 pub async fn device_revoke(st: &St, current: &CurrentSession, id: &str) -> Res<Value> {
     own_session(st, current, id).await?;
     st.supa
-        .delete("sessions", &vec![("id".into(), id.to_string())])
+        .delete("sessions", &vec![("id".into(), format!("eq.{id}"))])
         .await
         .map_err(DomainError::from_supa)?;
     st.session_cache_drop_session(id);

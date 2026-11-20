@@ -1,3 +1,8 @@
+> **STATUS (v5.0, 2026-11-21): partially dated.** The current `scripts/
+> warm.mjs` warms PUBLIC pages + login-redirect compiles only — no
+> cookie-scoped warming.
+> The parity analysis below still holds.
+
 # Sandbox ↔ Render parity
 
 **The problem it solves** (reported 2026-11-17): the app deployed on Render

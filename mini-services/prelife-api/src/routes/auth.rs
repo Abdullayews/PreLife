@@ -45,11 +45,13 @@ pub async fn login(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Res
         return Err(err(400, "missing_fields"));
     }
 
-    // v4.7 brute-force ceiling.
+    // v4.7 brute-force ceiling — both buckets checked together, so a
+    // rejected request consumes neither.
     let ip = crate::state::AppState::client_ip(&headers);
-    if !st.rate_allow(&format!("login:ip:{ip}"), 40, std::time::Duration::from_secs(15 * 60))
-        || !st.rate_allow(&format!("login:em:{email}"), 20, std::time::Duration::from_secs(15 * 60))
-    {
+    if !st.rate_allow_all(&[
+        (format!("login:ip:{ip}"), 40, std::time::Duration::from_secs(15 * 60)),
+        (format!("login:em:{email}"), 20, std::time::Duration::from_secs(15 * 60)),
+    ]) {
         return Err(err(429, "too_many_requests"));
     }
 
@@ -174,7 +176,7 @@ pub async fn signup(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Re
     if name.is_empty() || email.is_empty() || password.is_empty() {
         return Err(err(400, "missing_fields"));
     }
-    if char_len(&name) < 2 {
+    if char_len(&name) < 2 || char_len(&name) > 100 {
         return Err(err(400, "missing_fields"));
     }
     // The email shape check.
@@ -379,7 +381,7 @@ pub async fn complete(State(st): State<St>, headers: HeaderMap, body: Bytes) -> 
         _ => String::new(),
     };
 
-    if char_len(&name) < 2 {
+    if char_len(&name) < 2 || char_len(&name) > 100 {
         return Err(err(400, "missing_fields"));
     }
     if char_len(&password) < 8 {

@@ -6,6 +6,28 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  // DEV ONLY: the browser-facing /api/* calls (lib/api-url.ts appends the
+  // XTransformPort=3030 gateway param) are routed by the space-z.ai preview
+  // gateway — which does not exist on a plain localhost:3000 visit. This
+  // rewrite bridges that gap for local E2E (agent-browser, curl). Production
+  // (next start / NODE_ENV=production) leaves /api/* to the edge proxy
+  // exactly as before.
+  ...(process.env.NODE_ENV !== "production"
+    ? {
+        async rewrites() {
+          return [
+            {
+              source: "/api/:path*",
+              destination: `${process.env.API_INTERNAL_URL ?? "http://127.0.0.1:3030"}/api/:path*`,
+            },
+            {
+              source: "/internal/:path*",
+              destination: `${process.env.API_INTERNAL_URL ?? "http://127.0.0.1:3030"}/internal/:path*`,
+            },
+          ];
+        },
+      }
+    : {}),
   // Sandbox↔Render parity: `next dev` ships a floating "Next.js dev tools"
   // badge (bottom-left) plus route-compile spinners. None of that exists in
   // the production build served on Render, so the preview panel looked

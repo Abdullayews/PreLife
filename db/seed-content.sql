@@ -866,10 +866,12 @@ INSERT INTO subscription_features (code, name_key, price, sort_order) VALUES
   ('videos', 'feat.videos', 2, 5),
   ('coaching', 'feat.coaching', 6, 6),
   ('family', 'feat.family', 5, 7);
+-- v3.3 price sheet (Plus 15 / Pro 40 / Ultra 60) — kept in lockstep with
+-- emu.rs and export snapshots; the pre-v3.3 7/12/19 sheet is obsolete.
 INSERT INTO subscription_tiers (code, name_key, price, sort_order) VALUES
-  ('plus', 'plans.plus.name', 7, 0),
-  ('pro', 'plans.pro.name', 12, 1),
-  ('ultra', 'plans.ultra.name', 19, 2);
+  ('plus', 'plans.plus.name', 15, 0),
+  ('pro', 'plans.pro.name', 40, 1),
+  ('ultra', 'plans.ultra.name', 60, 2);
 INSERT INTO subscription_tier_features (tier_code, feature_code, sort_order) VALUES
   ('plus', 'gym', 0),
   ('plus', 'diet', 1),

@@ -11,10 +11,8 @@ pub mod internal;
 pub mod psych;
 pub mod subscription;
 
-use crate::error::DomainError;
 use crate::state::St;
-use crate::util::*;
-use axum::http::{HeaderMap, StatusCode};
+use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};

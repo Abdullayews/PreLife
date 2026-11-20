@@ -52,7 +52,10 @@ function LocaleSwitch({ className = "", signedIn = false }: { className?: string
           type="button"
           aria-pressed={loc === locale}
           onClick={() => {
-            router.replace(pathname, { locale: loc });
+            // Keep the shareable query (?tab=, psychologist fit-filters) —
+            // a bare pathname replace silently drops it.
+            const query = typeof window === "undefined" ? "" : window.location.search;
+            router.replace(query ? `${pathname}${query}` : pathname, { locale: loc });
             // Guest tiers: nothing is stored before consent; after consent
             // the choice is remembered as a persistent 1-year cookie.
             if (hasConsent()) persistLocale(loc);

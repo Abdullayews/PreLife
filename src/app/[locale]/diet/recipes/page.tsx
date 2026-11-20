@@ -43,7 +43,8 @@ export default async function DietRecipesPage({ params }: Props) {
         </header>
 
         <ul className="drecipes">
-          {dietRecipes.map((r) => {
+          {/* detail rows are DB-driven — skip items without details */}
+          {dietRecipes.filter((r) => RECIPE_DETAILS[r.id]).map((r) => {
             const detail = RECIPE_DETAILS[r.id]!;
             const Icon = RECIPE_ICONS[r.id] ?? ChefHat;
             return (

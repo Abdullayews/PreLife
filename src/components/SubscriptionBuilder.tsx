@@ -88,9 +88,9 @@ export function SubscriptionBuilder({
   };
 }) {
   const t = useTranslations("subscription");
-  /* Generic retry line for a failed request — the subscription
-   * namespace has no error string and messages are frozen this phase. */
-  const tErr = useTranslations("settingsPage.devices");
+  /* Generic retry line for a failed request — hoisted so the Devices panel
+   * copy never leaks into the subscription surface. */
+  const tErr = useTranslations("settingsPage");
   const [mode, setMode] = useState<"tier" | "custom">("tier");
   const [tier, setTier] = useState<string>("pro");
   const [picked, setPicked] = useState<string[]>(features.slice(0, 2).map((f) => f.id));
@@ -170,12 +170,13 @@ export function SubscriptionBuilder({
 
   return (
     <div className="subcfg">
-      {/* ── Template tiers ── */}
-      <div className="subcfg-modes" role="tablist" aria-label={t("title")}>
+      {/* ── Template tiers ── mode switcher: plain aria-pressed chips —
+          a tablist without tabpanels/arrow-key handling would be a11y-worse
+          than an honest toggle group (same pattern as QuizCard). */}
+      <div className="subcfg-modes" role="group" aria-label={t("title")}>
         <button
           type="button"
-          role="tab"
-          aria-selected={mode === "tier"}
+          aria-pressed={mode === "tier"}
           className="chip-f"
           onClick={() => setMode("tier")}
         >
@@ -183,8 +184,7 @@ export function SubscriptionBuilder({
         </button>
         <button
           type="button"
-          role="tab"
-          aria-selected={mode === "custom"}
+          aria-pressed={mode === "custom"}
           className="chip-f"
           onClick={() => setMode("custom")}
         >
@@ -301,7 +301,7 @@ export function SubscriptionBuilder({
             {busy ? ui.requesting : ui.requestCta}
           </button>
           {picked.length === 0 && <p className="subcustom-hint">{t("customPickHint")}</p>}
-          {failed && <p className="subcustom-hint" role="alert">{tErr("error")}</p>}
+          {failed && <p className="subcustom-hint" role="alert">{tErr("actionFailed")}</p>}
 
           {created && (
             /* <output> carries the implicit role="status" — the receipt

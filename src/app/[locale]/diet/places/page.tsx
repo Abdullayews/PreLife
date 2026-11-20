@@ -40,13 +40,15 @@ export default async function DietPlacesPage({ params }: Props) {
         </header>
 
         <ul className="gyms-grid">
-          {dietPlaces.map((place) => {
+          {/* detail rows are DB-driven — skip any list item the catalog
+               has no details for instead of crashing the page */}
+          {dietPlaces.filter((place) => VENUE_DETAILS[place.id]).map((place) => {
             const detail = VENUE_DETAILS[place.id]!;
             const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(detail.mapQuery)}`;
             return (
               <li key={place.id} className="gplace">
                 <div className="gplace-img">
-                  <img src={place.image} alt="" width={800} height={533} loading="lazy" decoding="async" />
+                  <img src={place.image} alt={t(place.nameKey)} width={800} height={533} loading="lazy" decoding="async" />
                 </div>
                 <div className="gplace-body">
                   <div className="place-top">

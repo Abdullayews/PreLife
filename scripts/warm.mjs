@@ -97,13 +97,15 @@ async function main() {
     "/api/content/worlds", "/api/content/gym", "/api/content/diet",
     "/api/content/meditation", "/api/content/library",
     "/api/content/subscription", "/api/i18n?locale=en",
-    "/api/gym/plan",
+    "/api/gym/plan", "/api/me/profile", "/api/me/preferences",
+    "/api/psych/console", "/api/subscription/custom",
   ];
   const badPosts = [
     "/api/auth/login", "/api/auth/signup", "/api/auth/resend", "/api/auth/complete",
     "/api/psych/quiz", "/api/psych/book", "/api/psych/pay",
     "/api/psych/cancel", "/api/psych/progress", "/api/psych/journal",
     "/api/psych/mood", "/api/ai/chat", "/api/psych/ai", "/api/gym/plan",
+    "/api/auth/verify", "/api/psych/console",
   ];
   for (const path of gets) {
     if (expired()) { out("deadline hit — stopping early"); return finish(); }

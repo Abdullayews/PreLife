@@ -149,6 +149,9 @@ fn consent_page(st: &St, origin: &str, provider: &str, redirect_to: &str, challe
     let identity = emu_identities(provider);
     let title = if provider == "apple" { "Apple" } else { "Google" };
     let action = gateway_url(st, &format!("{origin}/api/supa-emu/auth/v1/authorize"));
+    // Every query-derived value is HTML-escaped: the authorize GET only
+    // validates redirect_to's shape, so raw interpolation here would let a
+    // crafted link inject attributes/script into the consent page (XSS).
     let html = format!(
         r#"<!doctype html>
 <html lang="az">
@@ -194,10 +197,10 @@ fn consent_page(st: &St, origin: &str, provider: &str, redirect_to: &str, challe
   <h1>{title} hesabı ilə davam edin</h1>
   <p class="note">Bu səhifə yalnız sınaq rejimində görünür — real {title} pəncərəsinin yerini tutur. Mövcud hesabın e-poçtunu yazsanız, provayder ona bağlanacaq.</p>
   <form method="post" action="{action}">
-    <input type="hidden" name="provider" value="{provider}">
-    <input type="hidden" name="redirect_to" value="{redirect_to}">
-    <input type="hidden" name="code_challenge" value="{challenge}">
-    <input type="hidden" name="code_challenge_method" value="{method}">
+    <input type="hidden" name="provider" value="{provider_esc}">
+    <input type="hidden" name="redirect_to" value="{redirect_esc}">
+    <input type="hidden" name="code_challenge" value="{challenge_esc}">
+    <input type="hidden" name="code_challenge_method" value="{method_esc}">
     <label for="email">{title} e-poçtu</label>
     <input id="email" name="email" type="email" value="{identity_email}" required autocomplete="off">
     <button type="submit">Davam et</button>
@@ -207,6 +210,10 @@ fn consent_page(st: &St, origin: &str, provider: &str, redirect_to: &str, challe
 </body>
 </html>"#,
         identity_email = escape_html(identity.0),
+        provider_esc = escape_html(provider),
+        redirect_esc = escape_html(redirect_to),
+        challenge_esc = escape_html(challenge),
+        method_esc = escape_html(method),
     );
     (
         [(axum::http::header::CONTENT_TYPE, "text/html; charset=utf-8")],
@@ -279,6 +286,14 @@ pub async fn auth_get(State(st): State<St>, Path(action): Path<String>, RawQuery
         let method = query_get(&q, "code_challenge_method").unwrap_or("S256").to_string();
         if redirect_to.is_empty() || challenge.is_empty() || method != "S256" {
             return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid authorize request" }))).into_response();
+        }
+        // Same redirect_to shape check as the POST branch — reject anything
+        // that is not a parseable URL to our own callback before rendering.
+        let Ok(check) = url::Url::parse(&redirect_to) else {
+            return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid redirect_to" }))).into_response();
+        };
+        if check.path() != "/api/auth/callback" {
+            return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid redirect_to" }))).into_response();
         }
         return consent_page(&st, &origin, &provider, &redirect_to, &challenge, &method);
     }

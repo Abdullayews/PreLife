@@ -50,7 +50,7 @@ export default async function DietPlansPage({ params }: Props) {
             return (
               <li key={p.id} className="card dplan-card">
                 <div className="dplan-img">
-                  <img src={p.image} alt="" width={800} height={500} loading="lazy" decoding="async" />
+                  <img src={p.image} alt={t(p.nameKey)} width={800} height={500} loading="lazy" decoding="async" />
                 </div>
                 <div className="dplan-body">
                   <span className="card-top">

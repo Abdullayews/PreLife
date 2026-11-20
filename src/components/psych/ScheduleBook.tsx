@@ -18,10 +18,13 @@ type Props = {
 
 const hh = (hour: number) => `${String(hour).padStart(2, "0")}:00`;
 
-// Baku "today", captured once at module load — the date bounds for the
-// custom-time form (pure for the React Compiler; the server re-validates
-// the window on every request anyway).
-const TODAY = bakuParts(new Date()).date;
+// Baku "today" — computed per render (a client tab open across Baku
+// midnight must not keep yesterday's min/max on the custom-date input; the
+// cost is one cheap pure call).
+function useBakuToday() {
+  const [today] = useState(() => bakuParts(new Date()).date);
+  return today;
+}
 
 /** The control look shared with the filter bar's .timepick inputs (no bare
  * input/select class exists outside .timepick, so the tokens are inlined). */
@@ -29,7 +32,7 @@ const CONTROL: CSSProperties = {
   height: "2.25rem",
   paddingInline: ".6rem",
   border: "1px solid var(--line-strong)",
-  borderRadius: "10px",
+  borderRadius: "12px",
   background: "var(--surface)",
   font: "inherit",
   fontSize: ".875rem",
@@ -47,6 +50,7 @@ const CONTROL: CSSProperties = {
 export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Props) {
   const t = useTranslations("psychApp");
   const router = useRouter();
+  const TODAY = useBakuToday();
   const [picked, setPicked] = useState<{ date: string; hour: number } | null>(null);
   const [mode, setMode] = useState<"online" | "office">("online");
   const [message, setMessage] = useState("");
@@ -95,7 +99,10 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
         router.refresh();
       } else {
         const data = (await res.json()) as { error?: string };
-        setError(t(`bookError_${data.error ?? "generic"}`));
+        // A code the catalog lacks (server-side additions) falls back to the
+        // generic message instead of rendering a raw i18n key.
+        const code = data.error && t.has(`bookError_${data.error}`) ? `bookError_${data.error}` : "bookError_generic";
+        setError(t(code));
       }
     });
   };
@@ -118,7 +125,8 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
         router.refresh();
       } else {
         const data = (await res.json()) as { error?: string };
-        setCError(t(`bookError_${data.error ?? "generic"}`));
+        const code = data.error && t.has(`bookError_${data.error}`) ? `bookError_${data.error}` : "bookError_generic";
+        setCError(t(code));
       }
     });
   };
@@ -140,7 +148,7 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
             onClick={() => setPicked({ date: col.date, hour })}
           >
             <b style={{ display: "block", fontVariantNumeric: "tabular-nums" }}>{hh(hour)}</b>
-            <span style={{ display: "block", fontSize: ".625rem", fontWeight: 650, lineHeight: 1.2, letterSpacing: ".04em", overflowWrap: "anywhere" }}>
+            <span style={{ display: "block", fontSize: ".75rem", fontWeight: 650, lineHeight: 1.2, letterSpacing: ".04em", overflowWrap: "anywhere" }}>
               {t("reserve")}
             </span>
           </button>
@@ -190,7 +198,11 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
 
       {/* ── The request form for a picked grid slot ── */}
       {picked && (
-        <div className="psy-filters" role="form" aria-label={t("requestTitle")}>
+        <form
+          className="psy-filters"
+          aria-label={t("requestTitle")}
+          onSubmit={(e) => { e.preventDefault(); send(); }}
+        >
           <div className="psy-filter-row">
             <span className="lbl">{t("requestTitle")}</span>
             <span className="fit-tag">
@@ -233,7 +245,7 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
             </button>
           </div>
           {error && <p className="field-error" style={{ margin: 0 }}>{error}</p>}
-        </div>
+        </form>
       )}
 
       {/* ── Custom time: propose any hour of the next 60 days ── */}

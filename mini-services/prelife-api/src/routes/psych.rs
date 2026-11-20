@@ -183,9 +183,13 @@ pub async fn ai_post(State(st): State<St>, headers: HeaderMap, body: Bytes) -> R
         return Err(err(503, "supabase_unconfigured"));
     }
     let cs = require(&st, &headers).await?;
+    // The AI cost ceiling — same class as /api/ai/chat, per signed-in user.
+    let uid = crate::util::s(&cs.user, "id");
+    if !st.rate_allow(&format!("ai:psy:{}", uid), 10, std::time::Duration::from_secs(60)) {
+        return Err(err(429, "rate_limited"));
+    }
     let body = read_json(&body);
     let parsed = crate::ai::parse_chat_body(&body).map_err(|_| err(400, "invalid"))?;
     let out = crate::ai::psych_reply(&st, &parsed.history).await?;
-    let _ = cs;
     Ok(json_ok(serde_json::json!({ "reply": out.0, "source": out.1 })))
 }

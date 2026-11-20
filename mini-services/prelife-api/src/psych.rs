@@ -161,7 +161,8 @@ pub async fn mood_upsert(st: &St, user: &Value, body: &Value) -> Res<Value> {
     if let Some(Value::Array(arr)) = body.get("tags") {
         for t in arr {
             if let Value::String(ts) = t {
-                if ts.len() <= 24 && !tags.contains(ts) {
+                // char-length (not bytes) — consistent with every other cap.
+                if char_len(ts) <= 24 && !tags.contains(ts) {
                     tags.push(ts.clone());
                 }
             }
@@ -178,6 +179,9 @@ pub async fn mood_upsert(st: &St, user: &Value, body: &Value) -> Res<Value> {
     let uid = s(user, "id");
     let date = baku_parts(now_ms()).date;
 
+    // Serialize check-then-insert against concurrent same-day requests —
+    // two parallel posts would both see no row and create duplicates.
+    let _guard = st.write_lock.lock().await;
     let existing = st
         .supa
         .select_one("mood_logs", &[("select", "id"), ("user_id", &format!("eq.{uid}")), ("date", &format!("eq.{date}"))])
@@ -347,6 +351,9 @@ pub async fn book(st: &St, user: &Value, body: &Value) -> Res<Value> {
 
     let start_iso = ms_to_iso(start_ms);
     let uid = s(user, "id");
+    // Serialize the slot-check + insert: two concurrent POSTs for the same
+    // slot would both pass the clash select and double-book it.
+    let _guard = st.write_lock.lock().await;
     let clash = st
         .supa
         .select_one(
@@ -587,12 +594,12 @@ pub async fn console_respond(st: &St, user: &Value, body: &Value, origin: &str) 
     let now = now_iso();
     if action == "confirm" {
         st.supa
-            .update("appointments", &vec![("id".into(), id.clone())], &json!({ "status": "confirmed", "responded_at": now }))
+            .update("appointments", &vec![("id".into(), format!("eq.{id}"))], &json!({ "status": "confirmed", "responded_at": now }))
             .await
             .map_err(DomainError::from_supa)?;
     } else {
         st.supa
-            .update("appointments", &vec![("id".into(), id.clone())], &json!({ "status": "cancelled", "responded_at": now }))
+            .update("appointments", &vec![("id".into(), format!("eq.{id}"))], &json!({ "status": "cancelled", "responded_at": now }))
             .await
             .map_err(DomainError::from_supa)?;
     }

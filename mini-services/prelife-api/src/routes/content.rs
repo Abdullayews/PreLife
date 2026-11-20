@@ -68,7 +68,7 @@ pub async fn health(State(st): State<St>) -> Response {
     json_ok(json!({
         "ok": true,
         "service": "prelife",
-        "version": "2.2.0",
+        "version": "5.0.0",
         "uptimeSecs": st.started_at.elapsed().as_secs(),
         "supabaseConfigured": st.cfg.db_ready(),
     }))

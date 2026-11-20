@@ -1,3 +1,9 @@
+> **STATUS (v5.0, 2026-11-21): dated history.** The code it references has
+> moved on — `src/components/gym/GymApp.tsx` is now
+> `src/components/idman/IdmanApp.tsx`, the static data registries live in
+> Supabase (the Rust backend serves them).
+> Read for context, not as current behavior.
+
 # Gym app v1 + Home dashboard (2026-11-18)
 
 **The request:** after registration the sports section needs subtabs —

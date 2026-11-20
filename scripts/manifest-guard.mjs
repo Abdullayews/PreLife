@@ -16,7 +16,7 @@
  * the manifest is a cache of dev-prerender state, so a slightly stale
  * value is harmless; Next rewrites it as routes complete.
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, renameSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -64,7 +64,11 @@ function checkOnce() {
       try {
         const repaired = raw.slice(0, end);
         JSON.parse(repaired); // sanity: must be valid now
-        writeFileSync(MANIFEST, repaired);
+        // Atomic: Next must never observe a half-written manifest (the
+        // exact race this guard exists for, one level down).
+        const tmp = `${MANIFEST}.repair.${process.pid}`;
+        writeFileSync(tmp, repaired);
+        renameSync(tmp, MANIFEST);
         repairs++;
         log(`repaired the prerender manifest (${raw.length} → ${repaired.length} bytes, repair #${repairs})`);
         return;

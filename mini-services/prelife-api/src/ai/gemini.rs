@@ -11,6 +11,13 @@ pub struct GeminiOut {
 
 const API_ROOT: &str = "https://generativelanguage.googleapis.com/v1beta/models";
 
+/// One shared client (connection pool + DNS cache) for every Gemini call —
+/// a fresh client per request rebuilt the pool and dropped keep-alive.
+fn client() -> &'static reqwest::Client {
+    static CLIENT: std::sync::OnceLock<reqwest::Client> = std::sync::OnceLock::new();
+    CLIENT.get_or_init(reqwest::Client::new)
+}
+
 #[allow(clippy::too_many_arguments)]
 pub async fn generate(
     api_key: &str,
@@ -38,8 +45,7 @@ pub async fn generate(
         body.insert("tools".into(), json!([{ "functionDeclarations": t }]));
     }
 
-    let client = reqwest::Client::new();
-    let res = client
+    let res = client()
         .post(format!("{API_ROOT}/{model}:generateContent"))
         .header("content-type", "application/json")
         .header("x-goog-api-key", api_key)

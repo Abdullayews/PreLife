@@ -46,7 +46,7 @@ export default async function GymPage({ params, searchParams }: Props) {
   // Guests (supabase unconfigured, no session) see the unfiltered,
   // global catalog.
   const user = supabaseConfigured
-    ? await requireUser(locale, "/gym")
+    ? await requireUser(locale, sp.tab ? `/gym?tab=${encodeURIComponent(Array.isArray(sp.tab) ? sp.tab[0] : sp.tab)}` : "/gym")
     : session ?? {
       railFolded: false, role: "user" as const, psychSlug: null,
     };

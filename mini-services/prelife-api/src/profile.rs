@@ -279,6 +279,8 @@ pub async fn update_profile(st: &St, user_id: &str, body: &Value) -> Res<Value> 
         match w {
             Some(n) if (20.0..=400.0).contains(&n) => {
                 let today = utc_date(now_ms());
+                // Serialize check-then-insert — no duplicate rows per date.
+                let _guard = st.write_lock.lock().await;
                 let existing = st
                     .supa
                     .select_one(

@@ -19,6 +19,7 @@ export function QuizCard({ labels, zones }: { labels: QuizLabels; zones: { low: 
   const [active, setActive] = useState(ids[0] ?? "");
   const [answers, setAnswers] = useState<number[]>([]);
   const [result, setResult] = useState<{ score: number; maxScore: number } | null>(null);
+  const [err, setErr] = useState(false);
   const [pending, start] = useTransition();
 
   const quiz = labels[active];
@@ -28,6 +29,7 @@ export function QuizCard({ labels, zones }: { labels: QuizLabels; zones: { low: 
     setActive(id);
     setAnswers([]);
     setResult(null);
+    setErr(false);
   };
 
   const answer = (qi: number, oi: number) => {
@@ -40,6 +42,7 @@ export function QuizCard({ labels, zones }: { labels: QuizLabels; zones: { low: 
 
   const submit = () =>
     start(async () => {
+      setErr(false);
       const res = await fetch(apiUrl("/api/psych/quiz"), {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -49,6 +52,9 @@ export function QuizCard({ labels, zones }: { labels: QuizLabels; zones: { low: 
         const data = (await res.json()) as { score: number; maxScore: number };
         setResult(data);
         router.refresh();
+      } else {
+        // 401 / 503 / 409 — the spinner just stopping silently is confusing.
+        setErr(true);
       }
     });
 
@@ -93,6 +99,11 @@ export function QuizCard({ labels, zones }: { labels: QuizLabels; zones: { low: 
               {pending && <LoaderCircle size={16} className="spin" aria-hidden />}
               {t("quizSubmit")}
             </button>
+            {err && (
+              <p className="avail-note" role="alert" style={{ margin: 0 }}>
+                {t("errorGeneric")}
+              </p>
+            )}
           </div>
         </>
       )}

@@ -39,7 +39,10 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   let messages: Catalog = fallback;
   try {
-    const fetched = await apiGet<Catalog>(`/api/i18n?locale=${locale}`);
+    // 2.5 s budget: this runs on EVERY page render and the bundled catalog
+    // below is the designed fallback — a hung backend must not add 20 s
+    // of TTFB to every request.
+    const fetched = await apiGet<Catalog>(`/api/i18n?locale=${locale}`, 2_500);
     if (fetched && typeof fetched === "object" && Object.keys(fetched).length > 0) {
       messages = deepMerge(fallback, fetched);
     }

@@ -1,18 +1,17 @@
 {
   "name": "prelife",
-  "version": "2.2.0",
+  "version": "5.0.0",
   "private": true,
   "engines": {
-    "node": ">=20.19"
+    "node": ">=22.9"
   },
   "scripts": {
     "dev": "node scripts/dev-backend.mjs; (next dev -p 3000 2>&1 | tee dev.log) & node scripts/manifest-guard.mjs >> /tmp/manifest-guard.log 2>&1 & node scripts/warm.mjs; wait",
-    "dev:backend": "bun run dev --prefix mini-services/prelife-api",
+    "dev:backend": "bun --cwd mini-services/prelife-api run dev",
     "build": "next build && cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/",
     "start": "NODE_ENV=production HOSTNAME=0.0.0.0 node --env-file-if-exists=.env.production .next/standalone/server.js",
     "lint": "oxlint . && tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "db:export": "bun scripts/export-content.mjs",
     "db:apply": "node scripts/apply-db.mjs",
     "db:apply:schema": "node scripts/apply-db.mjs schema"
   },
@@ -20,14 +19,12 @@
     "lucide-react": "1.76.0",
     "next": "16.4.6",
     "next-intl": "4.15.3",
-    "nodemailer": "^10.6.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "z-ai-web-dev-sdk": "0.0.18"
   },
   "devDependencies": {
     "@types/node": "26.6.6",
-    "@types/nodemailer": "^8.0.2",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "oxlint": "1.94.0",
