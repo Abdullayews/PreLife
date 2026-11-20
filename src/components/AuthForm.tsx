@@ -73,6 +73,9 @@ function NoticeBox({ text }: { text: string }) {
  *     e-mail prefilled: the mail registration starts right where the
  *     visitor is (press Continue → confirmation link). The mail
  *     hand-off lives at the login place only.
+ *   • A Google/Apple login onto an UNCONFIRMED e-mail account also
+ *     lands here (v4.5): the first sign-in is the mail link, always —
+ *     the notice tells the visitor to confirm the account first.
  */
 export function AuthForm({
   mode,
@@ -85,7 +88,7 @@ export function AuthForm({
   next?: string;
   oauthError?: boolean;
   prefillEmail?: string;
-  notice?: "oauth_new" | null;
+  notice?: "oauth_new" | "unconfirmed" | null;
 }) {
   const t = useTranslations("authPage");
   const locale = useLocale();
@@ -273,6 +276,9 @@ export function AuthForm({
 
       {mode === "login" && notice === "oauth_new" && (
         <NoticeBox text={t("oauthLoginNotice")} />
+      )}
+      {mode === "login" && notice === "unconfirmed" && (
+        <NoticeBox text={t("unconfirmedNotice")} />
       )}
       {mode === "signup" && password && (
         <NoticeBox text={t("prefillNote")} />

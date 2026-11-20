@@ -587,15 +587,16 @@
       "email_unverified": "E-mail not confirmed. Check your inbox or resend the link."
     },
     "signupOkTitle": "Check your inbox",
-    "signupOkText": "We sent a confirmation link to {email} \u2014 your account activates the moment you open it.",
-    "signupOkNote": "The link is valid for 24 hours. Check spam if it hasn't arrived.",
-    "devLinkNote": "SMTP is not configured yet \u2014 test verification link:",
+    "signupOkText": "We sent a confirmation link to {email} \u2014 it is your first sign-in: opening it activates your account and signs you in.",
+    "signupOkNote": "The link is valid for 1 week. Check spam if it hasn't arrived.",
+    "devLinkNote": "Test mode sends no real mail \u2014 the verification link is right here:",
     "devLinkOpen": "Open the verification link",
-    "loginUnverified": "This e-mail isn't confirmed yet \u2014 check your inbox.",
+    "loginUnverified": "This account isn't confirmed yet \u2014 check your inbox: the link we sent is your first sign-in.",
     "resendCta": "Send the confirmation e-mail again",
     "resendOk": "A new confirmation e-mail was sent.",
     "resendFail": "Could not send \u2014 try again in a moment.",
-    "resendUnknown": "No pending signup found for this e-mail."
+    "resendUnknown": "No pending signup found for this e-mail.",
+    "unconfirmedNotice": "This account isn't confirmed yet \u2014 the first sign-in is only possible through the confirmation link we e-mailed you. Please check your inbox."
   },
   "accountMenu": {
     "signedInAs": "Signed in as",
