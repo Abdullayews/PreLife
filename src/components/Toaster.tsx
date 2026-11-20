@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { CheckCircle2, Info, TriangleAlert } from "lucide-react";
 
 /**
@@ -30,6 +31,7 @@ type Item = { id: number; msg: string; kind: ToastKind; out: boolean };
 let seq = 0;
 
 export function Toaster() {
+  const t = useTranslations("moduleCommon");
   const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
@@ -63,17 +65,17 @@ export function Toaster() {
   }, []);
 
   return (
-    <div className="pl-toaster" role="region" aria-label="Notifications">
+    <section className="pl-toaster" aria-label={t("notifications")}>
       {items.map((it) => (
-        <div key={it.id} className="pl-toast" data-kind={it.kind} data-out={it.out || undefined} role="status">
+        <output key={it.id} className="pl-toast" data-kind={it.kind} data-out={it.out || undefined}>
           {it.kind === "error"
             ? <TriangleAlert size={17} aria-hidden />
             : it.kind === "info"
               ? <Info size={17} aria-hidden />
               : <CheckCircle2 size={17} aria-hidden />}
           <span>{it.msg}</span>
-        </div>
+        </output>
       ))}
-    </div>
+    </section>
   );
 }

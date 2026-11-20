@@ -53,9 +53,11 @@ type EmuGlobal = {
 const G = globalThis as unknown as { __prelifeEmu?: EmuGlobal };
 const g: EmuGlobal = (G.__prelifeEmu ??= {});
 
-/** True when the emulator is switched on (dev only). */
+/** True when the emulator is switched on (dev only). The NODE_ENV
+ * guard is load-bearing (v4.7): a stray SUPABASE_EMU=1 in a production
+ * env must not expose the emulator's unauthenticated admin surface. */
 export function emuEnabled(): boolean {
-  return process.env.SUPABASE_EMU === "1";
+  return process.env.SUPABASE_EMU === "1" && process.env.NODE_ENV !== "production";
 }
 
 /* ── persistence ─────────────────────────────────────────────────────────── */

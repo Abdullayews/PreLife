@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { assistantReply, parseChatBody } from "@/lib/server/ai";
 import { currentSession } from "@/lib/server/session";
+import { clientIp, rateAllow } from "@/lib/server/rate-limit";
 import { jsonError, readJson, toErrorResponse } from "@/lib/server/route-helpers";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +15,10 @@ export const dynamic = "force-dynamic";
  * No canned replies, ever: when both providers fail the chain throws
  * ApiCode(503, "ai_unavailable") and this route forwards it verbatim —
  * the client shows an honest retry instead of a fake answer.
+ *
+ * v4.7: rate limits — 10/min per IP for guests, 30/min per account
+ * signed in. Every message is a paid provider call; the endpoint used
+ * to be an open-ended cost tap.
  */
 export async function POST(req: NextRequest) {
   const body = await readJson(req);
@@ -32,6 +37,13 @@ export async function POST(req: NextRequest) {
   } catch {
     /* guest — plain assistant */
   }
+
+  // v4.7: the cost ceiling — guests by IP (10/min), accounts by id
+  // (30/min). The client surfaces a retry hint on 429.
+  const allowed = user
+    ? rateAllow(`ai:u:${user.id}`, 30, 60 * 1000)
+    : rateAllow(`ai:ip:${clientIp(req.headers)}`, 10, 60 * 1000);
+  if (!allowed) return jsonError(429, "rate_limited");
 
   try {
     const out = await assistantReply({

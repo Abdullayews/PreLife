@@ -397,6 +397,7 @@ export function AuthForm({
           type="button"
           className="social-btn"
           onClick={() => startOauth("google")}
+          disabled={busy}
         >
           <GoogleIcon />{t("google")}
         </button>
@@ -404,6 +405,7 @@ export function AuthForm({
           type="button"
           className="social-btn"
           onClick={() => startOauth("apple")}
+          disabled={busy}
         >
           <AppleIcon />{t("apple")}
         </button>

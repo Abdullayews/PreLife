@@ -389,7 +389,8 @@ export const en = {
       navStart: "Get started",
       navThemeToggle: "Toggle dark / light mode",
       navHome: "PreLife — home",
-      galleryLabel: "Hero photos"
+      galleryLabel: "Hero photos",
+      notifications: "Notifications"
     },
     gymHome: {
       metaTitle: "Gym",
@@ -550,7 +551,7 @@ export const en = {
     authPage: {
       passwordOptional: "No account yet? Enter just your e-mail and continue — we'll send a confirmation link.",
       loginNeedsPassword: "An account exists for this e-mail — enter your password.",
-      oauthNewNotice: "No PreLife account was found for your Google/Apple e-mail. Your address is filled in below — complete the registration with a name and password.",
+      oauthLoginNotice: "No account was found via Google/Apple for this e-mail. Your address is filled in below — press Continue and the confirmation link will be on its way.",
       prefillNote: "Your e-mail and password were carried over from the login form.",
       loginTitle: "Welcome back",
       loginSubtitle: "Sign in to open your PreLife.",
@@ -585,18 +586,21 @@ export const en = {
         invalid_credentials: "Wrong email or password.",
         email_taken: "An account with this email already exists.",
         generic: "Something went wrong. Please try again.",
-        email_unverified: "E-mail not confirmed. Check your inbox or resend the link."
+        oauth: "The Google/Apple sign-in did not go through — try again in a moment, or continue with e-mail.",
+        email_unverified: "E-mail not confirmed. Check your inbox or resend the link.",
+        too_many_requests: "Too many attempts — please try again in a moment."
       },
       signupOkTitle: "Check your inbox",
-      signupOkText: "We sent a confirmation link to {email} — your account activates the moment you open it.",
-      signupOkNote: "The link is valid for 24 hours. Check spam if it hasn't arrived.",
-      devLinkNote: "SMTP is not configured yet — test verification link:",
+      signupOkText: "We sent a confirmation link to {email} — it is your first sign-in: opening it activates your account and signs you in.",
+      signupOkNote: "The link is valid for 1 week. Check spam if it hasn't arrived.",
+      devLinkNote: "Test mode sends no real mail — the verification link is right here:",
       devLinkOpen: "Open the verification link",
-      loginUnverified: "This e-mail isn't confirmed yet — check your inbox.",
+      loginUnverified: "This account isn't confirmed yet — check your inbox: the link we sent is your first sign-in.",
       resendCta: "Send the confirmation e-mail again",
       resendOk: "A new confirmation e-mail was sent.",
       resendFail: "Could not send — try again in a moment.",
-      resendUnknown: "No pending signup found for this e-mail."
+      resendUnknown: "No pending signup found for this e-mail.",
+      unconfirmedNotice: "This account isn't confirmed yet — the first sign-in is only possible through the confirmation link we e-mailed you. Please check your inbox."
     },
     accountMenu: {
       signedInAs: "Signed in as",
@@ -1222,7 +1226,8 @@ export const en = {
       waterDone: "Daily target complete!",
       waterEyebrow: "Water tracking",
       waterGlass: "glass",
-      waterHint: "Tick the glasses you drink through the day — 8 is the target."
+      waterHint: "Tick the glasses you drink through the day — 8 is the target.",
+      backToSection: "Back to section"
     },
     gymApp: {
       metaTitle: "Gym",
@@ -2076,7 +2081,8 @@ export const en = {
         custom: "Custom time",
         noAccess: "This console is for linked psychologist accounts only."
       },
-      colActions: "Actions"
+      colActions: "Actions",
+      backToSection: "Back to section"
     },
     verifyPage: {
       completeTitle: "Complete your account",

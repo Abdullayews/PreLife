@@ -267,6 +267,14 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   .user-btn::after { content: ""; position: absolute; inset: -4px; }
   .conn-toast button { position: relative; width: 2.25rem; height: 2.25rem; }
   .conn-toast button::after { content: ""; position: absolute; inset: -4px; }
+  /* v4.7 (loop iter 1): the remaining sub-44px controls — the rail's
+     fold button, the AI chat close, the booking day/time pickers and
+     the new backlink pill — all grow on touch screens. */
+  .backlink { width: 2.75rem; height: 2.75rem; }
+  .rail-fold { width: 2.75rem; height: 2.75rem; }
+  .ai-fab-x { width: 2.75rem; height: 2.75rem; }
+  .daypick button { min-height: 2.75rem; }
+  .timepick input { min-height: 2.75rem; }
 }
 /* A2 — accent volume: the icon tile keeps its quiet wash background (a
    sanctioned wash tone) but the glyph itself drops to muted, so accents
@@ -1007,6 +1015,17 @@ html.dark .set-logout:hover { background: color-mix(in srgb, #e58c86 15%, transp
 .page { padding: calc(var(--nav-h) + clamp(2rem, 6vw, 4.5rem)) 0 clamp(2rem, 6vw, 4.5rem); }
 .page-head { display: grid; gap: 1rem; margin: 2rem 0 3rem; justify-items: start; }
 .page-head.center { justify-items: center; text-align: center; }
+/* The subpage "back" affordance — a compact pill that answers hover
+   and press like every other control. It used to be a bare, unstyled
+   14px icon: no hit area, no feedback, no accessible name. (v4.7) */
+.backlink {
+  display: inline-grid; place-items: center; flex: none;
+  width: 2.25rem; height: 2.25rem; border-radius: 999px;
+  border: 1px solid var(--line); color: var(--muted);
+  transition: background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out), border-color var(--t-fast) var(--ease-out), transform var(--t-press) var(--ease-out);
+}
+.backlink:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 6%, transparent); border-color: var(--line-strong); }
+.backlink:active { transform: scale(.94); }
 .back { display: inline-flex; align-items: center; gap: .4rem; font-size: .875rem; font-weight: 600; color: var(--muted); }
 .back:hover { color: var(--ink); }
 .blk { margin-top: 3.25rem; display: grid; gap: 1rem; }
@@ -1381,7 +1400,7 @@ a.card:hover em svg { transform: translateX(3px); }
   display: flex; flex-direction: column;
   width: min(19rem, calc(100vw - 1.5rem));
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: var(--r-lg);
   background: color-mix(in srgb, var(--surface) 82%, transparent);
   -webkit-backdrop-filter: blur(22px) saturate(1.6);
   backdrop-filter: blur(22px) saturate(1.6);
@@ -1411,7 +1430,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .rail-fab {
   position: fixed; left: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 43;
   display: grid; place-items: center;
-  width: 52px; height: 52px; border: 1px solid var(--line); border-radius: 18px;
+  width: 52px; height: 52px; border: 1px solid var(--line); border-radius: var(--r-md);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   -webkit-backdrop-filter: blur(14px) saturate(1.5);
   backdrop-filter: blur(14px) saturate(1.5);
@@ -1435,14 +1454,14 @@ a.card:hover em svg { transform: translateX(3px); }
 .rail-brand em { color: var(--accent-text); font-style: normal; }
 .rail-brand-ic {
   display: grid; place-items: center; flex: none;
-  width: 38px; height: 38px; border-radius: 13px;
+  width: 38px; height: 38px; border-radius: var(--r-sm);
   background: var(--deep); color: var(--deep-ink);
 }
 .rail-fold {
   display: grid; place-items: center; flex: none;
-  width: 32px; height: 32px; border: 1px solid var(--line); border-radius: 10px;
+  width: 32px; height: 32px; border: 1px solid var(--line); border-radius: var(--r-sm);
   background: color-mix(in srgb, var(--ink) 4%, transparent); color: var(--muted);
-  cursor: pointer; transition: color .2s, background-color .2s;
+  cursor: pointer; transition: color var(--t-fast), background-color var(--t-fast);
 }
 .rail-fold:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 8%, transparent); }
 
@@ -1472,7 +1491,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .rail-id {
   display: flex; align-items: center; gap: .65rem;
   width: 100%; min-height: 48px; padding: .5rem .5rem .65rem;
-  border: 0; border-radius: 13px;
+  border: 0; border-radius: var(--r-md);
   background: transparent; color: inherit;
   font: inherit; text-align: left; cursor: pointer;
   transition: background-color .2s;
@@ -1528,7 +1547,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .rail-item {
   display: flex; align-items: center; gap: .65rem;
   width: 100%; min-height: 46px; padding: 0 .6rem;
-  border: 0; border-radius: 13px;
+  border: 0; border-radius: var(--r-md);
   background: transparent; color: var(--muted);
   font: 600 .9rem/1.15 var(--font-body); text-align: left; text-decoration: none;
   cursor: pointer;
@@ -1577,7 +1596,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .rail-tab {
   display: flex; align-items: center; gap: .65rem;
   width: 100%; min-height: 42px; padding: 0 .6rem .6rem .85rem;
-  border: 0; border-radius: 13px;
+  border: 0; border-radius: var(--r-md);
   background: transparent; color: var(--muted);
   font: 600 .875rem/1.15 var(--font-body); text-align: left; text-decoration: none;
   cursor: pointer;
@@ -2437,10 +2456,12 @@ html.dark .idman {
   background: var(--accent); color: var(--accent-ink);
   font: 650 .9375rem/1 var(--font-body); cursor: pointer; text-decoration: none;
   box-shadow: var(--shadow-1);
-  transition: filter .2s, transform .2s, background-color .2s;
+  /* v4.7 (loop iter 1): the same 160ms press language as .btn — the
+     gym-surface CTAs used to answer with `transform: none` and felt dead. */
+  transition: filter var(--t-fast) var(--ease-out), transform var(--t-press) var(--ease-out), background-color var(--t-fast) var(--ease-out);
 }
 .ibtn:hover { filter: brightness(1.07); transform: translateY(-1px); }
-.ibtn:active { transform: none; }
+.ibtn:active { transform: translateY(0) scale(.97); box-shadow: inset 0 1px 2px color-mix(in srgb, var(--ink) 22%, transparent); }
 .ibtn:disabled { opacity: .55; cursor: default; filter: none; transform: none; }
 .ibtn-sm { min-height: 2.35rem; padding-inline: .9rem; font-size: .8125rem; }
 .ibtn-ghost { background: transparent; color: var(--ink); border-color: var(--line); box-shadow: none; }

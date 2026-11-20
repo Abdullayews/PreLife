@@ -45,7 +45,7 @@ export default async function PracticePage({ params }: Props) {
     <PsychShell locale={locale} active="practice">
       <div className="wrap">
         <header className="page-head">
-          <p className="eyebrow"><i /><Link href="/diet" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>{t("practiceEyebrow")}</p>
+          <p className="eyebrow"><i /><Link href="/meditation" className="backlink" aria-label={t("backToSection")}><ArrowLeft size={14} aria-hidden /></Link>{t("practiceEyebrow")}</p>
           <h1 className="display sm">{t("practiceTitle")}</h1>
           <p className="lede">{t("practiceSubtitle")}</p>
         </header>
@@ -76,7 +76,7 @@ export default async function PracticePage({ params }: Props) {
           <ul className="cards2" style={{ marginTop: "1rem" }}>
             {audio.map((m) => (
               <li key={m.id}>
-                <AudioPlayerCard id={m.id} src={m.src} title={t(m.titleKey)} desc={`${t(m.descKey)} · ${m.minutes} min`} />
+                <AudioPlayerCard id={m.id} src={m.src} title={t(m.titleKey)} desc={`${t(m.descKey)} · ${t("tdbMinutes", { count: m.minutes })}`} />
               </li>
             ))}
           </ul>
@@ -88,7 +88,7 @@ export default async function PracticePage({ params }: Props) {
           <ul className="media-row" style={{ marginTop: "1rem" }}>
             {video.map((m) => (
               <li key={m.id}>
-                <VideoCard id={m.id} src={m.src} poster={m.poster} title={t(m.titleKey)} desc={`${t(m.descKey)} · ${m.minutes} min`} />
+                <VideoCard id={m.id} src={m.src} poster={m.poster} title={t(m.titleKey)} desc={`${t(m.descKey)} · ${t("tdbMinutes", { count: m.minutes })}`} />
               </li>
             ))}
           </ul>

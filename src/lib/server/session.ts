@@ -474,12 +474,41 @@ export async function revokeTokenSession(token: string): Promise<void> {
 }
 
 /**
- * The public origin the browser sees (x-forwarded-host beats host; proto
- * from x-forwarded-proto). OAuth redirect_to must return there — the
- * server's own listen address is unreachable from the outside world.
+ * The public origin a request should be treated as. The forwarded
+ * headers are only TRUSTED when the host matches a configured origin
+ * (PUBLIC_URL — comma-separated allowlist — or NEXT_PUBLIC_SITE_URL);
+ * a spoofed Host header must never leak into verification mail links
+ * or redirects (v4.7 loop hardening). Development localhost is always
+ * allowed; production falls back to the first configured origin when
+ * the header does not match, or to the raw value when nothing is
+ * configured (the pre-existing behavior). OAuth redirect_to must
+ * return to the public origin — the server's own listen address is
+ * unreachable from the outside world.
  */
 export function originFrom(headers: Headers): string {
   const proto = headers.get("x-forwarded-proto") || "http";
-  const host = headers.get("x-forwarded-host") || headers.get("host") || "127.0.0.1:3000";
-  return `${proto}://${host}`;
+  const host = (headers.get("x-forwarded-host") || headers.get("host") || "127.0.0.1:3000")
+    .split(",")[0]?.trim() || "127.0.0.1:3000";
+  const raw = `${proto}://${host}`;
+
+  const allowlist = [
+    ...String(process.env.PUBLIC_URL ?? "").split(",").map((s) => s.trim()).filter(Boolean),
+    process.env.NEXT_PUBLIC_SITE_URL ?? "",
+  ].filter(Boolean);
+  const hostOf = (u: string): string | null => {
+    try {
+      return new URL(u).host;
+    } catch {
+      return null;
+    }
+  };
+
+  // Development: local origins are always fine.
+  if (process.env.NODE_ENV !== "production" && /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/.test(host)) {
+    return raw;
+  }
+  // Production: the forwarded host must match a configured origin,
+  // otherwise the first configured origin wins (never the spoof).
+  if (allowlist.some((u) => hostOf(u) === host)) return raw;
+  return allowlist.length > 0 ? allowlist[0] : raw;
 }

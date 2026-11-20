@@ -84,7 +84,14 @@ export async function MoodCharts({ logs, locale, tags }: { logs: MoodRow[]; loca
         <h3>{t("chartHeatTitle")}</h3>
         <div>
           <div className="heat-head" aria-hidden>
-            {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => <span key={d}>{d}</span>)}
+            {/* Weekday headers Mon-first, in the visitor's locale (v4.7:
+             *  they used to be hardcoded English). 2024-01-01 is a Monday. */}
+            {[...Array(7)].map((_, i) => (
+              <span key={i}>
+                {new Intl.DateTimeFormat(locale, { weekday: "short" })
+                  .format(new Date(Date.UTC(2024, 0, 1 + i)))}
+              </span>
+            ))}
           </div>
           <div className="heat" role="img" aria-label={t("chartHeatTitle")}>
             {cells.map((c) => (
