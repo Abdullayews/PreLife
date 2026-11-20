@@ -18,10 +18,10 @@ function sha256B64url(s: string): string {
 }
 
 /**
- * GET /api/auth/oauth/{google|apple} — starts the OAuth flow: mints a
- * PKCE verifier (kept in a short-lived HttpOnly cookie), then redirects
- * to Supabase's /authorize. Provider credentials live in Supabase
- * (Authentication → Providers).
+ * GET /api/auth/oauth/{google|apple}?locale — starts the OAuth flow:
+ * mints a PKCE verifier (kept with the locale in a short-lived
+ * HttpOnly cookie), then redirects to Supabase's /authorize. Provider
+ * credentials live in Supabase (Authentication → Providers).
  */
 export async function GET(
   req: NextRequest,
@@ -35,6 +35,8 @@ export async function GET(
 
   const origin = originFrom(req.headers);
   const redirectTo = `${origin}/api/auth/callback`;
+  const localeRaw = req.nextUrl.searchParams.get("locale") ?? "az";
+  const locale = localeRaw === "en" || localeRaw === "ru" ? localeRaw : "az";
 
   const verifier = randomBytes(48).toString("base64url"); // 64 chars — inside 43..128
   const challenge = sha256B64url(verifier);
@@ -44,6 +46,6 @@ export async function GET(
     + `&code_challenge=${challenge}&code_challenge_method=S256`;
 
   const res = NextResponse.redirect(url, 302);
-  res.cookies.set(oauthCookie(verifier, isSecure(req.headers)));
+  res.cookies.set(oauthCookie(verifier, isSecure(req.headers), locale));
   return res;
 }

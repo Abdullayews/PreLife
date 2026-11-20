@@ -548,6 +548,10 @@ export const en = {
       ctaNote: "Free editor consultation with every collection."
     },
     authPage: {
+      passwordOptional: "No account yet? Enter just your e-mail and continue — we'll send a confirmation link.",
+      loginNeedsPassword: "An account exists for this e-mail — enter your password.",
+      oauthNewNotice: "No PreLife account was found for your Google/Apple e-mail. Your address is filled in below — complete the registration with a name and password.",
+      prefillNote: "Your e-mail and password were carried over from the login form.",
       loginTitle: "Welcome back",
       loginSubtitle: "Sign in to open your PreLife.",
       signupTitle: "Create your account",
@@ -575,6 +579,7 @@ export const en = {
       socialSoonTitle: "{provider} sign-in",
       socialSoonDesc: "It will be available soon — for now, please use email and password.",
       errors: {
+        password_required: "An account exists for this e-mail — enter your password.",
         missing_fields: "Please fill in all fields.",
         invalid_email: "Please enter a valid email address.",
         short_password: "Password must be at least 8 characters.",
@@ -2075,6 +2080,15 @@ export const en = {
       colActions: "Actions"
     },
     verifyPage: {
+      completeTitle: "Complete your account",
+      completeText: "Your e-mail is confirmed. Set your name and password to finish signing in.",
+      passwordRepeat: "Repeat password",
+      passwordMismatch: "Passwords do not match.",
+      completeCta: "Complete and continue",
+      completeFail: "Could not complete — try again.",
+      cancelledTitle: "Registration cancelled",
+      cancelledText: "The account was not confirmed within 1 week, so the registration was cancelled. You can sign up again.",
+      signupAgain: "Sign up again",
       title: "Verify e-mail",
       checking: "Verifying…",
       okTitle: "E-mail verified!",

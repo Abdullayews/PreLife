@@ -546,6 +546,10 @@
     "ctaNote": "H\u0259r kolleksiya il\u0259 pulsuz redaktor konsultasiyas\u0131."
   },
   "authPage": {
+    "passwordOptional": "Hesab\u0131n\u0131z yoxdursa yaln\u0131z e-po\u00e7tu yaz\u0131b davam edin \u2014 t\u0259sdiq linki g\u00f6nd\u0259ril\u0259c\u0259k.",
+    "loginNeedsPassword": "Bu e-po\u00e7tla hesab var \u2014 \u015fifr\u0259nizi daxil edin.",
+    "oauthNewNotice": "Google/Apple hesab\u0131n\u0131zla PreLife hesab\u0131 tap\u0131lmad\u0131. E-po\u00e7tunuz a\u015fa\u011f\u0131da doldurulub \u2014 ad v\u0259 \u015fifr\u0259 il\u0259 qeydiyyat\u0131 tamamlay\u0131n.",
+    "prefillNote": "E-po\u00e7t v\u0259 \u015fifr\u0259niz giri\u015f formundan g\u0259tirildi.",
     "loginTitle": "Xo\u015f g\u0259lmisiniz",
     "loginSubtitle": "PreLife-\u0131n\u0131z\u0131 a\u00e7maq \u00fc\u00e7\u00fcn daxil olun.",
     "signupTitle": "Hesab\u0131n\u0131z\u0131 yarad\u0131n",
@@ -573,6 +577,7 @@
     "socialSoonTitle": "{provider} il\u0259 daxilolma",
     "socialSoonDesc": "Tezlikl\u0259 \u0259l\u00e7atan olacaq \u2014 h\u0259l\u0259lik e-po\u00e7t v\u0259 \u015fifr\u0259d\u0259n istifad\u0259 edin.",
     "errors": {
+      "password_required": "Bu e-po\u00e7tla hesab var \u2014 \u015fifr\u0259nizi daxil edin.",
       "missing_fields": "B\u00fct\u00fcn xanalar\u0131 doldurun.",
       "invalid_email": "D\u00fczg\u00fcn e-po\u00e7t \u00fcnvan\u0131 daxil edin.",
       "short_password": "\u015eifr\u0259 \u0259n az\u0131 8 simvoldan ibar\u0259t olmal\u0131d\u0131r.",
@@ -2073,6 +2078,15 @@
     "colActions": "\u018fm\u0259liyyatlar"
   },
   "verifyPage": {
+    "completeTitle": "Hesab\u0131n\u0131z\u0131 tamamlay\u0131n",
+    "completeText": "E-po\u00e7tunuz t\u0259sdiql\u0259ndi. Giri\u015f \u00fc\u00e7\u00fcn ad\u0131n\u0131z\u0131 v\u0259 \u015fifr\u0259nizi t\u0259yin edin.",
+    "passwordRepeat": "\u015eifr\u0259 (t\u0259krar)",
+    "passwordMismatch": "\u015eifr\u0259l\u0259r \u00fcst-\u00fcst\u0259 d\u00fc\u015fm\u00fcr.",
+    "completeCta": "Tamamla v\u0259 davam et",
+    "completeFail": "Tamamlanmad\u0131 \u2014 yenid\u0259n c\u0259hd edin.",
+    "cancelledTitle": "Qeydiyyat l\u0259\u011fv olundu",
+    "cancelledText": "Hesab 1 h\u0259ft\u0259 \u0259rzind\u0259 t\u0259sdiql\u0259nm\u0259diyi \u00fc\u00e7\u00fcn qeydiyyat\u0131n\u0131z l\u0259\u011fv olundu. Yenid\u0259n qeydiyyatdan ke\u00e7\u0259 bil\u0259rsiniz.",
+    "signupAgain": "Yenid\u0259n qeydiyyatdan ke\u00e7",
     "title": "E-po\u00e7t t\u0259sdiqi",
     "checking": "T\u0259sdiq yoxlan\u0131l\u0131r\u2026",
     "okTitle": "E-po\u00e7t t\u0259sdiql\u0259ndi!",

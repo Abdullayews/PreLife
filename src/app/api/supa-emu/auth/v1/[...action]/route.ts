@@ -45,10 +45,9 @@ export async function POST(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
     }
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
     const password = typeof body.password === "string" ? body.password : "";
-    const fullName =
-      (body.user_metadata && typeof body.user_metadata === "object"
-        && typeof (body.user_metadata as Row).full_name === "string"
-        ? (body.user_metadata as Row).full_name : "") || "";
+    const meta = (body.user_metadata && typeof body.user_metadata === "object"
+      ? body.user_metadata as Row : {}) as Row;
+    const fullName = typeof meta.full_name === "string" ? meta.full_name : "";
     if (!email || !password) return err(400, { message: "email and password required" });
 
     const data = emuData();
@@ -62,7 +61,9 @@ export async function POST(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
       email,
       pass_hash: emuHashPassword(password),
       email_confirmed: body.email_confirm === true,
-      user_metadata: { full_name: fullName },
+      // v4.3: keep the whole metadata object (needs_completion etc.),
+      // exactly like GoTrue does.
+      user_metadata: { ...meta, full_name: fullName },
       created_at: now, updated_at: now, last_sign_in_at: null,
     };
     data.authUsers.push(user);
@@ -110,6 +111,89 @@ export async function POST(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
       refresh_token: `emu-refresh-${crypto.randomUUID()}`,
       user: gotrueUser(user),
     });
+  }
+
+  return err(404, { message: "not found" });
+}
+
+/* ── GET ─────────────────────────────────────────────────────────────────── */
+
+export async function GET(req: NextRequest, ctx: Ctx): Promise<NextResponse> {
+  const blocked = guard();
+  if (blocked) return blocked;
+  const { action } = await ctx.params;
+
+  /* GET /admin/users?emails=a@b.c — the exact-match e-mail lookup the
+   * login route uses (mirrors GoTrue's admin list endpoint shape). */
+  if (action.length === 2 && action[0] === "admin" && action[1] === "users") {
+    const sp = req.nextUrl.searchParams;
+    const emails = sp
+      .getAll("emails")
+      .flatMap((v) => v.split(","))
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    const filter = (sp.get("filter") ?? "").trim().toLowerCase();
+
+    const data = emuData();
+    let users = data.authUsers;
+    if (emails.length) {
+      users = users.filter((u) => emails.includes(String(u.email).toLowerCase()));
+    } else if (filter) {
+      users = users.filter((u) => String(u.email).toLowerCase().includes(filter));
+    }
+
+    const perPage = Math.max(1, Math.min(50, Number(sp.get("per_page") ?? 10) || 10));
+    const page = Math.max(1, Number(sp.get("page") ?? 1) || 1);
+    const start = (page - 1) * perPage;
+    return NextResponse.json({
+      users: users.slice(start, start + perPage).map((u) => gotrueUser(u)),
+      total: users.length,
+      page,
+      per_page: perPage,
+    });
+  }
+
+  /* GET /admin/users/{id} — one user (the verify route reads its
+   * user_metadata for the needs_completion flag). */
+  if (action.length === 3 && action[0] === "admin" && action[1] === "users") {
+    const data = emuData();
+    const user = data.authUsers.find((u) => u.id === action[2]);
+    if (!user) return err(404, { code: 404, msg: "User not found" });
+    return NextResponse.json(gotrueUser(user));
+  }
+
+  /* GET /authorize — no OAuth providers exist in the sandbox; bounce to
+   * the login page with the same error shape the real callback uses. */
+  if (action.length === 1 && action[0] === "authorize") {
+    return NextResponse.redirect(new URL("/az/login?error=oauth", req.nextUrl.origin), 303);
+  }
+
+  return err(404, { message: "not found" });
+}
+
+/* ── DELETE ─────────────────────────────────────────────────────────────── */
+
+export async function DELETE(_req: NextRequest, ctx: Ctx): Promise<NextResponse> {
+  const blocked = guard();
+  if (blocked) return blocked;
+  const { action } = await ctx.params;
+
+  /* DELETE /admin/users/{id} — mirrors GoTrue; cascades the profiles,
+   * sessions and verification rows like the real FK constraints do. */
+  if (action.length === 3 && action[0] === "admin" && action[1] === "users") {
+    const id = action[2]!;
+    const data = emuData();
+    const idx = data.authUsers.findIndex((u) => u.id === id);
+    if (idx === -1) return err(404, { code: 404, msg: "User not found" });
+
+    data.authUsers.splice(idx, 1);
+    for (const table of ["profiles", "sessions", "email_verifications"]) {
+      data.tables[table] = (data.tables[table] ?? []).filter(
+        (row) => row.user_id !== id && row.id !== id,
+      );
+    }
+    emuTouch();
+    return NextResponse.json({ message: "User deleted successfully" });
   }
 
   return err(404, { message: "not found" });

@@ -362,12 +362,17 @@ export function tokenFromCookieHeader(raw: string | null): string | null {
   return null;
 }
 
-/** The pl_oauth verifier from a raw Cookie header value, if present. */
+/** The pl_oauth verifier from a raw Cookie header value, if present.
+ * v4.3 packs the locale in front ("az.<verifier>") so the OAuth
+ * callback can bounce to the right signup page; bare verifiers from a
+ * mid-flow upgrade still parse. */
 export function oauthVerifierFromCookieHeader(raw: string | null): string | null {
   if (!raw) return null;
   for (const part of raw.split(";")) {
     const p = part.trim();
-    if (p.startsWith(`${OAUTH_COOKIE}=`)) return p.slice(OAUTH_COOKIE.length + 1);
+    if (!p.startsWith(`${OAUTH_COOKIE}=`)) continue;
+    const v = p.slice(OAUTH_COOKIE.length + 1);
+    return v.match(/^[a-z]{2}\./) ? v.slice(3) : v;
   }
   return null;
 }
@@ -431,10 +436,10 @@ export function clearedOAuthCookie(secure: boolean) {
   };
 }
 
-export function oauthCookie(verifier: string, secure: boolean) {
+export function oauthCookie(verifier: string, secure: boolean, locale = "az") {
   return {
     name: OAUTH_COOKIE,
-    value: verifier,
+    value: `${locale}.${verifier}`,
     path: "/",
     maxAge: OAUTH_TTL_S,
     httpOnly: true,

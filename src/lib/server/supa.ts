@@ -131,6 +131,7 @@ export async function authAdminCreateUser(
   password: string,
   fullName: string,
   emailConfirm = true,
+  extraMetadata: Record<string, unknown> = {},
 ): Promise<Record<string, unknown>> {
   const res = await fetch(`${AUTH}/admin/users`, {
     method: "POST",
@@ -139,7 +140,7 @@ export async function authAdminCreateUser(
       email,
       password,
       email_confirm: emailConfirm,
-      user_metadata: { full_name: fullName },
+      user_metadata: { full_name: fullName, ...extraMetadata },
     }),
     cache: "no-store",
   });
@@ -154,6 +155,76 @@ export async function authAdminGetUser(id: string): Promise<Record<string, unkno
   const text = await res.text();
   if (!res.ok) throw new Error(`gotrue ${res.status}: ${text}`);
   return JSON.parse(text) as Record<string, unknown>;
+}
+
+/** True when the GoTrue user row is an e-mail-confirmed account. Handles
+ * both shapes: real GoTrue (email_confirmed_at) and the local emulator
+ * (email_confirmed boolean). */
+export function isConfirmedUser(u: Record<string, unknown>): boolean {
+  if (u.email_confirmed === true) return true;
+  const at = u.email_confirmed_at ?? u.confirmed_at;
+  return typeof at === "string" && at.length > 0;
+}
+
+/** Admin delete — removes the auth user (profiles & co cascade via FK).
+ * 404 counts as success (already gone). */
+export async function authAdminDeleteUser(id: string): Promise<void> {
+  const res = await fetch(`${AUTH}/admin/users/${id}`, {
+    method: "DELETE",
+    headers: HDRS,
+    cache: "no-store",
+  });
+  if (!res.ok && res.status !== 404) {
+    throw new Error(`gotrue ${res.status}: ${await res.text()}`);
+  }
+}
+
+/** Find one auth user by exact e-mail (case-insensitive), or null. Uses
+ * GoTrue's exact-match `emails` filter first, then the long-standing
+ * `filter` substring search with a client-side exact match as fallback —
+ * older GoTrue builds ignore the emails parameter. */
+export async function authAdminFindUserByEmail(
+  email: string,
+): Promise<Record<string, unknown> | null> {
+  const mail = email.trim().toLowerCase();
+  if (!mail) return null;
+
+  // Primary: exact-match emails filter.
+  try {
+    const res = await fetch(
+      `${AUTH}/admin/users?emails=${encodeURIComponent(mail)}&per_page=1`,
+      { headers: HDRS, cache: "no-store" },
+    );
+    if (res.ok) {
+      const v = (await res.json()) as { users?: unknown[] };
+      if (Array.isArray(v.users)) {
+        const hit = v.users.find(
+          (u) => (u as Record<string, unknown>).email === mail,
+        );
+        if (hit) return hit as Record<string, unknown>;
+      }
+    }
+  } catch {
+    /* fall through to the filter search */
+  }
+
+  // Fallback: substring filter + exact match on our side.
+  try {
+    const res = await fetch(
+      `${AUTH}/admin/users?filter=${encodeURIComponent(mail)}&per_page=50`,
+      { headers: HDRS, cache: "no-store" },
+    );
+    if (!res.ok) return null;
+    const v = (await res.json()) as { users?: unknown[] };
+    const list = Array.isArray(v.users) ? v.users : [];
+    return (
+      (list.find(
+        (u) => (u as Record<string, unknown>).email === mail,
+      ) as Record<string, unknown>) ?? null
+    );
+  } catch {
+    return null;
+  }
 }
 
 /** Admin update — e.g. { email_confirm: true } after the verification

@@ -548,6 +548,10 @@ export const ru = {
       ctaNote: "Бесплатная консультация редактора с каждой коллекцией."
     },
     authPage: {
+      passwordOptional: "Нет аккаунта? Введите только e-mail и продолжите — мы отправим ссылку для подтверждения.",
+      loginNeedsPassword: "Для этого e-mail есть аккаунт — введите пароль.",
+      oauthNewNotice: "Аккаунт PreLife для вашего Google/Apple не найден. Адрес подставлен ниже — завершите регистрацию, указав имя и пароль.",
+      prefillNote: "Ваш e-mail и пароль перенесены из формы входа.",
       loginTitle: "С возвращением",
       loginSubtitle: "Войдите, чтобы открыть свой PreLife.",
       signupTitle: "Создайте аккаунт",
@@ -575,6 +579,7 @@ export const ru = {
       socialSoonTitle: "Вход через {provider}",
       socialSoonDesc: "Появится позжже — пока используйте почту и пароль.",
       errors: {
+        password_required: "Для этого e-mail есть аккаунт — введите пароль.",
         missing_fields: "Заполните все поля.",
         invalid_email: "Введите корректный адрес почты.",
         short_password: "Пароль должен быть не короче 8 символов.",
@@ -2075,6 +2080,15 @@ export const ru = {
       colActions: "Действия"
     },
     verifyPage: {
+      completeTitle: "Завершите регистрацию",
+      completeText: "Ваш e-mail подтверждён. Установите имя и пароль для входа.",
+      passwordRepeat: "Повторите пароль",
+      passwordMismatch: "Пароли не совпадают.",
+      completeCta: "Завершить и продолжить",
+      completeFail: "Не удалось завершить — попробуйте ещё раз.",
+      cancelledTitle: "Регистрация отменена",
+      cancelledText: "Аккаунт не был подтверждён в течение недели, поэтому регистрация отменена. Вы можете зарегистрироваться снова.",
+      signupAgain: "Зарегистрироваться снова",
       title: "Подтверждение e-mail",
       checking: "Проверяем…",
       okTitle: "E-mail подтверждён!",
