@@ -1,29 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 30 30" style="enable-background:new 0 0 30 30;" xml:space="preserve">
-<defs>
-  <style type="text/css">
-    .st194{fill:#2D2D2D;stroke:#FFFFFF;stroke-width:0.6317;stroke-miterlimit:10;}
-    .st23{fill:#FFFFFF;}
+<!-- PreLife icon v2 — the golden wand + twinkle.
+     Reference: user-provided design (golden gradient wand, four-point
+     sparkle on near-black). Keeps the v1 "living icon" DNA: the sparkle
+     gently twinkles where SVG favicon animation is supported. -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+  <defs>
+    <!-- Wand gold: light cream-gold -> deeper bronze, lit from above. -->
+    <linearGradient id="pl-wand" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F7E4A6"/>
+      <stop offset=".55" stop-color="#E0B45C"/>
+      <stop offset="1" stop-color="#B9832F"/>
+    </linearGradient>
+    <!-- Sparkle gold: brighter, so the twinkle reads as the light source. -->
+    <linearGradient id="pl-spark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFEDB8"/>
+      <stop offset="1" stop-color="#DCA743"/>
+    </linearGradient>
+    <style type="text/css">
+      .pl-tile { fill:#0B0B0D; stroke:rgba(255,255,255,.12); stroke-width:.6; stroke-miterlimit:10; }
+      .pl-wand { fill:url(#pl-wand); }
+      .pl-sheen { fill:#FFEFC2; opacity:.5; }
+      .pl-spark { fill:url(#pl-spark); }
+      .pl-twinkle {
+        animation: pl-twinkle 2.8s ease-in-out infinite;
+        transform-box: fill-box; transform-origin: center;
+      }
+      @keyframes pl-twinkle {
+        0%, 100% { transform: scale(1) rotate(0deg); opacity: .92; }
+        50%      { transform: scale(1.07) rotate(5deg); opacity: 1; }
+      }
+    </style>
+  </defs>
 
-    .z-breathe {
-      animation: breathe 2.5s ease-in-out infinite;
-    }
+  <!-- Near-black rounded tile (matches the dark theme-color #0d0d0f). -->
+  <rect class="pl-tile" x="1.5" y="1.5" width="27" height="27" rx="7.2"/>
 
-    @keyframes breathe {
-      0%, 100% { opacity: 0.7; }
-      50% { opacity: 1; }
-    }
-  </style>
-</defs>
+  <!-- The wand: a vertical golden pill on the left. -->
+  <rect class="pl-wand" x="8.2" y="7.4" width="3.5" height="15.2" rx="1.75"/>
+  <!-- A thin left-side sheen — polished-gold depth at larger sizes. -->
+  <rect class="pl-sheen" x="9.0" y="8.9" width=".8" height="12.2" rx=".4"/>
 
-<g>
-  <path class="st194" d="M24.51,28.51H5.49c-2.21,0-4-1.79-4-4V5.49c0-2.21,1.79-4,4-4h19.03c2.21,0,4,1.79,4,4v19.03
-    C28.51,26.72,26.72,28.51,24.51,28.51z"/>
-  <g class="z-breathe">
-    <path class="st23" d="M15.47,7.1l-1.3,1.85c-0.2,0.29-0.54,0.47-0.9,0.47h-7.1V7.09C6.16,7.1,15.47,7.1,15.47,7.1z"/>
-    <polygon class="st23" points="24.3,7.1 13.14,22.91 5.7,22.91 16.86,7.1"/>
-    <path class="st23" d="M14.53,22.91l1.31-1.86c0.2-0.29,0.54-0.47,0.9-0.47h7.09v2.33H14.53z"/>
+  <!-- The twinkle: four-point sparkle with concave curves, upper right.
+       Placed so the wand+sparkle group reads optically centered: the
+       sparkle's mass pulls right-up, the solid pill anchors left-down. -->
+  <g class="pl-twinkle">
+    <path class="pl-spark" transform="translate(20.1 12) scale(5.6)"
+      d="M0,-1 C.13,-.21 .21,-.13 1,0 C.21,.13 .13,.21 0,1 C-.13,.21 -.21,.13 -1,0 C-.21,-.13 -.13,-.21 0,-1 Z"/>
   </g>
-</g>
 </svg>
