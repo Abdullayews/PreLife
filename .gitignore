@@ -65,10 +65,12 @@ server.log
 /prelife-preview/
 /tests/
 /examples/
-# mini-services: platform scratch services are ignored, but the PreLife
-# Rust backend IS the product's backend — keep it tracked.
-/mini-services/*
-!/mini-services/prelife-api/
+# mini-services: platform scratch services stay local (none shipped).
+/mini-services/
+
+# perfection-loop runtime state (cron-driven; never part of the app)
+/.loop-state.json
+/.loop-token
 /tool-results/
 /upload/
 
@@ -87,6 +89,3 @@ db/emu-store.json
 # secrets
 .env
 .env.local
-
-# rust
-mini-services/prelife-api/target/

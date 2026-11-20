@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { CalendarDays, ChevronLeft, ChevronRight, Flower2 } from "lucide-react";
 
 /** One day of the journal history — entries pre-translated and
@@ -30,6 +30,7 @@ export function JournalHistory({
   minDate: string;
 }) {
   const t = useTranslations("psychApp");
+  const locale = useLocale();
   const [selected, setSelected] = useState(today);
 
   const byDate = useMemo(
@@ -45,12 +46,13 @@ export function JournalHistory({
   };
 
   /* The label: pre-formatted when the day has one, otherwise built from
-   *  the raw date parts (months stay translatable via a locale-agnostic
-   *  numeric format — same digits in every locale). */
+   *  the raw date parts — formatted in the VISITOR's locale (v4.7: it
+   *  used to be hardcoded "az" and showed Azerbaijani weekday names to
+   *  EN/RU visitors). */
   const day = byDate.get(selected);
   const label = day
     ? day.label
-    : new Intl.DateTimeFormat("az", { weekday: "long", day: "numeric", month: "long" })
+    : new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" })
         .format(new Date(`${selected}T12:00:00Z`));
 
   return (

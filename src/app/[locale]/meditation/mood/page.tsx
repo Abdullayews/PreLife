@@ -56,7 +56,7 @@ export default async function MoodPage({ params }: Props) {
     <PsychShell locale={locale} active="mood">
       <div className="wrap">
         <header className="page-head">
-          <p className="eyebrow"><i /><Link href="/diet" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>{t("moodPageEyebrow")}</p>
+          <p className="eyebrow"><i /><Link href="/meditation" className="backlink" aria-label={t("backToSection")}><ArrowLeft size={14} aria-hidden /></Link>{t("moodPageEyebrow")}</p>
           <h1 className="display sm">{t("moodPageTitle")}</h1>
           <p className="lede">{t("moodPageSubtitle")}</p>
         </header>

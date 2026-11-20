@@ -34,7 +34,7 @@ export default async function DietPlansPage({ params }: Props) {
         <header className="page-head">
           <p className="eyebrow">
             <i />
-            <Link href="/diet" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>
+            <Link href="/diet" className="backlink" aria-label={t("backToSection")}><ArrowLeft size={14} aria-hidden /></Link>
             {t("rail_plans")}
           </p>
           <h1 className="display sm">{t("plansTitle")}</h1>

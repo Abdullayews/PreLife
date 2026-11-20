@@ -64,7 +64,7 @@ export default async function BookingsPage({ params }: Props) {
     <PsychShell locale={locale} active="bookings">
       <div className="wrap">
         <header className="page-head">
-          <p className="eyebrow"><i /><Link href="/diet" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>{t("bookingsEyebrow")}</p>
+          <p className="eyebrow"><i /><Link href="/meditation" className="backlink" aria-label={t("backToSection")}><ArrowLeft size={14} aria-hidden /></Link>{t("bookingsEyebrow")}</p>
           <h1 className="display sm">{t("bookingsTitle")}</h1>
           <p className="lede">{t("bookingsSubtitle")}</p>
         </header>

@@ -184,7 +184,7 @@ export const az = {
             desc: "Ceyms Klir. Kiçik dəyişikliklər, görkəmli nəticələr — hər PreLife planı üçün vərdiş yoldaşı."
           },
           "1": {
-            title: "Hazırın gücü",
+            title: "Hazırkı anın gücü",
             desc: "Ekhart Tolle. Mövcudluq bir praktika kimi — meditasiya bölməsi ilə təbii uyğunluq."
           },
           "2": {
@@ -233,7 +233,7 @@ export const az = {
       diet: {
         name: "Qidalanma",
         heroTitle: "Sadəcə yaxşı yeyin.",
-        heroText: "Bələdçi pərə planları, dürüst reseptlər, etibar etdiyiniz dietoloqlar və yaxşı yeməyi asanlaşdıran videolar — planı tənzimləmək üçün AI ilə.",
+        heroText: "Bələdçili pəhriz planları, dürüst reseptlər, etibar etdiyiniz dietoloqlar və yaxşı yeməyi asanlaşdıran videolar — planı tənzimləmək üçün AI ilə.",
         ctaTitle: "İlk yeməyinizi planlaşdırın",
         ctaText: "Bir tarazlıq qabı çox yaxşı bir başlanğıcdır.",
         subs: {
@@ -312,7 +312,7 @@ export const az = {
           name: "Pro"
         },
         ultra: {
-          desc: "Pro + şəxsi trenler rəhbərliyi və ailə profilləri.",
+          desc: "Pro + şəxsi məşqçi rəhbərliyi və ailə profilləri.",
           name: "Ultra"
         }
       },
@@ -371,9 +371,9 @@ export const az = {
       statTwoValue: "34+",
       statThreeLabel: "Üçüncü",
       statThreeValue: "56+",
-      exploreTitle: "Digər modulları kəşfet",
+      exploreTitle: "Digər modulları kəşf et",
       exploreSubtitle: "PreLife tək bir disiplin deyil.",
-      exploreCta: "Kəşfet",
+      exploreCta: "Kəşf et",
       moduleName_gym: "İdman",
       moduleDesc_gym: "Təlim planları, hərəkət kitabxanası, zallar.",
       moduleName_diet: "Qidalanma",
@@ -389,7 +389,8 @@ export const az = {
       navStart: "Başla",
       navThemeToggle: "Tünd / işıq rejimini dəyiş",
       navHome: "PreLife — ana səhifə",
-      galleryLabel: "Hero şəkilləri"
+      galleryLabel: "Hero şəkilləri",
+      notifications: "Bildirişlər"
     },
     gymHome: {
       metaTitle: "Gym",
@@ -550,7 +551,7 @@ export const az = {
     authPage: {
       passwordOptional: "Hesabınız yoxdursa yalnız e-poçtu yazıb davam edin — təsdiq linki göndəriləcək.",
       loginNeedsPassword: "Bu e-poçtla hesab var — şifrənizi daxil edin.",
-      oauthNewNotice: "Google/Apple hesabınızla PreLife hesabı tapılmadı. E-poçtunuz aşağıda doldurulub — ad və şifrə ilə qeydiyyatı tamamlayın.",
+      oauthLoginNotice: "Google/Apple ilə bu e-poçta hesab tapılmadı. E-poçtunuz aşağıda doldurulub — «Davam et» düyməsini basın, qeydiyyat üçün təsdiq linki göndəriləcək.",
       prefillNote: "E-poçt və şifrəniz giriş formundan gətirildi.",
       loginTitle: "Xoş gəlmisiniz",
       loginSubtitle: "PreLife-ınızı açmaq üçün daxil olun.",
@@ -575,7 +576,6 @@ export const az = {
       signUpLink: "Qeydiyyatdan keç",
       signInLink: "Daxil ol",
       backToWelcome: "Xoş gəldin səhifəsinə qayıt",
-      demoHint: "Saytı sınayırsınız? 123 e-poçt və 123 şifrə ilə daxil olun.",
       socialSoonTitle: "{provider} ilə daxilolma",
       socialSoonDesc: "Tezliklə əlçatan olacaq — hələlik e-poçt və şifrədən istifadə edin.",
       errors: {
@@ -586,18 +586,21 @@ export const az = {
         invalid_credentials: "E-poçt və ya şifrə yanlışdır.",
         email_taken: "Bu e-poçtla hesab artıq mövcuddur.",
         generic: "Bir xəta baş verdi. Yenidən cəhd edin.",
-        email_unverified: "E-poçt təsdiqlənməyib. Gələnlər qutusunu yoxlayın və ya linki yenidən göndərin."
+        oauth: "Google/Apple ilə giriş alınmadı — bir azdan yenidən cəhd edin və ya e-poçtla davam edin.",
+        email_unverified: "E-poçt təsdiqlənməyib. Gələnlər qutusunu yoxlayın və ya linki yenidən göndərin.",
+        too_many_requests: "Çox çox cəhd — bir azdan yenidən sınayın."
       },
       signupOkTitle: "E-poçtunuzu yoxlayın",
-      signupOkText: "{email} ünvanına təsdiq linki göndərdik — linki açdıqdan sonra hesabınız aktivləşəcək.",
-      signupOkNote: "Link 24 saat qüvvədədir. Gəlmədisə spam qovluğuna baxın.",
-      devLinkNote: "SMTP hələ qurulmayıb — test üçün təsdiq linki:",
+      signupOkText: "{email} ünvanına təsdiq linki göndərdik — link ilk girişinizdir: açdıqda hesabınız aktivləşir və avtomatik daxil olursunuz.",
+      signupOkNote: "Link 1 həftə qüvvədədir. Gəlmədisə spam qovluğuna baxın.",
+      devLinkNote: "Sınaq rejimində real mail göndərilmir — təsdiq linki birbaşa burada:",
       devLinkOpen: "Təsdiq linkini aç",
-      loginUnverified: "Bu e-poçt hələ təsdiqlənməyib — gələnlər qutusunu yoxlayın.",
+      loginUnverified: "Bu hesab hələ təsdiqlənməyib — hesabınızı təsdiqləmək üçün mailə baxın: göndərilən link ilk girişinizdir.",
       resendCta: "Təsdiq məktubunu yenidən göndər",
       resendOk: "Yeni təsdiq məktubu göndərildi.",
       resendFail: "Göndərmə alınmadı — bir azdan yenidən cəhd edin.",
-      resendUnknown: "Bu e-poçtlə gözləyən qeydiyyat tapılmadı."
+      resendUnknown: "Bu e-poçtlə gözləyən qeydiyyat tapılmadı.",
+      unconfirmedNotice: "Bu hesab hələ təsdiqlənməyib — ilk giriş yalnız e-poçtunuza göndərilən təsdiq linki ilə mümkündür. Mailə baxın."
     },
     accountMenu: {
       signedInAs: "Daxil olmusunuz",
@@ -822,7 +825,7 @@ export const az = {
       greetEvening: "Axşamınız xeyir",
       quoteEyebrow: "Günün sitatı",
       quote1: "Sükut, zərif formada. Bugün özünə beş dəqiqə ver.",
-      quote2: "Nəfəs almaq ən qısa yol ən uzun yola — özünə geri qayıtmağın.",
+      quote2: "Nəfəs — özünə geri qayıtmağın ən qısa yoludur.",
       quote3: "Hər gün bir addım. Dəyişiklik birdən deyil, sakit-sakit gəlir.",
       quote4: "Hisslərini adlandır — adlanan hiss zəifləyir.",
       quote5: "Zehin bağçadır: bəzən əkmək, bəzən isə sadəcə suvarmaq kifayətdir.",
@@ -1112,7 +1115,7 @@ export const az = {
       mediaAMorningDesc: "Günü sakit başlatmaq üçün qısa yönləndirmə.",
       mediaABoxTitle: "Qutu nəfəsi",
       mediaABoxDesc: "4-4-4-4 ritmi ilə dərhal balans.",
-      mediaABodyTitle: "Bədən skanerası",
+      mediaABodyTitle: "Bədən skanı",
       mediaABodyDesc: "Təpədən ayaq barmaqlara diqqət gəzintisi.",
       mediaAEveningTitle: "Axşam rahatlığı",
       mediaAEveningDesc: "Günü buraxmaq, yuxuya hazırlaşmaq.",
@@ -1144,7 +1147,7 @@ export const az = {
         egg: "Yumurta",
         feta: "Feta pendiri",
         garlic: "Sarımsaq",
-        greens: "Yasəmən yarpaqları",
+        greens: "Yarpalı göyərtilər",
         herbs: "Göyərti",
         honey: "Bal",
         lemon: "Limon",
@@ -1187,7 +1190,7 @@ export const az = {
       rail_places: "Sağlam məkanlar",
       rail_plans: "Qida planları",
       rail_recipes: "Reseptlər",
-      recBowlName: "Zülal qabası",
+      recBowlName: "Zülal qabı",
       recBowlTarget: "Toyuq, düyü, avokado — 520 kcal, 20 dəqiqə",
       recChefName: "Şef tabağı",
       recChefTarget: "Mal əti və kinoa ilə premium axşam — 610 kcal",
@@ -1223,7 +1226,8 @@ export const az = {
       waterDone: "Günlük hədəf tamamdır!",
       waterEyebrow: "Su izləməsi",
       waterGlass: "stəkan",
-      waterHint: "Gün boyu içdiyin stəkanları işarələ — 8 stəkan hədəfdir."
+      waterHint: "Gün boyu içdiyin stəkanları işarələ — 8 stəkan hədəfdir.",
+      backToSection: "Bölməyə qayıt"
     },
     gymApp: {
       metaTitle: "İdman",
@@ -1315,7 +1319,7 @@ export const az = {
         sessionProgressA11y: "Təlim gedişatı: {done}/{total}",
         sessionTitle: "Bugünkü təlim",
         setsLine: "{sets} × {reps}",
-        start: "İdməna başla",
+        start: "İdmana başla",
         loading: "Plan yüklənir…",
         buildCta: "Şəxsi plan qur",
         resetCta: "Sıfırla",
@@ -1349,7 +1353,7 @@ export const az = {
         details: "Ətraflı",
         equipTitle: "İdman alətləri",
         trainerYears: "{count} il təcrübə",
-        trainersTitle: "Trenler"
+        trainersTitle: "Məşqçilər"
       },
       ratingA11y: "5 baldan {score} ball",
       filterLabel: "Qrupa görə filtrlə",
@@ -1420,7 +1424,7 @@ export const az = {
       placeAtlasName: "Atlas Club",
       placeAtlasDesc: "Yasamalda geniş kardio zonası və qrup dərsləri olan müasir zal — günün istənilən vaxtı açıq.",
       placeForgeName: "The Forge",
-      placeForgeDesc: "Güç liftinqi üçün platformalar, geniş parkovka və sauna — ciddi təlim üçün baza.",
+      placeForgeDesc: "Güc liftinqi üçün platformalar, geniş parkovka və sauna — ciddi təlim üçün baza.",
       placeSummitName: "Summit Fitness",
       placeSummitDesc: "Bakının şimalında üzgüçülük hovuzu və bərpa zonası olan premium fitnes mərkəzi.",
       equipment: {
@@ -1487,7 +1491,7 @@ export const az = {
       exLegpressName: "Ayaq press",
       exLegpressTarget: "Quadriseps, kalça",
       exLungeGuide: "Bir ayağı irəli at, arxa diz yavaş yerə yaxınlaşır. Ön diz barmaq keçmir, gövdə düz. Güclə yuxarı qalx, ayağı dəyiş.",
-      exLungeName: "Çıxıntı (lunge)",
+      exLungeName: "Hücum addımı (lunge)",
       exLungeTarget: "Quadriseps, kalça, balans",
       exOhpGuide: "Ayaq üstə, ştanqa çiyində. Bünyədi yığ, barı başın üstündən düz yuxarı it — bar üzlə eyni xəttə keçir, sonra qulaq səviyyəsində tam aç.",
       exOhpName: "Ayaq üstə çiyin press",
@@ -1508,7 +1512,7 @@ export const az = {
       exSquatName2: "Ştanqa ilə squat",
       exSquatTarget2: "Quadriseps, bünyad, kalça",
       exStretchGuide: "Hər əzələ qrupunu 20-30 saniyə yumşaq çək; sıçrama yox. Nəfəs axını itmir — gərginlik nəfəslə birlikdə yumşalır.",
-      exStretchName: "Gərginləşmə",
+      exStretchName: "Gərginləndirmə",
       exStretchTarget: "Əzələ elastikliyi, bərpa",
       exSwingGuide: "Giriyanı iki əllə tut, kalça ilə it — qol sadəcə asılıdır. Güc kalçadan gəlir, giriya çiyin səviyyəsinə qədər yellənir. Bel heç vaxt yuvarlanmır.",
       exSwingName: "Giriya yelləncəyi",
@@ -1523,7 +1527,7 @@ export const az = {
         boxingCorner: "Boks küncü",
         cableStation: "Kablo stansiyaları",
         dumbbells: "Halter dəsti",
-        ellipticals: "Ellips trenajörler",
+        ellipticals: "Elliptik trenajorlar",
         freeWeights: "Sərbəst çəki zonası",
         functionalZone: "Funksional zona",
         kettlebells: "Girya dəsti",
@@ -1740,7 +1744,7 @@ export const az = {
       colPsychologist: "Psixoloq",
       colStatus: "Status",
       colWhen: "Vaxt",
-      errorGeneric: "Nisbətən səhv oldu — bir azdan yenidən cəhd et.",
+      errorGeneric: "Nəsə alınmadı — bir azdan yenidən cəhd edin.",
       filterAny: "Hamısı",
       filterDays: "Günlər",
       filterFormat: "Format",
@@ -1777,7 +1781,7 @@ export const az = {
       journalPickDate: "Gün seç",
       journalPlaceholder: "Fikirlərini burax…",
       journalPrompt1: "Bu gün nəyə görə minnətdarsan?",
-      journalPrompt2: "Bugün səni ən çox nə yormaqla bitdi?",
+      journalPrompt2: "Bu gün səni ən çox nə yordu?",
       journalPrompt3: "Bir kiçik qələbəni yaz — hətta fincan qəhvə olsa belə.",
       journalPrompt4: "Bu gün hansı hissəyə ən çox vaxt getdi? Niyə?",
       journalPrompt5: "Sabah üçün bir balaca niyyət seç.",
@@ -1786,7 +1790,7 @@ export const az = {
       journalSave: "Saxla",
       journalSaved: "Jurnala yazıldı",
       mediaABodyDesc: "Təpədən ayaq barmaqlara diqqət gəzintisi.",
-      mediaABodyTitle: "Bədən skanerası",
+      mediaABodyTitle: "Bədən skanı",
       mediaABoxDesc: "4-4-4-4 ritmi ilə dərhal balans.",
       mediaABoxTitle: "Qutu nəfəsi",
       mediaAEveningDesc: "Günü buraxmaq, yuxuya hazırlaşmaq.",
@@ -1878,7 +1882,7 @@ export const az = {
       psyGulshanRules: "Cütlük seanslarında hər iki tərəf ilk seansda iştirak etməlidir. Ödəniş seansdan əvvəl; ləğv 48 saat şərti ilə.",
       psyGulshanTitle: "Cütlük terapevti (EFT)",
       psyKamranBio: "Uşaq və yeniyetmələrlə oyun-dilində işləyən psixoloq — valideynlə birgə yol xəritəsi.",
-      psyKamranEdu: "BDU, psixologiya (2012), uşaq və yeniyetmə üzrə ixtartisaslaşma (2014). Məktəb psixoloqu kimi 6 il işləyib; oyun terapiyası və valideyn məsləhətləri üzrə öz kabinetini açıb.",
+      psyKamranEdu: "BDU, psixologiya (2012), uşaq və yeniyetmə üzrə ixtisaslaşma (2014). Məktəb psixoloqu kimi 6 il işləyib; oyun terapiyası və valideyn məsləhətləri üzrə öz kabinetini açıb.",
       psyKamranName: "Kamran Yusifzadə",
       psyKamranRules: "Uşaq seansları 45 dəqiqədir; valideyn ilk və son 10 dəqiqəyə dəvət olunur. Uşağın razılığı olmadan heç bir məşğələ aparılmır.",
       psyKamranTitle: "Uşaq və yeniyetmə psixoloqu",
@@ -1900,9 +1904,9 @@ export const az = {
       psyRatingA11y: "Reytinq: {score} / 5",
       psyRulesEyebrow: "Qaydalar",
       psySamirBio: "Gənc böyüklər və karyera stressi ilə işləyən konsultant — konkret hədəflər, qısa müdaxilələr.",
-      psySamirEdu: "BDU, psixologiya (2014). Axşam kabinetində fərdi seanslarla tanınır; iş gərginliyi və komandaxarası münasibətlər üzrə konsalting şirkətləri ilə əməkdaşlıq edir. ACT və CBT ansamblında işləyir.",
+      psySamirEdu: "BDU, psixologiya (2014). Axşam kabinetində fərdi seanslarla tanınır; iş gərginliyi və komanda arası münasibətlər üzrə konsalting şirkətləri ilə əməkdaşlıq edir. ACT və CBT ansamblında işləyir.",
       psySamirName: "Samir Əliyev",
-      psySamirRules: "Axşam saatları tələblidir — rezerv 48 saat əvvəl təsdiqlənir. İş yaylıqları (notes) istəsən hazırlanır.",
+      psySamirRules: "Axşam saatları tələblidir — rezerv 48 saat əvvəl təsdiqlənir. Seans qeydləri (notes) istəyən üçün hazırlanır.",
       psySamirTitle: "Psixoloji konsultant",
       psyScheduleEyebrow: "Cədvəl və rezerv",
       psySince: "{year}-ci ildən praktika",
@@ -1956,7 +1960,7 @@ export const az = {
       quiz_sleep_q3o3: "İki-üç",
       quiz_sleep_q3o4: "Daha çox",
       quiz_sleep_title: "Yuxu keyfiyyəti",
-      quiz_stress_desc: "Son bir həftə içində gərginlik necə daşıyır?",
+      quiz_stress_desc: "Son bir həftə içində gərginliyi necə daşıyırsan?",
       quiz_stress_q1: "Gün içində gərginlik neçə dəfə hiss edilir?",
       quiz_stress_q1o1: "Nadir",
       quiz_stress_q1o2: "Gündə bir-iki",
@@ -1974,7 +1978,7 @@ export const az = {
       quiz_stress_q3o4: "Güclü",
       quiz_stress_title: "Stress səviyyəsi",
       quote1: "Sükut, zərif formada. Bugün özünə beş dəqiqə ver.",
-      quote2: "Nəfəs almaq ən qısa yol ən uzun yola — özünə geri qayıtmağın.",
+      quote2: "Nəfəs — özünə geri qayıtmağın ən qısa yoludur.",
       quote3: "Hər gün bir addım. Dəyişiklik birdən deyil, sakit-sakit gəlir.",
       quote4: "Hisslərini adlandır — adlanan hiss zəifləyir.",
       quote5: "Zehin bağçadır: bəzən əkmək, bəzən isə sadəcə suvarmaq kifayətdir.",
@@ -2077,7 +2081,8 @@ export const az = {
         custom: "Öz vaxtı",
         noAccess: "Bu panel yalnız əlaqələndirilmiş psixoloq hesabları üçündür."
       },
-      colActions: "Əməliyyatlar"
+      colActions: "Əməliyyatlar",
+      backToSection: "Bölməyə qayıt"
     },
     verifyPage: {
       completeTitle: "Hesabınızı tamamlayın",
@@ -2094,7 +2099,7 @@ export const az = {
       okTitle: "E-poçt təsdiqləndi!",
       okText: "Hesabınız hazırdır — xoş gəlmisiniz.",
       goHome: "PreLife-a daxil ol",
-      badTitle: "Link keçərsizdir",
+      badTitle: "Link etibarsızdır",
       badText: "Bu təsdiq linki yanlışdır və ya artıq istifadə olunub.",
       expired: "Linkin vaxtı bitib — yenisini göndərin.",
       resend: "Yeni link göndər",

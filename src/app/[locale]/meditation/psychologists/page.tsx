@@ -73,7 +73,7 @@ export default async function PsychologistsPage({ params, searchParams }: Props)
     <PsychShell locale={locale} active="psychologists">
       <div className="wrap">
         <header className="page-head">
-          <p className="eyebrow"><i /><Link href="/meditation" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>{t("psychEyebrow")}</p>
+          <p className="eyebrow"><i /><Link href="/meditation" className="backlink" aria-label={t("backToSection")}><ArrowLeft size={14} aria-hidden /></Link>{t("psychEyebrow")}</p>
           <h1 className="display sm">{t("psychTitle")}</h1>
           <p className="lede">{t("psychSubtitle")}</p>
         </header>

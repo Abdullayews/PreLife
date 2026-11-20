@@ -102,11 +102,16 @@ export async function consumeVerification(token: string): Promise<ConsumeResult>
     return { status: "expired", userId, email };
   }
 
-  await supaUpdate(
+  // Atomic single-use claim (v4.7): the UPDATE itself carries the
+  // "still unconsumed" filter, so two parallel clicks of the same link
+  // cannot both win — the loser sees zero updated rows and gets
+  // "invalid" instead of a second session.
+  const claimed = await supaUpdate(
     "email_verifications",
-    [["token_hash", `eq.${sha256Hex(token)}`]],
+    [["token_hash", `eq.${sha256Hex(token)}`], ["consumed_at", "is.null"]],
     { consumed_at: new Date().toISOString() },
   );
+  if (claimed.length === 0) return "invalid";
   return { status: "ok", userId, email, locale: normLocale(typeof row.locale === "string" ? row.locale : "az") };
 }
 

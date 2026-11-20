@@ -182,7 +182,7 @@
           "desc": "Ceyms Klir. Ki\u00e7ik d\u0259yi\u015fiklikl\u0259r, g\u00f6rk\u0259mli n\u0259tic\u0259l\u0259r \u2014 h\u0259r PreLife plan\u0131 \u00fc\u00e7\u00fcn v\u0259rdi\u015f yolda\u015f\u0131."
         },
         "1": {
-          "title": "Haz\u0131r\u0131n g\u00fcc\u00fc",
+          "title": "Haz\u0131rk\u0131 an\u0131n g\u00fcc\u00fc",
           "desc": "Ekhart Tolle. M\u00f6vcudluq bir praktika kimi \u2014 meditasiya b\u00f6lm\u0259si il\u0259 t\u0259bii uy\u011funluq."
         },
         "2": {
@@ -231,7 +231,7 @@
     "diet": {
       "name": "Qidalanma",
       "heroTitle": "Sad\u0259c\u0259 yax\u015f\u0131 yeyin.",
-      "heroText": "B\u0259l\u0259d\u00e7i p\u0259r\u0259 planlar\u0131, d\u00fcr\u00fcst reseptl\u0259r, etibar etdiyiniz dietoloqlar v\u0259 yax\u015f\u0131 yem\u0259yi asanla\u015fd\u0131ran videolar \u2014 plan\u0131 t\u0259nziml\u0259m\u0259k \u00fc\u00e7\u00fcn AI il\u0259.",
+      "heroText": "B\u0259l\u0259d\u00e7ili p\u0259hriz planlar\u0131, d\u00fcr\u00fcst reseptl\u0259r, etibar etdiyiniz dietoloqlar v\u0259 yax\u015f\u0131 yem\u0259yi asanla\u015fd\u0131ran videolar \u2014 plan\u0131 t\u0259nziml\u0259m\u0259k \u00fc\u00e7\u00fcn AI il\u0259.",
       "ctaTitle": "\u0130lk yem\u0259yinizi planla\u015fd\u0131r\u0131n",
       "ctaText": "Bir tarazl\u0131q qab\u0131 \u00e7ox yax\u015f\u0131 bir ba\u015flan\u011f\u0131cd\u0131r.",
       "subs": {
@@ -310,7 +310,7 @@
         "name": "Pro"
       },
       "ultra": {
-        "desc": "Pro + \u015f\u0259xsi trenler r\u0259hb\u0259rliyi v\u0259 ail\u0259 profill\u0259ri.",
+        "desc": "Pro + \u015f\u0259xsi m\u0259\u015fq\u00e7i r\u0259hb\u0259rliyi v\u0259 ail\u0259 profill\u0259ri.",
         "name": "Ultra"
       }
     },
@@ -369,9 +369,9 @@
     "statTwoValue": "34+",
     "statThreeLabel": "\u00dc\u00e7\u00fcnc\u00fc",
     "statThreeValue": "56+",
-    "exploreTitle": "Dig\u0259r modullar\u0131 k\u0259\u015ffet",
+    "exploreTitle": "Dig\u0259r modullar\u0131 k\u0259\u015ff et",
     "exploreSubtitle": "PreLife t\u0259k bir disiplin deyil.",
-    "exploreCta": "K\u0259\u015ffet",
+    "exploreCta": "K\u0259\u015ff et",
     "moduleName_gym": "\u0130dman",
     "moduleDesc_gym": "T\u0259lim planlar\u0131, h\u0259r\u0259k\u0259t kitabxanas\u0131, zallar.",
     "moduleName_diet": "Qidalanma",
@@ -387,7 +387,8 @@
     "navStart": "Ba\u015fla",
     "navThemeToggle": "T\u00fcnd / i\u015f\u0131q rejimini d\u0259yi\u015f",
     "navHome": "PreLife \u2014 ana s\u0259hif\u0259",
-    "galleryLabel": "Hero \u015f\u0259kill\u0259ri"
+    "galleryLabel": "Hero \u015f\u0259kill\u0259ri",
+    "notifications": "Bildiri\u015fl\u0259r"
   },
   "gymHome": {
     "metaTitle": "Gym",
@@ -573,7 +574,6 @@
     "signUpLink": "Qeydiyyatdan ke\u00e7",
     "signInLink": "Daxil ol",
     "backToWelcome": "Xo\u015f g\u0259ldin s\u0259hif\u0259sin\u0259 qay\u0131t",
-    "demoHint": "Sayt\u0131 s\u0131nay\u0131rs\u0131n\u0131z? 123 e-po\u00e7t v\u0259 123 \u015fifr\u0259 il\u0259 daxil olun.",
     "socialSoonTitle": "{provider} il\u0259 daxilolma",
     "socialSoonDesc": "Tezlikl\u0259 \u0259l\u00e7atan olacaq \u2014 h\u0259l\u0259lik e-po\u00e7t v\u0259 \u015fifr\u0259d\u0259n istifad\u0259 edin.",
     "errors": {
@@ -585,7 +585,8 @@
       "email_taken": "Bu e-po\u00e7tla hesab art\u0131q m\u00f6vcuddur.",
       "generic": "Bir x\u0259ta ba\u015f verdi. Yenid\u0259n c\u0259hd edin.",
       "oauth": "Google/Apple il\u0259 giri\u015f al\u0131nmad\u0131 \u2014 bir azdan yenid\u0259n c\u0259hd edin v\u0259 ya e-po\u00e7tla davam edin.",
-      "email_unverified": "E-po\u00e7t t\u0259sdiql\u0259nm\u0259yib. G\u0259l\u0259nl\u0259r qutusunu yoxlay\u0131n v\u0259 ya linki yenid\u0259n g\u00f6nd\u0259rin."
+      "email_unverified": "E-po\u00e7t t\u0259sdiql\u0259nm\u0259yib. G\u0259l\u0259nl\u0259r qutusunu yoxlay\u0131n v\u0259 ya linki yenid\u0259n g\u00f6nd\u0259rin.",
+      "too_many_requests": "\u00c7ox \u00e7ox c\u0259hd \u2014 bir azdan yenid\u0259n s\u0131nay\u0131n."
     },
     "signupOkTitle": "E-po\u00e7tunuzu yoxlay\u0131n",
     "signupOkText": "{email} \u00fcnvan\u0131na t\u0259sdiq linki g\u00f6nd\u0259rdik \u2014 link ilk giri\u015finizdir: a\u00e7d\u0131qda hesab\u0131n\u0131z aktivl\u0259\u015fir v\u0259 avtomatik daxil olursunuz.",
@@ -822,7 +823,7 @@
     "greetEvening": "Ax\u015fam\u0131n\u0131z xeyir",
     "quoteEyebrow": "G\u00fcn\u00fcn sitat\u0131",
     "quote1": "S\u00fckut, z\u0259rif formada. Bug\u00fcn \u00f6z\u00fcn\u0259 be\u015f d\u0259qiq\u0259 ver.",
-    "quote2": "N\u0259f\u0259s almaq \u0259n q\u0131sa yol \u0259n uzun yola \u2014 \u00f6z\u00fcn\u0259 geri qay\u0131tma\u011f\u0131n.",
+    "quote2": "N\u0259f\u0259s \u2014 \u00f6z\u00fcn\u0259 geri qay\u0131tma\u011f\u0131n \u0259n q\u0131sa yoludur.",
     "quote3": "H\u0259r g\u00fcn bir add\u0131m. D\u0259yi\u015fiklik bird\u0259n deyil, sakit-sakit g\u0259lir.",
     "quote4": "Hissl\u0259rini adland\u0131r \u2014 adlanan hiss z\u0259ifl\u0259yir.",
     "quote5": "Zehin ba\u011f\u00e7ad\u0131r: b\u0259z\u0259n \u0259km\u0259k, b\u0259z\u0259n is\u0259 sad\u0259c\u0259 suvarmaq kifay\u0259tdir.",
@@ -1112,7 +1113,7 @@
     "mediaAMorningDesc": "G\u00fcn\u00fc sakit ba\u015flatmaq \u00fc\u00e7\u00fcn q\u0131sa y\u00f6nl\u0259ndirm\u0259.",
     "mediaABoxTitle": "Qutu n\u0259f\u0259si",
     "mediaABoxDesc": "4-4-4-4 ritmi il\u0259 d\u0259rhal balans.",
-    "mediaABodyTitle": "B\u0259d\u0259n skaneras\u0131",
+    "mediaABodyTitle": "B\u0259d\u0259n skan\u0131",
     "mediaABodyDesc": "T\u0259p\u0259d\u0259n ayaq barmaqlara diqq\u0259t g\u0259zintisi.",
     "mediaAEveningTitle": "Ax\u015fam rahatl\u0131\u011f\u0131",
     "mediaAEveningDesc": "G\u00fcn\u00fc buraxmaq, yuxuya haz\u0131rla\u015fmaq.",
@@ -1144,7 +1145,7 @@
       "egg": "Yumurta",
       "feta": "Feta pendiri",
       "garlic": "Sar\u0131msaq",
-      "greens": "Yas\u0259m\u0259n yarpaqlar\u0131",
+      "greens": "Yarpal\u0131 g\u00f6y\u0259rtil\u0259r",
       "herbs": "G\u00f6y\u0259rti",
       "honey": "Bal",
       "lemon": "Limon",
@@ -1187,7 +1188,7 @@
     "rail_places": "Sa\u011flam m\u0259kanlar",
     "rail_plans": "Qida planlar\u0131",
     "rail_recipes": "Reseptl\u0259r",
-    "recBowlName": "Z\u00fclal qabas\u0131",
+    "recBowlName": "Z\u00fclal qab\u0131",
     "recBowlTarget": "Toyuq, d\u00fcy\u00fc, avokado \u2014 520 kcal, 20 d\u0259qiq\u0259",
     "recChefName": "\u015eef taba\u011f\u0131",
     "recChefTarget": "Mal \u0259ti v\u0259 kinoa il\u0259 premium ax\u015fam \u2014 610 kcal",
@@ -1223,7 +1224,8 @@
     "waterDone": "G\u00fcnl\u00fck h\u0259d\u0259f tamamd\u0131r!",
     "waterEyebrow": "Su izl\u0259m\u0259si",
     "waterGlass": "st\u0259kan",
-    "waterHint": "G\u00fcn boyu i\u00e7diyin st\u0259kanlar\u0131 i\u015far\u0259l\u0259 \u2014 8 st\u0259kan h\u0259d\u0259fdir."
+    "waterHint": "G\u00fcn boyu i\u00e7diyin st\u0259kanlar\u0131 i\u015far\u0259l\u0259 \u2014 8 st\u0259kan h\u0259d\u0259fdir.",
+    "backToSection": "B\u00f6lm\u0259y\u0259 qay\u0131t"
   },
   "gymApp": {
     "metaTitle": "\u0130dman",
@@ -1315,7 +1317,7 @@
       "sessionProgressA11y": "T\u0259lim gedi\u015fat\u0131: {done}/{total}",
       "sessionTitle": "Bug\u00fcnk\u00fc t\u0259lim",
       "setsLine": "{sets} \u00d7 {reps}",
-      "start": "\u0130dm\u0259na ba\u015fla",
+      "start": "\u0130dmana ba\u015fla",
       "loading": "Plan y\u00fckl\u0259nir\u2026",
       "buildCta": "\u015e\u0259xsi plan qur",
       "resetCta": "S\u0131f\u0131rla",
@@ -1349,7 +1351,7 @@
       "details": "\u018ftrafl\u0131",
       "equipTitle": "\u0130dman al\u0259tl\u0259ri",
       "trainerYears": "{count} il t\u0259cr\u00fcb\u0259",
-      "trainersTitle": "Trenler"
+      "trainersTitle": "M\u0259\u015fq\u00e7il\u0259r"
     },
     "ratingA11y": "5 baldan {score} ball",
     "filterLabel": "Qrupa g\u00f6r\u0259 filtrl\u0259",
@@ -1420,7 +1422,7 @@
     "placeAtlasName": "Atlas Club",
     "placeAtlasDesc": "Yasamalda geni\u015f kardio zonas\u0131 v\u0259 qrup d\u0259rsl\u0259ri olan m\u00fcasir zal \u2014 g\u00fcn\u00fcn ist\u0259nil\u0259n vaxt\u0131 a\u00e7\u0131q.",
     "placeForgeName": "The Forge",
-    "placeForgeDesc": "G\u00fc\u00e7 liftinqi \u00fc\u00e7\u00fcn platformalar, geni\u015f parkovka v\u0259 sauna \u2014 ciddi t\u0259lim \u00fc\u00e7\u00fcn baza.",
+    "placeForgeDesc": "G\u00fcc liftinqi \u00fc\u00e7\u00fcn platformalar, geni\u015f parkovka v\u0259 sauna \u2014 ciddi t\u0259lim \u00fc\u00e7\u00fcn baza.",
     "placeSummitName": "Summit Fitness",
     "placeSummitDesc": "Bak\u0131n\u0131n \u015fimal\u0131nda \u00fczg\u00fc\u00e7\u00fcl\u00fck hovuzu v\u0259 b\u0259rpa zonas\u0131 olan premium fitnes m\u0259rk\u0259zi.",
     "equipment": {
@@ -1487,7 +1489,7 @@
     "exLegpressName": "Ayaq press",
     "exLegpressTarget": "Quadriseps, kal\u00e7a",
     "exLungeGuide": "Bir aya\u011f\u0131 ir\u0259li at, arxa diz yava\u015f yer\u0259 yax\u0131nla\u015f\u0131r. \u00d6n diz barmaq ke\u00e7mir, g\u00f6vd\u0259 d\u00fcz. G\u00fccl\u0259 yuxar\u0131 qalx, aya\u011f\u0131 d\u0259yi\u015f.",
-    "exLungeName": "\u00c7\u0131x\u0131nt\u0131 (lunge)",
+    "exLungeName": "H\u00fccum add\u0131m\u0131 (lunge)",
     "exLungeTarget": "Quadriseps, kal\u00e7a, balans",
     "exOhpGuide": "Ayaq \u00fcst\u0259, \u015ftanqa \u00e7iyind\u0259. B\u00fcny\u0259di y\u0131\u011f, bar\u0131 ba\u015f\u0131n \u00fcst\u00fcnd\u0259n d\u00fcz yuxar\u0131 it \u2014 bar \u00fczl\u0259 eyni x\u0259tt\u0259 ke\u00e7ir, sonra qulaq s\u0259viyy\u0259sind\u0259 tam a\u00e7.",
     "exOhpName": "Ayaq \u00fcst\u0259 \u00e7iyin press",
@@ -1508,7 +1510,7 @@
     "exSquatName2": "\u015etanqa il\u0259 squat",
     "exSquatTarget2": "Quadriseps, b\u00fcnyad, kal\u00e7a",
     "exStretchGuide": "H\u0259r \u0259z\u0259l\u0259 qrupunu 20-30 saniy\u0259 yum\u015faq \u00e7\u0259k; s\u0131\u00e7rama yox. N\u0259f\u0259s ax\u0131n\u0131 itmir \u2014 g\u0259rginlik n\u0259f\u0259sl\u0259 birlikd\u0259 yum\u015fal\u0131r.",
-    "exStretchName": "G\u0259rginl\u0259\u015fm\u0259",
+    "exStretchName": "G\u0259rginl\u0259ndirm\u0259",
     "exStretchTarget": "\u018fz\u0259l\u0259 elastikliyi, b\u0259rpa",
     "exSwingGuide": "Giriyan\u0131 iki \u0259ll\u0259 tut, kal\u00e7a il\u0259 it \u2014 qol sad\u0259c\u0259 as\u0131l\u0131d\u0131r. G\u00fcc kal\u00e7adan g\u0259lir, giriya \u00e7iyin s\u0259viyy\u0259sin\u0259 q\u0259d\u0259r yell\u0259nir. Bel he\u00e7 vaxt yuvarlanm\u0131r.",
     "exSwingName": "Giriya yell\u0259nc\u0259yi",
@@ -1523,7 +1525,7 @@
       "boxingCorner": "Boks k\u00fcnc\u00fc",
       "cableStation": "Kablo stansiyalar\u0131",
       "dumbbells": "Halter d\u0259sti",
-      "ellipticals": "Ellips trenaj\u00f6rler",
+      "ellipticals": "Elliptik trenajorlar",
       "freeWeights": "S\u0259rb\u0259st \u00e7\u0259ki zonas\u0131",
       "functionalZone": "Funksional zona",
       "kettlebells": "Girya d\u0259sti",
@@ -1740,7 +1742,7 @@
     "colPsychologist": "Psixoloq",
     "colStatus": "Status",
     "colWhen": "Vaxt",
-    "errorGeneric": "Nisb\u0259t\u0259n s\u0259hv oldu \u2014 bir azdan yenid\u0259n c\u0259hd et.",
+    "errorGeneric": "N\u0259s\u0259 al\u0131nmad\u0131 \u2014 bir azdan yenid\u0259n c\u0259hd edin.",
     "filterAny": "Ham\u0131s\u0131",
     "filterDays": "G\u00fcnl\u0259r",
     "filterFormat": "Format",
@@ -1777,7 +1779,7 @@
     "journalPickDate": "G\u00fcn se\u00e7",
     "journalPlaceholder": "Fikirl\u0259rini burax\u2026",
     "journalPrompt1": "Bu g\u00fcn n\u0259y\u0259 g\u00f6r\u0259 minn\u0259tdarsan?",
-    "journalPrompt2": "Bug\u00fcn s\u0259ni \u0259n \u00e7ox n\u0259 yormaqla bitdi?",
+    "journalPrompt2": "Bu g\u00fcn s\u0259ni \u0259n \u00e7ox n\u0259 yordu?",
     "journalPrompt3": "Bir ki\u00e7ik q\u0259l\u0259b\u0259ni yaz \u2014 h\u0259tta fincan q\u0259hv\u0259 olsa bel\u0259.",
     "journalPrompt4": "Bu g\u00fcn hans\u0131 hiss\u0259y\u0259 \u0259n \u00e7ox vaxt getdi? Niy\u0259?",
     "journalPrompt5": "Sabah \u00fc\u00e7\u00fcn bir balaca niyy\u0259t se\u00e7.",
@@ -1786,7 +1788,7 @@
     "journalSave": "Saxla",
     "journalSaved": "Jurnala yaz\u0131ld\u0131",
     "mediaABodyDesc": "T\u0259p\u0259d\u0259n ayaq barmaqlara diqq\u0259t g\u0259zintisi.",
-    "mediaABodyTitle": "B\u0259d\u0259n skaneras\u0131",
+    "mediaABodyTitle": "B\u0259d\u0259n skan\u0131",
     "mediaABoxDesc": "4-4-4-4 ritmi il\u0259 d\u0259rhal balans.",
     "mediaABoxTitle": "Qutu n\u0259f\u0259si",
     "mediaAEveningDesc": "G\u00fcn\u00fc buraxmaq, yuxuya haz\u0131rla\u015fmaq.",
@@ -1878,7 +1880,7 @@
     "psyGulshanRules": "C\u00fctl\u00fck seanslar\u0131nda h\u0259r iki t\u0259r\u0259f ilk seansda i\u015ftirak etm\u0259lidir. \u00d6d\u0259ni\u015f seansdan \u0259vv\u0259l; l\u0259\u011fv 48 saat \u015f\u0259rti il\u0259.",
     "psyGulshanTitle": "C\u00fctl\u00fck terapevti (EFT)",
     "psyKamranBio": "U\u015faq v\u0259 yeniyetm\u0259l\u0259rl\u0259 oyun-dilind\u0259 i\u015fl\u0259y\u0259n psixoloq \u2014 valideynl\u0259 birg\u0259 yol x\u0259rit\u0259si.",
-    "psyKamranEdu": "BDU, psixologiya (2012), u\u015faq v\u0259 yeniyetm\u0259 \u00fczr\u0259 ixtartisasla\u015fma (2014). M\u0259kt\u0259b psixoloqu kimi 6 il i\u015fl\u0259yib; oyun terapiyas\u0131 v\u0259 valideyn m\u0259sl\u0259h\u0259tl\u0259ri \u00fczr\u0259 \u00f6z kabinetini a\u00e7\u0131b.",
+    "psyKamranEdu": "BDU, psixologiya (2012), u\u015faq v\u0259 yeniyetm\u0259 \u00fczr\u0259 ixtisasla\u015fma (2014). M\u0259kt\u0259b psixoloqu kimi 6 il i\u015fl\u0259yib; oyun terapiyas\u0131 v\u0259 valideyn m\u0259sl\u0259h\u0259tl\u0259ri \u00fczr\u0259 \u00f6z kabinetini a\u00e7\u0131b.",
     "psyKamranName": "Kamran Yusifzad\u0259",
     "psyKamranRules": "U\u015faq seanslar\u0131 45 d\u0259qiq\u0259dir; valideyn ilk v\u0259 son 10 d\u0259qiq\u0259y\u0259 d\u0259v\u0259t olunur. U\u015fa\u011f\u0131n raz\u0131l\u0131\u011f\u0131 olmadan he\u00e7 bir m\u0259\u015f\u011f\u0259l\u0259 apar\u0131lm\u0131r.",
     "psyKamranTitle": "U\u015faq v\u0259 yeniyetm\u0259 psixoloqu",
@@ -1900,9 +1902,9 @@
     "psyRatingA11y": "Reytinq: {score} / 5",
     "psyRulesEyebrow": "Qaydalar",
     "psySamirBio": "G\u0259nc b\u00f6y\u00fckl\u0259r v\u0259 karyera stressi il\u0259 i\u015fl\u0259y\u0259n konsultant \u2014 konkret h\u0259d\u0259fl\u0259r, q\u0131sa m\u00fcdaxil\u0259l\u0259r.",
-    "psySamirEdu": "BDU, psixologiya (2014). Ax\u015fam kabinetind\u0259 f\u0259rdi seanslarla tan\u0131n\u0131r; i\u015f g\u0259rginliyi v\u0259 komandaxaras\u0131 m\u00fcnasib\u0259tl\u0259r \u00fczr\u0259 konsalting \u015firk\u0259tl\u0259ri il\u0259 \u0259m\u0259kda\u015fl\u0131q edir. ACT v\u0259 CBT ansambl\u0131nda i\u015fl\u0259yir.",
+    "psySamirEdu": "BDU, psixologiya (2014). Ax\u015fam kabinetind\u0259 f\u0259rdi seanslarla tan\u0131n\u0131r; i\u015f g\u0259rginliyi v\u0259 komanda aras\u0131 m\u00fcnasib\u0259tl\u0259r \u00fczr\u0259 konsalting \u015firk\u0259tl\u0259ri il\u0259 \u0259m\u0259kda\u015fl\u0131q edir. ACT v\u0259 CBT ansambl\u0131nda i\u015fl\u0259yir.",
     "psySamirName": "Samir \u018fliyev",
-    "psySamirRules": "Ax\u015fam saatlar\u0131 t\u0259l\u0259blidir \u2014 rezerv 48 saat \u0259vv\u0259l t\u0259sdiql\u0259nir. \u0130\u015f yayl\u0131qlar\u0131 (notes) ist\u0259s\u0259n haz\u0131rlan\u0131r.",
+    "psySamirRules": "Ax\u015fam saatlar\u0131 t\u0259l\u0259blidir \u2014 rezerv 48 saat \u0259vv\u0259l t\u0259sdiql\u0259nir. Seans qeydl\u0259ri (notes) ist\u0259y\u0259n \u00fc\u00e7\u00fcn haz\u0131rlan\u0131r.",
     "psySamirTitle": "Psixoloji konsultant",
     "psyScheduleEyebrow": "C\u0259dv\u0259l v\u0259 rezerv",
     "psySince": "{year}-ci ild\u0259n praktika",
@@ -1956,7 +1958,7 @@
     "quiz_sleep_q3o3": "\u0130ki-\u00fc\u00e7",
     "quiz_sleep_q3o4": "Daha \u00e7ox",
     "quiz_sleep_title": "Yuxu keyfiyy\u0259ti",
-    "quiz_stress_desc": "Son bir h\u0259ft\u0259 i\u00e7ind\u0259 g\u0259rginlik nec\u0259 da\u015f\u0131y\u0131r?",
+    "quiz_stress_desc": "Son bir h\u0259ft\u0259 i\u00e7ind\u0259 g\u0259rginliyi nec\u0259 da\u015f\u0131y\u0131rsan?",
     "quiz_stress_q1": "G\u00fcn i\u00e7ind\u0259 g\u0259rginlik ne\u00e7\u0259 d\u0259f\u0259 hiss edilir?",
     "quiz_stress_q1o1": "Nadir",
     "quiz_stress_q1o2": "G\u00fcnd\u0259 bir-iki",
@@ -1974,7 +1976,7 @@
     "quiz_stress_q3o4": "G\u00fccl\u00fc",
     "quiz_stress_title": "Stress s\u0259viyy\u0259si",
     "quote1": "S\u00fckut, z\u0259rif formada. Bug\u00fcn \u00f6z\u00fcn\u0259 be\u015f d\u0259qiq\u0259 ver.",
-    "quote2": "N\u0259f\u0259s almaq \u0259n q\u0131sa yol \u0259n uzun yola \u2014 \u00f6z\u00fcn\u0259 geri qay\u0131tma\u011f\u0131n.",
+    "quote2": "N\u0259f\u0259s \u2014 \u00f6z\u00fcn\u0259 geri qay\u0131tma\u011f\u0131n \u0259n q\u0131sa yoludur.",
     "quote3": "H\u0259r g\u00fcn bir add\u0131m. D\u0259yi\u015fiklik bird\u0259n deyil, sakit-sakit g\u0259lir.",
     "quote4": "Hissl\u0259rini adland\u0131r \u2014 adlanan hiss z\u0259ifl\u0259yir.",
     "quote5": "Zehin ba\u011f\u00e7ad\u0131r: b\u0259z\u0259n \u0259km\u0259k, b\u0259z\u0259n is\u0259 sad\u0259c\u0259 suvarmaq kifay\u0259tdir.",
@@ -2077,7 +2079,8 @@
       "custom": "\u00d6z vaxt\u0131",
       "noAccess": "Bu panel yaln\u0131z \u0259laq\u0259l\u0259ndirilmi\u015f psixoloq hesablar\u0131 \u00fc\u00e7\u00fcnd\u00fcr."
     },
-    "colActions": "\u018fm\u0259liyyatlar"
+    "colActions": "\u018fm\u0259liyyatlar",
+    "backToSection": "B\u00f6lm\u0259y\u0259 qay\u0131t"
   },
   "verifyPage": {
     "completeTitle": "Hesab\u0131n\u0131z\u0131 tamamlay\u0131n",
@@ -2094,7 +2097,7 @@
     "okTitle": "E-po\u00e7t t\u0259sdiql\u0259ndi!",
     "okText": "Hesab\u0131n\u0131z haz\u0131rd\u0131r \u2014 xo\u015f g\u0259lmisiniz.",
     "goHome": "PreLife-a daxil ol",
-    "badTitle": "Link ke\u00e7\u0259rsizdir",
+    "badTitle": "Link etibars\u0131zd\u0131r",
     "badText": "Bu t\u0259sdiq linki yanl\u0131\u015fd\u0131r v\u0259 ya art\u0131q istifad\u0259 olunub.",
     "expired": "Linkin vaxt\u0131 bitib \u2014 yenisini g\u00f6nd\u0259rin.",
     "resend": "Yeni link g\u00f6nd\u0259r",

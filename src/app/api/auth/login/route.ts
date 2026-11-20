@@ -8,6 +8,7 @@ import {
 } from "@/lib/server/supa";
 import { createSession, isSecure, originFrom, sessionCookie, userView } from "@/lib/server/session";
 import { jsonError, readJson } from "@/lib/server/route-helpers";
+import { clientIp, mailSendAllowed, rateAllow } from "@/lib/server/rate-limit";
 import {
   createVerification,
   pendingVerificationForUser,
@@ -49,6 +50,17 @@ export async function POST(req: NextRequest) {
   const locale = typeof body.locale === "string" ? body.locale : "az";
   if (!email) return jsonError(400, "missing_fields");
 
+  // v4.7: brute-force ceiling — 40 attempts / 15 min per IP, 20 per
+  // address. Generous for humans (a typo is one attempt), decisive for
+  // scripted credential stuffing.
+  const ip = clientIp(req.headers);
+  if (
+    !rateAllow(`login:ip:${ip}`, 40, 15 * 60 * 1000)
+    || !rateAllow(`login:em:${email}`, 20, 15 * 60 * 1000)
+  ) {
+    return jsonError(429, "too_many_requests");
+  }
+
   // ── Does an account exist for this e-mail? ────────────────────────────
   let account: Record<string, unknown> | null = null;
   try {
@@ -89,6 +101,9 @@ export async function POST(req: NextRequest) {
           const meta = account.user_metadata as Record<string, unknown> | undefined;
           if (meta?.needs_completion === true) {
             try {
+              // v4.7: this path mails too — the shared mail guard applies
+              // (the per-IP login ceiling above does not cover mail volume).
+              if (!mailSendAllowed(ip, email)) return jsonError(429, "too_many_requests");
               const { devLink } = await createVerification(
                 userId, email, locale, originFrom(req.headers),
               );
@@ -129,6 +144,9 @@ export async function POST(req: NextRequest) {
   // shared step the OAuth callback's Google/Apple hand-off runs). The
   // account is created pending (random password, unconfirmed) — it only
   // becomes real once the e-mail link is confirmed within 1 week.
+  // v4.7: the mail guard (5/hour per address, 20/hour per IP) — the
+  // login-page start used to be an unlimited mail-bombing surface.
+  if (!mailSendAllowed(ip, email)) return jsonError(429, "too_many_requests");
   try {
     const { devLink } = await startMailRegistration(
       email, locale, originFrom(req.headers),

@@ -387,7 +387,8 @@
     "navStart": "Get started",
     "navThemeToggle": "Toggle dark / light mode",
     "navHome": "PreLife \u2014 home",
-    "galleryLabel": "Hero photos"
+    "galleryLabel": "Hero photos",
+    "notifications": "Notifications"
   },
   "gymHome": {
     "metaTitle": "Gym",
@@ -573,7 +574,6 @@
     "signUpLink": "Sign up",
     "signInLink": "Sign in",
     "backToWelcome": "Back to welcome",
-    "demoHint": "Testing the site? Sign in with email 123 and password 123.",
     "socialSoonTitle": "{provider} sign-in",
     "socialSoonDesc": "It will be available soon \u2014 for now, please use email and password.",
     "errors": {
@@ -585,7 +585,8 @@
       "email_taken": "An account with this email already exists.",
       "generic": "Something went wrong. Please try again.",
       "oauth": "The Google/Apple sign-in did not go through \u2014 try again in a moment, or continue with e-mail.",
-      "email_unverified": "E-mail not confirmed. Check your inbox or resend the link."
+      "email_unverified": "E-mail not confirmed. Check your inbox or resend the link.",
+      "too_many_requests": "Too many attempts \u2014 please try again in a moment."
     },
     "signupOkTitle": "Check your inbox",
     "signupOkText": "We sent a confirmation link to {email} \u2014 it is your first sign-in: opening it activates your account and signs you in.",
@@ -1223,7 +1224,8 @@
     "waterDone": "Daily target complete!",
     "waterEyebrow": "Water tracking",
     "waterGlass": "glass",
-    "waterHint": "Tick the glasses you drink through the day \u2014 8 is the target."
+    "waterHint": "Tick the glasses you drink through the day \u2014 8 is the target.",
+    "backToSection": "Back to section"
   },
   "gymApp": {
     "metaTitle": "Gym",
@@ -2077,7 +2079,8 @@
       "custom": "Custom time",
       "noAccess": "This console is for linked psychologist accounts only."
     },
-    "colActions": "Actions"
+    "colActions": "Actions",
+    "backToSection": "Back to section"
   },
   "verifyPage": {
     "completeTitle": "Complete your account",

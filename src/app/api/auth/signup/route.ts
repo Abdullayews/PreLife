@@ -9,6 +9,7 @@ import {
   userFromAuth,
 } from "@/lib/server/supa";
 import { originFrom } from "@/lib/server/session";
+import { clientIp, mailSendAllowed } from "@/lib/server/rate-limit";
 import {
   createVerification,
   pendingVerificationForUser,
@@ -51,6 +52,12 @@ export async function POST(req: NextRequest) {
 
   const lang = locale === "en" ? "en" : locale === "ru" ? "ru" : "az";
   const origin = originFrom(req.headers);
+
+  // v4.7: the shared mail guard — every signup path mails from here on
+  // (5/hour per address, 20/hour per IP).
+  if (!mailSendAllowed(clientIp(req.headers), email)) {
+    return jsonError(429, "too_many_requests");
+  }
 
   // ── Fresh create ───────────────────────────────────────────────────────
   let created: Record<string, unknown>;

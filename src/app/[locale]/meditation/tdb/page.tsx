@@ -28,7 +28,7 @@ export default async function TdbPage({ params }: Props) {
         <header className="page-head">
           <p className="eyebrow">
             <i />
-            <Link href="/meditation" className="backlink"><ArrowLeft size={14} aria-hidden /></Link>
+            <Link href="/meditation" className="backlink" aria-label={t("backToSection")}><ArrowLeft size={14} aria-hidden /></Link>
             {t("tdbEyebrow")}
           </p>
           <h1 className="display sm">{t("tdbTitle")}</h1>
