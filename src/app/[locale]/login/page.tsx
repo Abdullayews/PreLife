@@ -29,20 +29,32 @@ export default async function LoginPage({ params, searchParams }: Props) {
   // /api/auth/callback redirects here with ?error=oauth when the Google /
   // Apple flow fails (provider not configured in Supabase, denied consent…).
   const oauthError = sp.error === "oauth";
-  // v4.4: it also redirects here with ?email=…&notice=oauth_new when a
-  // Google/Apple LOGIN found no account — the mail registration starts
-  // right on this page (the e-mail arrives prefilled).
-  // v4.5: ?email=…&notice=unconfirmed when a provider login hit an
-  // existing but still-unconfirmed e-mail account — the first sign-in
-  // is the mail link, so the visitor is sent back to check the inbox.
+  // v4.6: it redirects here with ?email=…&notice=mail_sent when a
+  // Google/Apple LOGIN found no account — the callback already created
+  // the pending registration and sent the confirmation mail, so the
+  // form is replaced by the "check your inbox" card (the dev sandbox
+  // also carries &devlink=… — no real mail there, the link itself is
+  // surfaced instead). ?notice=oauth_new is the rare fallback when the
+  // automatic send failed; ?notice=unconfirmed (v4.5) when a provider
+  // login hit an existing but still-unconfirmed e-mail account.
   const prefillRaw = Array.isArray(sp.email) ? sp.email[0] : sp.email;
   const prefillEmail = typeof prefillRaw === "string" ? prefillRaw.trim().slice(0, 120) : "";
   const notice =
-    sp.notice === "oauth_new"
-      ? "oauth_new"
-      : sp.notice === "unconfirmed"
-        ? "unconfirmed"
-        : null;
+    sp.notice === "mail_sent"
+      ? "mail_sent"
+      : sp.notice === "oauth_new"
+        ? "oauth_new"
+        : sp.notice === "unconfirmed"
+          ? "unconfirmed"
+          : null;
+  // The sandbox dev link — only trusted when it is a link back into
+  // this site (never a javascript: payload from a crafted URL).
+  const devRaw = Array.isArray(sp.devlink) ? sp.devlink[0] : sp.devlink;
+  const devLink =
+    notice === "mail_sent" && typeof devRaw === "string"
+      && (/^https?:\/\//i.test(devRaw) || devRaw.startsWith("/"))
+      ? devRaw.slice(0, 2048)
+      : null;
 
   return (
     <div data-world="shell" className="world page">
@@ -53,6 +65,7 @@ export default async function LoginPage({ params, searchParams }: Props) {
           oauthError={oauthError}
           prefillEmail={prefillEmail}
           notice={notice}
+          mailDevLink={devLink}
         />
       </div>
     </div>

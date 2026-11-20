@@ -1,11 +1,8 @@
-import { randomBytes } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import {
-  authAdminCreateUser,
   authAdminFindUserByEmail,
   authPasswordLogin,
   isConfirmedUser,
-  supaUpdate,
   supabaseConfigured,
   userFromAuth,
 } from "@/lib/server/supa";
@@ -15,6 +12,7 @@ import {
   createVerification,
   pendingVerificationForUser,
   purgeRegistration,
+  startMailRegistration,
   verificationExpired,
 } from "@/lib/server/verification";
 
@@ -127,27 +125,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ action: "signup_prefill", email });
   }
 
-  // E-mail only: start the registration right here. The account is
-  // created pending (random password, unconfirmed) — it only becomes
-  // real once the e-mail link is confirmed within 1 week.
+  // E-mail only: start the registration right here (v4.6 — the same
+  // shared step the OAuth callback's Google/Apple hand-off runs). The
+  // account is created pending (random password, unconfirmed) — it only
+  // becomes real once the e-mail link is confirmed within 1 week.
   try {
-    const created = await authAdminCreateUser(
-      email,
-      randomBytes(24).toString("base64url"), // placeholder until the completion step
-      "",
-      false,
-      { needs_completion: true },
-    );
-    const user = userFromAuth(created);
-    if (!user) return jsonError(500, "generic");
-
-    const lang = locale === "en" ? "en" : locale === "ru" ? "ru" : "az";
-    if (lang !== "en") {
-      await supaUpdate("profiles", [["id", `eq.${user.id}`]], { lang }).catch(() => {});
-    }
-
-    const { devLink } = await createVerification(
-      user.id, email, locale, originFrom(req.headers),
+    const { devLink } = await startMailRegistration(
+      email, locale, originFrom(req.headers),
     );
     return NextResponse.json({ action: "check_inbox", email, devLink });
   } catch (e) {

@@ -16,6 +16,7 @@ import {
   originFrom,
   sessionCookie,
 } from "@/lib/server/session";
+import { startMailRegistration } from "@/lib/server/verification";
 
 export const dynamic = "force-dynamic";
 
@@ -76,10 +77,12 @@ function parseOauthCookie(
  *     page is a registration, not a dead end.
  *
  *   • login — unknown e-mail: the phantom row is deleted again and the
- *     visitor lands back on the LOGIN page with the e-mail prefilled,
- *     where the mail registration starts (v4.3 account-first: e-mail
- *     only → confirmation mail). The mail hand-off lives at the login
- *     place only — never on the signup page.
+ *     mail registration starts AUTOMATICALLY (v4.6): the pending
+ *     account is created and the confirmation e-mail is sent right
+ *     here in the callback, so the visitor lands directly on the
+ *     "check your inbox" card — no Continue press, nothing to type.
+ *     The mail hand-off still lives at the login place only — never
+ *     on the signup page.
  *
  *   • an existing account (e-mail provider on the row) links to the
  *     provider and just logs in, from either page — but ONLY when the
@@ -144,22 +147,38 @@ export async function GET(req: NextRequest) {
         return res;
       }
 
-      // Login rules: no account for this e-mail → delete the phantom
-      // row and hand the visitor to the login page's mail flow (the
-      // e-mail arrives prefilled; one press on Continue sends the
-      // confirmation link). The mail hand-off lives at the login place
-      // only — never on the signup page.
+      // Login rules (v4.6): no account for this e-mail → the hand-off
+      // is AUTOMATIC. The phantom row goes away, the pending account is
+      // created and the confirmation e-mail is sent right here — the
+      // visitor lands directly on the "check your inbox" card, with no
+      // form to fill and no button to press. The provider already gave
+      // us the e-mail; the registration starts itself.
       await authAdminDeleteUser(user.id).catch((e) => {
         console.warn("[auth:callback] phantom delete failed", e);
       });
-      const res = NextResponse.redirect(
-        `${origin}/${locale}/login`
-        + `?email=${encodeURIComponent(user.email)}`
-        + `&notice=oauth_new`,
-        302,
-      );
-      res.cookies.set(clearedOAuthCookie(isSecure(req.headers)));
-      return res;
+      try {
+        const { devLink } = await startMailRegistration(user.email, locale, origin);
+        const qs = new URLSearchParams({ email: user.email, notice: "mail_sent" });
+        // Dev sandbox only (production mails go out for real and never
+        // produce a dev link): surface the link instead of the mail.
+        if (devLink) qs.set("devlink", devLink);
+        const res = NextResponse.redirect(`${origin}/${locale}/login?${qs.toString()}`, 302);
+        res.cookies.set(clearedOAuthCookie(isSecure(req.headers)));
+        return res;
+      } catch (e) {
+        // Rare (e.g. the phantom delete lagged and the e-mail is still
+        // taken) — fall back to the manual screen: the e-mail arrives
+        // prefilled and Continue re-runs the same registration.
+        console.error("[auth:callback mail hand-off]", e);
+        const res = NextResponse.redirect(
+          `${origin}/${locale}/login`
+          + `?email=${encodeURIComponent(user.email)}`
+          + `&notice=oauth_new`,
+          302,
+        );
+        res.cookies.set(clearedOAuthCookie(isSecure(req.headers)));
+        return res;
+      }
     }
 
     // An e-mail account behind the provider button? It must already be

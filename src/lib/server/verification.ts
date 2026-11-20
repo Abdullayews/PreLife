@@ -1,5 +1,13 @@
 import { createHash, randomBytes } from "node:crypto";
-import { authAdminDeleteUser, supaDelete, supaInsert, supaSelectOne, supaUpdate } from "./supa";
+import {
+  authAdminCreateUser,
+  authAdminDeleteUser,
+  supaDelete,
+  supaInsert,
+  supaSelectOne,
+  supaUpdate,
+  userFromAuth,
+} from "./supa";
 import { sendMail, verificationEmailHtml } from "./mail";
 
 /**
@@ -103,6 +111,37 @@ export async function consumeVerification(token: string): Promise<ConsumeResult>
 }
 
 /* ── v4.3 pending-registration helpers ─────────────────────────────────── */
+
+/** v4.6: the shared "start a mail registration" step — creates the
+ * pending account (random placeholder password, unconfirmed,
+ * needs_completion) and sends the 1-week verification e-mail. Used by
+ * the login route (the e-mail-only start) and by the OAuth callback
+ * (the Google/Apple hand-off: the provider's e-mail starts the
+ * registration automatically — no Continue press, nothing to type).
+ * Throws whatever GoTrue throws; a "422" means the e-mail is taken. */
+export async function startMailRegistration(
+  email: string,
+  locale: string,
+  origin: string,
+): Promise<{ userId: string; devLink: string | null }> {
+  const created = await authAdminCreateUser(
+    email,
+    randomBytes(24).toString("base64url"), // placeholder until the completion step
+    "",
+    false,
+    { needs_completion: true },
+  );
+  const user = userFromAuth(created);
+  if (!user) throw new Error("unexpected user shape after create");
+
+  const lang = normLocale(locale);
+  if (lang !== "en") {
+    await supaUpdate("profiles", [["id", `eq.${user.id}`]], { lang }).catch(() => {});
+  }
+
+  const { devLink } = await createVerification(user.id, email, locale, origin);
+  return { userId: user.id, devLink };
+}
 
 /** The latest unconsumed verification row of a user (any expiry — the
  * caller decides whether it has lapsed). Exactly one live token exists
