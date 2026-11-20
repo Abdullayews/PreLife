@@ -1,11 +1,24 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getSessionUser, requireUser } from "@/lib/auth";
-import { supabaseConfigured } from "@/lib/server/supa";
+import { apiGet } from "@/lib/server-api";
 import { getGymAppContent } from "@/lib/api";
 import { ContentUnavailable } from "@/components/ContentUnavailable";
 import { IdmanPage } from "@/components/idman/IdmanPage";
 import { isIdmanTabId } from "@/components/idman/data";
+
+/** { supabaseConfigured } from the Rust backend — cached 60s per process
+ *  (the health endpoint answers it; the backend owns the DB config). */
+let configuredCache: { at: number; v: boolean } | null = null;
+async function backendConfigured(): Promise<boolean> {
+  if (configuredCache && Date.now() - configuredCache.at < 60_000) {
+    return configuredCache.v;
+  }
+  const cfg = await apiGet<{ supabaseConfigured: boolean }>("/internal/config");
+  const v = cfg?.supabaseConfigured === true;
+  configuredCache = { at: Date.now(), v };
+  return v;
+}
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -28,6 +41,7 @@ export default async function GymPage({ params, searchParams }: Props) {
    * (fresh clone / offline demo) it falls back to a demo account so the
    * İdman surface still renders out of the box — in that case the guest
    * top Nav stays on screen, so the rail must keep its nav clearance. */
+  const supabaseConfigured = await backendConfigured();
   const session = await getSessionUser();
   // The demo account carries the v3.4 session-user fields except
   // `location` — guests (supabase unconfigured, no session) see the

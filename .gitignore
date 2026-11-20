@@ -65,8 +65,12 @@ server.log
 /prelife-preview/
 /tests/
 /examples/
-# mini-services: platform scratch services stay local (none shipped).
-/mini-services/
+# mini-services: platform scratch services stay local — EXCEPT the Rust
+# backend (prelife-api), which IS the app's /api/* server and ships with
+# the repo. Its build artifacts (target/) stay ignored.
+/mini-services/*
+!/mini-services/prelife-api/
+/mini-services/prelife-api/target/
 
 # perfection-loop runtime state (cron-driven; never part of the app)
 /.loop-state.json

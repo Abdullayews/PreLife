@@ -1,0 +1,22 @@
+[package]
+name = "prelife-api"
+version = "5.0.0"
+edition = "2021"
+description = "PreLife backend — the full Rust rewrite of the merged Next.js API (auth, psych, content, gym, subscription, AI, the local Supabase emulator)"
+
+[dependencies]
+axum = { version = "0.8", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+sha2 = "0.10"
+base64 = "0.22"
+uuid = { version = "1", features = ["v4"] }
+rand = "0.8"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+percent-encoding = "2"
+url = "2"
+
+[profile.dev]
+opt-level = 1

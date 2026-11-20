@@ -6,15 +6,15 @@
  * the sandbox preview the first visit to each page therefore pays a
  * 0.2–4s Turbopack compile, while the production build on Render serves
  * every route pre-compiled (tens of ms). That gap is exactly why the
- * sandbox felt slower and "not the same" as the live site.
+ * sandbox felt slower than the live site.
  *
- * What this script does, once the dev server answers on :3000 (the
- * merged backend serves /api/* from the same origin now):
- *   1. requests every page route once (public pages fully; protected
- *      ones compile their login-redirect path — enough to kill the lag);
- *   2. requests every API route once: GETs normally, POSTs with an
- *      INVALID empty body (the handlers validate before any side
- *      effect, so this warms the code path without touching data).
+ * What this script does (the backend is the RUST service on :3030 —
+ * dev-backend.mjs starts it before `next dev`):
+ *   1. requests every page route once on :3000 (public pages fully;
+ *      protected ones compile their login-redirect path — enough);
+ *   2. requests every API route once on :3030 (GETs normally, POSTs with
+ *      an INVALID empty body — the Rust handlers validate before any
+ *      side effect, so this warms the code path without touching data).
  *
  * It is hooked into `bun run dev` (see package.json): the dev server
  * starts in the background, this script runs in the foreground, and
@@ -23,6 +23,7 @@
  * script always exits 0.
  */
 const BASE = process.env.WARM_BASE ?? "http://127.0.0.1:3000";
+const API_BASE = process.env.WARM_API_BASE ?? "http://127.0.0.1:3030";
 const DEADLINE_MS = 150_000; // give up quietly after 2.5 minutes
 const startedAt = Date.now();
 
@@ -35,11 +36,11 @@ async function fetchOk(url, init) {
   return res;
 }
 
-/** Poll the root until the dev server answers (any status = ready). */
-async function waitForServer() {
+/** Poll a base until it answers (any status = ready). */
+async function waitForServer(base) {
   for (let i = 0; i < 180; i++) {
     try {
-      await fetchOk(`${BASE}/`, { cache: "no-store" });
+      await fetchOk(`${base}/`, { cache: "no-store" });
       return true;
     } catch {
       await new Promise((r) => setTimeout(r, 500));
@@ -49,9 +50,14 @@ async function waitForServer() {
 }
 
 async function main() {
-  if (!(await waitForServer())) {
+  if (!(await waitForServer(BASE))) {
     out("dev server never answered on :3000 — skipping warmup");
     return;
+  }
+  if (!(await waitForServer(API_BASE))) {
+    out("rust backend never answered on :3030 — API warmup skipped");
+  } else {
+    out("rust backend ready on :3030");
   }
   out("server ready — warming routes (kills the first-visit compile lag)");
 
@@ -102,7 +108,7 @@ async function main() {
   for (const path of gets) {
     if (expired()) { out("deadline hit — stopping early"); return finish(); }
     try {
-      const res = await fetchOk(`${BASE}${path}`, { cache: "no-store" });
+      const res = await fetchOk(`${API_BASE}${path}`, { cache: "no-store" });
       out(`GET ${path} ${res.status}`);
     } catch (err) {
       out(`GET ${path} FAILED ${err?.message ?? err}`);
@@ -111,7 +117,7 @@ async function main() {
   for (const path of badPosts) {
     if (expired()) { out("deadline hit — stopping early"); return finish(); }
     try {
-      const res = await fetchOk(`${BASE}${path}`, {
+      const res = await fetchOk(`${API_BASE}${path}`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: "{}",

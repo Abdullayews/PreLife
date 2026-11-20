@@ -6,6 +6,7 @@ import {
 } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { apiUrl } from "@/lib/api-url";
 
 /**
  * ProfileEditor — the own-data editor for /{locale}/profile.
@@ -36,7 +37,7 @@ type ApiWeights = { logDate: string; weightKg: number }[];
 
 type ApiBody = { profile: ApiProfile; weights: ApiWeights; email: string };
 
-/* ── Option lists — must mirror src/lib/server/profile.ts ────────────── */
+/* ── Option lists — must mirror mini-services/prelife-api/src/profile.rs ────────────── */
 
 const GENDERS = ["male", "female", "other"] as const;
 const GOALS = ["lose", "maintain", "gain", "fitness"] as const;
@@ -178,7 +179,7 @@ export function ProfileEditor({ user }: { user: ProfileEditorUser }) {
     let alive = true;
     (async () => {
       try {
-        const res = await fetch("/api/me/profile", { cache: "no-store" });
+        const res = await fetch(apiUrl("/api/me/profile"), { cache: "no-store" });
         if (!res.ok) return;
         const data = (await res.json()) as ApiBody;
         if (!alive) return;
@@ -217,7 +218,7 @@ export function ProfileEditor({ user }: { user: ProfileEditorUser }) {
 
   const patch = useCallback(async (body: Record<string, unknown>): Promise<ApiBody | null> => {
     try {
-      const res = await fetch("/api/me/profile", {
+      const res = await fetch(apiUrl("/api/me/profile"), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -316,7 +317,7 @@ export function ProfileEditor({ user }: { user: ProfileEditorUser }) {
     if (invalid.length > 0) { setSaveErr(true); return; }
     if (Object.keys(body).length === 0) { setFlash(true); return; } // nothing changed
 
-    // Backend quirk (src/lib/server/profile.ts, off-limits here): the
+    // Backend quirk (mini-services/prelife-api/src/profile.rs, off-limits here): the
     // "nothing_to_update" guard runs BEFORE the weight-log branch, so a
     // weight-ONLY patch would 400. Re-asserting the current
     // planOnboardingDone (same value → no-op write) carries it through.

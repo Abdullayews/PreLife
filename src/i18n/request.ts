@@ -1,14 +1,14 @@
 import { getRequestConfig } from "next-intl/server";
 import { hasLocale } from "next-intl";
 import { routing } from "./routing";
-import { i18nCatalog } from "@/lib/server/content";
+import { apiGet } from "@/lib/server-api";
 
 /**
- * The message catalog is DATABASE-DRIVEN: i18n_messages is read from
- * Supabase Postgres by the merged backend (one row per dotted key,
- * three locale columns, TTL-cached 60s in-process). The static
- * messages/*.json files stay in the repo as a build-time FALLBACK so
- * the site still renders if the database is unreachable.
+ * The message catalog is DATABASE-DRIVEN: i18n_messages is read by the
+ * RUST BACKEND (mini-services/prelife-api, /api/i18n — TTL-cached 60s
+ * in-process there) and merged over the static messages/*.json files,
+ * which stay in the repo as a build-time FALLBACK so the site still
+ * renders if the backend is unreachable.
  */
 
 type Catalog = Record<string, unknown>;
@@ -39,12 +39,12 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   let messages: Catalog = fallback;
   try {
-    const fetched = await i18nCatalog(locale);
+    const fetched = await apiGet<Catalog>(`/api/i18n?locale=${locale}`);
     if (fetched && typeof fetched === "object" && Object.keys(fetched).length > 0) {
       messages = deepMerge(fallback, fetched);
     }
   } catch {
-    // Database unreachable — keep the bundled catalog.
+    // Backend unreachable — keep the bundled catalog.
   }
 
   return { locale, messages };

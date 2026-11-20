@@ -1,0 +1,11 @@
+{
+  "name": "prelife-api",
+  "version": "5.0.0",
+  "private": true,
+  "description": "The PreLife backend in Rust (axum). Port 3030.",
+  "scripts": {
+    "dev": "bun watch.mjs",
+    "build": "cargo build",
+    "start": "cargo run"
+  }
+}
