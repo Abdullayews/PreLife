@@ -42,8 +42,9 @@ function DevLinkBox({ note, open, href }: { note: string; open: string; href: st
 }
 
 /** The banner shown when a visitor arrives back on the LOGIN page
- * from a Google/Apple login that found no account (the callback
- * redirects them here with the e-mail prefilled — v4.4). */
+ * from a Google/Apple login that found no account (the manual
+ * fallback of the v4.6 automatic hand-off — the callback's mail send
+ * failed, so Continue re-runs the registration). */
 function NoticeBox({ text }: { text: string }) {
   return <output className="set-note">{text}</output>;
 }
@@ -69,10 +70,13 @@ function NoticeBox({ text }: { text: string }) {
  *     the provider vouches for the e-mail, the account is created and
  *     the visitor lands in the app. The provider button on /signup is
  *     a registration, never a bounce to the e-mail form.
- *   • A Google/Apple LOGIN with no account lands back HERE with the
- *     e-mail prefilled: the mail registration starts right where the
- *     visitor is (press Continue → confirmation link). The mail
- *     hand-off lives at the login place only.
+ *   • A Google/Apple LOGIN with no account hands off to the mail
+ *     registration AUTOMATICALLY (v4.6): the callback creates the
+ *     pending account and sends the confirmation e-mail itself, then
+ *     lands the visitor here straight on the "check your inbox" card
+ *     (notice="mail_sent") — no Continue press, nothing to type. The
+ *     notice="oauth_new" banner is only the rare fallback for when
+ *     that automatic send failed.
  *   • A Google/Apple login onto an UNCONFIRMED e-mail account also
  *     lands here (v4.5): the first sign-in is the mail link, always —
  *     the notice tells the visitor to confirm the account first.
@@ -83,12 +87,14 @@ export function AuthForm({
   oauthError,
   prefillEmail,
   notice,
+  mailDevLink,
 }: {
   mode: "login" | "signup";
   next?: string;
   oauthError?: boolean;
   prefillEmail?: string;
-  notice?: "oauth_new" | "unconfirmed" | null;
+  notice?: "oauth_new" | "unconfirmed" | "mail_sent" | null;
+  mailDevLink?: string | null;
 }) {
   const t = useTranslations("authPage");
   const locale = useLocale();
@@ -119,7 +125,14 @@ export function AuthForm({
   }, [mode, prefillEmail]);
 
   // Signup success: the "check your inbox" state replaces the form.
-  const [signedUp, setSignedUp] = useState<{ email: string; devLink: string | null } | null>(null);
+  // v4.6: it also STARTS there — notice="mail_sent" means the OAuth
+  // callback already sent the confirmation mail (the Google/Apple
+  // hand-off), so the form never shows at all.
+  const [signedUp, setSignedUp] = useState<{ email: string; devLink: string | null } | null>(
+    () => (notice === "mail_sent" && prefillEmail
+      ? { email: prefillEmail, devLink: mailDevLink ?? null }
+      : null),
+  );
   // Login on an unconfirmed account: the resend flow below the error.
   const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
   const [resendBusy, setResendBusy] = useState(false);
