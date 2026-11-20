@@ -22,6 +22,7 @@ import {
   minPriceOf,
   type GymAppContent, type GymAppExercise, type GymAppPlace, type GymAppProduct,
 } from "@/lib/gym";
+import { apiUrl } from "@/lib/api-url";
 
 /**
  * İdman v4 — the gym surface, fully DB-wired.
@@ -192,7 +193,7 @@ function PlanPanel({ catalog }: { catalog: GymAppContent }) {
   const load = useCallback(async () => {
     setStatus("loading");
     try {
-      const res = await fetch(`/api/gym/plan?locale=${encodeURIComponent(catalog.locale)}`, {
+      const res = await fetch(apiUrl(`/api/gym/plan?locale=${encodeURIComponent(catalog.locale)}`), {
         cache: "no-store",
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -211,7 +212,7 @@ function PlanPanel({ catalog }: { catalog: GymAppContent }) {
   const build = useCallback(async (answers: QuizAnswers) => {
     setBusy(true);
     try {
-      const res = await fetch("/api/gym/plan", {
+      const res = await fetch(apiUrl("/api/gym/plan"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ locale: catalog.locale, answers }),
@@ -237,7 +238,7 @@ function PlanPanel({ catalog }: { catalog: GymAppContent }) {
   const reset = useCallback(async () => {
     setBusy(true);
     try {
-      const res = await fetch("/api/gym/plan", { method: "DELETE" });
+      const res = await fetch(apiUrl("/api/gym/plan"), { method: "DELETE" });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       await load();
     } catch {

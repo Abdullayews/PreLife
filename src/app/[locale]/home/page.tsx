@@ -6,10 +6,22 @@ import { sections, sectionById, type SectionId } from "@/lib/shell";
 import { requireUser } from "@/lib/auth";
 import { bakuParts } from "@/lib/psychology";
 import { GYM_TABS, isShopTab } from "@/lib/gym";
-import { getActivePlan } from "@/lib/server/user-plans";
-import { getProfileView } from "@/lib/server/profile";
-import { listCustomPackages } from "@/lib/server/packages";
+import { apiGet } from "@/lib/server-api";
 import { AppPageShell } from "@/components/AppPageShell";
+
+/* The /home page's three data reads, answered in ONE call by the Rust
+ * backend (/internal/home — plan + profile + packages, cookie-scoped). */
+type HomeData = {
+  plan: {
+    title: string;
+    source: "default" | "ai";
+    week: number;
+    total: number;
+    days: unknown[];
+  } | null;
+  profile: { weightKg: number | null; planOnboardingDone: boolean };
+  packages: { status: string }[];
+};
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -36,11 +48,10 @@ export default async function HomePage({ params }: Props) {
   const tg = await getTranslations({ locale, namespace: "gymApp" });
 
   // Real account data (the AI tools and the plan tab read the same rows).
-  const [plan, profile, packages] = await Promise.all([
-    getActivePlan(user.id),
-    getProfileView(user.id),
-    listCustomPackages(user.id),
-  ]);
+  const data = await apiGet<HomeData>("/internal/home");
+  const plan = data?.plan ?? null;
+  const profile = data?.profile ?? { weightKg: null, planOnboardingDone: false };
+  const packages = data?.packages ?? [];
   const hasActivePackage = packages.some((p) => p.status === "active");
 
   // Baku wall-clock drives the greeting; the date line renders in-locale.

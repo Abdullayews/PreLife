@@ -25,7 +25,7 @@ export type SubTier = {
 };
 
 /** One saved custom-package request — the shape GET/POST
- *  /api/subscription/custom speaks (see src/lib/server/packages.ts). */
+ *  /api/subscription/custom speaks (see mini-services/prelife-api/src/packages.rs). */
 export type CustomPackage = {
   id: string;
   features: string[];
@@ -40,7 +40,7 @@ export type CustomPackage = {
 const MONTHS_OPTIONS = [1, 3, 6, 12] as const;
 
 /** Duration multipliers, mirroring monthsDiscount() in
- *  src/lib/server/packages.ts (1 → 1, 3 → .95, 6 → .90, 12 → .85).
+ *  mini-services/prelife-api/src/packages.rs (1 → 1, 3 → .95, 6 → .90, 12 → .85).
  *  Display only — the POST endpoint recomputes the price
  *  authoritatively, never trusting this table. */
 const MONTHS_MULTIPLIER: Record<number, number> = { 1: 1, 3: 0.95, 6: 0.9, 12: 0.85 };

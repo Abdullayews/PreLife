@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { getMessages } from "next-intl/server";
 import type { WorldsResponse } from "./worlds";
 import type { GymContent, GymAppContent, GymAppPlan, GymAppPlace, GymAppProduct, GymAppStore, MessageTree } from "./gym";
@@ -6,36 +5,21 @@ import { fillMsg, msgPath, repsLabelKey, type Reps } from "./gym";
 import type { DietContent } from "./nutrition";
 import type { LibraryContent } from "./library";
 import type { MeditationContent } from "./psychology";
-import {
-  dietCatalog,
-  gymCatalog,
-  libraryCatalog,
-  meditationCatalog,
-  subscriptionCatalog,
-  worldsCatalog,
-} from "./server/content";
-import {
-  bookingsList,
-  journalList,
-  moodList,
-  overview,
-  scheduleWindow,
-} from "./server/psych-data";
-import { currentSessionFromHeaders } from "./server/session";
+import { apiGet } from "./server-api";
 
 /**
- * Server-side data layer — the merged backend. Every getter runs the
- * same assembly code the /api routes use (src/lib/server/*), reading
- * Supabase Postgres directly: no HTTP hop, no separate service.
- * Content getters are served from the 60s in-process TTL cache; user
- * data getters resolve the cookie session per request and are never
- * cached.
+ * Server-side data layer — the view half of the merged app. Every getter
+ * asks the RUST BACKEND (mini-services/prelife-api) over a direct local
+ * call (lib/server-api.ts): the backend owns the sessions, the 60s
+ * content TTL cache and every write, so there is exactly one source of
+ * truth. Content getters are answered from the backend's cache; user
+ * data getters forward the cookie and are never cached here.
  */
 
-/* ── Content (public, TTL-cached 60s) ───────────────────────────────────── */
+/* ── Content (public, TTL-cached 60s in the backend) ───────────────────── */
 
-export const getWorlds = () => worldsCatalog() as Promise<WorldsResponse | null>;
-export const getGymContent = () => gymCatalog() as Promise<GymContent | null>;
+export const getWorlds = () => apiGet<WorldsResponse>("/api/content/worlds");
+export const getGymContent = () => apiGet<GymContent>("/api/content/gym");
 
 /* ── Account location scope (v3.4) ── */
 
@@ -43,11 +27,8 @@ export type ContentLocation = "global" | "az";
 
 /**
  * Filter content rows by the signed-in user's location choice. "az" keeps
- * only rows tagged country='AZ'; rows without a country tag count as AZ
- * (every seeded row is AZ, and the catalog builders do not all carry the
- * tag through yet). "global", undefined and null return the list
- * unchanged. Pure per-call post-processing — the shared 60s TTL catalogs
- * are never filtered inside the cache.
+ * only rows tagged country='AZ'; rows without a country tag count as AZ.
+ * "global", undefined and null return the list unchanged.
  */
 export function filterByLocation<T extends { country?: string | null }>(
   rows: T[],
@@ -72,12 +53,9 @@ function repsLabel(app: MessageTree, r: Reps): string {
 }
 
 /**
- * Resolve the raw gym catalog (key-carrying, TTL-cached, locale-free) into
- * the plain-text shape IdmanApp renders: every name_key/desc_key/guide_key
- * becomes a final translated string in the requested locale, stores are
- * joined into product offers, and the workout-day prescriptions render
- * through the gymApp.rep* templates. Returns null when the content backend
- * is unreachable (pages degrade to ContentUnavailable).
+ * Resolve the raw gym catalog (key-carrying, backend-cached, locale-free)
+ * into the plain-text shape IdmanApp renders. Returns null when the
+ * backend is unreachable (pages degrade to ContentUnavailable).
  */
 export async function getGymAppContent(
   locale: string,
@@ -136,9 +114,7 @@ export async function getGymAppContent(
     };
   }), location);
 
-  /* Stores — kind labels resolved for the offer rows, filtered by the
-   * account location BEFORE the offers join so products never point at
-   * a store the user's location choice excludes. */
+  /* Stores — filtered by the account location BEFORE the offers join. */
   const stores: GymAppStore[] = filterByLocation(Object.values(cat.stores).map((s) => ({
     slug: s.slug,
     name: s.name,
@@ -176,8 +152,7 @@ export async function getGymAppContent(
     }
   }
 
-  /* Plan catalog — world plans with localized copy, meta tags, progress and
-   * the day-by-day workout details (reps rendered through rep* templates). */
+  /* Plan catalog — localized copy, meta tags, progress, day-by-day. */
   const plans: GymAppPlan[] = cat.plans.map((plan): GymAppPlan => {
     const levelKey = plan.level
       ? `level${plan.level.charAt(0).toUpperCase()}${plan.level.slice(1)}`
@@ -210,22 +185,22 @@ export async function getGymAppContent(
   return { locale, halls, stores, products, exercises, plans };
 }
 
-/** Diet content, with `places` filtered by the account location choice
- *  ("az" keeps only Azerbaijan venues). */
+/* ── Other content catalogs (backend-cached) ───────────────────────────── */
+
+/** Diet content, with `places` filtered by the account location choice. */
 export async function getDietContent(
   location?: ContentLocation | null,
 ): Promise<DietContent | null> {
-  const content = (await dietCatalog()) as DietContent | null;
+  const content = await apiGet<DietContent>("/api/content/diet");
   if (!content || location !== "az") return content;
   return { ...content, places: filterByLocation(content.places, location) };
 }
 
-/** Meditation content, with `psychologists` filtered by the account
- *  location choice ("az" keeps only Azerbaijan psychologists). */
+/** Meditation content, with `psychologists` filtered by location. */
 export async function getMeditationContent(
   location?: ContentLocation | null,
 ): Promise<MeditationContent | null> {
-  const content = (await meditationCatalog()) as MeditationContent | null;
+  const content = await apiGet<MeditationContent>("/api/content/meditation");
   if (!content || location !== "az") return content;
   return {
     ...content,
@@ -233,12 +208,11 @@ export async function getMeditationContent(
   };
 }
 
-/** Library content, with `places` (venues) filtered by the account
- *  location choice ("az" keeps only Azerbaijan venues). */
+/** Library content, with `places` (venues) filtered by location. */
 export async function getLibraryContent(
   location?: ContentLocation | null,
 ): Promise<LibraryContent | null> {
-  const content = (await libraryCatalog()) as LibraryContent | null;
+  const content = await apiGet<LibraryContent>("/api/content/library");
   if (!content || location !== "az") return content;
   return { ...content, places: filterByLocation(content.places, location) };
 }
@@ -250,9 +224,9 @@ export type SubscriptionContent = {
   tiers: SubscriptionTierRow[];
 };
 export const getSubscriptionContent = () =>
-  subscriptionCatalog() as Promise<SubscriptionContent | null>;
+  apiGet<SubscriptionContent>("/api/content/subscription");
 
-/* ── User data (cookie session, never cached) ───────────────────────────── */
+/* ── User data (cookie-forwarded, never cached) ────────────────────────── */
 
 export type JournalEntryRow = {
   id: string; promptKey: string | null; content: string;
@@ -281,21 +255,8 @@ export type OverviewData = {
   doneSessions: number;
 };
 
-/** Resolve the cookie session, run the query, and flatten any failure to
- * null — pages render their signed-out / empty states gracefully. */
-async function withUser<T>(fn: (user: { id: string; email: string; name: string | null }) => Promise<T>): Promise<T | null> {
-  try {
-    const h = await headers();
-    const cs = await currentSessionFromHeaders(h);
-    if (!cs) return null;
-    return await fn(cs.user);
-  } catch {
-    return null;
-  }
-}
-
-export const getJournalData = () => withUser(journalList) as Promise<JournalData | null>;
-export const getMoodData = () => withUser(moodList) as Promise<MoodData | null>;
-export const getBookings = () => withUser(bookingsList) as Promise<BookingsData | null>;
-export const getScheduleWindow = () => withUser(scheduleWindow) as Promise<ScheduleWindowData | null>;
-export const getOverview = () => withUser(overview) as Promise<OverviewData | null>;
+export const getJournalData = () => apiGet<JournalData>("/api/psych/journal");
+export const getMoodData = () => apiGet<MoodData>("/api/psych/mood");
+export const getBookings = () => apiGet<BookingsData>("/api/psych/bookings");
+export const getScheduleWindow = () => apiGet<ScheduleWindowData>("/api/psych/schedule-window");
+export const getOverview = () => apiGet<OverviewData>("/api/psych/overview");
