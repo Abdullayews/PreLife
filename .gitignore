@@ -72,6 +72,9 @@ server.log
 !/mini-services/prelife-api/
 /mini-services/prelife-api/target/
 
+# AI-agent working notes (sandbox runtime; never part of the app)
+/agent-ctx/
+
 # perfection-loop runtime state (cron-driven; never part of the app)
 /.loop-state.json
 /.loop-token
