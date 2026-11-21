@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: t("termsTitle") };
 }
 
-/** Terms of service — the real text arrives later; placeholder for now. */
+/** Terms of service — the v5.2 copy lives in messages/*.json (termsPage.placeholder). */
 export default async function TermsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);

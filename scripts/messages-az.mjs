@@ -525,7 +525,8 @@ export const az = {
         generic: "Bir xəta baş verdi. Yenidən cəhd edin.",
         oauth: "Google/Apple ilə giriş alınmadı — bir azdan yenidən cəhd edin və ya e-poçtla davam edin.",
         email_unverified: "E-poçt təsdiqlənməyib. Gələnlər qutusunu yoxlayın və ya linki yenidən göndərin.",
-        too_many_requests: "Çox çox cəhd — bir azdan yenidən sınayın."
+        too_many_requests: "Çox çox cəhd — bir azdan yenidən sınayın.",
+        supabase_unconfigured: "Server hazırda verilənlər bazasına qoşulmayıb — bir azdan yenidən cəhd edin."
       },
       signupOkTitle: "E-poçtunuzu yoxlayın",
       signupOkText: "{email} ünvanına təsdiq linki göndərdik — link ilk girişinizdir: açdıqda hesabınız aktivləşir və avtomatik daxil olursunuz.",
@@ -556,11 +557,11 @@ export const az = {
     underConstruction: {},
     termsPage: {
       title: "Şərtlər",
-      placeholder: "hello, write this"
+      placeholder: "PreLife şəxsi, kommersiya olmayan istifadə üçün təqdim olunur. Hesabınız sizindir: şifrənizi qoruyun və platformadan dürüst istifadə edin — hesab paylaşmaq, məlumat çıxarmaq və icazəsiz avtomatik giriş qadağandır. Bronlar və ödənişlər ödəniş zamanı göstərilən qaydada aparılır; ləğv olunan sorğular ödənişdən əvvəl göstərilən psixoloq siyasətinə uyğun geri qaytarılır. Platforma böyüdükcə bu şərtlər yenilənə bilər — cari versiya hər zaman bu səhifədədir. Suallarınız üçün: support@prelife.app."
     },
     rulesPage: {
       title: "Qaydalar",
-      placeholder: "hello, write this"
+      placeholder: "Nəzakətli olun. PreLife sağlamlıq kommunasıdır: təhqir, peşəkar olmayanlardan tibbi məsləhət, söhbətlərdə və bron mesajlarında spam və reklam yolverilməzdir. Psixoloqlara elə yazın ki, özünüzə belə yazılmasını istərdiniz; başqalarının şəxsi məlumatlarını gizli saxlayın. Materiallar şəxsi yolçuluğunuz üçündür — ödənişli materialları yenidən yaymayın. Bu qaydaların pozulması bronları və hesabları dayandıra bilər."
     },
     settingsPage: {
       eyebrow: "Hesab",

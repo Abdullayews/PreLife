@@ -34,7 +34,7 @@ Browser ──▶ Next.js 16 (App Router, port 3000)          the FRONTEND
   components, `src/lib/api-url.ts` for the browser); the message catalogs
   are database-driven too (`src/i18n/request.ts` loads the backend's
   `/api/i18n`, with the bundled `messages/*.json` as fallback).
-- **Database** (Supabase): `i18n_messages` (1859 keys × az/en/ru), the
+- **Database** (Supabase): `i18n_messages` (1646 keys × az/en/ru), the
   four content worlds, gym, diet, psychology (8 psychologists, media,
   quizzes), library, subscriptions (Plus/Pro/Ultra + à-la-carte
   features), and user data (profiles, sessions, appointments, mood logs,

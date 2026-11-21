@@ -63,10 +63,10 @@ export function ConnectionNotice() {
 
   if (back) {
     return (
-      <div className="conn-toast" role="status" data-kind="back">
+      <output className="conn-toast" data-kind="back">
         <Wifi size={17} aria-hidden />
         <p>{t("back")}</p>
-      </div>
+      </output>
     );
   }
 

@@ -258,14 +258,14 @@ function PlanPanel({ catalog }: { catalog: GymAppContent }) {
 
   if (status === "error") {
     return (
-      <div className="iplan" role="status">
+      <output className="iplan">
         <p className="iplan-rest">{t("plan.planUnavailable")}</p>
         <div>
           <button type="button" className="ibtn ibtn-sm" onClick={() => { void load(); }}>
             {t("plan.retry")}
           </button>
         </div>
-      </div>
+      </output>
     );
   }
 
@@ -376,15 +376,12 @@ function PlanView({
             <span className="itag">{t("plan.weekLabel", { week: plan.week, total: plan.total })}</span>
             <span className="itag">{t("plan.daysPerWeek", { count: plan.days.length })}</span>
           </div>
-          <div
+          <progress
             className="iplan-bar"
-            role="progressbar"
-            aria-valuenow={weekPct}
-            aria-valuemin={0} aria-valuemax={100}
+            value={weekPct}
+            max={100}
             aria-label={t("plan.progressA11y", { percent: weekPct })}
-          >
-            <i style={{ width: `${weekPct}%` }} />
-          </div>
+          />
           <div style={{ display: "flex", flexWrap: "wrap", gap: ".5rem", marginTop: ".2rem" }}>
             <button type="button" className="ibtn ibtn-sm" onClick={onBuild} disabled={busy}>
               <Wand2 size={15} aria-hidden />{t("plan.buildCta")}
@@ -643,16 +640,12 @@ function PlanQuiz({
           <p className="iplan-hero-desc">{t("quiz.desc")}</p>
 
           {/* the step progress bar — linear width, advancing with steps */}
-          <div
+          <progress
             className="iquiz-bar"
-            role="progressbar"
-            aria-valuemin={0}
-            aria-valuemax={QUIZ_STEPS.length}
-            aria-valuenow={step + 1}
+            value={step + 1}
+            max={QUIZ_STEPS.length}
             aria-label={t("quiz.stepOf", { step: step + 1, total: QUIZ_STEPS.length })}
-          >
-            <i style={{ width: `${((step + 1) / QUIZ_STEPS.length) * 100}%` }} />
-          </div>
+          />
 
           <div key={step} className={dir === 1 ? "iquiz-step iquiz-step-fwd" : "iquiz-step iquiz-step-back"}>
             <div className="iplan-hero-meta" style={{ marginTop: ".2rem" }}>
@@ -860,10 +853,10 @@ function ShopPanel({ tab, catalog }: { tab: ShopTab; catalog: GymAppContent }) {
             </button>
           )}
         </div>
-        <div className="iseg" role="group" aria-label={t("sortLabel")}>
+        <fieldset className="iseg" aria-label={t("sortLabel")}>
           <button type="button" aria-pressed={sort === "popular"} onClick={() => setSort("popular")}>{t("sortPopular")}</button>
           <button type="button" aria-pressed={sort === "cheap"} onClick={() => setSort("cheap")}>{t("sortCheap")}</button>
-        </div>
+        </fieldset>
       </div>
 
       <ul className="ishop-chips" aria-label={t("filterLabel")}>
@@ -996,10 +989,10 @@ function HallsPanel({ catalog }: { catalog: GymAppContent }) {
             </button>
           )}
         </div>
-        <div className="iseg" role="group" aria-label={t("sortLabel")}>
+        <fieldset className="iseg" aria-label={t("sortLabel")}>
           <button type="button" aria-pressed={sort === "rating"} onClick={() => setSort("rating")}>{t("gyms.sortRating")}</button>
           <button type="button" aria-pressed={sort === "price"} onClick={() => setSort("price")}>{t("gyms.sortPrice")}</button>
-        </div>
+        </fieldset>
       </div>
 
       <ul className="ishop-chips" aria-label={t("gyms.filterLabel")}>

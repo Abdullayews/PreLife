@@ -523,7 +523,8 @@
       "generic": "Bir x\u0259ta ba\u015f verdi. Yenid\u0259n c\u0259hd edin.",
       "oauth": "Google/Apple il\u0259 giri\u015f al\u0131nmad\u0131 \u2014 bir azdan yenid\u0259n c\u0259hd edin v\u0259 ya e-po\u00e7tla davam edin.",
       "email_unverified": "E-po\u00e7t t\u0259sdiql\u0259nm\u0259yib. G\u0259l\u0259nl\u0259r qutusunu yoxlay\u0131n v\u0259 ya linki yenid\u0259n g\u00f6nd\u0259rin.",
-      "too_many_requests": "\u00c7ox \u00e7ox c\u0259hd \u2014 bir azdan yenid\u0259n s\u0131nay\u0131n."
+      "too_many_requests": "\u00c7ox \u00e7ox c\u0259hd \u2014 bir azdan yenid\u0259n s\u0131nay\u0131n.",
+      "supabase_unconfigured": "Server haz\u0131rda veril\u0259nl\u0259r bazas\u0131na qo\u015fulmay\u0131b \u2014 bir azdan yenid\u0259n c\u0259hd edin."
     },
     "signupOkTitle": "E-po\u00e7tunuzu yoxlay\u0131n",
     "signupOkText": "{email} \u00fcnvan\u0131na t\u0259sdiq linki g\u00f6nd\u0259rdik \u2014 link ilk giri\u015finizdir: a\u00e7d\u0131qda hesab\u0131n\u0131z aktivl\u0259\u015fir v\u0259 avtomatik daxil olursunuz.",
@@ -554,11 +555,11 @@
   "underConstruction": {},
   "termsPage": {
     "title": "\u015e\u0259rtl\u0259r",
-    "placeholder": "hello, write this"
+    "placeholder": "PreLife \u015f\u0259xsi, kommersiya olmayan istifad\u0259 \u00fc\u00e7\u00fcn t\u0259qdim olunur. Hesab\u0131n\u0131z sizindir: \u015fifr\u0259nizi qoruyun v\u0259 platformadan d\u00fcr\u00fcst istifad\u0259 edin \u2014 hesab payla\u015fmaq, m\u0259lumat \u00e7\u0131xarmaq v\u0259 icaz\u0259siz avtomatik giri\u015f qada\u011fand\u0131r. Bronlar v\u0259 \u00f6d\u0259ni\u015fl\u0259r \u00f6d\u0259ni\u015f zaman\u0131 g\u00f6st\u0259ril\u0259n qaydada apar\u0131l\u0131r; l\u0259\u011fv olunan sor\u011fular \u00f6d\u0259ni\u015fd\u0259n \u0259vv\u0259l g\u00f6st\u0259ril\u0259n psixoloq siyas\u0259tin\u0259 uy\u011fun geri qaytar\u0131l\u0131r. Platforma b\u00f6y\u00fcd\u00fckc\u0259 bu \u015f\u0259rtl\u0259r yenil\u0259n\u0259 bil\u0259r \u2014 cari versiya h\u0259r zaman bu s\u0259hif\u0259d\u0259dir. Suallar\u0131n\u0131z \u00fc\u00e7\u00fcn: support@prelife.app."
   },
   "rulesPage": {
     "title": "Qaydalar",
-    "placeholder": "hello, write this"
+    "placeholder": "N\u0259zak\u0259tli olun. PreLife sa\u011flaml\u0131q kommunas\u0131d\u0131r: t\u0259hqir, pe\u015f\u0259kar olmayanlardan tibbi m\u0259sl\u0259h\u0259t, s\u00f6hb\u0259tl\u0259rd\u0259 v\u0259 bron mesajlar\u0131nda spam v\u0259 reklam yolverilm\u0259zdir. Psixoloqlara el\u0259 yaz\u0131n ki, \u00f6z\u00fcn\u00fcz\u0259 bel\u0259 yaz\u0131lmas\u0131n\u0131 ist\u0259rdiniz; ba\u015fqalar\u0131n\u0131n \u015f\u0259xsi m\u0259lumatlar\u0131n\u0131 gizli saxlay\u0131n. Materiallar \u015f\u0259xsi yol\u00e7ulu\u011funuz \u00fc\u00e7\u00fcnd\u00fcr \u2014 \u00f6d\u0259ni\u015fli materiallar\u0131 yenid\u0259n yaymay\u0131n. Bu qaydalar\u0131n pozulmas\u0131 bronlar\u0131 v\u0259 hesablar\u0131 dayand\u0131ra bil\u0259r."
   },
   "settingsPage": {
     "eyebrow": "Hesab",

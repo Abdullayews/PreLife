@@ -173,7 +173,7 @@ export function SubscriptionBuilder({
       {/* ── Template tiers ── mode switcher: plain aria-pressed chips —
           a tablist without tabpanels/arrow-key handling would be a11y-worse
           than an honest toggle group (same pattern as QuizCard). */}
-      <div className="subcfg-modes" role="group" aria-label={t("title")}>
+      <fieldset className="subcfg-modes" aria-label={t("title")}>
         <button
           type="button"
           aria-pressed={mode === "tier"}
@@ -190,7 +190,7 @@ export function SubscriptionBuilder({
         >
           <Sparkles size={14} aria-hidden />{ui.customTag}
         </button>
-      </div>
+      </fieldset>
 
       {mode === "tier" ? (
         <ul className="subtiers">
@@ -242,7 +242,7 @@ export function SubscriptionBuilder({
 
           <div className="subcustom-dur">
             <span className="subcustom-lbl">{ui.months}</span>
-            <div className="seg" role="group" aria-label={ui.months}>
+            <fieldset className="seg" aria-label={ui.months}>
               {MONTHS_OPTIONS.map((m) => (
                 <button
                   key={m}
@@ -253,7 +253,7 @@ export function SubscriptionBuilder({
                   {m} {ui.monthsUnit}
                 </button>
               ))}
-            </div>
+            </fieldset>
           </div>
           {discountPct > 0 && (
             <p className="subcustom-hint subcustom-disc">

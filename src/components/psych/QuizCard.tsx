@@ -84,14 +84,14 @@ export function QuizCard({ labels, zones }: { labels: QuizLabels; zones: { low: 
           {quiz.questions.map((q, qi) => (
             <div className="quiz-q" key={qi}>
               <p>{`${qi + 1}. ${q.q}`}</p>
-              <div className="quiz-opts" role="group" aria-label={q.q}>
+              <fieldset className="quiz-opts" aria-label={q.q}>
                 {q.opts.map((opt, oi) => (
                   <button key={oi} type="button" aria-pressed={answers[qi] === oi} onClick={() => answer(qi, oi)}>
                     <i aria-hidden />
                     {opt}
                   </button>
                 ))}
-              </div>
+              </fieldset>
             </div>
           ))}
           <div className="psy-actions">
@@ -109,13 +109,13 @@ export function QuizCard({ labels, zones }: { labels: QuizLabels; zones: { low: 
       )}
 
       {quiz && result && (
-        <div className="quiz-score" role="status">
+        <output className="quiz-score">
           <b>{result.score} / {result.maxScore}</b>
           <p>{zone}</p>
           <button type="button" className="btn btn-sm btn-ghost" onClick={() => setResult(null)}>
             {t("quizAgain")}
           </button>
-        </div>
+        </output>
       )}
 
       <p className="chat-disclaim">{t("quizDisclaimer")}</p>

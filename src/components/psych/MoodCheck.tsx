@@ -57,13 +57,13 @@ export function MoodCheck({ initial, moodTags, compact = false }: { initial: Moo
   const row = (label: string, value: number, set: (n: number) => void) => (
     <div className="mood-row">
       <label>{label}</label>
-      <div className="mood-dots" role="group" aria-label={label}>
+      <fieldset className="mood-dots" aria-label={label}>
         {[1, 2, 3, 4, 5].map((n) => (
           <button key={n} type="button" aria-pressed={value === n} onClick={() => { set(n); setSaved(false); }}>
             {n}
           </button>
         ))}
-      </div>
+      </fieldset>
     </div>
   );
 

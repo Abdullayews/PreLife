@@ -519,8 +519,11 @@ export function AppShell({
         </button>
       )}
 
-      {/* ── The page content — keeps its own .wrap centering ── */}
-      <div className="app-main">{children}</div>
+      {/* ── The page content — keeps its own .wrap centering ──
+       * v5.2 (loop iter 3): while the mobile rail drawer is open, the page
+       * behind the scrim goes inert (same pattern as AiChatFab) so focus
+       * can't escape into covered content. */}
+      <div className="app-main" inert={mobile && expanded}>{children}</div>
     </div>
   );
 }

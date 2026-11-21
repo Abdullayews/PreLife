@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, type CSSProperties } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { apiUrl } from "@/lib/api-url";
@@ -25,19 +25,6 @@ function useBakuToday() {
   const [today] = useState(() => bakuParts(new Date()).date);
   return today;
 }
-
-/** The control look shared with the filter bar's .timepick inputs (no bare
- * input/select class exists outside .timepick, so the tokens are inlined). */
-const CONTROL: CSSProperties = {
-  height: "2.25rem",
-  paddingInline: ".6rem",
-  border: "1px solid var(--line-strong)",
-  borderRadius: "12px",
-  background: "var(--surface)",
-  font: "inherit",
-  fontSize: ".875rem",
-  color: "var(--ink)",
-};
 
 /** The psychologist's two-week booking grid, styled on the diet world's
  *  .sched table: dashed sage cells are free (click → request form), tinted
@@ -167,7 +154,7 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
   return (
     <div className="psy-sched">
       <div className="sched-clip">
-        <div className="sched-wrap" tabIndex={0} role="region" aria-label={t("scheduleA11y")}>
+        <section className="sched-wrap" tabIndex={0} aria-label={t("scheduleA11y")}>
           <table className="sched">
             <thead>
               <tr>
@@ -191,7 +178,7 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
               ))}
             </tbody>
           </table>
-        </div>
+        </section>
       </div>
 
       <p className="avail-note">{t("scheduleLegend")}</p>
@@ -208,13 +195,13 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
             <span className="fit-tag">
               {label(picked.date).day} {picked.date.slice(8, 10)} · {hh(picked.hour)}
             </span>
-            <div className="seg" role="group" aria-label={t("filterFormat")}>
+            <fieldset className="seg" aria-label={t("filterFormat")}>
               {(["online", "office"] as const).map((m) => (
                 <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}>
                   {t(`format_${m}`)}
                 </button>
               ))}
-            </div>
+            </fieldset>
             <span className="lbl">{price} AZN</span>
             <button
               type="button"
@@ -265,7 +252,7 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
             max={maxDate}
             value={cDate}
             onChange={(e) => { setCDate(e.target.value); setCError(""); }}
-            style={CONTROL}
+            className="sched-ctl"
           />
           <label className="lbl" htmlFor={`custom-hour-${slug}`} style={{ marginLeft: ".5rem" }}>
             {t("customHour")}
@@ -274,19 +261,19 @@ export function ScheduleBook({ slug, price, columns, dayNames, monthNames }: Pro
             id={`custom-hour-${slug}`}
             value={cHour}
             onChange={(e) => setCHour(e.target.value)}
-            style={CONTROL}
+            className="sched-ctl"
           >
             {Array.from({ length: 18 }, (_, i) => i + 6).map((h) => (
               <option key={h} value={String(h)}>{hh(h)}</option>
             ))}
           </select>
-          <div className="seg" role="group" aria-label={t("filterFormat")}>
+          <fieldset className="seg" aria-label={t("filterFormat")}>
             {(["online", "office"] as const).map((m) => (
               <button key={m} type="button" aria-pressed={cMode === m} onClick={() => setCMode(m)}>
                 {t(`format_${m}`)}
               </button>
             ))}
-          </div>
+          </fieldset>
           <span className="lbl">{price} AZN</span>
         </div>
         <textarea

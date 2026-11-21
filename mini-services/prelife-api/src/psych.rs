@@ -322,6 +322,13 @@ pub async fn book(st: &St, user: &Value, body: &Value) -> Res<Value> {
     }
 
     if !custom {
+        // v5.2 (loop iter 3): the same 60-day window as the custom path —
+        // direct API calls could previously book slots years ahead (the
+        // grid only shows two weeks, the API never bounded the date).
+        let today = baku_parts(now_ms()).date;
+        if date > plus_days(&today, 60) {
+            return Err(DomainError::Api(ApiError::bad_request()));
+        }
         let Some(weekday) = weekday_of(&date) else { return Err(DomainError::Api(ApiError::bad_request())) };
         let avail = sel(st, "psychologist_availability", &[("select", "day,from_hour,to_hour"), ("psychologist_slug", &format!("eq.{slug}"))]).await?;
         let in_block = avail.iter().any(|b| {
@@ -525,6 +532,51 @@ async fn client_of(st: &St, user_id: &str) -> (Option<String>, Option<String>) {
     (name, email)
 }
 
+/// v5.2 (loop iter 3): batched clients for a console page — ONE profiles
+/// select (id=in.(…)) plus CONCURRENT admin_get_user calls. The old
+/// per-row loop cost two sequential upstream round-trips per appointment
+/// (~80 for a full pending+confirmed+upcoming page).
+async fn clients_of(st: &St, user_ids: &[String]) -> std::collections::HashMap<String, (Option<String>, Option<String>)> {
+    use std::collections::{HashMap, HashSet};
+    let mut map: HashMap<String, (Option<String>, Option<String>)> = HashMap::new();
+    let mut seen = HashSet::new();
+    let unique: Vec<&String> = user_ids.iter().filter(|id| !id.is_empty() && seen.insert((*id).clone())).collect();
+    if unique.is_empty() {
+        return map;
+    }
+    // Names — one PostgREST select with id=in.(…).
+    let in_list = unique.iter().map(|id| id.as_str()).collect::<Vec<_>>().join(",");
+    if let Ok(rows) = st
+        .supa
+        .select("profiles", &[("select", "id,full_name"), ("id", &format!("in.({in_list})"))])
+        .await
+    {
+        for r in rows {
+            let rv = v(&r);
+            let id = s(&rv, "id");
+            if id.is_empty() {
+                continue;
+            }
+            map.insert(id, (s_opt(&rv, "full_name"), None));
+        }
+    }
+    // E-mails — concurrent per-id admin lookups (GoTrue has no batch get).
+    let fetches = unique.iter().map(|id| {
+        let fut = st.supa.admin_get_user(id);
+        async move {
+            let email = fut
+                .await
+                .ok()
+                .and_then(|au| au.get("email").and_then(|e| e.as_str()).map(String::from));
+            ((*id).clone(), email)
+        }
+    });
+    for (id, email) in futures::future::join_all(fetches).await {
+        map.entry(id).or_insert((None, None)).1 = email;
+    }
+    map
+}
+
 pub async fn console_list(st: &St, user: &Value) -> Res<Value> {
     let slug = require_psych_console(user)?;
 
@@ -544,12 +596,30 @@ pub async fn console_list(st: &St, user: &Value) -> Res<Value> {
         })
     };
 
+    // v5.2 (loop iter 3): resolve every client once, in two batched
+    // upstream passes, instead of a per-row e-mail+name lookup.
+    let ids: Vec<String> = pending
+        .iter()
+        .chain(&confirmed)
+        .chain(&upcoming)
+        .map(|r| s(&v(r), "user_id"))
+        .collect();
+    let clients = clients_of(st, &ids).await;
+    // The view closure runs once per list — capture the map (and the
+    // is_custom closure) by reference so each async block only moves a
+    // Copy &handle, keeping the closure Fn instead of FnOnce.
+    let clients_ref = &clients;
+    let is_custom_ref = &is_custom;
+
     let view = |rows: Vec<Row>| async move {
         let mut out = Vec::new();
         for r in rows {
-            let (name, email) = client_of(st, &s(&v(&r), "user_id")).await;
+            let (name, email) = clients_ref
+                .get(&s(&v(&r), "user_id"))
+                .cloned()
+                .unwrap_or((None, None));
             let mut obj = appointment_view(&r).as_object().cloned().unwrap_or_default();
-            obj.insert("custom".into(), json!(is_custom(&r)));
+            obj.insert("custom".into(), json!(is_custom_ref(&r)));
             obj.insert("client".into(), json!({ "name": name, "email": email }));
             out.push(Value::Object(obj));
         }

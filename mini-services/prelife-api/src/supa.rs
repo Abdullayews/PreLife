@@ -387,8 +387,13 @@ impl Supa {
                 }
                 // Last resort: page through the WHOLE directory — a 50-row
                 // window would silently hide every later user and make them
-                // permanently unloginnable.
+                // permanently unloginnable. v5.2 (loop iter 3): the scan is
+                // capped at 5 pages (1000 users) — unbounded paging turned
+                // every unknown-email login into a full-directory
+                // amplification against Supabase (bounded only by the IP
+                // rate limit). A miss past the cap reads as not-found.
                 let per_page = 200;
+                let max_pages = 5u32;
                 let mut page = 1u32;
                 loop {
                     let Some(users) = try_list(
@@ -411,6 +416,12 @@ impl Supa {
                         return None;
                     }
                     page += 1;
+                    if page > max_pages {
+                        eprintln!(
+                            "[supa] admin_find_user_by_email: {mail} past {max_pages} directory pages — treating as not-found (set SUPABASE_EMAIL_INDEX or upgrade GoTrue filters)"
+                        );
+                        return None;
+                    }
                 }
             }
         }

@@ -54,8 +54,8 @@ export function Gallery({
           />
         ))}
       </div>
-      <div
-        role="group"
+      {/* v5.2 (loop iter 3): native fieldset (was div role="group"). */}
+      <fieldset
         aria-label={label}
         className="gal-dots"
         onPointerEnter={() => setHoverPaused(true)}
@@ -74,7 +74,7 @@ export function Gallery({
             <span />
           </button>
         ))}
-      </div>
+      </fieldset>
     </>
   );
 }

@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: t("rulesTitle") };
 }
 
-/** Community rules — the real text arrives later; placeholder for now. */
+/** Community rules — the v5.2 copy lives in messages/*.json (rulesPage.placeholder). */
 export default async function RulesPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);

@@ -259,6 +259,10 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
    grows to a ≥44px hit area; fine-pointer layout stays untouched. The
    nav keeps its 4rem height — the grown controls still fit inside it. */
 @media (pointer: coarse) {
+  /* v5.2 (loop iter 3): iOS Safari zooms the whole page when an input
+     renders below 16px — every form field is lifted to ≥16px on touch.
+     1em keeps intentionally larger fields untouched. */
+  input, select, textarea { font-size: max(1em, 16px); }
   .icon-btn { width: 2.75rem; height: 2.75rem; }
   .btn-sm { min-height: 2.75rem; }
   .seg { height: auto; padding-block: .1875rem; }
@@ -275,6 +279,14 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
   .ai-fab-x { width: 2.75rem; height: 2.75rem; }
   .daypick button { min-height: 2.75rem; }
   .timepick input { min-height: 2.75rem; }
+  .sched-ctl { min-height: 2.75rem; }
+  /* v5.2 (loop iter 3): the last sub-44px controls — mood dots, chat
+     chips, quiz options, icon chips, filters, the modal X and the
+     inline seg — all grow to the 44px doctrine on touch screens. */
+  .mood-dots button, .chat-chips button, .ai-fab-chips button,
+  .quiz-opts button, .iseg button { min-height: 2.75rem; }
+  .chip-f, .ichip, .filter { min-height: 2.75rem; }
+  .modal-x { width: 2.75rem; height: 2.75rem; }
 }
 /* A2 — accent volume: the icon tile keeps its quiet wash background (a
    sanctioned wash tone) but the glyph itself drops to muted, so accents
@@ -378,6 +390,9 @@ html.dark .tinted { color: color-mix(in srgb, var(--c) 55%, white); }
 
 /* Drawer (below lg): frosted panel hanging under the bar */
 .nav-panel { position: relative; margin: .5rem 1rem 0; padding: .75rem; border-radius: var(--r-md); }
+/* v5.2 (loop iter 3): on landscape phones the welcome drawer can exceed
+   the viewport — cap and scroll instead of clipping the bottom links. */
+.nav-panel { max-height: calc(100svh - var(--nav-h) - 2rem); overflow-y: auto; }
 .nav-panel::before {
   content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit;
   border: 1px solid var(--line); background: color-mix(in srgb, var(--raised) 94%, transparent);
@@ -1206,6 +1221,9 @@ a.card:hover em svg { transform: translateX(3px); }
 .player-track b { font-size: .9375rem; }
 .player-track small { color: var(--muted); font-size: .8125rem; }
 .player-bar { position: relative; height: .4rem; border-radius: 999px; background: var(--tint); cursor: pointer; }
+/* v5.2 (loop iter 3): padded invisible hit area — the 6.4px bar alone is
+   unhittable on touch (same pattern as .gal-dots button::after). */
+.player-bar::after { content: ""; position: absolute; inset: -14px 0; }
 .player-bar i { position: absolute; inset: 0 auto 0 0; width: 0%; border-radius: inherit; background: var(--accent); transition: width .2s linear; }
 .player-time { display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .media-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
@@ -1238,6 +1256,11 @@ a.card:hover em svg { transform: translateX(3px); }
 .psy-filter-row > .lbl { font-size: .8125rem; font-weight: 650; color: var(--muted); margin-right: .35rem; }
 .timepick { display: inline-flex; align-items: center; gap: .45rem; }
 .timepick input { width: 4.6rem; height: 2.25rem; padding-inline: .6rem; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); font: inherit; font-size: .8125rem; font-variant-numeric: tabular-nums; }
+/* v5.2 (loop iter 3): the custom-booking date/select controls share the
+   .timepick look via a class — inline styles can't join the coarse-pointer
+   44px pass or the 16px iOS input rule (higher specificity). */
+.sched-ctl { height: 2.25rem; padding-inline: .6rem; border: 1px solid var(--line-strong); border-radius: 12px; background: var(--surface); font: inherit; font-size: .875rem; color: var(--ink); }
+.sched-ctl:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
 .timepick input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
 .daypick { display: inline-flex; flex-wrap: wrap; gap: .4rem; }
 .daypick button { min-width: 2.7rem; height: 2.25rem; padding-inline: .5rem; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); font-size: .8125rem; font-weight: 600; color: var(--muted); transition: border-color .2s, background-color .2s, color .2s, transform var(--t-press) var(--ease-out); }
@@ -1343,6 +1366,13 @@ a.card:hover em svg { transform: translateX(3px); }
 .cards2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 @media (max-width: 51.99rem) { .cards2 { grid-template-columns: 1fr; } }
 .psy-sched .sched { min-width: 72rem; }
+/* v5.2 (loop iter 3): inside the About modal on phones the 72rem grid
+   forced ~3 screens of swiping to reach afternoon slots — tighten the
+   columns (the sticky hour column keeps context) below 40rem. */
+@media (max-width: 40rem) {
+  .psy-sched .sched { min-width: 52rem; }
+  .psy-sched .sched th, .psy-sched .sched td { padding: .6rem .4rem; }
+}
 
 /* ════════════════════════════════════════════════════════════════════════
    GYM PANELS — the six subtab panels rendered inside the AppShell's
@@ -1778,7 +1808,7 @@ a.card:hover em svg { transform: translateX(3px); }
 .gplace-meta { display: grid; gap: .4rem; font-size: .875rem; color: var(--muted); }
 .gplace-line { display: inline-flex; align-items: center; gap: .45rem; min-width: 0; }
 .gplace-line svg { flex: none; }
-.gplace-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding-top: .9rem; border-top: 1px solid var(--line); }
+.gplace-foot { margin-top: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem; padding-top: .9rem; border-top: 1px solid var(--line); }
 
 /* ── Shop directories (equipment / supplements / accessories / clothing) ── */
 .gshop-note { display: flex; align-items: center; gap: .5rem; margin: -.4rem 0 .65rem; font-size: .8125rem; color: var(--muted); }
@@ -1972,7 +2002,9 @@ a.card:hover em svg { transform: translateX(3px); }
 /* Native <dialog>: showModal() brings the focus trap, Escape and the
    ::backdrop scrim; we style the chrome. */
 dialog.modal-panel {
-  width: min(34rem, 100%); max-height: min(86svh, 46rem);
+  /* v5.2 (loop iter 3): 1.5rem gutters so the 32px radius never clips
+     against the screen edge on phones (edge-to-edge before). */
+  width: min(34rem, calc(100% - 1.5rem)); max-height: min(86svh, 46rem);
   padding: 0; border: 1px solid var(--line); border-radius: var(--r-xl);
   background: var(--surface); box-shadow: var(--shadow-3);
   color: var(--ink);
@@ -1993,7 +2025,7 @@ dialog.modal-panel[open] {
 }
 dialog.modal-panel:not([open]) { opacity: 0; transform: translateY(10px) scale(.97); }
 @starting-style { dialog.modal-panel { opacity: 0; transform: translateY(14px) scale(.97); } }
-dialog.modal-panel.modal-wide { width: min(56rem, 100%); }
+dialog.modal-panel.modal-wide { width: min(56rem, calc(100% - 1.5rem)); }
 dialog.modal-panel::backdrop {
   background: color-mix(in srgb, var(--ink) 42%, transparent);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
@@ -2378,11 +2410,14 @@ dialog.modal-panel:not([open])::backdrop { opacity: 0; }
 .subcustom-cta:disabled { opacity: .5; cursor: default; }
 .subcustom-hint { font-size: .8125rem; color: var(--muted); }
 
-/* Fieldset-based button groups (water tracker, journal day nav) — reset
-   the native chrome, keep the custom look. */
-fieldset.water-row, fieldset.jrnl-nav {
-  border: 0; padding: 0; margin: 0; min-width: 0;
-}
+/* Fieldset-based button groups (water tracker, journal day nav, and the
+   v5.2 prefer-tag-over-role conversions — segs, daypick, quiz options,
+   mood dots, icon grids, subcfg, gallery dots) — reset the native chrome,
+   keep the custom look. :where keeps specificity at zero so every class
+   rule below keeps painting exactly as it did on the divs. */
+:where(fieldset) { border: 0; padding: 0; margin: 0; min-width: 0; }
+/* v5.2: <output> replaces div role="status" — every user sets display. */
+:where(output) { display: block; }
 
 /* ═══════════════════════════════════════════════════════════════════════
    İDMAN v3 — the redesigned gym surface (components/idman/*).
@@ -2690,6 +2725,14 @@ html.dark .idman {
   width: 100%; max-width: 420px; height: .5rem;
   border-radius: 999px; background: var(--tint); overflow: hidden;
 }
+/* v5.2 (loop iter 3): the two role="progressbar" divs became native
+   <progress> elements (jsx-a11y) — appearance:none lets the track+fill
+   paint exactly like the old div+<i> pair. The aria-hidden .small bars
+   keep the div+<i> pattern below. */
+progress.iplan-bar { appearance: none; -webkit-appearance: none; border: 0; display: block; }
+progress.iplan-bar::-webkit-progress-bar { background: transparent; }
+progress.iplan-bar::-webkit-progress-value { background: var(--accent); border-radius: 999px; transition: width .6s var(--inav-ease); }
+progress.iplan-bar::-moz-progress-bar { background: var(--accent); border-radius: 999px; }
 .iplan-bar i {
   display: block; height: 100%; border-radius: inherit;
   background: var(--accent);
@@ -3067,7 +3110,7 @@ html.dark .idman {
   to { opacity: 1; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .idman, .inav, .iplan-bar i, .iex, .iprod, .izal-card, .inav-sub, .inav-caret {
+  .idman, .inav, .iplan-bar i, progress.iplan-bar::-webkit-progress-value, progress.iplan-bar::-moz-progress-bar, .iex, .iprod, .izal-card, .inav-sub, .inav-caret {
     transition: none !important;
     animation: none !important;
   }
@@ -3339,11 +3382,11 @@ html.dark .idman {
   width: 100%; max-width: 420px; height: .4rem;
   border-radius: 999px; background: var(--tint); overflow: hidden;
 }
-.iquiz-bar i {
-  display: block; height: 100%; border-radius: inherit;
-  background: var(--accent);
-  transition: width 250ms linear;
-}
+/* v5.2 (loop iter 3): native <progress> (was div role="progressbar"). */
+progress.iquiz-bar { appearance: none; -webkit-appearance: none; border: 0; display: block; }
+progress.iquiz-bar::-webkit-progress-bar { background: transparent; }
+progress.iquiz-bar::-webkit-progress-value { background: var(--accent); border-radius: 999px; transition: width 250ms linear; }
+progress.iquiz-bar::-moz-progress-bar { background: var(--accent); border-radius: 999px; }
 
 /* Exercise check-off — the check draws itself once (~400ms ease-out,
    stroke delayed ~100ms after the pop), and the card gets a soft wash. */
@@ -3463,7 +3506,7 @@ html.dark .idman {
     animation: none !important;
   }
   .iex-check path { animation: none !important; stroke-dashoffset: 0; }
-  .iquiz-bar i { transition: none !important; }
+  progress.iquiz-bar::-webkit-progress-value, progress.iquiz-bar::-moz-progress-bar { transition: none !important; }
   .idman .ibtn, .idman .ichip, .idman .iseg button, .idman .isearch-x,
   .idman .inav-row, .idman .inav-group-head, .idman .inav-foot-btn,
   .idman .inav-fold, .idman .iprod-offer, .idman .itag-more, .idman .inav-fab,

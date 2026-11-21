@@ -353,13 +353,13 @@ export function ProfileEditor({ user }: { user: ProfileEditorUser }) {
     prefix: string,
     apply: (v: string) => void,
   ) => (
-    <div className="seg" role="group" aria-label={label} style={SEG_STYLE}>
+    <fieldset className="seg" aria-label={label} style={SEG_STYLE}>
       {keys.map((k) => (
         <button key={k} type="button" aria-pressed={value === k} onClick={() => apply(k)}>
           {t(`${prefix}.${k}`)}
         </button>
       ))}
-    </div>
+    </fieldset>
   );
 
   const seed = (user.name ?? "").trim();
