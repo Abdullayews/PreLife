@@ -83,6 +83,11 @@ Run it next to the Next.js server and route `/api/*` to it at the edge
 `API_TRANSFORM_PORT` unset — the frontend then calls plain `/api/*`
 paths on the same origin.
 
+**Route ONLY `/api/*` at the edge.** The `/internal/*` surface is for
+the Next.js SSR layer's loopback calls — never expose it publicly
+(`/internal/home` is cookie-authenticated, but `/internal/config` is an
+loopback-only).
+
 ## Layout
 
 ```

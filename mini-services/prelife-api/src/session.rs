@@ -344,9 +344,16 @@ pub async fn revoke_token_session(st: &St, token: &str) {
 
 /* ── cookies ───────────────────────────────────────────────────────────── */
 
-pub fn is_secure(headers: &HeaderMap) -> bool {
-    // Proxies send "https, http" or "HTTPS" — accept the case-insensitive
-    // first hop being https instead of an exact string match.
+pub fn is_secure(production: bool, headers: &HeaderMap) -> bool {
+    // v5.2 (security round 3): in production the cookie is ALWAYS Secure —
+    // the flag must not depend on a client-suppliable X-Forwarded-Proto
+    // (a first-hop "http" used to strip it on a genuinely-HTTPS response).
+    // Dev keeps the XFP check so the sandbox preview proxy (https) still
+    // exercises the Secure path. Proxies send "https, http" or "HTTPS" —
+    // accept the case-insensitive first hop being https.
+    if production {
+        return true;
+    }
     headers
         .get("x-forwarded-proto")
         .and_then(|v| v.to_str().ok())

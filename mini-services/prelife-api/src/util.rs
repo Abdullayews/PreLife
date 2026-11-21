@@ -258,6 +258,13 @@ pub fn char_len(s: &str) -> usize {
     s.chars().count()
 }
 
+/// v5.2 (security round 3): shared name charset gate — no control
+/// characters (signup + complete + profile PATCH all use it, so a stored
+/// name can never smuggle control sequences or HTML-significant bytes).
+pub fn name_chars_ok(name: &str) -> bool {
+    !name.chars().any(|c| c.is_control())
+}
+
 /// JS `str.slice(0, n)` by code points.
 pub fn char_take(s: &str, n: usize) -> String {
     s.chars().take(n).collect()
