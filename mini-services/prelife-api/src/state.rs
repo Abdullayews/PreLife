@@ -55,6 +55,9 @@ pub struct AppState {
     /// upserts) against TOCTOU double-inserts; coarse but correct at this
     /// scale. tokio::Mutex because the guard is held across awaits.
     pub write_lock: tokio::sync::Mutex<()>,
+    /// Kept for future authenticated diagnostics (the public /api/health
+    /// stopped exposing uptime in v5.2 security round 2).
+    #[allow(dead_code)]
     pub started_at: Instant,
 }
 

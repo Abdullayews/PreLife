@@ -55,6 +55,57 @@ async fn security_headers(req: Request, next: Next) -> Response {
     res
 }
 
+/// v5.2 (security round 2): CSRF defense-in-depth for state-changing /api/*
+/// calls. SameSite=Lax on pl_session already stops cross-site cookie
+/// attachment; this layer additionally rejects the request when a browser
+/// attached a **foreign Origin** to an unsafe method. Same-origin posts
+/// match the request host; non-browser callers (the SSR layer, curl — no
+/// Origin header at all) pass untouched, so server-to-server flows and the
+/// sandbox dev rewrite (Origin localhost vs rewritten Host 127.0.0.1) keep
+/// working via the loopback allowance.
+async fn origin_guard(req: Request, next: Next) -> Response {
+    let method = req.method().clone();
+    let path = req.uri().path().to_string();
+    let is_unsafe = matches!(
+        method,
+        axum::http::Method::POST | axum::http::Method::PUT | axum::http::Method::PATCH | axum::http::Method::DELETE
+    );
+    if is_unsafe && (path.starts_with("/api/") || path.starts_with("/internal/")) {
+        let h = req.headers();
+        if let Some(origin) = h.get("origin").and_then(|v| v.to_str().ok()) {
+            let origin_host = crate::util::origin_host(origin);
+            let req_host = h
+                .get("x-forwarded-host")
+                .or_else(|| h.get("host"))
+                .and_then(|v| v.to_str().ok())
+                .unwrap_or("")
+                .split(':')
+                .next()
+                .unwrap_or("");
+            let same_host = origin_host.as_deref() == Some(req_host);
+            // Loopback origins are trusted: the dev rewrite proxies browser
+            // posts to 127.0.0.1:3030 with the original localhost Origin,
+            // and only machine-local processes can own a loopback origin.
+            let loopback = matches!(origin_host.as_deref(), Some("localhost") | Some("127.0.0.1") | Some("[::1]"));
+            // "null"/opaque Origins (the emu consent page submits one after
+            // its redirect-charged navigation) pass only when the browser
+            // itself asserts same-originness via the forbidden-to-set
+            // Sec-Fetch-Site header — a cross-site attacker page can never
+            // produce that combination.
+            let null_ok = origin_host.is_none()
+                && h.get("sec-fetch-site").and_then(|v| v.to_str().ok()) == Some("same-origin");
+            if !(same_host || loopback || null_ok) {
+                return (
+                    StatusCode::FORBIDDEN,
+                    Json(serde_json::json!({ "error": "bad_origin" })),
+                )
+                    .into_response();
+            }
+        }
+    }
+    next.run(req).await
+}
+
 pub fn router(st: St) -> Router {
     Router::new()
         // health + i18n
@@ -102,12 +153,18 @@ pub fn router(st: St) -> Router {
         .route("/api/content/meditation", get(content::meditation))
         .route("/api/content/library", get(content::library))
         .route("/api/content/subscription", get(content::subscription))
-        // the local Supabase emulator (DEV only)
-        .route("/api/supa-emu/rest/v1/{table}", get(emu::rest_get).post(emu::rest_post).patch(emu::rest_patch).delete(emu::rest_delete))
-        .route("/api/supa-emu/auth/v1/{*action}", get(emu::auth_get).post(emu::auth_post).put(emu::auth_put).delete(emu::auth_delete))
+        // the local Supabase emulator (DEV only) — v5.2 (security round 2):
+        // the browser-facing surface is the OAuth consent page only.
+        // The REST mirror and GoTrue admin/token routes were REMOVED from
+        // the HTTP surface (in-process callers use EmuStore directly);
+        // serving them unauthenticated meant full-DB read/write + admin
+        // user forgery + session-table account takeover.
+        .route("/api/supa-emu/auth/v1/{*action}", get(emu::auth_get).post(emu::auth_post))
         // server-to-server (SSR data layer)
         .route("/internal/home", get(internal::home))
         .route("/internal/config", get(internal::config))
+        .layer(axum::extract::DefaultBodyLimit::max(1_048_576)) // v5.2 sec: 1 MiB cap — no unbounded body reads
+        .layer(axum::middleware::from_fn(origin_guard))
         .layer(axum::middleware::from_fn(security_headers))
         .with_state(st)
 }

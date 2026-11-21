@@ -496,17 +496,64 @@ pub fn origin_from(st: &St, headers: &HeaderMap) -> String {
     if !allowlist.is_empty() {
         return allowlist[0].clone();
     }
+    // v5.2 (security round 2): empty-allowlist fallbacks must never echo a
+    // client-controlled Host. Production refuses outright (broken links +
+    // a loud log beat a Host-header-injected verification link — the
+    // attacker's domain would receive the victim's token click).
     if st.cfg.production {
-        // v5.2 (loop iter 3): production with an empty allowlist must not
-        // echo the client-controlled scheme verbatim. The host is still
-        // request-derived (links must exist), so say it loudly — the real
-        // fix is setting PUBLIC_URL on the deployment.
         eprintln!(
-            "[origin] production with empty PUBLIC_URL — using https://{host}; set PUBLIC_URL to pin the origin"
+            "[origin] PRODUCTION with empty PUBLIC_URL — refusing client Host {host:?}; set PUBLIC_URL to pin the origin"
         );
-        return format!("https://{host}");
+        return "https://127.0.0.1".to_string();
     }
-    raw
+    // Dev: the sandbox preview reaches us through the gateway with a real
+    // external host. v5.2 (security round 2) tightened the echo to a
+    // TRUSTED dev-host policy (see dev_host_trusted): loopback + the
+    // platform's *.space-z.ai preview domains (mirrors allowedDevOrigins
+    // in next.config.ts). Anything else — evil.com included — falls back
+    // local. In emu mode links are returned to the requester only, never
+    // e-mailed, so a dev echo of a trusted preview host is by design.
+    if dev_host_trusted(&host) {
+        return raw;
+    }
+    "http://127.0.0.1:3000".to_string()
+}
+
+/// v5.2 (security round 2): hosts whose echo into link origins is allowed
+/// in dev. Loopback covers local dev; `*.space-z.ai` covers the sandbox
+/// preview panel (the platform's own domain — the same trust root as
+/// next.config.ts allowedDevOrigins). Strict authority shape implied.
+fn dev_host_trusted(host: &str) -> bool {
+    if !host_shape_ok(host) {
+        return false;
+    }
+    let (h, _port) = match host.rsplit_once(':') {
+        Some((h, p)) if !p.is_empty() && p.chars().all(|c| c.is_ascii_digit()) => (h, Some(p)),
+        _ => (host, None),
+    };
+    h == "localhost"
+        || h == "127.0.0.1"
+        || h.ends_with(".space-z.ai")
+        || h == "space-z.ai"
+}
+
+/// v5.2 (security round 2): a strict authority shape — ASCII
+/// host[:port], no scheme, no userinfo, no path, no IP-literal tricks.
+fn host_shape_ok(host: &str) -> bool {
+    if host.is_empty() || host.len() > 253 || host.contains("://") {
+        return false;
+    }
+    let (h, _port) = match host.rsplit_once(':') {
+        Some((h, p)) if !p.is_empty() && p.chars().all(|c| c.is_ascii_digit()) => (h, Some(p)),
+        _ => (host, None),
+    };
+    !h.is_empty()
+        && !h.starts_with('.')
+        && !h.starts_with('-')
+        && !h.ends_with('.')
+        && !h.ends_with('-')
+        && !h.contains("..")
+        && h.chars().all(|c| c.is_ascii_alphanumeric() || c == '.' || c == '-')
 }
 
 /* ── response helpers (redirect + Set-Cookie composition) ──────────────── */

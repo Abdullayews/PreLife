@@ -64,14 +64,10 @@ pub async fn i18n(State(st): State<St>, _headers: HeaderMap, RawQuery(raw): RawQ
     Ok(json_ok(catalog))
 }
 
-pub async fn health(State(st): State<St>) -> Response {
-    json_ok(json!({
-        "ok": true,
-        "service": "prelife",
-        "version": "5.0.0",
-        "uptimeSecs": st.started_at.elapsed().as_secs(),
-        "supabaseConfigured": st.cfg.db_ready(),
-    }))
+pub async fn health() -> Response {
+    // v5.2 (security round 2): no version / uptime / backend-mode for
+    // anonymous callers — service fingerprinting removed.
+    json_ok(json!({ "ok": true, "service": "prelife" }))
 }
 
 use serde_json::Value;
