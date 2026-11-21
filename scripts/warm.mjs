@@ -56,6 +56,7 @@ async function main() {
   }
   if (!(await waitForServer(API_BASE))) {
     out("rust backend never answered on :3030 — API warmup skipped");
+    return;
   } else {
     out("rust backend ready on :3030");
   }

@@ -530,7 +530,9 @@ fn rule_based_plan(answers: &Value, locale: &str, reg: &[(String, String, String
     let mut days = base.get("days").and_then(|d| d.as_array().cloned()).unwrap_or_default();
     days.extend(extra);
     days.sort_by_key(|d| d.get("day").and_then(|d| d.as_i64()).unwrap_or(1));
-    days.truncate(std::cmp::min(5, std::cmp::max(3, days_wanted as usize)));
+    // v5.2 (loop iter 3): the clamp allows days_wanted=2 but the truncate
+    // forced ≥3 — a user asking for 2 training days silently got 3.
+    days.truncate(std::cmp::min(5, std::cmp::max(2, days_wanted as usize)));
 
     let title = match locale {
         "ru" => "Личный план",

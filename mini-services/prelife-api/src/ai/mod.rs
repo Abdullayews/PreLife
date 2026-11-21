@@ -400,12 +400,22 @@ pub async fn assistant_reply(
     };
     let full_system = format!("{system}{context}");
 
+    // v5.2 (loop iter 3): a wall-clock budget across the tool loop AND the
+    // z-ai fallback — a slow upstream could previously hold one request
+    // for ~260s (5×40s Gemini rounds + the 60s fallback) with no cap.
+    let started = std::time::Instant::now();
+    const BUDGET: std::time::Duration = std::time::Duration::from_secs(90);
+
     if let Some(settings) = get_ai_settings(st).await {
         let contents_slice: Vec<(&str, &str)> = history.iter().map(|(r, c)| (r.as_str(), c.as_str())).collect();
         let mut contents = gemini::contents_from_history(&contents_slice);
         let tools = user.map(|_| tool_decls());
         let mut last_err = String::new();
         for _round in 0..5 {
+            if started.elapsed() >= BUDGET {
+                last_err = "assistant wall-clock budget exceeded".into();
+                break;
+            }
             let result = gemini::generate(
                 &settings.api_key,
                 &settings.model,
@@ -461,6 +471,12 @@ pub async fn assistant_reply(
     }
 
     let contents_slice: Vec<(&str, &str)> = history.iter().map(|(r, c)| (r.as_str(), c.as_str())).collect();
+    // v5.2 (loop iter 3): skip the fallback when the budget can no longer
+    // fit its own timeout — fail honestly instead of holding the request.
+    if started.elapsed() + std::time::Duration::from_secs(30) > BUDGET {
+        eprintln!("[ai] wall-clock budget exhausted before the z-ai fallback — honest 503");
+        return Err(DomainError::Api(ApiError::new(axum::http::StatusCode::SERVICE_UNAVAILABLE, "ai_unavailable")));
+    }
     match zai::chat(st, &full_system, &contents_slice).await {
         Ok(reply) => Ok((reply, "zai")),
         Err(e) => {

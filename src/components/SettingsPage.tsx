@@ -185,7 +185,7 @@ function DevicesPanel() {
                 </div>
                 <div className="field">
                   <span id={`dev-ico-${d.id}`} className="device-grid-label">{t("iconLabel")}</span>
-                  <div className="icon-grid" role="group" aria-labelledby={`dev-ico-${d.id}`}>
+                  <fieldset className="icon-grid" aria-labelledby={`dev-ico-${d.id}`}>
                     {DEVICE_ICON_KEYS.map((key) => {
                       const Icon = DEVICE_ICONS[key];
                       return (
@@ -201,7 +201,7 @@ function DevicesPanel() {
                         </button>
                       );
                     })}
-                  </div>
+                  </fieldset>
                 </div>
                 <div className="device-edit-actions">
                   <button type="button" className="btn btn-sm" onClick={saveEdit} disabled={busy || !editName.trim()}>
@@ -504,14 +504,14 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
                     <b>{t("appearance.theme")}</b>
                     <span>{t("appearance.themeHint")}</span>
                   </span>
-                  <div className="seg" role="group" aria-label={t("appearance.theme")}>
+                  <fieldset className="seg" aria-label={t("appearance.theme")}>
                     <button type="button" aria-pressed={dark === false} onClick={() => chooseTheme(false)}>
                       <Sun size={13} aria-hidden />{t("appearance.light")}
                     </button>
                     <button type="button" aria-pressed={dark === true} onClick={() => chooseTheme(true)}>
                       <Moon size={13} aria-hidden />{t("appearance.dark")}
                     </button>
-                  </div>
+                  </fieldset>
                 </div>
               </div>
             </section>
@@ -529,7 +529,7 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
                     <b>{t("language.title")}</b>
                     <span>{t("language.hint")}</span>
                   </span>
-                  <div className="seg" role="group" aria-label={t("language.title")}>
+                  <fieldset className="seg" aria-label={t("language.title")}>
                     {routing.locales.map((loc) => (
                       <button
                         key={loc}
@@ -540,7 +540,7 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
                         {loc}
                       </button>
                     ))}
-                  </div>
+                  </fieldset>
                 </div>
               </div>
             </section>

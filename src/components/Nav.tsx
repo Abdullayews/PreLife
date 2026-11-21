@@ -45,7 +45,9 @@ function LocaleSwitch({ className = "", signedIn = false }: { className?: string
   const router = useRouter();
   const pathname = usePathname();
   return (
-    <div role="group" aria-label={t("language")} className={`seg${className ? ` ${className}` : ""}`}>
+    // v5.2 (loop iter 3): native fieldset (was div role="group") —
+    // globals.css :where(fieldset) resets the chrome.
+    <fieldset aria-label={t("language")} className={`seg${className ? ` ${className}` : ""}`}>
       {routing.locales.map((loc) => (
         <button
           key={loc}
@@ -67,7 +69,7 @@ function LocaleSwitch({ className = "", signedIn = false }: { className?: string
           {loc}
         </button>
       ))}
-    </div>
+    </fieldset>
   );
 }
 

@@ -77,7 +77,7 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
   };
 
   return (
-    <div ref={barRef} className="cookie-bar" role="region" aria-label={t("text")}>
+    <section ref={barRef} className="cookie-bar" aria-label={t("text")}>
       <div className="cookie-in">
         <p>
           {t("text")} <Link href="/terms">{t("learnMore")}</Link>
@@ -91,6 +91,6 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -525,7 +525,8 @@ export const en = {
         generic: "Something went wrong. Please try again.",
         oauth: "The Google/Apple sign-in did not go through — try again in a moment, or continue with e-mail.",
         email_unverified: "E-mail not confirmed. Check your inbox or resend the link.",
-        too_many_requests: "Too many attempts — please try again in a moment."
+        too_many_requests: "Too many attempts — please try again in a moment.",
+        supabase_unconfigured: "The server is not connected to the database right now — please try again later."
       },
       signupOkTitle: "Check your inbox",
       signupOkText: "We sent a confirmation link to {email} — it is your first sign-in: opening it activates your account and signs you in.",
@@ -556,11 +557,11 @@ export const en = {
     underConstruction: {},
     termsPage: {
       title: "Terms",
-      placeholder: "hello, write this"
+      placeholder: "PreLife is provided for personal, non-commercial use. Your account is yours: keep your password safe and use the platform honestly — no account sharing, no scraping, no automated access without permission. Bookings and payments follow the flow shown at checkout; canceled requests are refunded according to the psychologist's policy shown before payment. We may update these terms as the platform grows — the current version always lives on this page. Questions? Write to support@prelife.app."
     },
     rulesPage: {
       title: "Rules",
-      placeholder: "hello, write this"
+      placeholder: "Be kind. PreLife is a health community: no harassment, no medical advice from non-professionals, no spam or advertising in chats and booking messages. Write to psychologists the way you would want to be written to; keep other people's personal details private. Content is for your personal journey — don't repost paid material. Breaking these rules can end bookings and accounts."
     },
     settingsPage: {
       eyebrow: "Account",

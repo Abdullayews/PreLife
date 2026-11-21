@@ -452,9 +452,16 @@ fn is_local_host(host: &str) -> bool {
 
 /// The public origin a request should be treated as (see session.ts).
 pub fn origin_from(st: &St, headers: &HeaderMap) -> String {
+    // v5.2 (loop iter 3): proto is validated and only the first hop is
+    // kept — a multi-hop "https, http" used to build the malformed
+    // origin "https, http://host", and arbitrary values could smuggle
+    // unexpected schemes into verification links.
     let proto = headers
         .get("x-forwarded-proto")
         .and_then(|v| v.to_str().ok())
+        .and_then(|v| v.split(',').next())
+        .map(|v| v.trim())
+        .filter(|v| *v == "https" || *v == "http")
         .unwrap_or("http");
     let host = headers
         .get("x-forwarded-host")
@@ -488,6 +495,16 @@ pub fn origin_from(st: &St, headers: &HeaderMap) -> String {
     }
     if !allowlist.is_empty() {
         return allowlist[0].clone();
+    }
+    if st.cfg.production {
+        // v5.2 (loop iter 3): production with an empty allowlist must not
+        // echo the client-controlled scheme verbatim. The host is still
+        // request-derived (links must exist), so say it loudly — the real
+        // fix is setting PUBLIC_URL on the deployment.
+        eprintln!(
+            "[origin] production with empty PUBLIC_URL — using https://{host}; set PUBLIC_URL to pin the origin"
+        );
+        return format!("https://{host}");
     }
     raw
 }

@@ -91,7 +91,7 @@ export default async function BookingsPage({ params }: Props) {
                     <th scope="col">{t("colFormat")}</th>
                     <th scope="col">{t("colPrice")}</th>
                     <th scope="col">{t("colPayment")}</th>
-                    <th scope="col"><span className="hide-sm">{t("colActions")}</span></th>
+                    <th scope="col">{t("colActions")}</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -17,6 +17,7 @@ rand = "0.8"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
 percent-encoding = "2"
 url = "2"
+futures = "0.3"
 
 [profile.dev]
 opt-level = 1

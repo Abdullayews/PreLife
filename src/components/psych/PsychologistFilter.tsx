@@ -54,13 +54,13 @@ export function PsychologistFilter({ dayNames, count }: { dayNames: Record<PsyWe
 
       <div className="psy-filter-row">
         <span className="lbl">{t("filterDays")}</span>
-        <div className="daypick" role="group" aria-label={t("filterDays")}>
+        <fieldset className="daypick" aria-label={t("filterDays")}>
           {([1, 2, 3, 4, 5, 6] as PsyWeekday[]).map((d) => (
             <button key={d} type="button" aria-pressed={days.includes(d)} onClick={() => toggleDay(d)}>
               {dayNames[d]}
             </button>
           ))}
-        </div>
+        </fieldset>
       </div>
 
       <div className="psy-filter-row">

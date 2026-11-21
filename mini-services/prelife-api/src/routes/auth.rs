@@ -236,24 +236,24 @@ pub async fn signup(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Re
                         }
                     }
                 } else {
-                    // Adopt the pending user.
+                    // Adopt the pending user. v5.2 (loop iter 3): security —
+                    // the password and display name are NOT written before
+                    // the e-mail link proves ownership. The old behaviour
+                    // (overwriting the password with whatever the current
+                    // caller chose) let anyone take over a pending account:
+                    // the victim clicks the fresh link → the account is
+                    // confirmed with a password only the attacker knows.
+                    // Now a fresh verification mail is simply sent; if the
+                    // account still needs completion the owner sets name +
+                    // password on /complete after the link. Only the
+                    // language preference carries over (harmless).
                     let id = existing_id;
-                    if let Err(e2) = st
-                        .supa
-                        .admin_update_user(&id, &json!({ "password": password, "user_metadata": { "full_name": name, "needs_completion": false } }))
-                        .await
-                    {
-                        eprintln!("[auth:signup adopt] {e2}");
-                        return Err(err(500, "generic"));
-                    }
-                    let mut profile_patch = json!({ "full_name": name });
                     if lang != "en" {
-                        profile_patch.as_object_mut().unwrap().insert("lang".into(), json!(lang));
+                        let _ = st
+                            .supa
+                            .update("profiles", &vec![("id".into(), format!("eq.{id}"))], &json!({ "lang": lang }))
+                            .await;
                     }
-                    let _ = st
-                        .supa
-                        .update("profiles", &vec![("id".into(), format!("eq.{id}"))], &profile_patch)
-                        .await;
                     match vf::create_verification(&st, &id, &email, &locale, &origin).await {
                         Ok((_t, dev_link)) => {
                             return Ok(json_status(json!({ "ok": true, "email": email, "devLink": dev_link }), StatusCode::CREATED));
