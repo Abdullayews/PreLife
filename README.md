@@ -9,7 +9,7 @@ Browser ──▶ Next.js 16 (App Router, port 3000)          the FRONTEND
               │  UI (React 19, next-intl), no API routes of its own
               │  SSR data layer ──▶ /internal/* on the backend (lib/server-api.ts)
               │
-              ▼  /api/* (browser calls, same origin via the edge proxy)
+              ▼  /api/* (same origin; the Next server proxies to 127.0.0.1:3030)
          prelife-api — RUST (axum) on :3030                the BACKEND
          (mini-services/prelife-api — same routes, JSON shapes, error
           codes and pl_session cookies as the TS backend it replaced)
@@ -113,7 +113,7 @@ sync-i18n.mjs` (upsert-only; never partially empties the table).
 
 ### API surface
 
-Served by the Rust backend (same origin through the edge proxy in
+Served by the Rust backend (same origin — the Next.js rewrite proxy in
 production; `:3030` with the sandbox gateway param in dev):
 
 Content: `GET /api/content/{worlds,gym,diet,meditation,library,subscription}` ·

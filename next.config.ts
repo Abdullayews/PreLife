@@ -42,28 +42,35 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
-  // DEV ONLY: the browser-facing /api/* calls (lib/api-url.ts appends the
-  // XTransformPort=3030 gateway param) are routed by the space-z.ai preview
-  // gateway — which does not exist on a plain localhost:3000 visit. This
-  // rewrite bridges that gap for local E2E (agent-browser, curl). Production
-  // (next start / NODE_ENV=production) leaves /api/* to the edge proxy
-  // exactly as before.
-  ...(process.env.NODE_ENV !== "production"
-    ? {
-        async rewrites() {
-          return [
-            {
-              source: "/api/:path*",
-              destination: `${process.env.API_INTERNAL_URL ?? "http://127.0.0.1:3030"}/api/:path*`,
-            },
+  // v5.3: /api/* is proxied to the Rust backend (mini-services/prelife-api)
+  // in EVERY environment. Production (Render, single web service): the
+  // browser talks same-origin /api/* and this proxy forwards to
+  // 127.0.0.1:3030, where scripts/start-production.mjs runs the backend
+  // next to the standalone server. Dev sandbox: bridges local E2E
+  // (agent-browser, curl) that bypasses the space-z gateway. The
+  // proxied request carries x-forwarded-host/-proto, which the backend's
+  // hardened origin_from (session.rs) reads for its allowlist checks.
+  // API_INTERNAL_URL points the proxy (and the SSR data layer) at a
+  // backend living on another host.
+  async rewrites() {
+    const backend = process.env.API_INTERNAL_URL ?? "http://127.0.0.1:3030";
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${backend}/api/:path*`,
+      },
+      // /internal/* stays DEV-ONLY: it is the SSR layer's loopback surface
+      // (never exposed publicly — see mini-services/prelife-api/README).
+      ...(process.env.NODE_ENV !== "production"
+        ? [
             {
               source: "/internal/:path*",
-              destination: `${process.env.API_INTERNAL_URL ?? "http://127.0.0.1:3030"}/internal/:path*`,
+              destination: `${backend}/internal/:path*`,
             },
-          ];
-        },
-      }
-    : {}),
+          ]
+        : []),
+    ];
+  },
   // Sandbox↔Render parity: `next dev` ships a floating "Next.js dev tools"
   // badge (bottom-left) plus route-compile spinners. None of that exists in
   // the production build served on Render, so the preview panel looked
