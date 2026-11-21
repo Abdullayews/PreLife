@@ -84,3 +84,93 @@ pub async fn plan_delete(State(st): State<St>, headers: HeaderMap) -> Result<Res
     let plan = crate::user_plans::get_active_plan(&st, &uid).await;
     Ok(json_ok(serde_json::json!({ "ok": true, "plan": plan })))
 }
+
+/* ── Set progress — the tappable set chips ────────────────────────────── */
+
+/// GET /api/gym/progress?planId=&day=&date= → { done: { exIdx: [setNo,…] } }
+pub async fn progress_get(
+    State(st): State<St>,
+    headers: HeaderMap,
+    RawQuery(raw): RawQuery,
+) -> Result<Response, DomainError> {
+    if !st.cfg.db_ready() {
+        return Err(err(503, "supabase_unconfigured"));
+    }
+    let cs = session::current_session(&st, &headers)
+        .await
+        .ok_or_else(|| err(401, "unauthorized"))?;
+    let q = parse_query(raw.as_deref());
+    let plan_id = query_get(&q, "planId").unwrap_or("").to_string();
+    let day = query_get(&q, "day").and_then(|d| d.parse::<i64>().ok()).unwrap_or(0);
+    let date = query_get(&q, "date").unwrap_or("").to_string();
+    if plan_id.is_empty() || !(1..=7).contains(&day) || !valid_baku_date(&date) {
+        return Err(err(400, "invalid"));
+    }
+    let uid = s(&cs.user, "id");
+    let done = crate::user_plans::progress_get(&st, &uid, &plan_id, day, &date).await;
+    Ok(json_ok(serde_json::json!({ "done": done })))
+}
+
+/// POST /api/gym/progress { planId, day, date, done } — replace-semantics
+/// upsert of the day's done-set map (empty map = reset).
+pub async fn progress_post(
+    State(st): State<St>,
+    headers: HeaderMap,
+    body: Bytes,
+) -> Result<Response, DomainError> {
+    if !st.cfg.db_ready() {
+        return Err(err(503, "supabase_unconfigured"));
+    }
+    let cs = session::current_session(&st, &headers)
+        .await
+        .ok_or_else(|| err(401, "unauthorized"))?;
+    let body = read_json(&body);
+    let plan_id = s(&body, "planId");
+    let day = body.get("day").and_then(|d| d.as_i64()).unwrap_or(0);
+    let date = s(&body, "date");
+    if plan_id.is_empty() || !(1..=7).contains(&day) || !valid_baku_date(&date) {
+        return Err(err(400, "invalid"));
+    }
+    let done = body.get("done").cloned().unwrap_or(json!({}));
+    if !done.is_object() {
+        return Err(err(400, "invalid"));
+    }
+    // Shape check: keys are exercise indexes, values int arrays 1..=12.
+    if let Some(map) = done.as_object() {
+        if map.len() > 30 {
+            return Err(err(400, "invalid"));
+        }
+        for (k, sets) in map {
+            if k.parse::<u32>().is_err() {
+                return Err(err(400, "invalid"));
+            }
+            match sets {
+                Value::Array(arr) => {
+                    if arr.len() > 12 || arr.iter().any(|v| v.as_i64().map(|n| !(1..=12).contains(&n)).unwrap_or(true)) {
+                        return Err(err(400, "invalid"));
+                    }
+                }
+                _ => return Err(err(400, "invalid")),
+            }
+        }
+    }
+    let uid = s(&cs.user, "id");
+    crate::user_plans::progress_save(&st, &uid, &plan_id, day, &date, &done).await?;
+    Ok(json_ok(serde_json::json!({ "ok": true })))
+}
+
+/// Baku 'YYYY-MM-DD' — strict shape + a real calendar date.
+fn valid_baku_date(d: &str) -> bool {
+    let b = d.as_bytes();
+    if b.len() != 10 || b[4] != b'-' || b[7] != b'-' {
+        return false;
+    }
+    let digits = |r: std::ops::Range<usize>| b[r].iter().all(|c| c.is_ascii_digit());
+    if !(digits(0..4) && digits(5..7) && digits(8..10)) {
+        return false;
+    }
+    let y: i32 = d[0..4].parse().unwrap_or(0);
+    let m: u32 = d[5..7].parse().unwrap_or(0);
+    let day: u32 = d[8..10].parse().unwrap_or(0);
+    (2020..=2100).contains(&y) && (1..=12).contains(&m) && (1..=31).contains(&day)
+}

@@ -248,6 +248,19 @@ html.dark .ico-moon { display: block; } html.dark .ico-sun { display: none; }
 .seg button[aria-pressed="true"], .seg button[aria-selected="true"] { background: var(--wash-2); color: var(--wash-ink); box-shadow: var(--shadow-1); }
 .tag { display: inline-block; padding: .2rem .65rem; border: 1px solid var(--line); border-radius: 999px; font-size: .75rem; font-weight: 600; color: var(--muted); white-space: nowrap; }
 .tag-solid { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+
+/* v3.5: Settings → Appearance "stop animations" — the hard kill switch.
+ * Mirrors prefers-reduced-motion but user-controlled; the ThemeGuard
+ * keeps the class alive and the pre-paint script applies it ASAP. */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  transition-duration: 0s !important;
+  animation-duration: 0s !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+
 .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
 .chips li { display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .8rem; border: 1px solid var(--line); border-radius: 999px; font-size: .8125rem; font-weight: 550; background: var(--surface); color: var(--muted); }
 .chips a { display: inline-flex; align-items: center; gap: .4rem; }
@@ -524,6 +537,7 @@ html.dark .panel-logout:hover { background: color-mix(in srgb, #e58c86 15%, tran
   .auth-or { font-size: .75rem; letter-spacing: .07em; gap: .6rem; }
 }
 .auth-social { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+
 .social-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: .55rem; height: 2.75rem;
   border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: var(--surface);
@@ -1534,6 +1548,18 @@ a.card:hover em svg { transform: translateX(3px); }
   font: 700 1.05rem/1 var(--font-display);
 }
 .rail-id-meta { flex: 1; display: grid; min-width: 0; }
+.rail-id-meta { position: relative; }
+.rail-premium {
+  display: inline-flex; align-items: center; gap: .25rem;
+  margin-top: .15rem; padding: .12rem .5rem;
+  border-radius: 999px; font-size: .62rem; font-weight: 700;
+  letter-spacing: .02em; text-transform: uppercase;
+  background: color-mix(in srgb, #e0b45c 22%, transparent);
+  color: color-mix(in srgb, #e0b45c 80%, var(--ink));
+  border: 1px solid color-mix(in srgb, #e0b45c 45%, transparent);
+  width: fit-content;
+}
+
 .rail-id-meta b {
   font-size: .9375rem; font-weight: 650; color: var(--ink);
   line-height: 1.25; overflow-wrap: anywhere;
@@ -2323,6 +2349,32 @@ dialog.modal-panel:not([open])::backdrop { opacity: 0; }
 }
 .drecipes { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); list-style: none; margin: 0; padding: 0; }
 .drecipe-card { display: grid; gap: .6rem; align-content: start; }
+
+/* v3.5: the bookshelf — filter chips + shelved card state */
+.shelf-filter {
+  display: flex; flex-wrap: wrap; gap: .5rem; margin: .2rem 0 1rem;
+}
+.filter-btn {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .42rem .9rem; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface);
+  color: var(--muted); font: 650 .82rem/1 var(--font-display);
+  cursor: pointer; transition: all .2s;
+}
+.filter-btn:hover { border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+.filter-btn.active {
+  background: var(--accent); border-color: transparent; color: var(--accent-ink);
+}
+.shelf-empty {
+  margin: 1.2rem 0; padding: 1.4rem 1.2rem;
+  border: 1px dashed var(--line); border-radius: 22px;
+  text-align: center; color: var(--muted); font-size: .88rem;
+}
+.drecipe-card.shelved {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.shelf-btn { justify-self: start; margin-top: .55rem; }
+
 .drecipe-card > p { color: var(--muted); font-size: .9375rem; }
 .drecipe-facts { display: flex; gap: 1rem; flex-wrap: wrap; }
 .drecipe-facts span {
@@ -2876,6 +2928,39 @@ progress.iplan-bar::-moz-progress-bar { background: var(--accent); border-radius
   color: var(--accent-text); box-shadow: none;
 }
 
+/* v3.5: per-set tracking chips (the tappable set numbers) */
+.iex-sets {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: .4rem; margin-top: .55rem;
+}
+.set-chip {
+  display: inline-grid; place-items: center;
+  min-width: 34px; height: 34px; padding: 0 .4rem;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface); color: var(--ink);
+  font: 700 .82rem/1 var(--font-display); cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s, transform .15s;
+}
+.set-chip:hover { border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.set-chip:active { transform: scale(.94); }
+.set-chip.done {
+  background: var(--accent); border-color: transparent; color: var(--accent-ink);
+}
+.set-check { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2.6; }
+.iex-sets-count {
+  margin-left: auto; font-size: .74rem; font-weight: 650; color: var(--muted);
+}
+.iplan-day-reset { margin-top: .45rem; }
+
+/* v3.5: the weekly strip is tappable — the pick button fills the cell */
+.iplan-week-pick {
+  display: grid; gap: .2rem; justify-items: center;
+  width: 100%; padding: 0; margin: 0;
+  background: none; border: none; cursor: pointer;
+  font: inherit; color: inherit; text-align: center;
+}
+.iplan-week-pick:hover .iplan-week-name { color: var(--accent-text); }
+
 .iplan-week { display: grid; gap: .6rem; }
 .iplan-week-row {
   display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -2895,7 +2980,12 @@ progress.iplan-bar::-moz-progress-bar { background: var(--accent); border-radius
   outline: 2px solid var(--accent); outline-offset: -1px;
 }
 .iplan-week-name { font-size: .78rem; font-weight: 700; }
-.iplan-week-tag { font-size: .66rem; font-weight: 600; color: var(--muted); }
+.iplan-week-tag {
+  font-size: .66rem; font-weight: 600; color: var(--muted);
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.iplan-week-pick { min-width: 0; }
+.iplan-week-day { min-width: 0; overflow: hidden; }
 
 .iplan-plans { display: grid; gap: .6rem; }
 .iplan-plan-grid {

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
-  ArrowUpRight, BookOpen, Clock, LibraryBig, Landmark, MapPin, Star,
+  ArrowUpRight, Clock, LibraryBig, Landmark, MapPin, Star,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { requireUser } from "@/lib/auth";
 import { getLibraryContent } from "@/lib/api";
+import { apiGet } from "@/lib/server-api";
+import { BooksPanel } from "@/components/library/BooksPanel";
 import { ContentUnavailable } from "@/components/ContentUnavailable";
-import { iconByName } from "@/lib/icons";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -58,6 +59,10 @@ export default async function LibraryPage({ params, searchParams }: Props) {
     collections: libraryCollections, books: libraryBooks, places: libraryPlaces,
     bookDetails: BOOK_DETAILS, venueDetails: LIB_VENUE_DETAILS,
   } = libraryContent;
+
+  // v3.5: the personal bookshelf — server-resolved for the first paint.
+  const shelfData = await apiGet<{ books?: string[] }>("/api/library/shelf");
+  const shelfSlugs = Array.isArray(shelfData?.books) ? shelfData!.books! : [];
 
   const tabs = TABS.map(({ id, icon }) => ({ id, label: tr(`rail_${id}`), icon }));
   const hrefs = Object.fromEntries(
@@ -113,36 +118,7 @@ export default async function LibraryPage({ params, searchParams }: Props) {
           )}
 
           {active === "books" && (
-            <>
-              <header className="page-head">
-                <p className="eyebrow"><i /><BookOpen size={14} aria-hidden />PreLife Library</p>
-                <h1 className="display sm">{t("booksTitle")}</h1>
-                <p className="lede">{t("booksSubtitle")}</p>
-              </header>
-              <ul className="drecipes">
-                {/* detail rows are DB-driven — skip items without details */}
-                {libraryBooks.filter((b) => BOOK_DETAILS[b.id]).map((b) => {
-                  const d = BOOK_DETAILS[b.id]!;
-                  const BookIcon = iconByName(b.icon);
-                  return (
-                    <li key={b.id} className="card drecipe-card">
-                      <div className="card-top">
-                        <span className="chip-ico tinted"><BookIcon size={20} aria-hidden /></span>
-                        <span className="tag">{t(`level${cap(b.level)}`)}</span>
-                      </div>
-                      <h3 className="h4">{t(b.nameKey)}</h3>
-                      <p className="dbook-target">{t(b.targetKey)}</p>
-                      <p className="dbook-author">{t("bookAuthor")}: <b>{d.author}</b></p>
-                      <div className="drecipe-facts">
-                        <span><BookOpen size={14} aria-hidden />{t("bookPages", { count: d.pages })}</span>
-                        <span><Clock size={14} aria-hidden />{t("bookMinutes", { count: d.minutes })}</span>
-                      </div>
-                      <p className="dbook-blurb">{t(d.blurbKey)}</p>
-                    </li>
-                  );
-                })}
-              </ul>
-            </>
+            <BooksPanel books={libraryBooks} details={BOOK_DETAILS} initialShelf={shelfSlugs} />
           )}
 
           {active === "venues" && (

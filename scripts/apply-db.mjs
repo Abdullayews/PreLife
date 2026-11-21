@@ -98,6 +98,14 @@ if (mode === "v3.4") {
   process.exit(0);
 }
 
+/* v3.5: gym plan set progress (user_plan_progress), personal bookshelf
+   (book_shelf), reduce-motion preference. See db/schema-v3.5.sql. */
+if (mode === "v3.5") {
+  await run(readFileSync(new URL("db/schema-v3.5.sql", root), "utf8"), "schema-v3.5.sql");
+  console.log("done.");
+  process.exit(0);
+}
+
 if (mode === "all" || mode === "schema") {
   await run(readFileSync(new URL("db/schema.sql", root), "utf8"), "schema.sql");
 }

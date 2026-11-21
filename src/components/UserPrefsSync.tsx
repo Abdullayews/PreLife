@@ -32,7 +32,11 @@ export function UserPrefsSync({ userId }: { userId: string | null }) {
       try {
         const res = await fetch(apiUrl("/api/me/preferences"));
         if (!res.ok) return;
-        const prefs = (await res.json()) as { locale?: string; theme?: string };
+        const prefs = (await res.json()) as {
+          locale?: string;
+          theme?: string;
+          reduceMotion?: boolean;
+        };
         if (cancelled) return;
 
         if (prefs.theme === "dark" || prefs.theme === "light") {
@@ -42,6 +46,20 @@ export function UserPrefsSync({ userId }: { userId: string | null }) {
             setThemeChoice(prefs.theme === "dark");
           }
           document.documentElement.classList.toggle("dark", prefs.theme === "dark");
+        }
+
+        // Account-tier reduce-motion (v3.5): follow the profile row across
+        // devices — but only when this browser has no explicit local choice
+        // yet (ThemeGuard keeps the local tier authoritative afterwards).
+        if (typeof prefs.reduceMotion === "boolean") {
+          let localMotion: string | null = null;
+          try { localMotion = localStorage.getItem("pl-motion"); } catch { /* unavailable */ }
+          if (localMotion === null) {
+            document.documentElement.classList.toggle("reduce-motion", prefs.reduceMotion);
+            if (hasConsent()) {
+              try { localStorage.setItem("pl-motion", prefs.reduceMotion ? "off" : "on"); } catch { /* unavailable */ }
+            }
+          }
         }
 
         if (

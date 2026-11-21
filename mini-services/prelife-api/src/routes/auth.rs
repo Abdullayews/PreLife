@@ -461,7 +461,35 @@ pub async fn me(State(st): State<St>, headers: HeaderMap) -> Result<Response, Do
         return Err(err(503, "supabase_unconfigured"));
     }
     let cs = session::current_session(&st, &headers).await;
-    Ok(json_ok(json!({ "user": cs.map(|c| session::user_view(&c.user)) })))
+    let user = match cs {
+        None => None,
+        Some(c) => {
+            let mut u = session::user_view(&c.user);
+            // Premium badge: any active custom package → the sidebar chip.
+            // A missing/failed lookup is a plain false — cosmetic only.
+            let uid = s(&c.user, "id");
+            if !uid.is_empty() {
+                let active = st
+                    .supa
+                    .select_one(
+                        "custom_packages",
+                        &vec![
+                            ("select".into(), "id".into()),
+                            ("user_id".into(), format!("eq.{uid}")),
+                            ("status".into(), "eq.active".into()),
+                        ],
+                    )
+                    .await
+                    .ok()
+                    .flatten();
+                if let Some(obj) = u.as_object_mut() {
+                    obj.insert("premium".into(), json!(active.is_some()));
+                }
+            }
+            Some(u)
+        }
+    };
+    Ok(json_ok(json!({ "user": user })))
 }
 
 /* ── GET /api/auth/verify ─────────────────────────────────────────────── */

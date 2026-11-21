@@ -15,6 +15,7 @@ export function saveUserPref(patch: {
   locale?: string;
   theme?: "light" | "dark";
   railFolded?: boolean;
+  reduceMotion?: boolean;
 }): void {
   void fetch(apiUrl("/api/me/preferences"), {
     method: "PATCH",

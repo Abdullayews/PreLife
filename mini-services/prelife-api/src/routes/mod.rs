@@ -9,6 +9,7 @@ pub mod emu;
 pub mod gym;
 pub mod internal;
 pub mod psych;
+pub mod shelf;
 pub mod subscription;
 
 use crate::state::St;
@@ -144,6 +145,10 @@ pub fn router(st: St) -> Router {
         .route("/api/ai/chat", post(ai::chat_post))
         // gym plan
         .route("/api/gym/plan", get(gym::plan_get).post(gym::plan_post).delete(gym::plan_delete))
+        .route("/api/gym/progress", get(gym::progress_get).post(gym::progress_post))
+        // library bookshelf
+        .route("/api/library/shelf", get(shelf::shelf_get).post(shelf::shelf_post))
+        .route("/api/library/shelf/{slug}", delete(shelf::shelf_delete))
         // subscription custom packages
         .route("/api/subscription/custom", get(subscription::custom_get).post(subscription::custom_post))
         // content catalogs

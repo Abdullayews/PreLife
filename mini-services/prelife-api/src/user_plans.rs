@@ -561,3 +561,91 @@ pub async fn save_chat_plan(st: &St, user_id: &str, raw: &Value, locale: &str) -
     let plan = normalize_plan_input(&Value::Object(input), locale, &reg)?;
     insert_active(st, user_id, &plan).await
 }
+
+/* ── Set progress (the tappable set chips on the plan day) ────────────── */
+
+/// The done-set map for one (plan, day, Baku date): `{ "<exIdx>": [setNo,…] }`.
+/// Missing row → empty map. Reading never fails: progress is cosmetic.
+pub async fn progress_get(st: &St, user_id: &str, plan_id: &str, day: i64, date: &str) -> Value {
+    let row = st
+        .supa
+        .select_one(
+            "user_plan_progress",
+            &vec![
+                ("select".into(), "done_sets".into()),
+                ("user_id".into(), format!("eq.{user_id}")),
+                ("plan_id".into(), format!("eq.{plan_id}")),
+                ("day".into(), format!("eq.{day}")),
+                ("date".into(), format!("eq.{date}")),
+            ],
+        )
+        .await
+        .ok()
+        .flatten();
+    row.and_then(|r| v(&r).get("done_sets").cloned())
+        .filter(|d| d.is_object())
+        .unwrap_or_else(|| json!({}))
+}
+
+/// Upsert the day's done-set map (replace semantics — the client sends the
+/// full state every time; an empty map resets the day).
+pub async fn progress_save(
+    st: &St,
+    user_id: &str,
+    plan_id: &str,
+    day: i64,
+    date: &str,
+    done: &Value,
+) -> Res<()> {
+    let done_str = serde_json::to_string(done).unwrap_or_else(|_| "{}".into());
+    // Bound the map: <= 30 exercises × <= 12 sets each keeps a hostile
+    // body far below any meaningful row size.
+    if done_str.len() > 4096 {
+        return Err(DomainError::Api(crate::error::ApiError::bad_request()));
+    }
+    let _guard = st.write_lock.lock().await;
+    let existing = st
+        .supa
+        .select_one(
+            "user_plan_progress",
+            &vec![
+                ("select".into(), "id".into()),
+                ("user_id".into(), format!("eq.{user_id}")),
+                ("plan_id".into(), format!("eq.{plan_id}")),
+                ("day".into(), format!("eq.{day}")),
+                ("date".into(), format!("eq.{date}")),
+            ],
+        )
+        .await
+        .ok()
+        .flatten();
+    match existing {
+        Some(row) => {
+            let id = s(&v(&row), "id");
+            st.supa
+                .update(
+                    "user_plan_progress",
+                    &vec![("id".into(), format!("eq.{id}"))],
+                    &json!({ "done_sets": done, "updated_at": now_iso() }),
+                )
+                .await
+                .map_err(DomainError::from_supa)?;
+        }
+        None => {
+            st.supa
+                .insert(
+                    "user_plan_progress",
+                    &json!({
+                        "user_id": user_id,
+                        "plan_id": plan_id,
+                        "day": day,
+                        "date": date,
+                        "done_sets": done,
+                    }),
+                )
+                .await
+                .map_err(DomainError::from_supa)?;
+        }
+    }
+    Ok(())
+}

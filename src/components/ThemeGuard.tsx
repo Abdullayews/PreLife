@@ -15,20 +15,29 @@ import { THEME_KEY, getVisitTheme } from "@/lib/consent";
  *
  * Resolution order: the persistent tier (localStorage, written only
  * after cookie consent) wins; otherwise the in-memory visit theme
- * (pre-consent); otherwise leave the class untouched.
+ * (pre-consent); otherwise leave the class untouched. The
+ * reduce-motion class ("pl-motion" = "off") is guarded the same way.
  */
 export function ThemeGuard() {
   useEffect(() => {
     const restore = () => {
       let stored: string | null = null;
+      let motion: string | null = null;
       try {
         stored = localStorage.getItem(THEME_KEY);
+        motion = localStorage.getItem("pl-motion");
       } catch { /* storage unavailable — fall back to the memory tier */ }
       const remembered = stored ?? getVisitTheme();
       if (remembered !== null) {
         const dark = remembered === "dark";
         if (document.documentElement.classList.contains("dark") !== dark) {
           document.documentElement.classList.toggle("dark", dark);
+        }
+      }
+      if (motion !== null) {
+        const off = motion === "off";
+        if (document.documentElement.classList.contains("reduce-motion") !== off) {
+          document.documentElement.classList.toggle("reduce-motion", off);
         }
       }
     };

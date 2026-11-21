@@ -28,7 +28,7 @@ import "./globals.css";
  * React hydrates; without the suppression React would report false-positive
  * attribute mismatches.
  */
-const themeScript = `try{if(localStorage.getItem('${THEME_KEY}')==='dark')document.documentElement.classList.add('dark');var p=location.pathname.split('/')[1];if(p==='az'||p==='en'||p==='ru')document.documentElement.lang=p}catch(e){}`;
+const themeScript = `try{if(localStorage.getItem('${THEME_KEY}')==='dark')document.documentElement.classList.add('dark');if(localStorage.getItem('pl-motion')==='off')document.documentElement.classList.add('reduce-motion');var p=location.pathname.split('/')[1];if(p==='az'||p==='en'||p==='ru')document.documentElement.lang=p}catch(e){}`;
 
 /* v4 mobile baseline: safe-area-aware viewport + per-scheme theme color
    matched to the page top (not the brand color). */

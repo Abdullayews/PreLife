@@ -86,6 +86,8 @@ export type ShellUser = {
   role?: "user" | "psychologist";
   /** v3.4: the linked psychologists_v2 slug (console guard). */
   psychSlug?: string | null;
+  /** v3.5: any active custom package → the "Premium üzv" rail chip. */
+  premium?: boolean;
 };
 
 type Props = {
@@ -380,6 +382,12 @@ export function AppShell({
                   <>
                     <span className="rail-id-meta">
                       <b>{displayName}</b>
+                      {user.premium && (
+                        <span className="tag-solid rail-premium">
+                          <Crown size={11} aria-hidden />
+                          {t("premiumBadge")}
+                        </span>
+                      )}
                     </span>
                     <ChevronsUpDown
                       size={14} aria-hidden

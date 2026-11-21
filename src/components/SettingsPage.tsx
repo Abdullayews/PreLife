@@ -365,6 +365,7 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
   const [cat, setCat] = useState<CatId>("account");
   // null until mount — avoids a hydration mismatch on the pressed state.
   const [dark, setDark] = useState<boolean | null>(null);
+  const [motion, setMotion] = useState(false);
   const [notify, setNotify] = useState<NotifyState>(DEFAULT_NOTIFY);
   const [busy, setBusy] = useState(false);
 
@@ -375,6 +376,23 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
       if (raw) setNotify({ ...DEFAULT_NOTIFY, ...(JSON.parse(raw) as Partial<NotifyState>) });
     } catch { /* storage unavailable */ }
   }, []);
+
+  useEffect(() => {
+    setMotion(document.documentElement.classList.contains("reduce-motion"));
+  }, []);
+
+  const chooseMotion = () => {
+    const next = !motion;
+    setMotion(next);
+    document.documentElement.classList.toggle("reduce-motion", next);
+    // Local tier (cross-visit, consent-gated) + the account tier.
+    try {
+      if (document.cookie.split(";").some((c) => c.trim().startsWith("pl_cookies="))) {
+        localStorage.setItem("pl-motion", next ? "off" : "on");
+      }
+    } catch { /* storage unavailable */ }
+    saveUserPref({ reduceMotion: next });
+  };
 
   const chooseTheme = (next: boolean) => {
     setDark(next);
@@ -512,6 +530,20 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
                       <Moon size={13} aria-hidden />{t("appearance.dark")}
                     </button>
                   </fieldset>
+                </div>
+                <div className="set-row">
+                  <span className="set-info">
+                    <b>{t("appearance.reduceMotion")}</b>
+                    <span>{t("appearance.reduceMotionHint")}</span>
+                  </span>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={motion}
+                    aria-label={t("appearance.reduceMotion")}
+                    className="switch"
+                    onClick={chooseMotion}
+                  />
                 </div>
               </div>
             </section>

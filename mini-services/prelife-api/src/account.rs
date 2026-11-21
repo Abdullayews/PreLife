@@ -22,6 +22,7 @@ fn prefs_view(row: Option<&Row>) -> Value {
         "theme": theme,
         "railFolded": row.map(|r| is_true(&v(r), "rail_folded")).unwrap_or(false),
         "contentLocation": if row.map(|r| s(&v(r), "content_location")).as_deref() == Some("az") { "az" } else { "global" },
+        "reduceMotion": row.map(|r| is_true(&v(r), "reduce_motion")).unwrap_or(false),
     })
 }
 
@@ -33,7 +34,10 @@ pub async fn preferences_get(st: &St, user_id: &str) -> Res<Value> {
     }
     let row = st
         .supa
-        .select_one("profiles", &[("select", "lang,theme,rail_folded,content_location"), ("id", &format!("eq.{user_id}"))])
+        .select_one(
+            "profiles",
+            &[("select", "lang,theme,rail_folded,content_location,reduce_motion"), ("id", &format!("eq.{user_id}"))],
+        )
         .await
         .map_err(DomainError::from_supa)?;
     let view = prefs_view(row.as_ref());
@@ -68,6 +72,12 @@ pub async fn preferences_update(st: &St, user_id: &str, body: &Value) -> Res<Val
     if let Some(loc) = body.get("contentLocation") {
         match loc {
             Value::String(s) if s == "global" || s == "az" => patch.insert("content_location".into(), json!(s)),
+            _ => return Err(DomainError::Api(ApiError::bad_request())),
+        };
+    }
+    if let Some(motion) = body.get("reduceMotion") {
+        match motion {
+            Value::Bool(b) => patch.insert("reduce_motion".into(), json!(b)),
             _ => return Err(DomainError::Api(ApiError::bad_request())),
         };
     }

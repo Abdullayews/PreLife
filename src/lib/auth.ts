@@ -23,6 +23,8 @@ export type SessionUser = {
   psychSlug: string | null;
   /** v3.4: content-scope choice (global | az) riding on the session row. */
   location: "global" | "az";
+  /** v3.5: any active custom package (the "Premium üzv" rail chip). */
+  premium: boolean;
 };
 
 /** /api/auth/me's user view — the SessionUser shape verbatim. */
@@ -44,6 +46,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       role: user.role === "psychologist" ? "psychologist" : "user",
       psychSlug: user.psychSlug ?? null,
       location: user.location === "az" ? "az" : "global",
+      premium: user.premium === true,
     };
   } catch {
     return null;

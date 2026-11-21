@@ -8,7 +8,7 @@ import {
 } from "react";
 import {
   BookOpen, Brain, CalendarDays, ChevronsUpDown, Clock, Crown,
-  Dumbbell, House, LoaderCircle, MapPin, Moon, Pill, Play, Salad, Search,
+  Dumbbell, House, LoaderCircle, MapPin, Moon, Pill, Play, RotateCcw, Salad, Search,
   SearchX, Settings, Shirt, Star, Sun, Wand2, X,
   type LucideIcon,
 } from "lucide-react";
@@ -306,8 +306,10 @@ function PlanView({
 }) {
   const t = useTranslations("gymApp");
   const [weekday, setWeekday] = useState<number | null>(null);
-  const [done, setDone] = useState<Set<string>>(new Set());
-  const doneKey = useRef<string>("");
+  /* Per-set completion, server-tracked: { "<exIdx>": [setNo,…] }. The
+   * whole-exercise localStorage marks are gone — sets are the unit now. */
+  const [doneSets, setDoneSets] = useState<Record<string, number[]>>({});
+  const [saving, setSaving] = useState(false);
 
   /* "Today" once, client-side (Baku), deferred a frame so the first
    * paint stays hydration-safe (the server cannot know the date). */
@@ -331,31 +333,64 @@ function PlanView({
     return plan.days[0] ?? { day: 1, focus: "", exercises: [] };
   }, [plan.days, weekday]);
 
-  /* Completion state — per plan + day + date, consent-gated, read a
-   * frame after mount (storage is browser-only). Keyed by exercise INDEX:
-   * custom AI moves share ex === "". */
+  /* Set marks for the shown day — loaded from the backend (one row per
+   * plan + day + Baku date). A failed load is just an empty day. */
   useEffect(() => {
-    const key = `pl:idman:done:${plan.id}:${day.day}:${bakuToday()}`;
-    const id = requestAnimationFrame(() => {
-      doneKey.current = key;
-      const raw = storeGet(key);
-      setDone(new Set(raw ? (JSON.parse(raw) as string[]).filter(Boolean) : []));
-    });
-    return () => cancelAnimationFrame(id);
+    let alive = true;
+    (async () => {
+      try {
+        const qs = new URLSearchParams({ planId: plan.id, day: String(day.day), date: bakuToday() });
+        const res = await fetch(apiUrl(`/api/gym/progress?${qs.toString()}`), { cache: "no-store" });
+        if (!res.ok) return;
+        const body = (await res.json()) as { done?: Record<string, number[]> };
+        if (alive && body.done && typeof body.done === "object") setDoneSets(body.done);
+      } catch {
+        /* offline — the day simply starts unmarked */
+      }
+    })();
+    return () => { alive = false; };
   }, [plan.id, day.day]);
 
-  const toggleDone = (idx: string) => {
-    setDone((prev) => {
-      const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx); else next.add(idx);
-      storeSet(doneKey.current, JSON.stringify([...next]));
+  /* Replace-semantics save: the full day map goes up on every change. */
+  const persist = useCallback(async (next: Record<string, number[]>) => {
+    setSaving(true);
+    try {
+      await fetch(apiUrl("/api/gym/progress"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planId: plan.id, day: day.day, date: bakuToday(), done: next }),
+      });
+    } catch {
+      /* keep the local state — the next toggle re-sends everything */
+    } finally {
+      setSaving(false);
+    }
+  }, [plan.id, day.day]);
+
+  const toggleSet = (exIdx: number, setNo: number) => {
+    setDoneSets((prev) => {
+      const marks = prev[String(exIdx)] ?? [];
+      const next = {
+        ...prev,
+        [String(exIdx)]: marks.includes(setNo) ? marks.filter((n) => n !== setNo) : [...marks, setNo].sort((a, b) => a - b),
+      };
+      if (next[String(exIdx)].length === 0) delete next[String(exIdx)];
+      void persist(next);
       return next;
     });
   };
 
+  const resetDay = () => {
+    setDoneSets({});
+    void persist({});
+  };
+
   const total = day.exercises.length;
-  const doneCount = day.exercises.filter((_, i) => done.has(String(i))).length;
+  const setsOf = (i: number) => day.exercises[i]?.sets ?? 0;
+  const doneSetsOf = (i: number) => doneSets[String(i)]?.length ?? 0;
+  const doneCount = day.exercises.filter((_, i) => doneSetsOf(i) >= setsOf(i) && setsOf(i) > 0).length;
   const allDone = total > 0 && doneCount === total;
+  const doneSetTotal = Object.values(doneSets).reduce((n, a) => n + a.length, 0);
   const groups = muscleGroupsOf(day, catalog.exercises);
   const minutes = minutesOf(day);
   const sets = totalSetsOf(day);
@@ -423,7 +458,7 @@ function PlanView({
 
             <ol className="iplan-list">
               {day.exercises.map((pe, i) => (
-                <li key={i} className={done.has(String(i)) ? "done" : undefined}>
+                <li key={i} className={doneSetsOf(i) >= setsOf(i) && setsOf(i) > 0 ? "done" : undefined}>
                   <span className="iplan-list-n" aria-hidden>{i + 1}</span>
                   <span className="iplan-list-name">{pe.name}</span>
                   <span className="iplan-list-dose">{t("plan.setsLine", { sets: pe.sets, reps: pe.reps })}</span>
@@ -433,9 +468,19 @@ function PlanView({
 
             <div className="iplan-progress">
               <div className="iplan-bar small" aria-hidden>
-                <i style={{ width: `${total ? Math.round((doneCount / total) * 100) : 0}%` }} />
+                <i style={{ width: `${sets ? Math.round((doneSetTotal / sets) * 100) : 0}%` }} />
               </div>
-              <p className="iplan-progress-txt">{t("plan.sessionProgress", { done: doneCount, total })}</p>
+              <p className="iplan-progress-txt">{t("plan.setsProgress", { done: doneSetTotal, total: sets })}</p>
+              {doneSetTotal > 0 && (
+                <button
+                  type="button"
+                  className="ibtn ibtn-sm ibtn-ghost iplan-day-reset"
+                  onClick={resetDay}
+                  disabled={saving}
+                >
+                  <RotateCcw size={14} aria-hidden />{t("plan.dayReset")}
+                </button>
+              )}
               {allDone && <p className="iplan-finished">{t("plan.finished")}</p>}
             </div>
           </div>
@@ -454,8 +499,8 @@ function PlanView({
                 index={i}
                 pe={pe}
                 ex={catalog.exercises[pe.ex]}
-                done={done.has(String(i))}
-                onToggle={() => toggleDone(String(i))}
+                doneSets={doneSets[String(i)] ?? []}
+                onToggleSet={(setNo) => toggleSet(i, setNo)}
               />
             ))}
           </ul>
@@ -477,10 +522,16 @@ function PlanView({
                   has ? "work" : "rest",
                   isTodayRow ? "today" : "",
                 ].join(" ")}
-                aria-current={isTodayRow ? "date" : undefined}
               >
-                <span className="iplan-week-name">{weekdayLabel(catalog.locale, planDayOf(d), true)}</span>
-                <span className="iplan-week-tag">{has ? t("plan.workoutTag") : t("plan.restTag")}</span>
+                <button
+                  type="button"
+                  className="iplan-week-pick"
+                  aria-pressed={isTodayRow}
+                  onClick={() => setWeekday(d)}
+                >
+                  <span className="iplan-week-name">{weekdayLabel(catalog.locale, planDayOf(d), true)}</span>
+                  <span className="iplan-week-tag">{has ? t("plan.workoutTag") : t("plan.restTag")}</span>
+                </button>
               </li>
             );
           })}
@@ -731,16 +782,17 @@ function PlanQuiz({
 /* ── An exercise card of today's session ────────────────────────────────── */
 
 function ExerciseCard({
-  index, pe, ex, done, onToggle,
+  index, pe, ex, doneSets, onToggleSet,
 }: {
   index: number; pe: PlanExercise; ex: GymAppExercise | undefined;
-  done: boolean; onToggle: () => void;
+  doneSets: number[]; onToggleSet: (setNo: number) => void;
 }) {
   const t = useTranslations("gymApp");
   const video = ex ? exerciseVideo(pe.ex) : null;
   const [open, setOpen] = useState(false);
+  const allDone = doneSets.length >= pe.sets && pe.sets > 0;
   return (
-    <li className={`iex${done ? " done" : ""}`}>
+    <li className={`iex${allDone ? " done" : ""}`}>
       <div
         className="iex-media"
         style={video ? undefined : {
@@ -771,22 +823,34 @@ function ExerciseCard({
             <p>{ex.guide}</p>
           </details>
         )}
-        <button
-          type="button"
-          className={`ibtn iex-done${done ? " done" : ""}`}
-          aria-pressed={done}
-          title={done ? t("plan.doneUndo") : t("plan.done")}
-          onClick={onToggle}
+        <div
+          className="iex-sets"
+          role="group"
+          aria-label={t("plan.setsGroup", { sets: pe.sets })}
         >
-          {done ? (
-            <>
-              <svg className="iex-check" viewBox="0 0 24 24" aria-hidden>
-                <path d="M4.5 12.5l5 5 10-11" />
-              </svg>
-              {t("plan.done")}
-            </>
-          ) : t("plan.done")}
-        </button>
+          {Array.from({ length: Math.max(1, pe.sets) }, (_, s) => s + 1).map((setNo) => {
+            const marked = doneSets.includes(setNo);
+            return (
+              <button
+                key={setNo}
+                type="button"
+                className={`set-chip${marked ? " done" : ""}`}
+                aria-pressed={marked}
+                aria-label={t("plan.setA11y", { set: setNo, state: marked ? t("plan.setDone") : t("plan.setOpen") })}
+                onClick={() => onToggleSet(setNo)}
+              >
+                {marked ? (
+                  <svg className="set-check" viewBox="0 0 24 24" aria-hidden>
+                    <path d="M4.5 12.5l5 5 10-11" />
+                  </svg>
+                ) : setNo}
+              </button>
+            );
+          })}
+          <span className="iex-sets-count" aria-live="polite">
+            {t("plan.setsCount", { done: doneSets.length, total: pe.sets })}
+          </span>
+        </div>
       </div>
     </li>
   );
