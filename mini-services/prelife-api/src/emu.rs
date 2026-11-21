@@ -512,6 +512,16 @@ impl EmuStore {
             meta.insert("providers".into(), json!(providers));
             meta.insert("provider".into(), json!(provider));
             existing.insert("app_metadata".into(), Value::Object(meta));
+            // v5.2 (security round 5): the OAuth provider asserts the e-mail
+            // is verified — flip the row to confirmed and drop any pending-
+            // registration flag left by an earlier login-mode mail hand-off,
+            // so the synthetic identity can always complete the flow. The
+            // consent allowlist in routes/emu.rs means only the two
+            // synthetic emails ever reach this branch.
+            existing.insert("email_confirmed".into(), json!(true));
+            if let Some(um) = existing.get_mut("user_metadata").and_then(|v| v.as_object_mut()) {
+                um.insert("needs_completion".into(), json!(false));
+            }
             existing.insert("updated_at".into(), json!(now));
             let out = Value::Object(existing.clone());
             drop(data);
