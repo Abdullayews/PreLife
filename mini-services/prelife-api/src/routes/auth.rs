@@ -43,11 +43,11 @@ pub fn email_shape_ok(email: &str) -> bool {
 /// display names — trim() only strips whitespace, so they used to survive
 /// into stored profiles verbatim.
 fn name_chars_ok(name: &str) -> bool {
-    !name.chars().any(|c| c.is_control())
+    crate::util::name_chars_ok(name)
 }
 
-fn is_secure(headers: &HeaderMap) -> bool {
-    session::is_secure(headers)
+fn is_secure(st: &St, headers: &HeaderMap) -> bool {
+    session::is_secure(st.cfg.production, headers)
 }
 
 /* ── POST /api/auth/login ─────────────────────────────────────────────── */
@@ -153,7 +153,7 @@ pub async fn login(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Res
             let mut res = json_ok(json!({ "user": session::user_view(&session_user) })).into_response();
             res.headers_mut().append(
                 "set-cookie",
-                session::session_cookie(&token, is_secure(&headers)).parse().unwrap(),
+                session::session_cookie(&token, is_secure(&st, &headers)).parse().unwrap(),
             );
             return Ok(res);
         }
@@ -216,7 +216,10 @@ pub async fn signup(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Re
     if !email_shape_ok(&email) {
         return Err(err(400, "invalid_email"));
     }
-    if char_len(&password) < 8 {
+    // v5.2 (security round 3): 72 chars is bcrypt's hard boundary —
+    // longer inputs are silently truncated by every bcrypt impl, so a
+    // 5000-char "password" would really auth on its first 72 bytes.
+    if char_len(&password) < 8 || char_len(&password) > 72 {
         return Err(err(400, "short_password"));
     }
 
@@ -390,7 +393,7 @@ pub async fn logout(State(st): State<St>, headers: HeaderMap) -> Result<Response
     }
     let mut res = json_ok(json!({ "ok": true })).into_response();
     res.headers_mut()
-        .append("set-cookie", session::cleared_session_cookie(is_secure(&headers)).parse().unwrap());
+        .append("set-cookie", session::cleared_session_cookie(is_secure(&st, &headers)).parse().unwrap());
     Ok(res)
 }
 
@@ -414,7 +417,8 @@ pub async fn complete(State(st): State<St>, headers: HeaderMap, body: Bytes) -> 
     if char_len(&name) < 2 || char_len(&name) > 100 || !name_chars_ok(&name) {
         return Err(err(400, "missing_fields"));
     }
-    if char_len(&password) < 8 {
+    // v5.2 (security round 3): same 72-char bcrypt ceiling as signup.
+    if char_len(&password) < 8 || char_len(&password) > 72 {
         return Err(err(400, "short_password"));
     }
 
@@ -460,7 +464,7 @@ pub async fn verify(State(st): State<St>, headers: HeaderMap, RawQuery(raw): Raw
     let token = query_get(&q, "token").unwrap_or("").to_string();
     let locale = vf::norm_locale(query_get(&q, "locale"));
     let origin = origin_from(&st, &headers);
-    let secure = is_secure(&headers);
+    let secure = is_secure(&st, &headers);
 
     let bounce = |path: String| -> Response {
         redirect_with_cookies(&format!("{origin}{path}"), StatusCode::SEE_OTHER, &[])
@@ -537,7 +541,7 @@ fn fail(st: &St, headers: &HeaderMap) -> Response {
     redirect_with_cookies(
         &format!("{origin}/login?error=oauth"),
         StatusCode::FOUND,
-        &[session::cleared_oauth_cookie(session::is_secure(headers))],
+        &[session::cleared_oauth_cookie(session::is_secure(st.cfg.production, headers))],
     )
 }
 
@@ -560,7 +564,7 @@ pub async fn callback(
         return Ok(fail(&st, &headers));
     };
 
-    let secure = session::is_secure(&headers);
+    let secure = session::is_secure(st.cfg.production, &headers);
 
     // The PKCE exchange: through the in-process emu code map or GoTrue.
     let exchanged = if st.cfg.supabase_emu {
@@ -719,7 +723,7 @@ pub async fn oauth_start(
     // Browser-facing /api/* navigation — the sandbox gateway routes it.
     let url = gateway_url(&st, &url);
 
-    let secure = is_secure(&headers);
+    let secure = is_secure(&st, &headers);
     Ok(redirect_with_cookies(
         &url,
         StatusCode::FOUND,

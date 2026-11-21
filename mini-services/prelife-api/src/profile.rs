@@ -148,7 +148,10 @@ pub async fn update_profile(st: &St, user_id: &str, body: &Value) -> Res<Value> 
         match name {
             Value::String(n) => {
                 let n = n.trim();
-                if n.is_empty() || char_len(n) > 100 {
+                // v5.2 (security round 3): same charset gate as signup —
+                // control characters could smuggle control sequences into
+                // every surface that echoes the stored full_name.
+                if n.is_empty() || char_len(n) > 100 || !crate::util::name_chars_ok(n) {
                     errors.push("name".into());
                 } else {
                     patch.insert("full_name".into(), json!(n));

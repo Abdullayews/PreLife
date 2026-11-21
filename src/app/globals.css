@@ -3190,6 +3190,14 @@ progress.iplan-bar::-moz-progress-bar { background: var(--accent); border-radius
   padding-bottom: 0;
 }
 .idman.idman-embed .imain { padding-top: 0; }
+/* v5.2 (security round 3 / mobile audit): the embedded module header flows
+   edge-to-edge inside .app-main on phones — every other app page gets its
+   gutter from .wrap, but idman-embed skips it, so the eyebrow/title/lede
+   touched x=0 while card text sat at ~1.25rem. Align the header with the
+   card copy instead of the screen edge. */
+@media (max-width: 63.9rem) {
+  .idman.idman-embed .ihead { padding-inline: 1.25rem; }
+}
 .app-shell[data-topnav="off"] .idman.idman-embed { --nav-h: 0rem; }
 .app-shell[data-topnav="off"] .idman.idman-embed .iplan-side {
   top: 1.25rem;
