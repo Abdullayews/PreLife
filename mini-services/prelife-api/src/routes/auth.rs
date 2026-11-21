@@ -370,8 +370,18 @@ pub async fn resend(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Re
         .as_ref()
         .map(|p| s(&Value::Object(p.clone()), "user_id"))
         .unwrap_or_default();
+    // v5.2 (security round 4): anti-enumeration parity — an unknown (or
+    // already-completed) email gets the exact same 200 {"ok":true,
+    // "devLink":null} shape as a known one. In production dev_link is
+    // always null, so the two responses are byte-identical and neither
+    // leaks whether an address is registered; the mail budget for the
+    // (ip, email) pair was already burned above, so probing stays
+    // rate-limited. The emulator's dev capture string remains a dev-only
+    // surface.
     if user_id.is_empty() {
-        return Err(err(404, "unknown"));
+        return Ok(json_ok(
+            json!({ "ok": true, "devLink": Option::<String>::None }),
+        ));
     }
 
     let origin = origin_from(&st, &headers);
