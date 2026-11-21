@@ -256,6 +256,16 @@ pub async fn auth_post(State(st): State<St>, Path(action): Path<String>, body: B
         if !email.contains('@') || email.len() > 120 {
             return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid email" }))).into_response();
         }
+        // v5.2 (security round 5): the consent page may only mint sessions
+        // for the emulator's own synthetic identities — the exact emails it
+        // pre-fills. Before this allowlist, POSTing the consent form with
+        // ANY registered account's email minted a full pl_session for that
+        // account: password-free takeover of a real user (reproduced with
+        // r5victim@test.dev). oauth_upsert_user now only ever sees the two
+        // synthetic identities, so real accounts stay unreachable here.
+        if email != emu_identities(&provider).0 {
+            return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid email" }))).into_response();
+        }
         if challenge.is_empty() || method != "S256" {
             return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid code_challenge" }))).into_response();
         }
