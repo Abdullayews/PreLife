@@ -1,7 +1,15 @@
 //! The local Supabase emulator's HTTP surface — /api/supa-emu/* (DEV
-//! only, SUPABASE_EMU=1). The REST routes mirror PostgREST; the auth
-//! routes mirror GoTrue, including the provider consent page that
-//! replaces Google/Apple's window in the sandbox.
+//! only, SUPABASE_EMU=1).
+//!
+//! v5.2 (security round 2): the HTTP surface is the **consent page only**
+//! (GET/POST authorize). Everything else — the PostgREST REST mirror, the
+//! GoTrue admin routes (user create/update/delete/list), the token
+//! endpoint — is called **in-process** by `src/supa.rs` (Supa::Emu talks
+//! straight to the EmuStore) and must never be reachable over HTTP: an
+//! open REST route meant anyone could read `sessions` (token hashes),
+//! INSERT a known hash bound to a victim's user_id (full account
+//! takeover), PATCH `profiles` (role/psychSlug privilege escalation) or
+//! create admin users with zero authentication. Those routes now 404.
 
 use crate::error::DomainError;
 use crate::session::gateway_url;
@@ -33,65 +41,9 @@ fn emu_guard(st: &St) -> Option<Response> {
 }
 
 /* ── REST: /api/supa-emu/rest/v1/{table} ──────────────────────────────── */
-
-pub async fn rest_get(
-    State(st): State<St>,
-    Path(table): Path<String>,
-    RawQuery(raw): RawQuery,
-) -> Response {
-    if let Some(blocked) = emu_guard(&st) {
-        return blocked;
-    }
-    let Some(store) = st.emu.clone() else { return not_found_json() };
-    let q = parse_query(raw.as_deref());
-    let rows: Vec<Value> = store.rest_get(&table, &q).into_iter().map(Value::Object).collect();
-    Json(rows).into_response()
-}
-
-pub async fn rest_post(State(st): State<St>, Path(table): Path<String>, body: Bytes) -> Response {
-    if let Some(blocked) = emu_guard(&st) {
-        return blocked;
-    }
-    let Some(store) = st.emu.clone() else { return not_found_json() };
-    let body: Value = match serde_json::from_slice(&body) {
-        Ok(v) => v,
-        Err(_) => return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid json" }))).into_response(),
-    };
-    match store.rest_post(&table, &body) {
-        Some(created) => {
-            let rows: Vec<Value> = created.into_iter().map(Value::Object).collect();
-            (StatusCode::CREATED, Json(rows)).into_response()
-        }
-        None => (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid body" }))).into_response(),
-    }
-}
-
-pub async fn rest_patch(State(st): State<St>, Path(table): Path<String>, RawQuery(raw): RawQuery, body: Bytes) -> Response {
-    if let Some(blocked) = emu_guard(&st) {
-        return blocked;
-    }
-    let Some(store) = st.emu.clone() else { return not_found_json() };
-    let body: Value = match serde_json::from_slice(&body) {
-        Ok(v) => v,
-        Err(_) => return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid json" }))).into_response(),
-    };
-    let Some(obj) = body.as_object().cloned() else {
-        return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid body" }))).into_response();
-    };
-    let q = parse_query(raw.as_deref());
-    let rows: Vec<Value> = store.rest_patch(&table, &obj, &q).into_iter().map(Value::Object).collect();
-    Json(rows).into_response()
-}
-
-pub async fn rest_delete(State(st): State<St>, Path(table): Path<String>, RawQuery(raw): RawQuery) -> Response {
-    if let Some(blocked) = emu_guard(&st) {
-        return blocked;
-    }
-    let Some(store) = st.emu.clone() else { return not_found_json() };
-    let q = parse_query(raw.as_deref());
-    store.rest_delete(&table, &q);
-    StatusCode::NO_CONTENT.into_response()
-}
+/* v5.2 (security round 2): NO HTTP REST surface. Supa::Emu reaches the
+ * EmuStore in-process (src/supa.rs); the router no longer registers these
+ * paths, and the store's rest_* methods are the in-process API only.  */
 
 fn not_found_json() -> Response {
     (StatusCode::NOT_FOUND, Json(json!({ "message": "not found" }))).into_response()
@@ -250,40 +202,11 @@ pub async fn auth_get(State(st): State<St>, Path(action): Path<String>, RawQuery
     let q = parse_query(raw.as_deref());
     let origin = crate::session::origin_from(&st, &headers);
 
-    // GET /admin/users?emails=… — the exact-match e-mail lookup.
-    if parts.len() == 2 && parts[0] == "admin" && parts[1] == "users" {
-        let Some(store) = st.emu.clone() else { return not_found_json() };
-        let emails: Vec<String> = q
-            .iter()
-            .filter(|(k, _)| k == "emails")
-            .flat_map(|(_, v)| v.split(',').map(|s| s.trim().to_lowercase()).collect::<Vec<_>>())
-            .filter(|s| !s.is_empty())
-            .collect();
-        let filter = query_get(&q, "filter").unwrap_or("").trim().to_lowercase();
-
-        let mut users = store.admin_list_users(&emails, &filter);
-        let per_page = query_get(&q, "per_page").and_then(|v| v.parse::<usize>().ok()).unwrap_or(10).clamp(1, 50);
-        let page = query_get(&q, "page").and_then(|v| v.parse::<usize>().ok()).unwrap_or(1).max(1);
-        let start = (page - 1) * per_page;
-        let total = users.len();
-        let page_users: Vec<Value> = users.drain(..).skip(start).take(per_page).collect();
-        return Json(json!({
-            "users": page_users,
-            "total": total,
-            "page": page,
-            "per_page": per_page,
-        }))
-        .into_response();
-    }
-
-    // GET /admin/users/{id}
-    if parts.len() == 3 && parts[0] == "admin" && parts[1] == "users" {
-        let Some(store) = st.emu.clone() else { return not_found_json() };
-        return match store.admin_get_user(&parts[2]) {
-            Some(u) => Json(u).into_response(),
-            None => (StatusCode::NOT_FOUND, Json(json!({ "code": 404, "msg": "User not found" }))).into_response(),
-        };
-    }
+    // v5.2 (security round 2): the admin/users GET branches (list + fetch
+    // by id) were removed from the HTTP surface — in-process callers use
+    // EmuStore directly; over HTTP they were an unauthenticated user
+    // directory dump. GET /authorize (the consent page) is the only
+    // browser-facing action.
 
     // GET /authorize — the consent page.
     if parts.len() == 1 && parts[0] == "authorize" {
@@ -311,7 +234,7 @@ pub async fn auth_get(State(st): State<St>, Path(action): Path<String>, RawQuery
     not_found_json()
 }
 
-pub async fn auth_post(State(st): State<St>, Path(action): Path<String>, RawQuery(raw): RawQuery, body: Bytes) -> Response {
+pub async fn auth_post(State(st): State<St>, Path(action): Path<String>, body: Bytes) -> Response {
     if let Some(blocked) = emu_guard(&st) {
         return blocked;
     }
@@ -355,104 +278,10 @@ pub async fn auth_post(State(st): State<St>, Path(action): Path<String>, RawQuer
             .unwrap();
     }
 
-    // POST /admin/users — create.
-    if parts.len() == 2 && parts[0] == "admin" && parts[1] == "users" {
-        let Some(store) = st.emu.clone() else { return not_found_json() };
-        let body: Value = match serde_json::from_slice(&body) {
-            Ok(v) => v,
-            Err(_) => return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid json" }))).into_response(),
-        };
-        let email = body.get("email").and_then(|e| e.as_str()).unwrap_or("").trim().to_lowercase();
-        let password = body.get("password").and_then(|p| p.as_str()).unwrap_or("").to_string();
-        let meta = body.get("user_metadata").cloned().unwrap_or(json!({}));
-        let full_name = meta.get("full_name").and_then(|f| f.as_str()).unwrap_or("").to_string();
-        if email.is_empty() || password.is_empty() {
-            return (StatusCode::BAD_REQUEST, Json(json!({ "message": "email and password required" }))).into_response();
-        }
-        return match store.admin_create_user(&email, &password, &full_name, body.get("email_confirm") == Some(&json!(true)), &meta) {
-            Ok(u) => Json(u).into_response(),
-            Err((status, body)) => (StatusCode::from_u16(status).unwrap(), Json(serde_json::from_str(&body).unwrap_or(json!({})))).into_response(),
-        };
-    }
+    // v5.2 (security round 2): POST /admin/users (create) and POST /token
+    // (password/PKCE grants) removed from the HTTP surface — unauthenticated
+    // admin-create was a full account forger, and the token mirror leaked
+    // password-grant probing. In-process callers (Supa::Emu) are unaffected.
 
-    // POST /token?grant_type=…
-    if parts.len() == 1 && parts[0] == "token" {
-        let q = parse_query(raw.as_deref());
-        let grant = query_get(&q, "grant_type").unwrap_or("").to_string();
-
-        let body: Value = match serde_json::from_slice(&body) {
-            Ok(v) => v,
-            Err(_) => return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid json" }))).into_response(),
-        };
-
-        if grant == "pkce" {
-            let auth_code = s(&body, "auth_code");
-            let verifier = s(&body, "code_verifier");
-            return match pkce_exchange(&st, &auth_code, &verifier).await {
-                Ok(v) => Json(v).into_response(),
-                Err(_) => (
-                    StatusCode::BAD_REQUEST,
-                    Json(json!({ "error": "invalid_grant", "error_description": "Invalid auth code" })),
-                )
-                    .into_response(),
-            };
-        }
-
-        if grant != "password" {
-            return (
-                StatusCode::BAD_REQUEST,
-                Json(json!({ "error": "unsupported_grant_type", "error_description": format!("Unsupported grant_type: {grant}") })),
-            )
-                .into_response();
-        }
-
-        let Some(store) = st.emu.clone() else { return not_found_json() };
-        let email = body.get("email").and_then(|e| e.as_str()).unwrap_or("").trim().to_lowercase();
-        let password = body.get("password").and_then(|p| p.as_str()).unwrap_or("");
-        return match store.password_login(&email, password) {
-            Ok(v) => Json(v).into_response(),
-            Err((status, body)) => {
-                let parsed: Value = serde_json::from_str(&body).unwrap_or(json!({}));
-                (StatusCode::from_u16(status).unwrap(), Json(parsed)).into_response()
-            }
-        };
-    }
-
-    not_found_json()
-}
-
-pub async fn auth_put(State(st): State<St>, Path(action): Path<String>, body: Bytes) -> Response {
-    if let Some(blocked) = emu_guard(&st) {
-        return blocked;
-    }
-    let parts = action_parts(&action);
-
-    if parts.len() == 3 && parts[0] == "admin" && parts[1] == "users" {
-        let Some(store) = st.emu.clone() else { return not_found_json() };
-        let body: Value = match serde_json::from_slice(&body) {
-            Ok(v) => v,
-            Err(_) => return (StatusCode::BAD_REQUEST, Json(json!({ "message": "invalid json" }))).into_response(),
-        };
-        return match store.admin_update_user(&parts[2], &body) {
-            Ok(u) => Json(u).into_response(),
-            Err((status, body)) => (StatusCode::from_u16(status).unwrap(), Json(serde_json::from_str(&body).unwrap_or(json!({})))).into_response(),
-        };
-    }
-    not_found_json()
-}
-
-pub async fn auth_delete(State(st): State<St>, Path(action): Path<String>) -> Response {
-    if let Some(blocked) = emu_guard(&st) {
-        return blocked;
-    }
-    let parts = action_parts(&action);
-
-    if parts.len() == 3 && parts[0] == "admin" && parts[1] == "users" {
-        let Some(store) = st.emu.clone() else { return not_found_json() };
-        return match store.admin_delete_user(&parts[2]) {
-            Ok(()) => Json(json!({ "message": "User deleted successfully" })).into_response(),
-            Err((status, body)) => (StatusCode::from_u16(status).unwrap(), Json(serde_json::from_str(&body).unwrap_or(json!({})))).into_response(),
-        };
-    }
     not_found_json()
 }

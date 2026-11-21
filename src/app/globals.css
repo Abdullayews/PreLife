@@ -2157,6 +2157,13 @@ dialog.modal-panel:not([open])::backdrop { opacity: 0; }
 .ai-fab-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: var(--shadow-3); }
 .ai-fab-btn:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 3px; }
 
+/* v5.2 (security round 2, mobile pass): on phones the FAB shares the
+ * first viewport's bottom-right band with the welcome modules intro —
+ * the lede's first line ran under the button. Reserve the footprint. */
+@media (max-width: 40rem) {
+  #modules .head { padding-right: 4.75rem; }
+}
+
 .ai-fab-panel {
   position: fixed; right: max(1.1rem, env(safe-area-inset-right));
   bottom: calc(5rem + env(safe-area-inset-bottom));
@@ -2776,6 +2783,13 @@ progress.iplan-bar::-moz-progress-bar { background: var(--accent); border-radius
   text-transform: uppercase; color: var(--muted);
 }
 .iplan-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+/* v5.2 (security round 2, mobile pass): at phone widths the bottom-left
+ * rail FAB (the mobile drawer toggle) sits over the muscle-group chips at
+ * the resting viewport — the first chip ("Cardio") was clipped mid-word.
+ * Indent the chip rows past the FAB footprint (52px button + 1rem edge). */
+@media (max-width: 40rem) {
+  .iplan-chips { padding-left: 3.25rem; }
+}
 
 .iplan-list { display: grid; gap: .3rem; list-style: none; margin: 0; padding: 0; }
 .iplan-list li {

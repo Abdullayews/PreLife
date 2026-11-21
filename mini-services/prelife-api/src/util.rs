@@ -345,3 +345,21 @@ pub fn parse_cookies(raw: Option<&str>) -> Vec<(String, String)> {
 pub fn cookie_get<'a>(cookies: &'a [(String, String)], name: &str) -> Option<&'a str> {
     cookies.iter().find(|(k, _)| k == name).map(|(_, v)| v.as_str())
 }
+
+/// v5.2 (security round 2): the host part of an Origin header value
+/// ("https://app.example.com:8443" -> "app.example.com"), or None for
+/// "null"/malformed values. Used by the CSRF origin guard.
+pub fn origin_host(origin: &str) -> Option<String> {
+    if origin.eq_ignore_ascii_case("null") || origin.is_empty() {
+        return None;
+    }
+    let rest = origin.split("://").nth(1).unwrap_or(origin);
+    let authority = rest.split(['/', '?', '#']).next().unwrap_or("");
+    // Drop an explicit port; keep the last colon segment only when it is
+    // all digits (plain hostnames pass through untouched).
+    let host = match authority.rsplit_once(':') {
+        Some((h, p)) if !p.is_empty() && p.chars().all(|c| c.is_ascii_digit()) => h,
+        _ => authority,
+    };
+    if host.is_empty() { None } else { Some(host.to_string()) }
+}

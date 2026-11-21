@@ -18,6 +18,34 @@ fn err(status: u16, code: &str) -> DomainError {
     DomainError::Api(ApiError::json(status, code))
 }
 
+/// v5.2 (security round 2): a conservative RFC-5321-ish shape — an
+/// explicit charset allowlist for the local part and the domain. The old
+/// whitespace-only check accepted parens/commas/quotes (junk that
+/// PostgREST treats as filter syntax — double-encoded downstream, but
+/// rejected at the door now) and homoglyph/control garbage.
+pub fn email_shape_ok(email: &str) -> bool {
+    let Some((local, domain)) = email.split_once('@') else { return false };
+    if local.is_empty() || domain.is_empty() || local.len() > 64 || domain.len() > 190 || email.len() > 254 {
+        return false;
+    }
+    let local_ok = local.chars().all(|c| c.is_ascii_alphanumeric() || ".!#$%&'*+/=?^_`{|}~-".contains(c));
+    let domain_ok = domain
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || c == '.' || c == '-')
+        && domain.contains('.')
+        && domain.split('.').all(|seg| !seg.is_empty())
+        && !domain.starts_with('-')
+        && !domain.ends_with('-');
+    local_ok && domain_ok
+}
+
+/// v5.2 (security round 2): control characters (\u0000-\u001f, \u007f) in
+/// display names — trim() only strips whitespace, so they used to survive
+/// into stored profiles verbatim.
+fn name_chars_ok(name: &str) -> bool {
+    !name.chars().any(|c| c.is_control())
+}
+
 fn is_secure(headers: &HeaderMap) -> bool {
     session::is_secure(headers)
 }
@@ -43,6 +71,11 @@ pub async fn login(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Res
     };
     if email.is_empty() {
         return Err(err(400, "missing_fields"));
+    }
+    // v5.2 (security round 2): same shape gate as signup — malformed
+    // addresses never reach the account lookup or the rate-limit buckets.
+    if !email_shape_ok(&email) {
+        return Err(err(400, "invalid_email"));
     }
 
     // v4.7 brute-force ceiling — both buckets checked together, so a
@@ -176,19 +209,11 @@ pub async fn signup(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Re
     if name.is_empty() || email.is_empty() || password.is_empty() {
         return Err(err(400, "missing_fields"));
     }
-    if char_len(&name) < 2 || char_len(&name) > 100 {
+    if char_len(&name) < 2 || char_len(&name) > 100 || !name_chars_ok(&name) {
         return Err(err(400, "missing_fields"));
     }
-    // The email shape check.
-    let parts: Vec<&str> = email.splitn(2, '@').collect();
-    let email_ok = parts.len() == 2
-        && !parts[0].is_empty()
-        && !parts[1].is_empty()
-        && !parts[0].contains(char::is_whitespace)
-        && !parts[1].contains(char::is_whitespace)
-        && parts[1].contains('.')
-        && parts[1].split('.').all(|seg| !seg.is_empty());
-    if !email_ok {
+    // The email shape check (v5.2: charset allowlist — see email_shape_ok).
+    if !email_shape_ok(&email) {
         return Err(err(400, "invalid_email"));
     }
     if char_len(&password) < 8 {
@@ -311,6 +336,11 @@ pub async fn resend(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Re
     if email.is_empty() {
         return Err(err(400, "missing_fields"));
     }
+    // v5.2 (security round 2): shape gate — junk addresses burn no
+    // mail_send_allowed budget.
+    if !email_shape_ok(&email) {
+        return Err(err(400, "invalid_email"));
+    }
 
     if !st.mail_send_allowed(&crate::state::AppState::client_ip(&headers), &email) {
         return Err(err(429, "too_many_requests"));
@@ -381,7 +411,7 @@ pub async fn complete(State(st): State<St>, headers: HeaderMap, body: Bytes) -> 
         _ => String::new(),
     };
 
-    if char_len(&name) < 2 || char_len(&name) > 100 {
+    if char_len(&name) < 2 || char_len(&name) > 100 || !name_chars_ok(&name) {
         return Err(err(400, "missing_fields"));
     }
     if char_len(&password) < 8 {

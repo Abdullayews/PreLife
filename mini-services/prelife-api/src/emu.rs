@@ -360,27 +360,10 @@ impl EmuStore {
             .map(gotrue_user)
     }
 
-    /// The admin list endpoint (emails exact-match / filter substring) —
-    /// GoTrue-shaped users.
-    pub fn admin_list_users(&self, emails: &[String], filter: &str) -> Vec<Value> {
-        self.data
-            .read()
-            .unwrap()
-            .auth_users
-            .iter()
-            .filter(|u| {
-                let email = s(&row_v(u), "email").to_lowercase();
-                if !emails.is_empty() {
-                    emails.iter().any(|e| e == &email)
-                } else if !filter.is_empty() {
-                    email.contains(filter)
-                } else {
-                    true
-                }
-            })
-            .map(gotrue_user)
-            .collect()
-    }
+    // v5.2 (security round 2): admin_list_users (the GoTrue admin list
+    // endpoint) was removed along with its HTTP route — its only caller
+    // was the unauthenticated GET /admin/users branch. find_user_by_email
+    // covers every legitimate in-process lookup.
 
     /// Exact-match e-mail lookup (lower-cased) — the emails= filter path.
     pub fn find_user_by_email(&self, email: &str) -> Option<Value> {
