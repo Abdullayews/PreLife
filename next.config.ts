@@ -3,9 +3,43 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
+const isProd = process.env.NODE_ENV === "production";
+
+/* v5.2 (loop iter 3, security round): baseline security headers.
+ * - CSP allows only self + Unsplash images (seed content) + data:/blob:
+ *   (avatars are data-URI validated server-side); Next's inline hydration
+ *   scripts/styles need 'unsafe-inline'; dev (Turbopack HMR) also needs
+ *   'unsafe-eval' + ws:.
+ * - Frame protection ships PRODUCTION-ONLY: the sandbox preview panel
+ *   iframes this app from a *.space-z.ai origin — X-Frame-Options /
+ *   frame-ancestors there would blank the preview. */
+const csp = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://images.unsplash.com",
+  "font-src 'self' data:",
+  `connect-src 'self'${isProd ? "" : " ws:"}`,
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  ...(isProd ? ["frame-ancestors 'none'"] : []),
+].join("; ");
+
+const securityHeaders = [
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+  { key: "Content-Security-Policy", value: csp },
+  ...(isProd ? [{ key: "X-Frame-Options", value: "DENY" }] : []),
+];
+
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  async headers() {
+    return [{ source: "/:path*", headers: securityHeaders }];
+  },
   // DEV ONLY: the browser-facing /api/* calls (lib/api-url.ts appends the
   // XTransformPort=3030 gateway param) are routed by the space-z.ai preview
   // gateway — which does not exist on a plain localhost:3000 visit. This

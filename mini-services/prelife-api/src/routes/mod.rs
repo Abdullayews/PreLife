@@ -12,7 +12,9 @@ pub mod psych;
 pub mod subscription;
 
 use crate::state::St;
-use axum::http::StatusCode;
+use axum::extract::Request;
+use axum::http::{HeaderValue, StatusCode};
+use axum::middleware::Next;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{delete, get, post};
 use axum::{Json, Router};
@@ -37,6 +39,21 @@ pub fn json_status(v: Value, status: StatusCode) -> Response {
 }
 
 /* ── assembly ─────────────────────────────────────────────────────────── */
+
+/// v5.2 (loop iter 3, security round): baseline security headers on every
+/// response. The API is JSON (nosniff is the load-bearing one), the emu
+/// consent page is HTML — both refuse framing (the app preview iframes the
+/// FRONTEND on :3000, never these API surfaces), leak no referrer, and
+/// dynamic data must not sit in any intermediary cache.
+async fn security_headers(req: Request, next: Next) -> Response {
+    let mut res = next.run(req).await;
+    let h = res.headers_mut();
+    h.insert("x-content-type-options", HeaderValue::from_static("nosniff"));
+    h.insert("referrer-policy", HeaderValue::from_static("no-referrer"));
+    h.insert("x-frame-options", HeaderValue::from_static("DENY"));
+    h.insert("cache-control", HeaderValue::from_static("no-store"));
+    res
+}
 
 pub fn router(st: St) -> Router {
     Router::new()
@@ -91,5 +108,6 @@ pub fn router(st: St) -> Router {
         // server-to-server (SSR data layer)
         .route("/internal/home", get(internal::home))
         .route("/internal/config", get(internal::config))
+        .layer(axum::middleware::from_fn(security_headers))
         .with_state(st)
 }

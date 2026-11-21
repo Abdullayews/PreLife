@@ -215,11 +215,21 @@ fn consent_page(st: &St, origin: &str, provider: &str, redirect_to: &str, challe
         challenge_esc = escape_html(challenge),
         method_esc = escape_html(method),
     );
-    (
+    let mut res = (
         [(axum::http::header::CONTENT_TYPE, "text/html; charset=utf-8")],
         html,
     )
-        .into_response()
+        .into_response();
+    // v5.2 (loop iter 3, security round): the consent page runs no scripts
+    // and styles inline — a strict CSP makes even a future escaping slip
+    // inert. form-action covers the POST to the emu authorize endpoint.
+    res.headers_mut().insert(
+        "content-security-policy",
+        axum::http::HeaderValue::from_static(
+            "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'",
+        ),
+    );
+    res
 }
 
 /* ── AUTH: /api/supa-emu/auth/v1/{*action} ────────────────────────────── */
