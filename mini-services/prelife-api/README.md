@@ -73,20 +73,35 @@ The main app's `bun run dev` starts this service automatically via
 
 ## Production
 
-```
-cargo build --release
-PRELIFE_ROOT=/srv/prelife NODE_ENV=production ./target/release/prelife-api
-```
+**v5.3 single-service layout (Render).** The backend and the Next.js
+standalone server run in ONE web service:
 
-Run it next to the Next.js server and route `/api/*` to it at the edge
-(Caddy/nginx: `handle /api/* { reverse_proxy 127.0.0.1:3030 }`). Leave
-`API_TRANSFORM_PORT` unset — the frontend then calls plain `/api/*`
-paths on the same origin.
+- `bun run build` → `scripts/build-backend.mjs` bootstraps rustup when
+  cargo is missing and runs `cargo build --release --locked`, then the
+  usual `next build` (standalone).
+- `bun run start` → `scripts/start-production.mjs` spawns this service
+  on `127.0.0.1:3030` (`PRELIFE_ROOT` = repo root, `NODE_ENV=production`),
+  waits for `/api/health`, then starts the Next standalone server.
+- `next.config.ts` proxies browser `/api/*` to `127.0.0.1:3030` (same
+  origin — the proxied request carries `x-forwarded-host`/`-proto` for
+  the hardened `origin_from` allowlist checks).
 
-**Route ONLY `/api/*` at the edge.** The `/internal/*` surface is for
-the Next.js SSR layer's loopback calls — never expose it publicly
-(`/internal/home` is cookie-authenticated, but `/internal/config` is an
-loopback-only).
+Environment (Render dashboard, or `.env.production`):
+`SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (the real project — the
+emulator is dev-only), `BREVO_API_KEY`/`MAIL_FROM`, `GEMINI_API_KEY`,
+and `PUBLIC_URL` (the origin allowlist for verification links, OAuth
+redirects and cookie `Secure` decisions — falls back to
+`RENDER_EXTERNAL_URL,https://prelife.net` when unset). Leave
+`API_TRANSFORM_PORT` unset.
+
+For a split deployment (backend on its own host) keep the same binary —
+`cargo build --release` — and point both `API_INTERNAL_URL` (the Next
+proxy + the SSR layer) and the edge router at it.
+
+**Never expose `/internal/*` publicly.** It is the Next.js SSR layer's
+loopback surface (`/internal/home` is cookie-authenticated, but
+`/internal/config` is an intentionally-open boolean for the gym demo
+fallback) — the production rewrite proxy routes `/api/*` only.
 
 ## Layout
 
