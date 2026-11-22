@@ -41,6 +41,7 @@ async function consoleCopy(locale: string): Promise<ConsoleCopy> {
     mode: s("mode"),
     confirm: s("confirm"),
     decline: s("decline"),
+    declineConfirm: s("declineConfirm"),
     confirmedTitle: s("confirmedTitle"),
     confirmedEmpty: s("confirmedEmpty"),
     custom: s("custom"),

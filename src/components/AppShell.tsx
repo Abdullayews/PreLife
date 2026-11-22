@@ -8,7 +8,7 @@ import {
   AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ChevronsUpDown,
   Circle, CircleHelp, ClipboardCheck, Crown, Dumbbell, FileText, Flower2, House, Landmark, Layers,
   LibraryBig, MapPin, Menu, MonitorPlay, NotebookPen, PanelLeftClose,
-  PanelLeftOpen, Pill, Salad, ScrollText, Settings, Shirt, UserRound, Users,
+  PanelLeftOpen, Pill, Salad, ScrollText, Settings, ShieldCheck, Shirt, UserRound, Users,
   Wind, type LucideIcon,
 } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -82,10 +82,13 @@ export type ShellUser = {
   avatar?: string | null;
   /** The rail fold choice from the server (v6.1) — first-paint correct. */
   railFolded?: boolean;
-  /** v3.4: 'psychologist' shows the console link in the rail. */
-  role?: "user" | "psychologist";
+  /** v3.4/v5.4: 'psychologist' → the console link, 'hall_manager' → the
+   *  hall console link, 'admin' → the admin console link. */
+  role?: "user" | "psychologist" | "hall_manager" | "admin";
   /** v3.4: the linked psychologists_v2 slug (console guard). */
   psychSlug?: string | null;
+  /** v5.4: the linked gym_places slug (hall console guard). */
+  hallSlug?: string | null;
   /** v3.5: any active custom package → the "Premium üzv" rail chip. */
   premium?: boolean;
 };
@@ -230,7 +233,9 @@ export function AppShell({
 
   /* Main pages — Home first, the four sections, Subscription last.
    * v3.4: linked psychologist accounts also get the console link right
-   * after the sections (their account surface for confirming requests). */
+   * after the sections (their account surface for confirming requests).
+   * v5.4: hall managers get their hall console, admins the platform
+   * console — one management surface per role, all in the same slot. */
   const mainNav: { href: string; label: string; icon: LucideIcon; desc: string }[] = [
     { href: "/home", label: th("tabs.home"), icon: House, desc: t("desc.home") },
     ...sections.map((s) => ({
@@ -238,6 +243,12 @@ export function AppShell({
     })),
     ...(user?.role === "psychologist"
       ? [{ href: "/meditation/console", label: t("console"), icon: ClipboardCheck, desc: t("consoleDesc") }]
+      : []),
+    ...(user?.role === "hall_manager"
+      ? [{ href: "/gym/console", label: t("hallConsole"), icon: Landmark, desc: t("hallConsoleDesc") }]
+      : []),
+    ...(user?.role === "admin"
+      ? [{ href: "/admin", label: t("adminConsole"), icon: ShieldCheck, desc: t("adminConsoleDesc") }]
       : []),
     { href: "/subscription", label: th("header.drawerSubscription"), icon: Crown, desc: t("desc.subscription") },
   ];

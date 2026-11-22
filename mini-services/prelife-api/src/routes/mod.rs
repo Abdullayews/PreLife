@@ -2,6 +2,7 @@
 //! now served by axum with identical paths, methods and response shapes.
 
 pub mod account;
+pub mod admin;
 pub mod ai;
 pub mod auth;
 pub mod content;
@@ -146,6 +147,10 @@ pub fn router(st: St) -> Router {
         // gym plan
         .route("/api/gym/plan", get(gym::plan_get).post(gym::plan_post).delete(gym::plan_delete))
         .route("/api/gym/progress", get(gym::progress_get).post(gym::progress_post))
+        // hall manager console (v5.4 role system)
+        .route("/api/gym/console", get(gym::console_get).post(gym::console_post))
+        // administrator console (v5.4 role system)
+        .route("/api/admin/console", get(admin::console_get))
         // library bookshelf
         .route("/api/library/shelf", get(shelf::shelf_get).post(shelf::shelf_post))
         .route("/api/library/shelf/{slug}", delete(shelf::shelf_delete))

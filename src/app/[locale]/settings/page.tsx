@@ -20,7 +20,7 @@ export default async function SettingsRoute({ params }: Props) {
 
   return (
     <AppPageShell locale={locale}>
-      <SettingsPage user={{ name: user.name, email: user.email }} />
+      <SettingsPage user={{ name: user.name, email: user.email, role: user.role }} />
     </AppPageShell>
   );
 }

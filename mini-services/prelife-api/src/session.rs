@@ -110,8 +110,19 @@ pub fn default_device(ua: &str) -> DeviceInfo {
 
 /* ── the user view (the /api/auth/me shape) ────────────────────────────── */
 
+/// v5.4: the known account roles (profiles.role). Anything else degrades
+/// to "user" — the session row is never trusted blindly.
+pub fn norm_role(v: Option<&str>) -> &'static str {
+    match v {
+        Some("psychologist") => "psychologist",
+        Some("hall_manager") => "hall_manager",
+        Some("admin") => "admin",
+        _ => "user",
+    }
+}
+
 pub fn user_view(u: &Value) -> Value {
-    let role = if u.get("role") == Some(&json!("psychologist")) { "psychologist" } else { "user" };
+    let role = norm_role(u.get("role").and_then(|v| v.as_str()));
     json!({
         "id": u.get("id").cloned().unwrap_or(Value::Null),
         "email": u.get("email").cloned().unwrap_or(Value::Null),
@@ -122,12 +133,16 @@ pub fn user_view(u: &Value) -> Value {
         "psychSlug": if role == "psychologist" {
             u.get("psychSlug").and_then(|v| v.as_str()).map(String::from).map(Value::String).unwrap_or(Value::Null)
         } else { Value::Null },
+        // v5.4: the linked gym_places slug (hall manager console guard).
+        "hallSlug": if role == "hall_manager" {
+            u.get("hallSlug").and_then(|v| v.as_str()).map(String::from).map(Value::String).unwrap_or(Value::Null)
+        } else { Value::Null },
         "location": if u.get("location") == Some(&json!("az")) { "az" } else { "global" },
     })
 }
 
 /// The enriched session user written onto session rows.
-fn session_user(id: &str, email: &str, name: Option<String>, avatar: Option<String>, rail_folded: bool, role: &str, psych_slug: Option<String>, location: &str) -> Value {
+fn session_user(id: &str, email: &str, name: Option<String>, avatar: Option<String>, rail_folded: bool, role: &str, psych_slug: Option<String>, hall_slug: Option<String>, location: &str) -> Value {
     json!({
         "id": id,
         "email": email,
@@ -136,6 +151,7 @@ fn session_user(id: &str, email: &str, name: Option<String>, avatar: Option<Stri
         "railFolded": rail_folded,
         "role": role,
         "psychSlug": psych_slug,
+        "hallSlug": hall_slug,
         "location": location,
     })
 }
@@ -161,6 +177,7 @@ pub async fn create_session(
     let mut rail_folded = false;
     let mut role = "user".to_string();
     let mut psych_slug: Option<String> = None;
+    let mut hall_slug: Option<String> = None;
     let mut location = "global".to_string();
 
     // Profile lookup: a transient transport failure must not silently mint a
@@ -176,9 +193,7 @@ pub async fn create_session(
         let pv = Value::Object(prof);
         avatar = s_opt(&pv, "avatar_url");
         rail_folded = is_true(&pv, "rail_folded");
-        if s(&pv, "role") == "psychologist" {
-            role = "psychologist".into();
-        }
+        role = norm_role(pv.get("role").and_then(|v| v.as_str())).to_string();
         if s(&pv, "content_location") == "az" {
             location = "az".into();
         }
@@ -198,6 +213,23 @@ pub async fn create_session(
             role = "user".into(); // not actually linked — plain user
         }
     }
+    // v5.4: hall managers resolve their hall the same way — the linked
+    // gym_places row owns the access; without a link it is a plain user.
+    if role == "hall_manager" {
+        let hall_params = vec![("select".to_string(), "slug".to_string()), ("owner_id".to_string(), format!("eq.{uid}"))];
+        let hall = match st.supa.select_one("gym_places", &hall_params).await {
+            Ok(p) => Ok(p),
+            Err(_) => st.supa.select_one("gym_places", &hall_params).await,
+        }
+        .map_err(DomainError::from_supa)?;
+        if let Some(hall) = hall {
+            let hv = Value::Object(hall);
+            hall_slug = s_opt(&hv, "slug");
+        }
+        if hall_slug.is_none() {
+            role = "user".into(); // not actually linked — plain user
+        }
+    }
 
     let mut row = Map::new();
     row.insert("user_id".into(), json!(uid));
@@ -207,6 +239,7 @@ pub async fn create_session(
     row.insert("user_folded".into(), json!(rail_folded));
     row.insert("user_role".into(), json!(role));
     row.insert("user_psych".into(), psych_slug.clone().map(Value::String).unwrap_or(Value::Null));
+    row.insert("user_hall".into(), hall_slug.clone().map(Value::String).unwrap_or(Value::Null));
     row.insert("user_location".into(), json!(location));
     row.insert("token_hash".into(), json!(sha256_hex(&token)));
     row.insert("device_name".into(), json!(device.name));
@@ -216,7 +249,7 @@ pub async fn create_session(
 
     if st.supa.insert("sessions", &Value::Object(row.clone())).await.is_err() {
         // Pre-v3.3 databases: drop the newer columns and retry.
-        for k in ["user_avatar", "user_folded", "user_role", "user_psych", "user_location"] {
+        for k in ["user_avatar", "user_folded", "user_role", "user_psych", "user_hall", "user_location"] {
             row.remove(k);
         }
         st.supa
@@ -227,7 +260,7 @@ pub async fn create_session(
 
     Ok((
         token,
-        session_user(&uid, &email, name, avatar, rail_folded, &role, psych_slug, &location),
+        session_user(&uid, &email, name, avatar, rail_folded, &role, psych_slug, hall_slug, &location),
     ))
 }
 
@@ -286,8 +319,9 @@ async fn load_session_row(st: &St, token: &str) -> Option<CurrentSession> {
         s_opt(&v, "user_name"),
         s_opt(&v, "user_avatar"),
         is_true(&v, "user_folded"),
-        &if s(&v, "user_role") == "psychologist" { "psychologist".to_string() } else { "user".to_string() },
+        norm_role(s_opt(&v, "user_role").as_deref()),
         s_opt(&v, "user_psych"),
+        s_opt(&v, "user_hall"),
         &if s(&v, "user_location") == "az" { "az".to_string() } else { "global".to_string() },
     );
     Some(CurrentSession {

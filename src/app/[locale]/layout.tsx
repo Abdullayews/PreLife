@@ -58,6 +58,8 @@ export default async function LocaleLayout({
     psychApp: all.psychApp,
     dietApp: all.dietApp,
     gymApp: all.gymApp,
+    gymHome: all.gymHome,
+    adminApp: all.adminApp,
     libraryApp: all.libraryApp,
     libraryHome: all.libraryHome,
     subscription: all.subscription,

@@ -106,6 +106,14 @@ if (mode === "v3.5") {
   process.exit(0);
 }
 
+/* v3.6: role system — hall manager accounts (gym_places.owner_id) + the
+   admin role + sessions.user_hall. See db/schema-v3.6.sql. */
+if (mode === "v3.6") {
+  await run(readFileSync(new URL("db/schema-v3.6.sql", root), "utf8"), "schema-v3.6.sql");
+  console.log("done.");
+  process.exit(0);
+}
+
 if (mode === "all" || mode === "schema") {
   await run(readFileSync(new URL("db/schema.sql", root), "utf8"), "schema.sql");
 }

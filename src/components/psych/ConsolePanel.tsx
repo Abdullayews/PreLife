@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { CalendarDays, Check, LoaderCircle, X } from "lucide-react";
 import { apiUrl } from "@/lib/api-url";
 import { toast } from "@/components/Toaster";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 /**
  * The psychologist's console (v3.4 request workflow): pending session
@@ -29,6 +30,7 @@ export type ConsoleCopy = {
   mode: string;
   confirm: string;
   decline: string;
+  declineConfirm: string;
   confirmedTitle: string;
   confirmedEmpty: string;
   custom: string;
@@ -63,6 +65,9 @@ export function ConsolePanel({ locale, copy }: { locale: string; copy: ConsoleCo
   const [data, setData] = useState<ConsoleData | null>(null);
   const [state, setState] = useState<"loading" | "error" | "ready">("loading");
   const [busy, setBusy] = useState<string | null>(null);
+  // The pending DECLINE confirm — declining a client's request is the
+  // console's one destructive action, so it asks first (confirm declines).
+  const [askDecline, setAskDecline] = useState<string | null>(null);
 
   // Same Baku wall-clock format the bookings page renders.
   const fmt = new Intl.DateTimeFormat(locale, {
@@ -154,7 +159,7 @@ export function ConsolePanel({ locale, copy }: { locale: string; copy: ConsoleCo
           <button
             type="button"
             className="btn btn-sm btn-ghost"
-            onClick={() => void respond(e.id, "decline")}
+            onClick={() => setAskDecline(e.id)}
             disabled={busy !== null}
           >
             {busy === e.id ? <LoaderCircle size={14} className="spin" aria-hidden /> : <X size={14} aria-hidden />}
@@ -227,6 +232,19 @@ export function ConsolePanel({ locale, copy }: { locale: string; copy: ConsoleCo
           </section>
         </>
       )}
+
+      <ConfirmDialog
+        open={askDecline !== null}
+        onClose={() => setAskDecline(null)}
+        onConfirm={() => {
+          const id = askDecline;
+          setAskDecline(null);
+          if (id) void respond(id, "decline");
+        }}
+        message={copy.declineConfirm}
+        confirmLabel={copy.decline}
+        busy={busy !== null}
+      />
     </div>
   );
 }

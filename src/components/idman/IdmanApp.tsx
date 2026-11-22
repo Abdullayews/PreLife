@@ -23,6 +23,7 @@ import {
   type GymAppContent, type GymAppExercise, type GymAppPlace, type GymAppProduct,
 } from "@/lib/gym";
 import { apiUrl } from "@/lib/api-url";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 /**
  * İdman v4 — the gym surface, fully DB-wired.
@@ -310,6 +311,9 @@ function PlanView({
    * whole-exercise localStorage marks are gone — sets are the unit now. */
   const [doneSets, setDoneSets] = useState<Record<string, number[]>>({});
   const [saving, setSaving] = useState(false);
+  /* The plan reset destroys the active plan + all progress — it asks
+   * first (the shared confirm guard). */
+  const [askReset, setAskReset] = useState(false);
 
   /* "Today" once, client-side (Baku), deferred a frame so the first
    * paint stays hydration-safe (the server cannot know the date). */
@@ -421,7 +425,7 @@ function PlanView({
             <button type="button" className="ibtn ibtn-sm" onClick={onBuild} disabled={busy}>
               <Wand2 size={15} aria-hidden />{t("plan.buildCta")}
             </button>
-            <button type="button" className="ibtn ibtn-sm ibtn-ghost" onClick={onReset} disabled={busy}>
+            <button type="button" className="ibtn ibtn-sm ibtn-ghost" onClick={() => setAskReset(true)} disabled={busy}>
               {t("plan.resetCta")}
             </button>
           </div>
@@ -549,6 +553,17 @@ function PlanView({
           </ul>
         </section>
       )}
+
+      <ConfirmDialog
+        open={askReset}
+        onClose={() => setAskReset(false)}
+        onConfirm={() => {
+          setAskReset(false);
+          onReset();
+        }}
+        message={t("plan.resetConfirm")}
+        confirmLabel={t("plan.resetCta")}
+      />
     </div>
   );
 }

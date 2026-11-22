@@ -15,6 +15,8 @@ import { hasConsent, persistLocale, setThemeChoice } from "@/lib/consent";
 import { saveUserPref } from "@/lib/user-prefs";
 import { DEVICE_ICON_KEYS } from "@/lib/devices";
 import { toast } from "@/components/Toaster";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import type { AccountRole } from "@/lib/auth";
 
 /**
  * Settings — categories on the LEFT, their content on the RIGHT (one
@@ -46,7 +48,7 @@ type NotifyKey = "reminders" | "digest" | "news";
 type NotifyState = Record<NotifyKey, boolean>;
 const DEFAULT_NOTIFY: NotifyState = { reminders: true, digest: true, news: false };
 
-export type SettingsUser = { name: string | null; email: string };
+export type SettingsUser = { name: string | null; email: string; role: AccountRole };
 
 /* ── Devices (Settings → Devices) ──────────────────────────────────────── */
 
@@ -91,6 +93,9 @@ function DevicesPanel() {
   const [editIcon, setEditIcon] = useState<string>("monitor");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  // The pending revoke — signing a device out ends its session, so the
+  // action asks first (the shared confirm guard).
+  const [askDev, setAskDev] = useState<Device | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -233,7 +238,7 @@ function DevicesPanel() {
                     className="icon-btn"
                     aria-label={d.current ? t("signOutCurrent") : t("signOut")}
                     title={d.current ? t("signOutCurrent") : t("signOut")}
-                    onClick={() => revoke(d)}
+                    onClick={() => setAskDev(d)}
                     disabled={busy}
                   >
                     <LogOut size={15} aria-hidden />
@@ -246,6 +251,19 @@ function DevicesPanel() {
       </div>
 
       <p className="set-note"><Info size={15} aria-hidden />{t("note")}</p>
+
+      <ConfirmDialog
+        open={askDev !== null}
+        onClose={() => setAskDev(null)}
+        onConfirm={() => {
+          const d = askDev;
+          setAskDev(null);
+          if (d) void revoke(d);
+        }}
+        message={askDev ? t(askDev.current ? "revokeCurrentConfirm" : "revokeConfirm") : ""}
+        confirmLabel={askDev ? t(askDev.current ? "signOutCurrent" : "signOut") : ""}
+        busy={busy}
+      />
     </section>
   );
 }
@@ -481,6 +499,12 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
                 <div className="set-row">
                   <span className="set-info"><b>{t("account.email")}</b></span>
                   <span className="set-val">{user.email}</span>
+                </div>
+                <div className="set-row">
+                  <span className="set-info"><b>{t("account.role")}</b></span>
+                  <span className="set-val">
+                    {t.has(`account.role_${user.role}`) ? t(`account.role_${user.role}`) : t("account.role_user")}
+                  </span>
                 </div>
                 <div className="set-row">
                   <span className="set-info"><b>{t("account.plan")}</b></span>

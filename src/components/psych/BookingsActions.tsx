@@ -6,18 +6,20 @@ import { useTranslations } from "next-intl";
 import { Banknote, LoaderCircle, X } from "lucide-react";
 import { apiUrl } from "@/lib/api-url";
 import { toast } from "@/components/Toaster";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 /** Row actions on the "My sessions" page. Since v3.4 a booking flows
  *  requested → confirmed (psychologist) → upcoming+paid (client pays), so
  *  the Pay button only exists on CONFIRMED unpaid rows — before that the
  *  psychologist has not accepted the request yet. Cancel works on any
- *  future row. */
+ *  future row and sits behind the shared confirm guard. */
 export function BookingsActions({
   id, payment, status, canCancel,
 }: { id: string; payment: string; status: string; canCancel: boolean }) {
   const t = useTranslations("psychApp");
   const router = useRouter();
   const [busy, setBusy] = useState<"pay" | "cancel" | null>(null);
+  const [askCancel, setAskCancel] = useState(false);
   const [, start] = useTransition();
 
   const canPay = payment === "unpaid" && status === "confirmed";
@@ -43,24 +45,37 @@ export function BookingsActions({
     });
 
   return (
-    <span className="psy-actions" style={{ margin: 0, gap: ".45rem" }}>
-      {status === "confirmed" && (
-        <p className="avail-note" style={{ margin: "0 0 .3rem", flexBasis: "100%" }}>
-          {t("payHint")}
-        </p>
-      )}
-      {canPay && (
-        <button type="button" className="btn btn-sm btn-quiet" onClick={() => post("/api/psych/pay", "pay")} disabled={busy !== null}>
-          {busy === "pay" ? <LoaderCircle size={14} className="spin" aria-hidden /> : <Banknote size={14} aria-hidden />}
-          {t("payMark")}
-        </button>
-      )}
-      {canCancel && (
-        <button type="button" className="btn btn-sm btn-ghost" onClick={() => post("/api/psych/cancel", "cancel")} disabled={busy !== null}>
-          {busy === "cancel" ? <LoaderCircle size={14} className="spin" aria-hidden /> : <X size={14} aria-hidden />}
-          {t("bookingCancel")}
-        </button>
-      )}
-    </span>
+    <>
+      <span className="psy-actions" style={{ margin: 0, gap: ".45rem" }}>
+        {status === "confirmed" && (
+          <p className="avail-note" style={{ margin: "0 0 .3rem", flexBasis: "100%" }}>
+            {t("payHint")}
+          </p>
+        )}
+        {canPay && (
+          <button type="button" className="btn btn-sm btn-quiet" onClick={() => post("/api/psych/pay", "pay")} disabled={busy !== null}>
+            {busy === "pay" ? <LoaderCircle size={14} className="spin" aria-hidden /> : <Banknote size={14} aria-hidden />}
+            {t("payMark")}
+          </button>
+        )}
+        {canCancel && (
+          <button type="button" className="btn btn-sm btn-ghost" onClick={() => setAskCancel(true)} disabled={busy !== null}>
+            {busy === "cancel" ? <LoaderCircle size={14} className="spin" aria-hidden /> : <X size={14} aria-hidden />}
+            {t("bookingCancel")}
+          </button>
+        )}
+      </span>
+      <ConfirmDialog
+        open={askCancel}
+        onClose={() => setAskCancel(false)}
+        onConfirm={() => {
+          setAskCancel(false);
+          post("/api/psych/cancel", "cancel");
+        }}
+        message={t("bookingCancelConfirm")}
+        confirmLabel={t("bookingCancel")}
+        busy={busy === "cancel"}
+      />
+    </>
   );
 }

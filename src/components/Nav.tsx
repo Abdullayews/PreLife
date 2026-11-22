@@ -37,7 +37,7 @@ export type MenuUser = { name: string | null; email: string };
  */
 
 /** Routes that belong to the logged-in app (the "main pages" experience). */
-const APP_HREFS = ["/home", "/gym", "/diet", "/meditation", "/library", "/subscription", "/settings", "/profile", "/help"];
+const APP_HREFS = ["/home", "/gym", "/diet", "/meditation", "/library", "/subscription", "/settings", "/profile", "/help", "/admin"];
 
 function LocaleSwitch({ className = "", signedIn = false }: { className?: string; signedIn?: boolean }) {
   const t = useTranslations("welcomePage.header");

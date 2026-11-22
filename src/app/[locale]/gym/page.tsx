@@ -47,9 +47,7 @@ export default async function GymPage({ params, searchParams }: Props) {
   // global catalog.
   const user = supabaseConfigured
     ? await requireUser(locale, sp.tab ? `/gym?tab=${encodeURIComponent(Array.isArray(sp.tab) ? sp.tab[0] : sp.tab)}` : "/gym")
-    : session ?? {
-      railFolded: false, role: "user" as const, psychSlug: null,
-    };
+    : session;
   const topnav = !(supabaseConfigured ? user : session);
 
   /* The whole İdman surface renders from the DB catalog (gym_* content

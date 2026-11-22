@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { BookOpen, BookmarkCheck, BookmarkPlus, Clock, LoaderCircle } from "lucide-react";
 import { apiUrl } from "@/lib/api-url";
 import { iconByName } from "@/lib/icons";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 /**
  * The library "books" panel with the personal bookshelf (v3.5).
@@ -40,6 +41,8 @@ export function BooksPanel({
   const [shelf, setShelf] = useState<string[]>(initialShelf);
   const [mineOnly, setMineOnly] = useState(false);
   const [busySlug, setBusySlug] = useState<string | null>(null);
+  // Unshelving asks first — { slug, name } of the book about to leave.
+  const [askRemove, setAskRemove] = useState<{ slug: string; name: string } | null>(null);
 
   const shelved = useCallback((id: string) => shelf.includes(id), [shelf]);
 
@@ -124,7 +127,7 @@ export function BooksPanel({
                 <button
                   type="button"
                   className={`btn btn-sm ${on ? "btn-ghost" : "btn-solid"} shelf-btn`}
-                  onClick={() => toggleShelf(b.id)}
+                  onClick={() => (on ? setAskRemove({ slug: b.id, name: t(b.nameKey) }) : toggleShelf(b.id))}
                   disabled={busySlug === b.id}
                   aria-pressed={on}
                 >
@@ -140,6 +143,18 @@ export function BooksPanel({
           })}
         </ul>
       )}
+      <ConfirmDialog
+        open={askRemove !== null}
+        onClose={() => setAskRemove(null)}
+        onConfirm={() => {
+          const slug = askRemove?.slug;
+          setAskRemove(null);
+          if (slug) void toggleShelf(slug);
+        }}
+        message={askRemove ? t("shelfRemoveConfirm", { name: askRemove.name }) : ""}
+        confirmLabel={t("shelfRemove")}
+        busy={askRemove !== null && busySlug === askRemove.slug}
+      />
     </>
   );
 }

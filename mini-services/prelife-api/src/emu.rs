@@ -101,6 +101,21 @@ impl EmuStore {
         let mut data = EmuData::default();
         data.tables = build_content_tables(&root);
 
+        // The seed's gym_trainers rows carry no id (a serial in production);
+        // stamp uuids so the hall console's remove-trainer filter can
+        // address them exactly like production rows.
+        if let Some(rows) = data.tables.get_mut("gym_trainers") {
+            for row in rows.iter_mut() {
+                let missing = row
+                    .get("id")
+                    .map(|v| v.is_null() || v == &json!(""))
+                    .unwrap_or(true);
+                if missing {
+                    row.insert("id".into(), json!(uuid_v4()));
+                }
+            }
+        }
+
         for t in PERSISTED_TABLES {
             let rows = persisted
                 .pointer(&format!("/tables/{t}"))

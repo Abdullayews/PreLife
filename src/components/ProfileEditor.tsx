@@ -7,6 +7,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { apiUrl } from "@/lib/api-url";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 
 /**
  * ProfileEditor — the own-data editor for /{locale}/profile.
@@ -170,6 +171,8 @@ export function ProfileEditor({ user }: { user: ProfileEditorUser }) {
   const [saveErr, setSaveErr] = useState(false);
   const [avBusy, setAvBusy] = useState(false); // avatar PATCH in flight
   const [avErr, setAvErr] = useState(false);
+  // Removing the avatar asks first (the shared confirm guard).
+  const [askAvatar, setAskAvatar] = useState(false);
 
   const fileRef = useRef<HTMLInputElement | null>(null);
 
@@ -395,7 +398,7 @@ export function ProfileEditor({ user }: { user: ProfileEditorUser }) {
               <button
                 type="button"
                 className="btn btn-sm btn-ghost"
-                onClick={removeAvatar}
+                onClick={() => setAskAvatar(true)}
                 disabled={avBusy}
               >
                 {t("avatarRemove")}
@@ -562,6 +565,18 @@ export function ProfileEditor({ user }: { user: ProfileEditorUser }) {
           )}
         </>
       )}
+
+      <ConfirmDialog
+        open={askAvatar}
+        onClose={() => setAskAvatar(false)}
+        onConfirm={() => {
+          setAskAvatar(false);
+          void removeAvatar();
+        }}
+        message={t("avatarRemoveConfirm")}
+        confirmLabel={t("avatarRemove")}
+        busy={avBusy}
+      />
     </>
   );
 }

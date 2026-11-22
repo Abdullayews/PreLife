@@ -511,6 +511,16 @@ html.dark .panel-logout:hover { background: color-mix(in srgb, #e58c86 15%, tran
   outline: none; border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
 }
+/* Selects share the input chrome (the hall console's specialty picker). */
+.field select {
+  height: 2.75rem; padding-inline: .8rem; border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+  background: var(--surface); color: var(--ink); font-size: .9375rem; cursor: pointer;
+  transition: border-color .2s, box-shadow .2s;
+}
+.field select:focus-visible {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
 /* Password field with the show/hide toggle inside the input's right
    edge. The button spans the input's full 2.75rem (44px) height — no
    coarse-pointer override needed. */
@@ -642,6 +652,23 @@ html.dark .panel-logout:hover { background: color-mix(in srgb, #e58c86 15%, tran
 .set-logout:disabled { opacity: .55; cursor: default; }
 html.dark .set-logout { color: #e58c86; border-color: color-mix(in srgb, #e58c86 26%, transparent); background: color-mix(in srgb, #e58c86 8%, transparent); }
 html.dark .set-logout:hover { background: color-mix(in srgb, #e58c86 15%, transparent); }
+
+/* ── Confirm dialog (the shared destructive-action guard) ────────────── */
+.confirm-body { padding: 1.1rem 1.2rem; }
+.confirm-msg {
+  display: flex; align-items: flex-start; gap: .6rem; margin: 0;
+  color: var(--ink); font-size: .95rem; line-height: 1.55;
+}
+.confirm-msg .confirm-ico { flex: none; margin-top: .12rem; color: #b3261e; }
+html.dark .confirm-msg .confirm-ico { color: #e58c86; }
+.confirm-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .6rem; margin-top: 1.15rem; }
+.btn-danger {
+  border-color: color-mix(in srgb, #b3261e 30%, transparent);
+  background: color-mix(in srgb, #b3261e 10%, transparent); color: #b3261e;
+}
+.btn-danger:hover { background: color-mix(in srgb, #b3261e 17%, transparent); }
+html.dark .btn-danger { color: #e58c86; border-color: color-mix(in srgb, #e58c86 30%, transparent); background: color-mix(in srgb, #e58c86 9%, transparent); }
+html.dark .btn-danger:hover { background: color-mix(in srgb, #e58c86 16%, transparent); }
 
 /* ── Settings → Devices ──────────────────────────────────────────────── */
 .device-list { display: grid; }
