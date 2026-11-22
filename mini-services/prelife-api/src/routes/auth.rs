@@ -57,13 +57,18 @@ pub async fn login(State(st): State<St>, headers: HeaderMap, body: Bytes) -> Res
         return Err(err(503, "supabase_unconfigured"));
     }
     let body = read_json(&body);
+    // v5.3 (security round 7): strict types — a non-string password used to
+    // coerce to "" and silently fall into the e-mail-only registration path
+    // (a probe like {"password":123} fired a verification mail). Reject it.
     let email = match body.get("email") {
         Some(Value::String(e)) => e.trim().to_lowercase(),
-        _ => String::new(),
+        Some(_) => return Err(err(400, "invalid_fields")),
+        None => String::new(),
     };
     let password = match body.get("password") {
         Some(Value::String(p)) => p.clone(),
-        _ => String::new(),
+        Some(_) => return Err(err(400, "invalid_fields")),
+        None => String::new(),
     };
     let locale = match body.get("locale") {
         Some(Value::String(l)) => l.clone(),
