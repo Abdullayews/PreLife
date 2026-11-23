@@ -9,6 +9,21 @@
 # semantics + XFF rotation vs the login buckets. verdicts: PASS = secure;
 # FAIL = vulnerability; INFO = accepted. Flood LAST (bucket hygiene).
 # ═══════════════════════════════════════════════════════════════════════
+# ROUND 11 RESULT (executed 2026-11-23, emu stack, booking day 2026-12-02):
+#   52 checks — 48 PASS / 0 FAIL / 4 INFO → CLEAN.
+#   INFO items (all accepted, consistent with rounds 1-10):
+#     W9  login pre-verify account → 403 email_unverified (enum tradeoff)
+#     Y6b dup shelf slug cleanup (housekeeping)
+#     Z1  login text/plain Content-Type accepted (CSRF guarded by
+#         SameSite=Lax + credentials never attacker-known)
+#     C0  booking cleanup (housekeeping)
+#   Highlights: foreign booking cancel/pay IDOR both 404; bookings list
+#   per-user; cookie revoked server-side on logout (reuse → user:null);
+#   bearer + percent-prefixed + dual cookies all resolved to exactly one
+#   identity; NaN JSON strict-400; role=admin via complete ignored;
+#   traversal slugs neutralized; XFF rotation still capped by the
+#   login:em bucket (429 ×5 of 25).
+# ═══════════════════════════════════════════════════════════════════════
 set -u
 BASE=http://localhost:3000
 EV=/tmp/r11; mkdir -p $EV
