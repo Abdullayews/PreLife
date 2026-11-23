@@ -261,8 +261,14 @@ pub fn char_len(s: &str) -> usize {
 /// v5.2 (security round 3): shared name charset gate — no control
 /// characters (signup + complete + profile PATCH all use it, so a stored
 /// name can never smuggle control sequences or HTML-significant bytes).
+/// v5.4 (security round 9): also reject the HTML-significant bytes
+/// `<`, `>`, `&` — a stored name is echoed on public pages (trainer
+/// cards, gym halls) and in HTML mail bodies, so tag/attribute injection
+/// must be impossible at the storage gate, not left to render-time
+/// escaping. Real names never contain these bytes (ə, ş, ç, ö, ü… are
+/// unaffected; apostrophes and hyphens stay valid).
 pub fn name_chars_ok(name: &str) -> bool {
-    !name.chars().any(|c| c.is_control())
+    !name.chars().any(|c| c.is_control() || c == '<' || c == '>' || c == '&')
 }
 
 /// JS `str.slice(0, n)` by code points.
