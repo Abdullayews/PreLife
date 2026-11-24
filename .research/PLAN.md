@@ -25,7 +25,7 @@ Son məhsul: `skills/pro-site-craft/SKILL.md` (istifadəçiyə çatda göndəril
 QAYDA: Bu dövr SAF ARAŞDIRMADIR — saytın koduna dəyişiklik YOX,
 commit/push YOX. Yalnız qeyd faylları yazılır.
 
-## Loop 1 — Vizual dizayn əsasları
+## Loop 1 — Vizual dizayn əsasları [TAMAMLANDI 2026-11-24 → notes/loop-1.md]
 1. Professional rəng sistemləri: semantik token-lər, dark mode pattern-ləri,
    kontrast qaydaları, brend palitrası qurulması
 2. Tipoqrafiya sistemləri: modular scale, font cütləşdirmə, variable fonts,
