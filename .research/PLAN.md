@@ -41,7 +41,7 @@ commit/push YOX. Yalnız qeyd faylları yazılır.
 6. Motion dizaynı: mikro-interaksiyalar, scroll-driven animasiyalar,
    easing/tempo qaydaları, motion token-lər, reduced-motion
 
-## Loop 3 — Responsive + a11y + performans
+## Loop 3 — Responsive + a11y + performans [TAMAMLANDI 2026-11-24 → notes/loop-3.md]
 7. Mobile-first responsive: breakpoint strategiyası, safe area, 44px touch
    target, adaptive images
 8. Accessibility: WCAG 2.2, ARIA pattern-ləri, klaviatura naviqasiyası,
@@ -49,7 +49,7 @@ commit/push YOX. Yalnız qeyd faylları yazılır.
 9. Performans: Core Web Vitals (LCP/INP/CLS) hədəfləri, SSR/streaming/ISR,
    şəkil/şrift optimallaşdırma, keşləmə strategiyaları
 
-## Loop 4 — Backend + təhlükəsizlik
+## Loop 4 — Backend + təhlükəsizlik [TAMAMLANDI 2026-11-24 → notes/loop-4.md]
 10. Professional API dizaynı: error kontraktları, validasiya, versiyalama,
     rate limiting (Rust/axum kontekstində)
 11. Auth və session təhlükəsizliyi: cookie pattern-ləri, OWASP 10,
@@ -57,14 +57,14 @@ commit/push YOX. Yalnız qeyd faylları yazılır.
 12. Database pattern-ləri: Postgres/Supabase, RLS, indeksləmə, migration,
     keşləmə qatları
 
-## Loop 5 — SEO + i18n + PWA + deploy
+## Loop 5 — SEO + i18n + PWA + deploy [TAMAMLANDI 2026-11-24 → notes/loop-5.md]
 13. SEO və metadata: structured data, OG tags, sitemap, hreflang
 14. i18n best practices: AZ/EN/RU, mesaj kataloqları, locale routing
 15. PWA və offline: service worker, offline səhifələr, install prompt
 16. Deployment və observability: Render, git-push CI/CD, monitoring,
     error tracking
 
-## Loop 6 — Sintez (son)
+## Loop 6 — Sintez (son) [TAMAMLANDI 2026-11-24 → skills/pro-site-craft/SKILL.md + notes/loop-6-synthesis.md]
 - Bütün loop-*.md qeydlərini topla (itkin mövzular varsa qısa araşdırma ilə doldur)
 - `skills/pro-site-craft/SKILL.md` yaz: "PreLife kimi professional sayt necə
   dizayn və inşa olunmalıdır" biblesi — bütün bölmələrdə KONKRET qaydalar
