@@ -1,7 +1,19 @@
 import type { ReactNode } from "react";
 import type { Viewport } from "next";
+import { Inter } from "next/font/google";
 import { THEME_KEY } from "@/lib/shell";
 import "./globals.css";
+
+/* v6 (pro-site-craft): Inter — self-hosted via next/font (zero CLS,
+ * automatic size-adjust, no external request at runtime). AZ coverage
+ * verified against Google's latin-ext unicode-range (Ə U+018F, ə U+0259,
+ * ş/Ş, ç/Ç, ğ/Ğ, İ/ı all present); cyrillic covers the RU locale. The
+ * system stack stays as the fallback chain behind it. */
+const inter = Inter({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 /**
  * The true root layout — the ONLY place that renders <html>/<head>/<body>.
@@ -45,7 +57,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     // lang="en" is the static SSR default (the site's default locale); the
     // pre-paint script corrects it to az/ru from the URL prefix before the
     // first paint, and <HtmlLang> keeps it in sync on soft switches.
-    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" className={inter.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

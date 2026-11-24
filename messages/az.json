@@ -9,7 +9,7 @@
       "menu": "Menyunu a\u00e7",
       "close": "Menyunu ba\u011fla",
       "language": "Dili d\u0259yi\u015fin",
-      "getStarted": "Ba\u015flay\u0131n",
+      "getStarted": "Pulsuz ba\u015flay\u0131n",
       "account": "Hesab",
       "drawerSectionsLabel": "B\u00f6lm\u0259l\u0259r",
       "drawerPlatformLabel": "Platforma",
@@ -21,6 +21,8 @@
       "title": "\u0130dman. Qida. Zehin. Oxu.",
       "subtitle": "PreLife idman\u0131, qidalanman\u0131, psixologiyan\u0131 v\u0259 kitablar\u0131 bir sakit sistemd\u0259 birl\u0259\u015fdirir \u2014 h\u0259r b\u00f6lm\u0259d\u0259 planlar, videolar, m\u00fct\u0259x\u0259ssisl\u0259r v\u0259 AI.",
       "seeAll": "B\u00f6lm\u0259l\u0259ri k\u0259\u015ff edin",
+      "start": "Pulsuz hesab yarad\u0131n",
+      "proof": "Erk\u0259n \u00e7\u0131x\u0131\u015f \u2014 b\u00fct\u00fcn b\u00f6lm\u0259l\u0259r v\u0259 AI indi pulsuzdur",
       "chips": {
         "meditation": "Psixologiya",
         "library": "Kitablar",
@@ -57,6 +59,58 @@
           "point1": "H\u0259d\u0259fin\u0259 uy\u011fun qidalanma proqram\u0131 al",
           "point2": "Kaloriyaya diqq\u0259tl\u0259 s\u00fcr\u0259tli reseptl\u0259r bi\u015fir",
           "point3": "Suyunu izl\u0259, sa\u011flam m\u0259kanlar tap"
+        }
+      }
+    },
+    "steps": {
+      "eyebrow": "Nec\u0259 i\u015fl\u0259yir",
+      "title": "\u00dc\u00e7 add\u0131mda ba\u015flay\u0131n",
+      "items": {
+        "one": {
+          "title": "Hesab yarad\u0131n",
+          "text": "D\u0259qiq\u0259lik qeydiyyat \u2014 yaln\u0131z e-po\u00e7t v\u0259 \u015fifr\u0259, kart t\u0259l\u0259b olunmur."
+        },
+        "two": {
+          "title": "B\u00f6lm\u0259nizi se\u00e7in",
+          "text": "\u0130dman, qidalanma, psixologiya v\u0259 ya kitab \u2014 h\u0259r birind\u0259 planlar, videolar v\u0259 m\u00fct\u0259x\u0259ssisl\u0259r."
+        },
+        "three": {
+          "title": "H\u0259r g\u00fcn bir add\u0131m",
+          "text": "Plan\u0131n\u0131z\u0131 izl\u0259yin, ir\u0259lil\u0259yi\u015finizi g\u00f6r\u00fcn \u2014 PreLife AI yan\u0131n\u0131zda olsun."
+        }
+      }
+    },
+    "pricing": {
+      "eyebrow": "Abun\u0259lik",
+      "title": "\u0130ndi pulsuz, sonra siz\u0259 uy\u011fun",
+      "subtitle": "Erk\u0259n \u00e7\u0131x\u0131\u015f m\u00fcdd\u0259tind\u0259 b\u00fct\u00fcn b\u00f6lm\u0259l\u0259r pulsuzdur. \u00d6d\u0259ni\u015fl\u0259r g\u0259l\u0259nd\u0259 \u00fc\u00e7 plan haz\u0131r olacaq.",
+      "freeNow": "\u0130ndi pulsuz",
+      "note": "\u00d6d\u0259ni\u015fl\u0259r yax\u0131n yenil\u0259m\u0259 il\u0259 aktivl\u0259\u015f\u0259c\u0259k \u2014 bu m\u0259rh\u0259l\u0259d\u0259 kart m\u0259lumat\u0131 soru\u015fulmur.",
+      "cta": "Planlar\u0131 g\u00f6r\u00fcn"
+    },
+    "faq": {
+      "eyebrow": "Suallar",
+      "title": "Tez-tez veril\u0259n suallar",
+      "items": {
+        "q1": {
+          "q": "PreLife n\u0259dir?",
+          "a": "\u0130dman, qidalanma, psixologiya v\u0259 kitab b\u00f6lm\u0259l\u0259rini bir platformada birl\u0259\u015fdir\u0259n Az\u0259rbaycan m\u0259hsuludur \u2014 h\u0259r b\u00f6lm\u0259d\u0259 planlar, videolar, m\u00fct\u0259x\u0259ssisl\u0259r v\u0259 AI k\u00f6m\u0259k\u00e7i."
+        },
+        "q2": {
+          "q": "Qiym\u0259ti n\u0259 q\u0259d\u0259rdir?",
+          "a": "\u0130ndi erk\u0259n \u00e7\u0131x\u0131\u015f m\u0259rh\u0259l\u0259sind\u0259 h\u0259r \u015fey pulsuzdur. \u00d6d\u0259ni\u015fl\u0259r aktivl\u0259\u015f\u0259nd\u0259 Plus, Pro v\u0259 Ultra planlar\u0131 t\u0259qdim edil\u0259c\u0259k."
+        },
+        "q3": {
+          "q": "Hesab yaratmaq \u00fc\u00e7\u00fcn n\u0259 laz\u0131md\u0131r?",
+          "a": "Yaln\u0131z e-po\u00e7t \u00fcnvan\u0131 v\u0259 \u015fifr\u0259 \u2014 bir d\u0259qiq\u0259 \u00e7\u0259kir, kart t\u0259l\u0259b olunmur."
+        },
+        "q4": {
+          "q": "AI n\u0259 \u00fc\u00e7\u00fcn istifad\u0259 olunur?",
+          "a": "H\u0259r b\u00f6lm\u0259d\u0259 yol g\u00f6st\u0259rici kimi: planlar\u0131 izah edir, suallar\u0131n\u0131z\u0131 cavabland\u0131r\u0131r v\u0259 ir\u0259lil\u0259yi\u015finizi \u015f\u0259rh edir."
+        },
+        "q5": {
+          "q": "Hans\u0131 dill\u0259rd\u0259 i\u015fl\u0259yir?",
+          "a": "Az\u0259rbaycan, ingilis v\u0259 rus dill\u0259rind\u0259 \u2014 interfeys v\u0259 m\u0259zmun \u00fc\u00e7 dild\u0259 haz\u0131rlan\u0131b."
         }
       }
     },
@@ -344,6 +398,7 @@
     "navClose": "Menyunu ba\u011fla",
     "navThemeToggle": "T\u00fcnd / i\u015f\u0131q rejimini d\u0259yi\u015f",
     "navHome": "PreLife \u2014 ana s\u0259hif\u0259",
+    "skipToContent": "\u018fsas m\u0259zmuna ke\u00e7",
     "galleryLabel": "Hero \u015f\u0259kill\u0259ri",
     "notifications": "Bildiri\u015fl\u0259r",
     "confirmTitle": "\u018fminsiniz?",

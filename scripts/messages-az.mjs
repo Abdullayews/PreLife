@@ -11,7 +11,7 @@ export const az = {
         menu: "Menyunu aç",
         close: "Menyunu bağla",
         language: "Dili dəyişin",
-        getStarted: "Başlayın",
+        getStarted: "Pulsuz başlayın",
         account: "Hesab",
         drawerSectionsLabel: "Bölmələr",
         drawerPlatformLabel: "Platforma",
@@ -23,6 +23,8 @@ export const az = {
         title: "İdman. Qida. Zehin. Oxu.",
         subtitle: "PreLife idmanı, qidalanmanı, psixologiyanı və kitabları bir sakit sistemdə birləşdirir — hər bölmədə planlar, videolar, mütəxəssislər və AI.",
         seeAll: "Bölmələri kəşf edin",
+        start: "Pulsuz hesab yaradın",
+        proof: "Erkən çıxış — bütün bölmələr və AI indi pulsuzdur",
         chips: {
           meditation: "Psixologiya",
           library: "Kitablar",
@@ -59,6 +61,58 @@ export const az = {
             point1: "Hədəfinə uyğun qidalanma proqramı al",
             point2: "Kaloriyaya diqqətlə sürətli reseptlər bişir",
             point3: "Suyunu izlə, sağlam məkanlar tap"
+          }
+        }
+      },
+      steps: {
+        eyebrow: "Necə işləyir",
+        title: "Üç addımda başlayın",
+        items: {
+          one: {
+            title: "Hesab yaradın",
+            text: "Dəqiqəlik qeydiyyat — yalnız e-poçt və şifrə, kart tələb olunmur."
+          },
+          two: {
+            title: "Bölmənizi seçin",
+            text: "İdman, qidalanma, psixologiya və ya kitab — hər birində planlar, videolar və mütəxəssislər."
+          },
+          three: {
+            title: "Hər gün bir addım",
+            text: "Planınızı izləyin, irəliləyişinizi görün — PreLife AI yanınızda olsun."
+          }
+        }
+      },
+      pricing: {
+        eyebrow: "Abunəlik",
+        title: "İndi pulsuz, sonra sizə uyğun",
+        subtitle: "Erkən çıxış müddətində bütün bölmələr pulsuzdur. Ödənişlər gələndə üç plan hazır olacaq.",
+        freeNow: "İndi pulsuz",
+        note: "Ödənişlər yaxın yeniləmə ilə aktivləşəcək — bu mərhələdə kart məlumatı soruşulmur.",
+        cta: "Planları görün"
+      },
+      faq: {
+        eyebrow: "Suallar",
+        title: "Tez-tez verilən suallar",
+        items: {
+          q1: {
+            q: "PreLife nədir?",
+            a: "İdman, qidalanma, psixologiya və kitab bölmələrini bir platformada birləşdirən Azərbaycan məhsuludur — hər bölmədə planlar, videolar, mütəxəssislər və AI köməkçi."
+          },
+          q2: {
+            q: "Qiyməti nə qədərdir?",
+            a: "İndi erkən çıxış mərhələsində hər şey pulsuzdur. Ödənişlər aktivləşəndə Plus, Pro və Ultra planları təqdim ediləcək."
+          },
+          q3: {
+            q: "Hesab yaratmaq üçün nə lazımdır?",
+            a: "Yalnız e-poçt ünvanı və şifrə — bir dəqiqə çəkir, kart tələb olunmur."
+          },
+          q4: {
+            q: "AI nə üçün istifadə olunur?",
+            a: "Hər bölmədə yol göstərici kimi: planları izah edir, suallarınızı cavablandırır və irəliləyişinizi şərh edir."
+          },
+          q5: {
+            q: "Hansı dillərdə işləyir?",
+            a: "Azərbaycan, ingilis və rus dillərində — interfeys və məzmun üç dildə hazırlanıb."
           }
         }
       },
@@ -346,6 +400,7 @@ export const az = {
       navClose: "Menyunu bağla",
       navThemeToggle: "Tünd / işıq rejimini dəyiş",
       navHome: "PreLife — ana səhifə",
+      skipToContent: "Əsas məzmuna keç",
       galleryLabel: "Hero şəkilləri",
       notifications: "Bildirişlər",
       confirmTitle: "Əminsiniz?",

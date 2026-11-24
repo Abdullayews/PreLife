@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
-import { getMessages } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import { routing } from "@/i18n/routing";
@@ -41,7 +41,10 @@ export default async function LocaleLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
 
-  const [user, cookieStore, all] = await Promise.all([getSessionUser(), cookies(), getMessages()]);
+  const [user, cookieStore, all, tCommon] = await Promise.all([
+    getSessionUser(), cookies(), getMessages(),
+    getTranslations({ locale, namespace: "moduleCommon" }),
+  ]);
 
   // Only the namespaces client components read are shipped to the browser.
   const client = {
@@ -72,6 +75,10 @@ export default async function LocaleLayout({
     <>
       <HtmlLang locale={locale} />
       <NextIntlClientProvider messages={client}>
+        {/* v6 (pro-site-craft, WCAG 2.4.1): the skip link is the FIRST
+            focusable element on every page — keyboard users jump straight
+            past the nav into the main content. */}
+        <a href="#main" className="skip">{tCommon("skipToContent")}</a>
         {/* v2.3: the top bar renders for everyone — guests on every
             surface, signed-in users on the welcome surface. On the app
             surface a signed-in visitor navigates via the İdman rail
@@ -90,7 +97,7 @@ export default async function LocaleLayout({
             every tab and subtab renders the floating chat (context-aware,
             account tools enabled). Guests meet it on /welcome. */}
         {user && <AiChatFab signedIn />}
-        <main>{children}</main>
+        <main id="main" tabIndex={-1}>{children}</main>
         <Footer />
         <CookieConsent initialAccepted={cookieStore.get(CONSENT_COOKIE)?.value === "1"} />
       </NextIntlClientProvider>

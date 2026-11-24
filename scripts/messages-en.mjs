@@ -11,7 +11,7 @@ export const en = {
         menu: "Open menu",
         close: "Close menu",
         language: "Change language",
-        getStarted: "Get started",
+        getStarted: "Start free",
         account: "Account",
         drawerSectionsLabel: "Sections",
         drawerPlatformLabel: "Platform",
@@ -23,6 +23,8 @@ export const en = {
         title: "Train. Eat. Breathe. Read.",
         subtitle: "PreLife brings gym, nutrition, psychology and books together in one calm system — with plans, videos, experts and AI in every section.",
         seeAll: "Explore the sections",
+        start: "Create free account",
+        proof: "Early access — every section and AI free for now",
         chips: {
           meditation: "Psychology",
           library: "Books",
@@ -59,6 +61,58 @@ export const en = {
             point1: "Get meal plans that match your goal",
             point2: "Cook quick recipes with calories in mind",
             point3: "Track your water and find healthy venues"
+          }
+        }
+      },
+      steps: {
+        eyebrow: "How it works",
+        title: "Start in three steps",
+        items: {
+          one: {
+            title: "Create an account",
+            text: "A one-minute sign-up — just email and password, no card required."
+          },
+          two: {
+            title: "Pick your section",
+            text: "Gym, nutrition, psychology or books — each with plans, videos and experts."
+          },
+          three: {
+            title: "One step a day",
+            text: "Follow your plan, watch your progress — PreLife AI at your side."
+          }
+        }
+      },
+      pricing: {
+        eyebrow: "Subscription",
+        title: "Free now, yours to pick later",
+        subtitle: "During early access every section is free. When payments arrive, three plans will be ready.",
+        freeNow: "Free now",
+        note: "Payments arrive with an upcoming update — no card details are asked at this stage.",
+        cta: "See the plans"
+      },
+      faq: {
+        eyebrow: "Questions",
+        title: "Frequently asked questions",
+        items: {
+          q1: {
+            q: "What is PreLife?",
+            a: "An Azerbaijani product that brings gym, nutrition, psychology and books together in one platform — with plans, videos, experts and an AI assistant in every section."
+          },
+          q2: {
+            q: "How much does it cost?",
+            a: "Everything is free during early access. When payments go live, the Plus, Pro and Ultra plans will be available."
+          },
+          q3: {
+            q: "What do I need to sign up?",
+            a: "Just an email address and a password — it takes a minute, no card required."
+          },
+          q4: {
+            q: "What is the AI used for?",
+            a: "As a guide in every section: it explains plans, answers your questions and comments on your progress."
+          },
+          q5: {
+            q: "Which languages does it support?",
+            a: "Azerbaijani, English and Russian — the interface and content come in all three."
           }
         }
       },
@@ -346,6 +400,7 @@ export const en = {
       navClose: "Close menu",
       navThemeToggle: "Toggle dark / light mode",
       navHome: "PreLife — home",
+      skipToContent: "Skip to main content",
       galleryLabel: "Hero photos",
       notifications: "Notifications",
       confirmTitle: "Are you sure?",
