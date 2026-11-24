@@ -33,7 +33,7 @@ commit/push YOX. Yalnız qeyd faylları yazılır.
 3. Layout və spacing: grid sistemləri, 8pt spacing, whitespace iyerarxiyası,
    visual hierarchy, Apple-estetikası minimalizm qaydaları
 
-## Loop 2 — UX naviqasiya + motion
+## Loop 2 — UX naviqasiya + motion [TAMAMLANDI 2026-11-24 → notes/loop-2.md]
 4. Naviqasiya və informasiya arxitekturası: rail/tab pattern-ləri,
    sticky footer, mobile nav, breadcrumb
 5. Landing/konversiya strukturu: hero, bölmə ardıcıllığı, CTA dizaynı,
