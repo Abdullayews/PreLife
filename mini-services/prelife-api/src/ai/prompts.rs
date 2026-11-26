@@ -19,12 +19,8 @@ Return ONLY a JSON object, no markdown, no commentary:
 {"title": string, "level": "Başlanğıc" | "Orta" | "İleri", "totalWeeks": number (4-16), "focus": string, "days": [{"day": number (1=Monday … 7=Sunday), "focus": string, "exercises": [{"ex": string (registry code, or "" when not in the registry), "name": string, "sets": number, "reps": string, "rest": number (seconds), "note": string (optional coaching cue)}]}]}
 Write every user-facing string (title, level, focus, day focus, names, reps, notes) in the user's language."#;
 
-pub const PROMPT_CONTEXT: &str = r#"Signed-in user: {name} ({email}).
-Profile: {profile}.
-Current page: {page}.
-Active workout plan: {plan}.
-Subscription: {package}.
-Use this context to make your help concrete; you may act on the account with the tools when asked."#;
+pub const PROMPT_CONTEXT: &str = r#"The user is a signed-in member of the platform. Profile: {profile}. Current page: {page}. Active workout plan: {plan}. Subscription: {package}.
+Use this context to make your help concrete; you may act on the account with the tools when asked. Never ask for or repeat the user's e-mail address or real name; you do not need them. If body metrics would help, ask the user or use the get_my_data tool."#;
 
 pub const AI_PROMPT_SEEDS: &[AiPromptSeed] = &[
     AiPromptSeed { key: "assistant", content: PROMPT_ASSISTANT },

@@ -692,7 +692,7 @@ export const az = {
         data: {
           h: "11. Məlumatlarınız və hüquqlarınız",
           p1: "Şəxsi məlumatlarınız Azərbaycan Respublikasının «Fərdi məlumatlar haqqında» Qanununun (2024-cü il dəyişiklikləri daxil olmaqla) tələblərinə uyğun emal olunur; Avropa İqtisadi Məkanında üzvlük edən istifadəçilər üçün Ümumi Məlumat Mühafizəsi Qaydası (GDPR) da tətbiq oluna bilər. Sağlamlıqla bağlı qeydləriniz (əhval, gündəlik, çəki tarixçəsi) xüsusi qayğı tələb edən kateqoriyadır və yalnız təsdiqlənmiş hesabınızda görünür.",
-          p2: "Aşağıdakı hüquqlarınız var: məlumatlarınıza çıxış, dəyişdirilməsi, silinməsi, daşına bilən formatda köçürülməsi və emala etiraz. Bu hüquqları həyata keçirmək üçün hello@prelife.net ünvanına yazın.",
+          p2: "Aşağıdakı hüquqlarınız var: məlumatlarınıza çıxış, dəyişdirilməsi, silinməsi, daşına bilən formatda köçürülməsi və emala etiraz. Bu hüquqların bir hissəsini birbaşa həyata keçirə bilərsiniz — Ayarlar → Məxfilik bölməsində bütün məlumatlarınızı yükləyir, sağlamlıq datası icazələrini idarə edir və hesabınızı birlikdə bütün qeydləri ilə silirsiniz; digər istəklər üçün hello@prelife.net ünvanına yazın.",
           p3: "Giriş (Google/Apple), e-poçt çatdırılması və AI emalı üçüncü tərəb xidmətlərdən istifadə olunur; onların rolu və quraşdırılan cookie-lər Cookie siyasətimizdə açıqlanır."
         },
         changes: {
@@ -708,7 +708,7 @@ export const az = {
         },
         terminate: {
           h: "14. Hesabın bağlanması",
-          p1: "Hesabınızı bağlamaq istəyirsinizsə, hello@prelife.net ünvanına yazın — məlumatlarınızın silinməsi barədə tələbiniz qanunvericiliyə uyğun icra olunur.",
+          p1: "Hesabınızı özünüz bağlaya bilərsiniz — Ayarlar → Məxfilik → «Hesabı sil» (diqqət: əməliyyat geri qaytarıla bilməz və bütün qeydlərinizi silir). Kömək və ya suallar üçün hello@prelife.net ünvanına yazın.",
           p2: "Qaydaların pozulması, qanunsuz fəaliyyət və ya Platformanın təhlükəsizliyinə qarşı hərəkətlər hesabı dayandırmağa və ya bağlamağa əsas verir. Bağlanma halında aktiv paket və bronlar barədə məlumat e-poçtla göstərilir."
         },
         law: {
@@ -793,7 +793,8 @@ export const az = {
         appearance: "Görünüş",
         language: "Dil",
         notifications: "Bildirişlər",
-        location: "Lokasiya"
+        location: "Lokasiya",
+        privacy: "Məxfilik"
       },
       devices: {
         title: "Cihazlar",
@@ -879,7 +880,70 @@ export const az = {
         newsHint: "Yeni bölmələr və özəlliklər, təxminən ayda bir dəfə.",
         note: "Müvəqqəti düymələr — tam bildiriş sistemi ilə yadda saxlanmağa başlayacaqlar."
       },
+      privacy: {
+        consentsTitle: "Sağlamlıq datası icazələri",
+        consentsSubtitle: "Əhval, gündəlik, testlər və AI — bu funksiyalar sağlamlıqla əlaqəli məlumat emal edir və yalnız açıq icazənizlə işləyir.",
+        scopes: {
+          mood: { title: "Əhval jurnalı", desc: "Əhval, enerji və yuxu qeydlərinizi saxlamaq üçün icazə." },
+          journal: { title: "Gündəlik", desc: "Sərbəst mətnli gündəlik qeydlərinizi saxlamaq üçün icazə." },
+          quiz: { title: "Özünüqiymət testləri", desc: "Test nəticələrinizi saxlamaq üçün icazə." },
+          ai: { title: "AI köməkçisi", desc: "Söhbətlərinizi və məhdud profil kontekstini (ad və e-poçt göndərilmir) Google Gemini-yə (ABŞ) göndərmək üçün icazə." }
+        },
+        consentsNote: "İcazələr istənilən vaxt geri ala bilərsiniz — geri alınanda funksiya sönilir, mövcud qeydləriniz silinmir; onları aşağıdan yükləyə və ya hesabla birlikdə silə bilərsiniz.",
+        exportTitle: "Məlumatlarımı yüklə",
+        exportSubtitle: "Hesabınıza aid bütün məlumatları bir JSON faylında yükləyin.",
+        exportBtn: "JSON yüklə",
+        exportDone: "Fayl yükləndi.",
+        exportFail: "Yükləmə alınmadı. Yenidən cəhd edin.",
+        exportNote: "Fayl əhval jurnalı, gündəlik, test nəticələri, çəki tarixçəsi, bronlar, planlar və hesab məlumatlarını əhatə edir.",
+        deleteTitle: "Hesabı sil",
+        deleteSubtitle: "Hesabınızı və bütün məlumatlarınızı həmişəlik silin. Bu əməliyyat geri qaytarıla bilməz.",
+        deleteWordLabel: "Təsdiq sözü",
+        deleteWordHint: "Davam etmək üçün «SİL» yazın.",
+        deleteWord: "SİL",
+        deletePasswordLabel: "Parol",
+        deletePasswordHint: "Parol ilə hesabınız varsa, parolu daxil edin.",
+        deleteBtn: "Hesabı həmişəlik sil",
+        deleteDone: "Hesab silindi.",
+        deleteFail: {
+          generic: "Silinmə alınmadı. Yenidən cəhd edin.",
+          password_required: "Parol tələb olunur — parolunuzu daxil edin.",
+          invalid_credentials: "Parol yanlışdır.",
+          confirm_required: "Təsdiq alınmadı — yenidən cəhd edin.",
+          rate_limited: "Çox cəhd — bir dəqiqədən sonra yenidən cəhd edin."
+        },
+        deleteNote: "Silinmə bütün qeydlərinizi — əhval jurnalı, gündəlik, testlər, çəki tarixçəsi, bronlar, planlar, cihaz sessiyaları və hesabın özünü — həmişəlik silir."
+      },
       actionFailed: "Əməliyyat alınmadı. Yenidən cəhd edin."
+    },
+    consentGate: {
+      loading: "İcazə vəziyyəti yoxlanılır…",
+      error: "İcazə vəziyyəti yüklənmədi. Səhifəni yeniləyin.",
+      retry: "Yenidən cəhd et",
+      allow: "İcazə ver",
+      notNow: "İndi yox",
+      manage: "Ayarlar → Məxfilik",
+      granted: "İcazə verildi.",
+      locked: "Bu funksiya icazə tələb edir.",
+      note: "İcazə istənilən vaxt Ayarlar → Məxfilik-dən geri alına bilər; imtina hesabınızın digər funksiyalarına təsir etmir.",
+      scopes: {
+        mood: {
+          title: "Əhval jurnalı üçün icazə",
+          body: "Əhval, enerji və yuxu qeydləri sağlamlıqla əlaqəli məlumat sayılır və yalnız sizin üçün, yalnız sizə görünən şəkildə saxlanılır. İmtina etsəniz, bu funksiya işləməyəcək — hesabın digər hissələrinə təsir etmir."
+        },
+        journal: {
+          title: "Gündəlik üçün icazə",
+          body: "Gündəlik qeydləriniz şəxsi, sağlamlıqla əlaqəli mətnlərdir; yalnız sizin üçün saxlanılır. İmtina etsəniz, gündəlik yaza bilməyəcəksiniz."
+        },
+        quiz: {
+          title: "Özünüqiymət testləri üçün icazə",
+          body: "Test cavablarınız və nəticələriniz sağlamlıqla əlaqəli məlumatdır; yalnız sizin üçün saxlanılır. İmtina etsəniz, testlər işləməyəcək."
+        },
+        ai: {
+          title: "AI köməkçisi üçün icazə",
+          body: "Söhbətləriniz və məhdudlaşdırılmış kontekst (məqsəd, aktivlik — ad və e-poçt göndərilmir) xarici AI provayderi Google Gemini-yə (ABŞ) ötürülür. Söhbət tarixçəsi serverdə saxlanmır. İmtina etsəniz, AI funksiyaları işləməyəcək."
+        }
+      }
     },
     profilePage: {
       eyebrow: "Hesab",

@@ -88,17 +88,15 @@ pub async fn get_profile_view(st: &St, user_id: &str) -> Res<Value> {
     }))
 }
 
-/// A compact one-line profile summary for the AI context prompt.
+/// A compact one-line profile summary for the AI context prompt. Data
+/// minimization (GDPR Art. 5(1)(c) + EDPB ChatGPT Taskforce): NO body
+/// metrics (weight/height) and NO identifiers in the AMBIENT context —
+/// when the model genuinely needs metrics for a task, it asks or uses the
+/// get_my_data tool (an explicit, consented action).
 pub async fn profile_summary_line(st: &St, user_id: &str) -> String {
     match get_profile_view(st, user_id).await {
         Ok(p) => {
             let mut parts: Vec<String> = Vec::new();
-            if let Some(w) = p.get("weightKg").and_then(|v| v.as_f64()) {
-                parts.push(format!("{} kg", crate::mail::format_price(w)));
-            }
-            if let Some(h) = p.get("heightCm").and_then(|v| v.as_f64()) {
-                parts.push(format!("{} cm", crate::mail::format_price(h)));
-            }
             if let Some(g) = p.get("goal").and_then(|v| v.as_str()) {
                 parts.push(format!("goal: {g}"));
             }

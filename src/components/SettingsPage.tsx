@@ -4,8 +4,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { apiUrl } from "@/lib/api-url";
 import {
-  Bell, Briefcase, Check, Gamepad2, Globe, Headphones, Home, Info, Languages, Laptop,
-  LoaderCircle, LogOut, MapPin, Monitor, Moon, Palette, Pencil, Smartphone, Sun, Tablet, Tv,
+  Bell, Briefcase, Check, Download, Gamepad2, Globe, Headphones, Home, Info, Languages, Laptop,
+  LoaderCircle, LogOut, MapPin, Monitor, Moon, Palette, Pencil, ShieldCheck, Smartphone, Sun, Tablet, Trash2, Tv,
   UserRound, Watch, X, type LucideIcon,
 } from "lucide-react";
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -14,6 +14,7 @@ import { routing } from "@/i18n/routing";
 import { hasConsent, persistLocale, setThemeChoice } from "@/lib/consent";
 import { saveUserPref } from "@/lib/user-prefs";
 import { DEVICE_ICON_KEYS } from "@/lib/devices";
+import { fetchConsents, setConsent, type ConsentMap, type DataScope } from "@/lib/data-consent";
 import { toast } from "@/components/Toaster";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import type { AccountRole } from "@/lib/auth";
@@ -33,6 +34,7 @@ import type { AccountRole } from "@/lib/auth";
 const CATS = [
   { id: "account", icon: UserRound },
   { id: "devices", icon: Monitor },
+  { id: "privacy", icon: ShieldCheck },
   { id: "appearance", icon: Palette },
   { id: "language", icon: Languages },
   { id: "location", icon: MapPin },
@@ -265,6 +267,189 @@ function DevicesPanel() {
         busy={busy}
       />
     </section>
+  );
+}
+
+/* ── Privacy (Settings → Privacy: consents, export, deletion) ─────── */
+
+const PRIVACY_SCOPES: DataScope[] = ["mood", "journal", "quiz", "ai"];
+
+/** The data-rights panel: per-scope consent switches (withdrawable),
+ *  the JSON data export (access + portability) and the self-service
+ *  account deletion (erasure) with a typed confirmation + password
+ *  re-check for password accounts. */
+function PrivacyPanel() {
+  const t = useTranslations("settingsPage");
+  const tp = useTranslations("settingsPage.privacy");
+  const router = useRouter();
+
+  const [consents, setConsents] = useState<ConsentMap | null>(null);
+  const [busyScope, setBusyScope] = useState<DataScope | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const [password, setPassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    const map = await fetchConsents();
+    setConsents(map);
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const toggle = async (scope: DataScope) => {
+    if (busyScope || consents === null) return;
+    setBusyScope(scope);
+    const next = await setConsent(scope, !consents[scope]);
+    if (next === null) {
+      toast(t("actionFailed"));
+    } else {
+      setConsents(next);
+    }
+    setBusyScope(null);
+  };
+
+  const exportData = async () => {
+    if (exporting) return;
+    setExporting(true);
+    setExportError(false);
+    try {
+      const res = await fetch(apiUrl("/api/me/export"), { cache: "no-store" });
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `prelife-data-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast(tp("exportDone"));
+    } catch {
+      setExportError(true);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const deleteAccount = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(apiUrl("/api/me"), {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: true, password: password || undefined }),
+      });
+      if (res.ok) {
+        toast(tp("deleteDone"));
+        router.replace("/welcome");
+        router.refresh();
+        return;
+      }
+      const body = (await res.json().catch(() => null)) as { error?: string } | null;
+      const code = body?.error ?? "generic";
+      setDeleteError(tp.has(`deleteFail.${code}`) ? tp(`deleteFail.${code}`) : tp("deleteFail.generic"));
+    } catch {
+      setDeleteError(tp("deleteFail.generic"));
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const wordOk = confirmText.trim().toUpperCase() === tp("deleteWord").trim().toUpperCase();
+
+  return (
+    <>
+      <section className="set-panel" aria-label={tp("consentsTitle")}>
+        <div className="set-head">
+          <h2 className="h3">{tp("consentsTitle")}</h2>
+          <p>{tp("consentsSubtitle")}</p>
+        </div>
+        <div className="set-rows">
+          {PRIVACY_SCOPES.map((scope) => (
+            <div className="set-row" key={scope}>
+              <span className="set-info">
+                <b>{tp(`scopes.${scope}.title`)}</b>
+                <span>{tp(`scopes.${scope}.desc`)}</span>
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={consents?.[scope] ?? false}
+                aria-label={tp(`scopes.${scope}.title`)}
+                className="switch"
+                onClick={() => void toggle(scope)}
+                disabled={consents === null || busyScope !== null}
+              />
+            </div>
+          ))}
+        </div>
+        <p className="set-note"><Info size={15} aria-hidden />{tp("consentsNote")}</p>
+      </section>
+
+      <section className="set-panel" aria-label={tp("exportTitle")}>
+        <div className="set-head">
+          <h2 className="h3">{tp("exportTitle")}</h2>
+          <p>{tp("exportSubtitle")}</p>
+        </div>
+        {exportError && <p className="field-error" role="alert">{tp("exportFail")}</p>}
+        <button type="button" className="btn btn-sm" onClick={() => void exportData()} disabled={exporting}>
+          {exporting ? <LoaderCircle size={14} className="spin" aria-hidden /> : <Download size={14} aria-hidden />}
+          {tp("exportBtn")}
+        </button>
+        <p className="set-note"><Info size={15} aria-hidden />{tp("exportNote")}</p>
+      </section>
+
+      <section className="set-panel set-danger" aria-label={tp("deleteTitle")}>
+        <div className="set-head">
+          <h2 className="h3">{tp("deleteTitle")}</h2>
+          <p>{tp("deleteSubtitle")}</p>
+        </div>
+        {deleteError && <p className="field-error" role="alert">{deleteError}</p>}
+        <div className="set-rows">
+          <div className="set-row">
+            <span className="set-info">
+              <b>{tp("deleteWordLabel")}</b>
+              <span>{tp("deleteWordHint")}</span>
+            </span>
+            <input
+              type="text"
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              aria-label={tp("deleteWordLabel")}
+              autoComplete="off"
+              maxLength={20}
+              className="set-input"
+            />
+          </div>
+          <div className="set-row">
+            <span className="set-info">
+              <b>{tp("deletePasswordLabel")}</b>
+              <span>{tp("deletePasswordHint")}</span>
+            </span>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              aria-label={tp("deletePasswordLabel")}
+              autoComplete="current-password"
+              maxLength={100}
+              className="set-input"
+            />
+          </div>
+        </div>
+        <button type="button" className="btn btn-sm btn-danger" onClick={() => void deleteAccount()} disabled={deleting || !wordOk}>
+          {deleting ? <LoaderCircle size={14} className="spin" aria-hidden /> : <Trash2 size={14} aria-hidden />}
+          {tp("deleteBtn")}
+        </button>
+        <p className="set-note"><Info size={15} aria-hidden />{tp("deleteNote")}</p>
+      </section>
+    </>
   );
 }
 
@@ -533,6 +718,7 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
           )}
 
           {cat === "devices" && <DevicesPanel />}
+          {cat === "privacy" && <PrivacyPanel />}
 
           {cat === "appearance" && (
             <section className="set-panel" aria-label={t("appearance.title")}>

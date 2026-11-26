@@ -156,6 +156,12 @@ pub async fn chat_via_provider(st: &St, system: &str, history: &[(String, String
             Ok(_) => eprintln!("[ai] gemini failed → z-ai fallback: empty reply"),
         }
     }
+    // Crisis gate: health-adjacent distress text never reaches the fallback
+    // provider — fail honestly instead (no canned replies).
+    if crisis_flagged(history) {
+        eprintln!("[ai] crisis-signal message → z-ai fallback skipped (data minimization)");
+        return Err(DomainError::Api(ApiError::new(axum::http::StatusCode::SERVICE_UNAVAILABLE, "ai_unavailable")));
+    }
     let contents = history.iter().map(|(r, c)| (r.as_str(), c.as_str())).collect::<Vec<_>>();
     match zai::chat(st, system, &contents).await {
         Ok(reply) => Ok((reply, "zai")),
@@ -276,7 +282,9 @@ async fn run_tool(st: &St, name: &str, args: &Value, user: &Value, locale: &str)
                 pkgs.truncate(5);
                 Ok(json!({
                     "ok": true,
-                    "email": s(user, "email"),
+                    // No e-mail in the tool result either — the model never
+                    // needs the address to act on the account (tools address
+                    // the session server-side, not by identifier).
                     "profile": profile,
                     "activePlan": plan,
                     "customPackages": pkgs,
@@ -328,7 +336,35 @@ async fn run_tool(st: &St, name: &str, args: &Value, user: &Value, locale: &str)
     }
 }
 
-/* ── Context (the signed-in user's situation) ─────────────────────────── */
+/* ── Context (the signed-in user's situation) ───────────────────────── */
+
+/// Crisis-signal indicators (az/en/ru). When the user's message suggests
+/// self-harm or severe distress, the message must NEVER be forwarded to
+/// the fallback provider — an honest failure is the safe failure (the
+/// primary provider's terms and DPA still govern it; the fallback's do
+/// not cover health-adjacent data).
+const CRISIS_MARKERS: &[&str] = &[
+    // Azerbaijani
+    "intihar", "öldürüm özümü", "ölmək istə", "canıma qəsd", "özümə zərər",
+    // English
+    "suicide", "kill myself", "end my life", "self-harm", "hurt myself", "want to die",
+    // Russian
+    "самоубийст", "покончить", "убить себя", "суицид", "хочу умереть",
+];
+
+/// True when any of the recent user messages carries a crisis signal.
+/// Conservative by design: a false positive only skips the fallback
+/// provider (the honest-failure path already exists for outages).
+pub fn crisis_flagged(history: &[(String, String)]) -> bool {
+    let recent: Vec<&(String, String)> = history.iter().rev().take(3).collect();
+    recent
+        .iter()
+        .filter(|(role, _)| role == "user")
+        .any(|(_, content)| {
+            let l = content.to_lowercase();
+            CRISIS_MARKERS.iter().any(|m| l.contains(m))
+        })
+}
 
 fn page_label(page: Option<&str>) -> String {
     let Some(page) = page else { return "unknown".to_string() };
@@ -373,11 +409,14 @@ async fn build_context_block(st: &St, user: &Value, page: Option<&str>) -> Strin
     let profile = crate::profile::profile_summary_line(st, &user_id).await;
     let plan = crate::user_plans::plan_summary_line(st, &user_id).await;
     let pkg = crate::packages::package_summary_line(st, &user_id).await;
-    let name = s_opt(user, "name")
-        .unwrap_or_else(|| s(user, "email").split('@').next().unwrap_or("").to_string());
+    // Data minimization (GDPR Art. 5(1)(c) + EDPB ChatGPT Taskforce): the
+    // ambient prompt carries NO direct identifiers — name and e-mail are
+    // never sent. The replaces also neutralise STALE templates still
+    // stored in ai_prompts (an admin-edited or older-seeded row), so no
+    // identifier can leak through a leftover {name}/{email} placeholder.
     template
-        .replace("{name}", &name)
-        .replace("{email}", &s(user, "email"))
+        .replace("{name}", "a registered member")
+        .replace("{email}", "not shared")
         .replace("{profile}", &profile)
         .replace("{page}", &page_label(page))
         .replace("{plan}", &plan)
@@ -475,6 +514,12 @@ pub async fn assistant_reply(
     // fit its own timeout — fail honestly instead of holding the request.
     if started.elapsed() + std::time::Duration::from_secs(30) > BUDGET {
         eprintln!("[ai] wall-clock budget exhausted before the z-ai fallback — honest 503");
+        return Err(DomainError::Api(ApiError::new(axum::http::StatusCode::SERVICE_UNAVAILABLE, "ai_unavailable")));
+    }
+    // Crisis gate: distress text never reaches the fallback provider,
+    // whatever the budget says (mirrors chat_via_provider).
+    if crisis_flagged(history) {
+        eprintln!("[ai] crisis-signal message → z-ai fallback skipped (data minimization)");
         return Err(DomainError::Api(ApiError::new(axum::http::StatusCode::SERVICE_UNAVAILABLE, "ai_unavailable")));
     }
     match zai::chat(st, &full_system, &contents_slice).await {

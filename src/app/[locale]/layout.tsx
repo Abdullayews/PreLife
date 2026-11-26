@@ -56,6 +56,7 @@ export default async function LocaleLayout({
     sidePanel: all.sidePanel,
     cookieBar: all.cookieBar,
     settingsPage: all.settingsPage,
+    consentGate: all.consentGate,
     notFoundPage: all.notFoundPage,
     connection: all.connection,
     psychApp: all.psychApp,

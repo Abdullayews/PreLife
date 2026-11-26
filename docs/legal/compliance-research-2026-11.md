@@ -293,17 +293,38 @@ qəbul olunmazdan əvvəl RU-üzlü hüquq firması ilə təsdiq şərtdir.
 
 ### P0 — dərhal (bu həftə)
 
+**Status (2026-11-27):** 1 — sahib tərəfindən SKIP edilib (billing qərarı; risk
+yuxarıda qeyd olunub); 2, 3 və 4 — İCRA EDİLİB (aşağıdakı status qeydləri).
+
 1. **Gemini API paid tier-ə keçid**: GCP layihəsində billing aktivləşdirilməsi və
    açarın paid rejimə düşməsinin təsdiqi. EEA/UK istifadəçiləri üçün müqavilə
    baxımından məcburidir; free tier-də mental-health məzmunlu söhbətlər
    training-korpor sərhəddən keçir.
+   *Status: SKIP (sahib qərarı). Əlavə tapıntı: sandbox-dakı GEMINI_API_KEY
+   "API_KEY_INVALID" qaytarır — açarın özü yoxlanılmalı/yenilənməlidir; istehsalat
+   açarı da yoxlanılmalıdır (fallback istehsalatda konfiqurasiyasız olduğundan AI
+   503 verəcək).*
 2. **AI kontekst minimallaşdırılması**: PROMPT_CONTEXT-dən ad/email (və mümkünsə
    çəki/boy) çıxarılması — GDPR data minimization + Taskforce prinsipi; crisis
    əlamətli mesajların fallback provider-ə heç vaxt düşməməsi.
+   *Status: İCRA EDİLİB. PROMPT_CONTEXT artıq identifikator daşımır (köhnə DB
+   şablonları üçün neytral əvəzetmələr də var); ambient kontekstdən çəki/boy
+   çıxarılıb (get_my_data aləti istəyə bağlı qalır); get_my_data cavabından
+   email çıxarılıb; crisis-siqnallı mesajlar (az/en/ru marker-ləri) fallback-i
+   keçmir — dürüst 503.*
 3. **Consent arxitekturasının layihəsi**: mood/gündəlik/test/AI-kontekst üçün
    granulyar, geri çəkilə bilən, loglanan explicit consent (default: rədd).
+   *Status: İCRA EDİLİB. user_consents cədvəli (v3.7 migration, istehsalata
+   tətbiq edilib), /api/me/consents (GET/POST), server tərəfli 403
+   consent_required_<scope> qapıları (mood/journal/quiz/ai + daxil olmuş
+   istifadəçi üçün /api/ai/chat), ConsentGate UI komponenti, chat panellərində
+   qapılı kompozitor, Settings → Məxfilik-də idarəetmə (4 switch).*
 4. **Hesab silinməsi + data export endpoint-lərinin implementasiyası** — hər üç
    yurisdiksiyada ən aydın pozuntudur.
+   *Status: İCRA EDİLİB. GET /api/me/export (17 bölməli JSON, attachment),
+   DELETE /api/me (yazılı təsdiq sözü + parol hesabları üçün parol yenidən
+   yoxlanışı; cədvəl-cədvəl silmə + auth user + cache təmizliyi; emu-da tam
+   silinmə yoxlanılıb). ToU 11/14-cü bölmələri öz-özünə xidməti əks etdirir.*
 
 ### P1 — 30–60 gün
 

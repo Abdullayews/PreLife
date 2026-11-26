@@ -10,6 +10,7 @@ import {
   bakuParts, moodStreak, psyBySlug, dayRotated,
 } from "@/lib/psychology";
 import { MoodCheck } from "@/components/psych/MoodCheck";
+import { ConsentGate } from "@/components/ConsentGate";
 import { BreathCircle } from "@/components/psych/BreathCircle";
 import { AudioPlayerCard } from "@/components/psych/AudioPlayerCard";
 import { VideoCard } from "@/components/psych/VideoCard";
@@ -119,11 +120,13 @@ export default async function MeditationPage({ params }: Props) {
               <p className="mood-state" style={{ color: "var(--muted)" }}>
                 {todayLog ? t("moodDone", { mood: todayLog.mood, energy: todayLog.energy, sleep: todayLog.sleepQ }) : t("moodTodo")}
               </p>
-              <MoodCheck
-                compact
-                moodTags={content.moodTags}
-                initial={todayLog ? { mood: todayLog.mood, energy: todayLog.energy, sleepQ: todayLog.sleepQ, tags: todayLog.tags ? todayLog.tags.split(",") : [], note: todayLog.note ?? "" } : null}
-              />
+              <ConsentGate scope="mood">
+                <MoodCheck
+                  compact
+                  moodTags={content.moodTags}
+                  initial={todayLog ? { mood: todayLog.mood, energy: todayLog.energy, sleepQ: todayLog.sleepQ, tags: todayLog.tags ? todayLog.tags.split(",") : [], note: todayLog.note ?? "" } : null}
+                />
+              </ConsentGate>
             </li>
             <li>
               <BreathCircle />
@@ -149,12 +152,16 @@ export default async function MeditationPage({ params }: Props) {
 
         <section aria-labelledby="ai-h" className="blk">
           <h2 id="ai-h" className="eyebrow"><b>03</b>{t("aiEyebrow")}</h2>
-          <AiPanel />
+          <ConsentGate scope="ai">
+            <AiPanel />
+          </ConsentGate>
         </section>
 
         <section aria-labelledby="journal-h" className="blk">
           <h2 id="journal-h" className="eyebrow"><b>04</b>{t("journalEyebrow")}</h2>
-          <JournalCard prompt={t(promptKey)} promptKey={promptKey} />
+          <ConsentGate scope="journal">
+            <JournalCard prompt={t(promptKey)} promptKey={promptKey} />
+          </ConsentGate>
           <p className="note"><Link href="/meditation/journal">{t("journalOpenArchive")}</Link></p>
         </section>
 

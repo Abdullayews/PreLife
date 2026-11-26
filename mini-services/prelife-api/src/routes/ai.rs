@@ -31,6 +31,15 @@ pub async fn chat_post(State(st): State<St>, headers: HeaderMap, body: Bytes) ->
             })
         });
 
+    // Art. 9 gate: a signed-in chat sends (minimised) account context and
+    // may carry health-adjacent text — the "ai" scope covers it. Guests
+    // keep the plain assistant (no account data is attached at all).
+    if let Some(u) = user.as_ref() {
+        if !crate::consent::consent_granted(&st, s(u, "id").as_str(), "ai").await? {
+            return Err(crate::consent::consent_error("ai"));
+        }
+    }
+
     // v4.7: the cost ceiling.
     let allowed = match user.as_ref() {
         Some(u) => st.rate_allow(&format!("ai:u:{}", s(u, "id")), 30, std::time::Duration::from_secs(60)),

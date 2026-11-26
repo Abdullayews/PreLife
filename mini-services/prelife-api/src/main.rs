@@ -8,6 +8,8 @@
 mod account;
 mod ai;
 mod config;
+mod consent;
+mod data_export;
 mod content;
 mod emu;
 mod error;

@@ -8,6 +8,7 @@ import {
   bakuParts, dayRotated,
 } from "@/lib/psychology";
 import { JournalCard } from "@/components/psych/JournalCard";
+import { ConsentGate } from "@/components/ConsentGate";
 import { JournalHistory, type JournalDay } from "@/components/psych/JournalHistory";
 import { JournalList } from "@/components/psych/JournalList";
 import { PsychShell } from "@/components/psych/PsychShell";
@@ -85,7 +86,9 @@ export default async function JournalPage({ params }: Props) {
 
         <section aria-labelledby="write-h" className="blk">
           <h2 id="write-h" className="eyebrow"><b>01</b>{t("journalEyebrow")}</h2>
-          <JournalCard prompt={t(promptKey)} promptKey={promptKey} />
+          <ConsentGate scope="journal">
+            <JournalCard prompt={t(promptKey)} promptKey={promptKey} />
+          </ConsentGate>
         </section>
 
         <section aria-labelledby="history-h" className="blk">

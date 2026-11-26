@@ -9,6 +9,7 @@ import { MoodCheck } from "@/components/psych/MoodCheck";
 import { QuizCard } from "@/components/psych/QuizCard";
 import { MoodCharts } from "@/components/psych/MoodCharts";
 import { PsychShell } from "@/components/psych/PsychShell";
+import { ConsentGate } from "@/components/ConsentGate";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -64,21 +65,25 @@ export default async function MoodPage({ params }: Props) {
         <section aria-labelledby="check-h" className="blk">
           <h2 id="check-h" className="eyebrow"><b>01</b>{t("moodEyebrow")}</h2>
           <div className="card">
-            <MoodCheck
+            <ConsentGate scope="mood">
+              <MoodCheck
               moodTags={contentData?.moodTags ?? []}
               initial={todayLog
                 ? { mood: todayLog.mood, energy: todayLog.energy, sleepQ: todayLog.sleepQ, tags: todayLog.tags ? todayLog.tags.split(",") : [], note: todayLog.note ?? "" }
                 : null}
-            />
+              />
+            </ConsentGate>
           </div>
         </section>
 
         <section aria-labelledby="quiz-h" className="blk">
           <h2 id="quiz-h" className="eyebrow"><b>02</b>{t("quizEyebrow")}</h2>
-          <QuizCard
-            labels={labels}
-            zones={{ low: t("quizZoneLow"), mid: t("quizZoneMid"), high: t("quizZoneHigh") }}
-          />
+          <ConsentGate scope="quiz">
+            <QuizCard
+              labels={labels}
+              zones={{ low: t("quizZoneLow"), mid: t("quizZoneMid"), high: t("quizZoneHigh") }}
+            />
+          </ConsentGate>
         </section>
 
         <section aria-labelledby="charts-h" className="blk">

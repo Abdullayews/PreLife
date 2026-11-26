@@ -126,6 +126,9 @@ pub fn router(st: St) -> Router {
         // me + devices
         .route("/api/me/profile", get(account::profile_get).patch(account::profile_patch))
         .route("/api/me/preferences", get(account::preferences_get).patch(account::preferences_patch))
+        .route("/api/me/consents", get(account::consents_get).post(account::consents_post))
+        .route("/api/me/export", get(account::export_get))
+        .route("/api/me", delete(account::account_delete))
         .route("/api/devices", get(account::devices_list))
         .route("/api/devices/{id}", axum::routing::patch(account::device_patch).delete(account::device_delete))
         // psych

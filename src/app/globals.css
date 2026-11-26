@@ -718,7 +718,37 @@ html.dark .confirm-msg .confirm-ico { color: #e58c86; }
 html.dark .btn-danger { color: #e58c86; border-color: color-mix(in srgb, #e58c86 30%, transparent); background: color-mix(in srgb, #e58c86 9%, transparent); }
 html.dark .btn-danger:hover { background: color-mix(in srgb, #e58c86 16%, transparent); }
 
+/* ── Settings → Privacy: consents, export, deletion ──────────────────── */
+.set-input {
+  min-height: 44px; min-width: 12rem; max-width: 100%; padding: 0 .8rem;
+  border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+  background: var(--surface); color: var(--ink);
+  font: 500 .9375rem/1 var(--font-body);
+}
+.set-input:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px; border-color: transparent;
+}
+.set-danger { border-color: color-mix(in srgb, #b3261e 26%, var(--line)); }
+html.dark .set-danger { border-color: color-mix(in srgb, #e58c86 26%, var(--line)); }
+
+/* ── The data-consent gate card (feature areas + chat panels) ────────── */
+.consent-card {
+  display: grid; gap: .8rem; padding: 1.15rem 1.25rem;
+}
+.consent-card[data-compact="true"] { padding: .9rem 1rem; gap: .6rem; }
+.consent-card .chip-ico { justify-self: start; }
+.consent-card b { font-size: .9375rem; }
+.consent-card p { margin: 0; font-size: .8125rem; line-height: 1.55; color: var(--muted); }
+.consent-card[data-compact="true"] p { font-size: .8rem; }
+.consent-card-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.consent-card-note {
+  padding-top: .6rem; border-top: 1px dashed var(--line-strong);
+  font-size: .75rem !important; color: var(--muted);
+}
+.consent-card[data-compact="true"] .consent-card-note { display: none; }
+
 /* ── Settings → Devices ──────────────────────────────────────────────── */
+
 .device-list { display: grid; }
 .device {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
@@ -2446,6 +2476,7 @@ dialog.modal-panel:not([open])::backdrop { opacity: 0; }
   transition: color .2s, border-color .2s;
 }
 .ai-fab-chips button:hover { color: var(--accent-text); border-color: color-mix(in srgb, var(--accent) 45%, transparent); }
+.ai-fab-composer { display: grid; gap: .55rem; }
 .ai-fab-form {
   display: flex; align-items: center; gap: .5rem;
   padding: .7rem 1rem; border-top: 1px solid var(--line);

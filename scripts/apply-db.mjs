@@ -114,6 +114,15 @@ if (mode === "v3.6") {
   process.exit(0);
 }
 
+/* v3.7: data-consent gate (user_consents) for the health-adjacent features
+   (mood/journal/quiz/ai) — GDPR Art. 9 explicit consent, self-service
+   grant/withdrawal. See db/schema-v3.7.sql. */
+if (mode === "v3.7") {
+  await run(readFileSync(new URL("db/schema-v3.7.sql", root), "utf8"), "schema-v3.7.sql");
+  console.log("done.");
+  process.exit(0);
+}
+
 if (mode === "all" || mode === "schema") {
   await run(readFileSync(new URL("db/schema.sql", root), "utf8"), "schema.sql");
 }

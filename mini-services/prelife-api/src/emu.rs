@@ -19,7 +19,7 @@ pub const PERSISTED_TABLES: &[&str] = &[
     "sessions", "profiles", "journal_entries_v2", "mood_logs", "quiz_results",
     "meditation_progress", "appointments", "user_weight_logs", "custom_packages",
     "user_plans", "email_verifications", "mail_outbox", "ai_settings", "ai_prompts",
-    "user_plan_progress", "book_shelf",
+    "user_plan_progress", "book_shelf", "user_consents",
 ];
 
 

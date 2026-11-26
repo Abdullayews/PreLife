@@ -690,7 +690,7 @@
       "data": {
         "h": "11. Your data and your rights",
         "p1": "Your personal data is processed in accordance with the Republic of Azerbaijan's Law on Personal Data (including the 2024 amendments); for users in the European Economic Area, the General Data Protection Regulation (GDPR) may also apply. Your health-related entries (mood, journal, weight history) are a category requiring special care and are visible only in your verified account.",
-        "p2": "You have the following rights: access to your data, correction, deletion, transfer in a portable format, and objection to processing. To exercise these rights, write to hello@prelife.net.",
+        "p2": "You have the following rights: access to your data, correction, deletion, transfer in a portable format, and objection to processing. You can exercise part of them directly \u2014 in Settings \u2192 Privacy you can download all of your data, manage your health-data consents and delete your account with all of its records; for other requests, write to hello@prelife.net.",
         "p3": "Sign-in (Google/Apple), email delivery, and AI processing use third-party services; their roles and the cookies they involve are explained in our Cookie Policy."
       },
       "changes": {
@@ -706,7 +706,7 @@
       },
       "terminate": {
         "h": "14. Closing your account",
-        "p1": "If you want to close your account, write to hello@prelife.net \u2014 your request to delete your data is fulfilled in accordance with the law.",
+        "p1": "You can close your account yourself \u2014 Settings \u2192 Privacy \u2192 Delete account (note: it cannot be undone and deletes all of your records). For help or questions, write to hello@prelife.net.",
         "p2": "Breaches of the rules, unlawful activity, or actions against the Platform's security are grounds for suspending or closing an account. In the event of closure, information about active packages and bookings is provided by email."
       },
       "law": {
@@ -819,7 +819,8 @@
       "appearance": "Appearance",
       "language": "Language",
       "notifications": "Notifications",
-      "location": "Location"
+      "location": "Location",
+      "privacy": "Privacy"
     },
     "devices": {
       "title": "Devices",
@@ -905,7 +906,82 @@
       "newsHint": "New sections and features, about once a month.",
       "note": "Temporary toggles \u2014 they will start persisting with the full notification system."
     },
+    "privacy": {
+      "consentsTitle": "Health-data consents",
+      "consentsSubtitle": "Mood, journal, quizzes and AI process health-related information and run only with your explicit consent.",
+      "scopes": {
+        "mood": {
+          "title": "Mood journal",
+          "desc": "Consent to store your mood, energy and sleep entries."
+        },
+        "journal": {
+          "title": "Journal",
+          "desc": "Consent to store your free-text journal entries."
+        },
+        "quiz": {
+          "title": "Self-assessment quizzes",
+          "desc": "Consent to store your quiz results."
+        },
+        "ai": {
+          "title": "AI assistant",
+          "desc": "Consent to send your chats and a minimal profile context (no name or e-mail) to Google Gemini (US)."
+        }
+      },
+      "consentsNote": "You can withdraw any consent at any time \u2014 the feature turns off, your existing entries stay; download them below or delete them with your account.",
+      "exportTitle": "Download my data",
+      "exportSubtitle": "Download everything your account owns in a single JSON file.",
+      "exportBtn": "Download JSON",
+      "exportDone": "File downloaded.",
+      "exportFail": "Download failed. Try again.",
+      "exportNote": "The file includes mood logs, journal, quiz results, weight history, bookings, plans and account details.",
+      "deleteTitle": "Delete account",
+      "deleteSubtitle": "Permanently delete your account and all of your data. This cannot be undone.",
+      "deleteWordLabel": "Confirmation word",
+      "deleteWordHint": "Type DELETE to continue.",
+      "deleteWord": "DELETE",
+      "deletePasswordLabel": "Password",
+      "deletePasswordHint": "If your account uses a password, enter it.",
+      "deleteBtn": "Delete permanently",
+      "deleteDone": "Account deleted.",
+      "deleteFail": {
+        "generic": "Deletion failed. Try again.",
+        "password_required": "Password required \u2014 enter your password.",
+        "invalid_credentials": "Wrong password.",
+        "confirm_required": "Confirmation failed \u2014 try again.",
+        "rate_limited": "Too many attempts \u2014 try again in a minute."
+      },
+      "deleteNote": "Deletion permanently removes all of your records \u2014 mood logs, journal, quizzes, weight history, bookings, plans, device sessions and the account itself."
+    },
     "actionFailed": "That didn't work. Please try again."
+  },
+  "consentGate": {
+    "loading": "Checking consent\u2026",
+    "error": "Could not load the consent state. Reload the page.",
+    "retry": "Try again",
+    "allow": "Allow",
+    "notNow": "Not now",
+    "manage": "Settings \u2192 Privacy",
+    "granted": "Consent granted.",
+    "locked": "This feature needs your consent.",
+    "note": "Consent can be withdrawn any time in Settings \u2192 Privacy; refusing does not affect the rest of your account.",
+    "scopes": {
+      "mood": {
+        "title": "Consent for the mood journal",
+        "body": "Mood, energy and sleep entries are health-related data, stored only for you and visible only to you. If you refuse, this feature stays off \u2014 nothing else on your account changes."
+      },
+      "journal": {
+        "title": "Consent for the journal",
+        "body": "Your journal entries are private, health-related texts, stored only for you. If you refuse, you will not be able to write entries."
+      },
+      "quiz": {
+        "title": "Consent for self-assessment quizzes",
+        "body": "Your quiz answers and results are health-related data, stored only for you. If you refuse, quizzes stay off."
+      },
+      "ai": {
+        "title": "Consent for the AI assistant",
+        "body": "Your chats and a minimal context (goal, activity \u2014 your name and e-mail are never sent) are transmitted to the external AI provider Google Gemini (US). Chat history is not stored on our servers. If you refuse, AI features stay off."
+      }
+    }
   },
   "profilePage": {
     "eyebrow": "Account",

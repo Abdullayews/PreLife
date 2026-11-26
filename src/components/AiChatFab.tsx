@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
 import { apiUrl } from "@/lib/api-url";
+import { ConsentGate } from "@/components/ConsentGate";
 import { LoaderCircle, Send, Sparkles, X } from "lucide-react";
 
 type Msg = { role: "user" | "assistant"; content: string; failed?: boolean };
@@ -191,37 +192,40 @@ export function AiChatFab({ signedIn = false }: { signedIn?: boolean }) {
               )}
             </div>
 
-            {messages.length === 0 && (
-              <div className="ai-fab-chips">
-                {(["chip1", "chip2", "chip3"] as const).map((key) => (
-                  <button key={key} type="button" onClick={() => void send(t(key))}>
-                    {t(key)}
+            <ConsentGate scope="ai" enabled={signedIn} compact>
+              <div className="ai-fab-composer">
+                {messages.length === 0 && (
+                  <div className="ai-fab-chips">
+                    {(["chip1", "chip2", "chip3"] as const).map((key) => (
+                      <button key={key} type="button" onClick={() => void send(t(key))}>
+                        {t(key)}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <form
+                  className="ai-fab-form"
+                  onSubmit={(e) => { e.preventDefault(); void send(input); }}
+                >
+                  <input
+                    ref={inputRef}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder={t("placeholder")}
+                    aria-label={t("placeholder")}
+                    maxLength={600}
+                  />
+                  <button
+                    type="submit"
+                    className="ai-fab-send"
+                    disabled={busy || input.trim().length === 0}
+                    aria-label={t("send")}
+                  >
+                    <Send size={16} aria-hidden />
                   </button>
-                ))}
+                </form>
               </div>
-            )}
-
-            <form
-              className="ai-fab-form"
-              onSubmit={(e) => { e.preventDefault(); void send(input); }}
-            >
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={t("placeholder")}
-                aria-label={t("placeholder")}
-                maxLength={600}
-              />
-              <button
-                type="submit"
-                className="ai-fab-send"
-                disabled={busy || input.trim().length === 0}
-                aria-label={t("send")}
-              >
-                <Send size={16} aria-hidden />
-              </button>
-            </form>
+            </ConsentGate>
             <p className="ai-fab-note">{t("disclaimer")}</p>
           </>
         )}

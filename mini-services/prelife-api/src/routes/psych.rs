@@ -5,6 +5,7 @@ use super::{json_ok, json_status, read_json};
 use crate::error::{ApiError, DomainError};
 use crate::session::{self, origin_from};
 use crate::state::St;
+use crate::util::s;
 use axum::body::Bytes;
 use axum::extract::{Path, State};
 use axum::http::{HeaderMap, StatusCode};
@@ -35,6 +36,10 @@ pub async fn journal_post(State(st): State<St>, headers: HeaderMap, body: Bytes)
         return Err(err(503, "supabase_unconfigured"));
     }
     let cs = require(&st, &headers).await?;
+    // Art. 9 gate: the journal is health-adjacent free text.
+    if !crate::consent::consent_granted(&st, s(&cs.user, "id").as_str(), "journal").await? {
+        return Err(crate::consent::consent_error("journal"));
+    }
     let body = read_json(&body);
     let out = crate::psych::journal_create(&st, &cs.user, &body).await?;
     Ok(json_status(out, StatusCode::CREATED))
@@ -67,6 +72,10 @@ pub async fn mood_post(State(st): State<St>, headers: HeaderMap, body: Bytes) ->
         return Err(err(503, "supabase_unconfigured"));
     }
     let cs = require(&st, &headers).await?;
+    // Art. 9 gate: mood/energy/sleep self-reports are health-adjacent.
+    if !crate::consent::consent_granted(&st, s(&cs.user, "id").as_str(), "mood").await? {
+        return Err(crate::consent::consent_error("mood"));
+    }
     let body = read_json(&body);
     Ok(json_ok(crate::psych::mood_upsert(&st, &cs.user, &body).await?))
 }
@@ -78,6 +87,10 @@ pub async fn quiz_post(State(st): State<St>, headers: HeaderMap, body: Bytes) ->
         return Err(err(503, "supabase_unconfigured"));
     }
     let cs = require(&st, &headers).await?;
+    // Art. 9 gate: self-assessment results are health-adjacent.
+    if !crate::consent::consent_granted(&st, s(&cs.user, "id").as_str(), "quiz").await? {
+        return Err(crate::consent::consent_error("quiz"));
+    }
     let body = read_json(&body);
     let out = crate::psych::quiz_submit(&st, &cs.user, &body).await?;
     Ok(json_status(out, StatusCode::CREATED))
@@ -183,6 +196,11 @@ pub async fn ai_post(State(st): State<St>, headers: HeaderMap, body: Bytes) -> R
         return Err(err(503, "supabase_unconfigured"));
     }
     let cs = require(&st, &headers).await?;
+    // Art. 9 gate: the companion chat is health-adjacent text sent to the
+    // LLM provider — the "ai" scope covers every AI feature.
+    if !crate::consent::consent_granted(&st, s(&cs.user, "id").as_str(), "ai").await? {
+        return Err(crate::consent::consent_error("ai"));
+    }
     // The AI cost ceiling — same class as /api/ai/chat, per signed-in user.
     let uid = crate::util::s(&cs.user, "id");
     if !st.rate_allow(&format!("ai:psy:{}", uid), 10, std::time::Duration::from_secs(60)) {
