@@ -5,8 +5,8 @@ import {
 } from "react";
 import { useTranslations } from "next-intl";
 import {
-  AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ChevronsUpDown,
-  Circle, CircleHelp, ClipboardCheck, Crown, Dumbbell, FileText, Flower2, House, Landmark, Layers,
+  AudioLines, Backpack, BookOpen, Brain, CalendarDays, ChefHat, ChevronsUpDown, Circle,
+  CircleHelp, ClipboardCheck, Cookie, Crown, Dumbbell, FileText, Flower2, House, Landmark, Layers,
   LibraryBig, MapPin, Menu, MonitorPlay, NotebookPen, PanelLeftClose,
   PanelLeftOpen, Pill, Salad, ScrollText, Settings, ShieldCheck, Shirt, UserRound, Users,
   Wind, type LucideIcon,
@@ -260,6 +260,7 @@ export function AppShell({
     { href: "/settings", label: ta("settings"), icon: Settings },
     { href: "/help", label: ta("help"), icon: CircleHelp },
     { href: "/terms", label: ta("terms"), icon: FileText },
+    { href: "/cookies", label: ta("cookies"), icon: Cookie },
     { href: "/rules", label: ta("rules"), icon: ScrollText },
   ] as const;
 

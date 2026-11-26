@@ -376,7 +376,10 @@
     "homeDescription": "PreLife-da h\u0259r g\u00fcn ba\u015flad\u0131\u011f\u0131n\u0131z yer.",
     "loginTitle": "Daxil ol",
     "signupTitle": "Hesab yarat",
-    "termsTitle": "\u015e\u0259rtl\u0259r",
+    "termsTitle": "\u0130stifad\u0259 \u015f\u0259rtl\u0259ri",
+    "termsDescription": "PreLife xidm\u0259tind\u0259n istifad\u0259 qaydalar\u0131 \u2014 hesab, seanslar, \u00f6d\u0259ni\u015fl\u0259r v\u0259 h\u00fcquqlar\u0131n\u0131z.",
+    "cookiesTitle": "Cookie siyas\u0259ti",
+    "cookiesDescription": "PreLife-\u0131n hans\u0131 cookie v\u0259 yadda\u015fdan istifad\u0259 etdiyi, raz\u0131l\u0131q prinsipi v\u0259 idar\u0259etm\u0259 \u00fcsullar\u0131.",
     "rulesTitle": "Qaydalar",
     "settingsTitle": "Ayarlar",
     "profileTitle": "Profil",
@@ -603,6 +606,7 @@
     "settings": "Ayarlar",
     "help": "K\u00f6m\u0259k",
     "terms": "\u015e\u0259rtl\u0259r",
+    "cookies": "Cookie siyas\u0259ti",
     "rules": "Qaydalar",
     "signIn": "Daxil ol"
   },
@@ -614,8 +618,191 @@
   },
   "underConstruction": {},
   "termsPage": {
-    "title": "\u015e\u0259rtl\u0259r",
-    "placeholder": "PreLife \u015f\u0259xsi, kommersiya olmayan istifad\u0259 \u00fc\u00e7\u00fcn t\u0259qdim olunur. Hesab\u0131n\u0131z sizindir: \u015fifr\u0259nizi qoruyun v\u0259 platformadan d\u00fcr\u00fcst istifad\u0259 edin \u2014 hesab payla\u015fmaq, m\u0259lumat \u00e7\u0131xarmaq v\u0259 icaz\u0259siz avtomatik giri\u015f qada\u011fand\u0131r. Bronlar v\u0259 \u00f6d\u0259ni\u015fl\u0259r \u00f6d\u0259ni\u015f zaman\u0131 g\u00f6st\u0259ril\u0259n qaydada apar\u0131l\u0131r; l\u0259\u011fv olunan sor\u011fular \u00f6d\u0259ni\u015fd\u0259n \u0259vv\u0259l g\u00f6st\u0259ril\u0259n psixoloq siyas\u0259tin\u0259 uy\u011fun geri qaytar\u0131l\u0131r. Platforma b\u00f6y\u00fcd\u00fckc\u0259 bu \u015f\u0259rtl\u0259r yenil\u0259n\u0259 bil\u0259r \u2014 cari versiya h\u0259r zaman bu s\u0259hif\u0259d\u0259dir. Suallar\u0131n\u0131z \u00fc\u00e7\u00fcn: support@prelife.app."
+    "title": "\u0130stifad\u0259 \u015f\u0259rtl\u0259ri",
+    "updated": "Son yenil\u0259m\u0259: 26 noyabr 2026",
+    "intro": "Bu s\u0259n\u0259d prelife.net xidm\u0259tini (bundan sonra \u00abPreLife\u00bb v\u0259 ya \u00abPlatforma\u00bb) istifad\u0259 qaydalar\u0131n\u0131 m\u00fc\u0259yy\u0259n edir. Hesab yaratmaqla, daxil olmaqla v\u0259 ya Platformadan istifad\u0259 etm\u0259kl\u0259 bu \u015f\u0259rtl\u0259rl\u0259 raz\u0131la\u015f\u0131rs\u0131n\u0131z; raz\u0131 deyilsinizs\u0259, xidm\u0259td\u0259n istifad\u0259 etm\u0259yin. \u015e\u0259rtl\u0259r Az\u0259rbaycan Respublikas\u0131n\u0131n qanunvericiliyin\u0259 uy\u011fun t\u0259rtib olunub v\u0259 sizin ya\u015fad\u0131\u011f\u0131n\u0131z \u00f6lk\u0259nin m\u0259cburi qaydalar\u0131 il\u0259 birlikd\u0259 t\u0259tbiq olunur.",
+    "seeAlso": "Ox\u015far s\u0259n\u0259dl\u0259r",
+    "seeCookies": "Cookie siyas\u0259ti",
+    "seeRules": "\u0130cma qaydalar\u0131",
+    "sections": {
+      "accept": {
+        "h": "1. \u015e\u0259rtl\u0259rin q\u0259bulu",
+        "p1": "Bu \u015f\u0259rtl\u0259r prelife.net \u00fcnvan\u0131nda t\u0259qdim olunan b\u00fct\u00fcn xidm\u0259tl\u0259r\u0259 \u2014 s\u0259hif\u0259l\u0259r\u0259, hesab\u0131n\u0131za, abun\u0259likl\u0259r\u0259 v\u0259 Platforman\u0131n dig\u0259r al\u0259tl\u0259rin\u0259 \u2014 \u015famil olunur. Hesab yaratmaqla, daxil olmaqla v\u0259 ya xidm\u0259td\u0259n istifad\u0259 etm\u0259kl\u0259 bu s\u0259n\u0259dl\u0259 ba\u011fl\u0131 oldu\u011funuzu t\u0259sdiql\u0259yirsiniz.",
+        "p2": "Bu s\u0259n\u0259d b\u00fct\u00fcn istifad\u0259\u00e7il\u0259r\u0259 \u00fcnvanlanm\u0131\u015f a\u00e7\u0131q t\u0259klifdir; hesab\u0131n yarad\u0131lmas\u0131 v\u0259 ya xidm\u0259td\u0259n istifad\u0259 t\u0259klifin q\u0259bulu kimi qiym\u0259tl\u0259ndirilir. \u015e\u0259rtl\u0259rl\u0259 raz\u0131 deyilsinizs\u0259, Platformadan istifad\u0259 etm\u0259yin."
+      },
+      "service": {
+        "h": "2. Xidm\u0259t haqq\u0131nda",
+        "p1": "PreLife \u2014 idman, qidalanma, psixologiya v\u0259 oxu \u00fc\u00e7\u00fcn vahid platformad\u0131r: \u015f\u0259xsi m\u0259\u015fq planlar\u0131, reseptl\u0259r v\u0259 qida proqramlar\u0131, meditasiya v\u0259 n\u0259f\u0259s praktikalar\u0131, psixoloqlarla onlayn seans bronu, kitab kolleksiyalar\u0131 v\u0259 AI k\u00f6m\u0259k\u00e7isi. \u018fsas funksiyalar pulsuzdur; geni\u015fl\u0259nmi\u015f imkanlar \u00fc\u00e7\u00fcn Premium paketl\u0259r t\u0259klif olunur \u2014 cari tarifl\u0259r v\u0259 daxil olanlar h\u0259mi\u015f\u0259 abun\u0259lik s\u0259hif\u0259sind\u0259 g\u00f6st\u0259rilir.",
+        "p2": "Platforma prelife.net \u00fcnvan\u0131nda i\u015fl\u0259dilir. Suallar\u0131n\u0131z v\u0259 m\u00fcraci\u0259tl\u0259riniz \u00fc\u00e7\u00fcn: hello@prelife.net."
+      },
+      "account": {
+        "h": "3. Hesab, ya\u015f v\u0259 t\u0259hl\u00fck\u0259sizlik",
+        "p1": "Platformadan istifad\u0259 etm\u0259k \u00fc\u00e7\u00fcn 18 ya\u015f\u0131n\u0131z tam olmal\u0131d\u0131r. Ya\u015fad\u0131\u011f\u0131n\u0131z \u00f6lk\u0259nin qanunu 16\u201317 ya\u015fl\u0131 \u015f\u0259xsl\u0259rin \u00f6z raz\u0131l\u0131\u011f\u0131 il\u0259 onlayn xidm\u0259tl\u0259rd\u0259n istifad\u0259sin\u0259 icaz\u0259 verirs\u0259, bel\u0259 istifad\u0259\u00e7il\u0259r yaln\u0131z valideyn v\u0259 ya qanuni n\u00fcmay\u0259nd\u0259sinin raz\u0131l\u0131\u011f\u0131 il\u0259 hesab yarada bil\u0259r. 13 ya\u015fdan ki\u00e7ik u\u015faqlar\u0131n \u015f\u0259xsi m\u0259lumatlar\u0131 q\u0259bul edilmir.",
+        "p2": "Hesab\u0131n\u0131z siz\u0259 aiddir: \u015fifr\u0259nizi m\u0259xfi saxlay\u0131n, hesab\u0131 ba\u015fqalar\u0131 il\u0259 payla\u015fmay\u0131n v\u0259 hesab\u0131n\u0131za qeyri-qanuni giri\u015fi d\u0259rhal biz\u0259 bildirin. Hesab\u0131n\u0131zla apar\u0131lan b\u00fct\u00fcn \u0259m\u0259liyyatlar\u0131n m\u0259suliyy\u0259ti sizd\u0259 qal\u0131r.",
+        "p3": "Yaln\u0131\u015f m\u0259lumat verm\u0259yin, ba\u015fqas\u0131n\u0131n ad\u0131na hesab a\u00e7may\u0131n v\u0259 Platforman\u0131 qanunsuz m\u0259qs\u0259dl\u0259r \u00fc\u00e7\u00fcn istifad\u0259 etm\u0259yin."
+      },
+      "notmedical": {
+        "h": "4. Platforma tibbi m\u0259sl\u0259h\u0259t deyil",
+        "p1": "PreLife \u2014 sa\u011flaml\u0131q m\u00f6vzusunda \u00fcmumi m\u0259lumat v\u0259 r\u0259hb\u0259rlik xidm\u0259tidir; tibbi m\u00fcayin\u0259, diaqnoz, m\u00fcalic\u0259 v\u0259 ya resept \u0259v\u0259zi deyil. Proqramlar, m\u0259\u015fql\u0259r, qida t\u00f6vsiy\u0259l\u0259ri v\u0259 m\u0259qal\u0259l\u0259r \u00fcmumi xarakter da\u015f\u0131y\u0131r v\u0259 \u015f\u0259xsi v\u0259ziyy\u0259tiniz\u0259 uy\u011funla\u015fd\u0131r\u0131lmay\u0131b.",
+        "p2": "H\u0259r hans\u0131 sa\u011flaml\u0131q q\u0259rar\u0131 verm\u0259zd\u0259n \u0259vv\u0259l \u2014 x\u00fcsus\u0259n xroniki x\u0259st\u0259lik, d\u0259rman q\u0259bulu, hamil\u0259lik v\u0259 ya z\u0259d\u0259 hal\u0131nda \u2014 h\u0259kim v\u0259 ya dig\u0259r ixtisasl\u0131 m\u00fct\u0259x\u0259ssisl\u0259 m\u0259sl\u0259h\u0259tl\u0259\u015fin. Yeni m\u0259\u015fq v\u0259 p\u0259hriz\u0259 ba\u015flamazdan \u0259vv\u0259l b\u0259d\u0259ninizin haz\u0131rl\u0131\u011f\u0131n\u0131 yoxlay\u0131n.",
+        "p3": "F\u00f6vq\u0259lad\u0259 hal yarand\u0131qda Platformadan k\u00f6m\u0259k g\u00f6zl\u0259m\u0259yin: d\u0259rhal 112 (v\u0259 ya \u00f6lk\u0259nizin t\u0259cili xidm\u0259t n\u00f6mr\u0259si) il\u0259 \u0259laq\u0259 saxlay\u0131n v\u0259 ya yax\u0131n tibbi m\u00fc\u0259ssis\u0259y\u0259 m\u00fcraci\u0259t edin."
+      },
+      "ai": {
+        "h": "5. AI k\u00f6m\u0259k\u00e7isi",
+        "p1": "Platformadak\u0131 AI k\u00f6m\u0259k\u00e7isi suallar\u0131n\u0131za cavab verm\u0259k, planlar v\u0259 t\u00f6vsiy\u0259l\u0259r haz\u0131rlamaq \u00fc\u00e7\u00fcn i\u015fl\u0259dilir. Cavablar\u0131 m\u0259lumat xarakterlidir, s\u0259hv ola bil\u0259r v\u0259 pe\u015f\u0259kar \u2014 tibbi, psixoloji, h\u00fcquqi v\u0259 ya maliyy\u0259 \u2014 m\u0259sl\u0259h\u0259tin \u0259v\u0259zi deyil.",
+        "p2": "AI-ya yazd\u0131qlar\u0131n\u0131z cavab haz\u0131rlamaq \u00fc\u00e7\u00fcn emal olunur; ba\u015fqalar\u0131n\u0131n \u015f\u0259xsi m\u0259lumatlar\u0131n\u0131 v\u0259 sirrini s\u00f6hb\u0259t\u0259 daxil etm\u0259yin. Emal\u0131n mahiyy\u0259ti il\u0259 Cookie siyas\u0259timizd\u0259 tan\u0131\u015f ola bil\u0259rsiniz."
+      },
+      "sessions": {
+        "h": "6. Psixoloq seanslar\u0131",
+        "p1": "Platformada t\u0259qdim olunan psixoloqlar m\u00fcst\u0259qil pe\u015f\u0259karlard\u0131r: seans\u0131n keyfiyy\u0259ti, ixtisas\u0131 v\u0259 pe\u015f\u0259kar etikas\u0131 onlar\u0131n m\u0259suliyy\u0259tidir. Platforma bronu, t\u0259sdiqi v\u0259 \u00f6d\u0259ni\u015f statuslar\u0131n\u0131n izl\u0259nm\u0259sini t\u0259min edir.",
+        "p2": "Bron sor\u011fusu g\u00f6nd\u0259rildikd\u0259n sonra psixoloq onu t\u0259sdiql\u0259yir v\u0259 ya r\u0259dd edir; t\u0259sdiql\u0259nmi\u015f seans\u0131 ba\u015flamam\u0131\u015fdan \u0259vv\u0259l hesab\u0131n\u0131zdan l\u0259\u011fv ed\u0259 bil\u0259rsiniz. Seans ba\u015flad\u0131qdan sonra l\u0259\u011fv m\u00fcmk\u00fcn deyil.",
+        "p3": "Seans zaman\u0131 v\u0259 mesajla\u015fmada h\u00f6rm\u0259tli olun \u2014 Platforman\u0131n icma qaydalar\u0131 bu m\u00fcnasib\u0259tl\u0259r\u0259 d\u0259 \u015famil olunur."
+      },
+      "payments": {
+        "h": "7. \u00d6d\u0259ni\u015fl\u0259r, abun\u0259lik v\u0259 geri qaytarma",
+        "p1": "Premium paketl\u0259rin cari tarifl\u0259ri, t\u0259rkibi v\u0259 m\u00fcdd\u0259ti abun\u0259lik s\u0259hif\u0259sind\u0259 g\u00f6st\u0259rilir. Paketl\u0259r platformada sor\u011fu il\u0259 aktivl\u0259\u015fir: t\u0259l\u0259biniz g\u00f6nd\u0259rilir, komanda t\u0259sdiql\u0259yir v\u0259 paket hesab\u0131n\u0131zda aktivl\u0259\u015fir; \u00f6d\u0259ni\u015f t\u0259limatlar\u0131 t\u0259sdiq zaman\u0131 g\u00f6st\u0259rilir.",
+        "p2": "Psixoloq seans\u0131 \u00fc\u00e7\u00fcn g\u00f6st\u0259ril\u0259n qiym\u0259t v\u0259 \u015f\u0259rtl\u0259r bron zaman\u0131 ayd\u0131nla\u015fd\u0131r\u0131l\u0131r; \u00f6d\u0259ni\u015f statusu hesab\u0131n\u0131zda izl\u0259nilir. Seans\u0131 ba\u015flamam\u0131\u015f l\u0259\u011fv etdikd\u0259 al\u0131nm\u0131\u015f \u00f6d\u0259ni\u015fl\u0259rin geri qaytar\u0131lmas\u0131 \u00fc\u00e7\u00fcn hello@prelife.net \u00fcnvan\u0131na m\u00fcraci\u0259t edin \u2014 geri qaytarma \u00f6d\u0259ni\u015f zaman\u0131 g\u00f6st\u0259ril\u0259n qaydalara uy\u011fun apar\u0131l\u0131r.",
+        "p3": "Ya\u015fad\u0131\u011f\u0131n\u0131z \u00f6lk\u0259nin qanunvericiliyi uzaqdan m\u00fcqavil\u0259l\u0259r \u00fc\u00e7\u00fcn imtina h\u00fcququ (m\u0259s\u0259l\u0259n, Avropa \u0130qtisadi M\u0259kan\u0131nda 14 g\u00fcn) n\u0259z\u0259rd\u0259 tutursa, bu h\u00fcquq saxlan\u0131l\u0131r; r\u0259q\u0259msal xidm\u0259t\u0259 d\u0259rhal ba\u015flama\u011fa a\u00e7\u0131q raz\u0131l\u0131q verdiyiniz halda qanunun icaz\u0259 verdiyi h\u0259dd\u0259 m\u0259hdudla\u015fa bil\u0259r.",
+        "p4": "Bu b\u0259nd qanunla qorunan istehlak\u00e7\u0131 h\u00fcquqlar\u0131n\u0131z\u0131 \u2014 o c\u00fcml\u0259d\u0259n Az\u0259rbaycan Respublikas\u0131nda istehlak\u00e7\u0131 h\u00fcquqlar\u0131n\u0131n qorunmas\u0131 qanunvericiliyini \u2014 m\u0259hdudla\u015fd\u0131rm\u0131r."
+      },
+      "content": {
+        "h": "8. Sizin m\u0259zmununuz",
+        "p1": "G\u00fcnd\u0259lik yaz\u0131lar\u0131, qeydl\u0259riniz, r\u0259yl\u0259riniz v\u0259 Platformaya daxil etdiyiniz dig\u0259r materiallar siz\u0259 m\u0259xsusdur. Bu materiallar\u0131 siz\u0259 g\u00f6st\u0259rm\u0259k, saxlamaq v\u0259 t\u0259hl\u00fck\u0259sizliyini t\u0259min etm\u0259k \u00fc\u00e7\u00fcn Platformaya m\u0259hdud lisenziya verirsiniz; bu lisenziya material\u0131 satmaq v\u0259 ya k\u00fctl\u0259vi yaymaq h\u00fcququ vermir.",
+        "p2": "M\u0259zmununuza g\u00f6r\u0259 m\u0259suliyy\u0259t sizd\u0259dir: qanunsuz, t\u0259hqiramiz, ba\u015fqalar\u0131n\u0131n h\u00fcquqlar\u0131n\u0131 pozan v\u0259 ya icma qaydalar\u0131na zidd material yerl\u0259\u015fdirm\u0259yin."
+      },
+      "fairuse": {
+        "h": "9. D\u00fcr\u00fcst istifad\u0259",
+        "p1": "Platforman\u0131n davaml\u0131 v\u0259 t\u0259hl\u00fck\u0259siz i\u015fl\u0259m\u0259si \u00fc\u00e7\u00fcn a\u015fa\u011f\u0131dak\u0131lar qada\u011fand\u0131r:",
+        "li1": "Hesab\u0131 ba\u015fqalar\u0131 il\u0259 payla\u015fmaq, satmaq v\u0259 ya icar\u0259y\u0259 verm\u0259k;",
+        "li2": "M\u0259lumatlar\u0131 avtomatik toplamaq, k\u00fctl\u0259vi sur\u0259td\u0259 \u00e7\u0131xarmaq v\u0259 \u00fc\u00e7\u00fcnc\u00fc t\u0259r\u0259f m\u0259qs\u0259dl\u0259ri il\u0259 istifad\u0259 etm\u0259k;",
+        "li3": "\u0130caz\u0259siz avtomatik giri\u015f, botlar v\u0259 Platforman\u0131n normal i\u015fin\u0259 mane olan sor\u011fular;",
+        "li4": "Yaz\u0131l\u0131 icaz\u0259 olmadan t\u0259hl\u00fck\u0259sizlik testl\u0259ri, skanerl\u0259m\u0259 v\u0259 a\u00e7\u0131qlar\u0131n axtar\u0131lmas\u0131;",
+        "li5": "Xidm\u0259ti t\u0259rsin\u0259 m\u00fch\u0259ndislik etm\u0259k v\u0259 texniki m\u0259hdudiyy\u0259tl\u0259ri ke\u00e7m\u0259k;",
+        "li6": "AI k\u00f6m\u0259k\u00e7isini v\u0259 psixoloqlarla mesajla\u015fman\u0131 spam, reklam v\u0259 ya qanunsuz m\u0259qs\u0259dl\u0259rl\u0259 istifad\u0259 etm\u0259k.",
+        "p2": "Bu qaydalar\u0131n pozulmas\u0131 hesab\u0131n dayand\u0131r\u0131lmas\u0131na v\u0259 ya ba\u011flanmas\u0131na s\u0259b\u0259b ola bil\u0259r."
+      },
+      "ip": {
+        "h": "10. M\u00fc\u0259llif h\u00fcququ",
+        "p1": "Platformada t\u0259qdim olunan materiallar \u2014 m\u0259tnl\u0259r, proqramlar, videolar, \u015f\u0259kill\u0259r v\u0259 dizayn \u2014 qanunla qorunur v\u0259 yaln\u0131z \u015f\u0259xsi, kommersiya olmayan istifad\u0259 \u00fc\u00e7\u00fcn t\u0259qdim olunur.",
+        "p2": "\u00d6d\u0259ni\u015fli materiallar\u0131 yenid\u0259n yaymaq, sat\u0131\u015fa \u00e7\u0131xarmaq v\u0259 ya k\u00fctl\u0259vi sur\u0259td\u0259 \u00e7oxaltmaq qada\u011fand\u0131r. Platformadan istifad\u0259 ed\u0259rk\u0259n m\u0259nb\u0259y\u0259 istinad edin.",
+        "p3": "\u00abPreLife\u00bb ad\u0131 sahibin\u0259 m\u0259xsusdur; ba\u015fqa adlar v\u0259 ni\u015fanlar \u00f6z sahibl\u0259rin\u0259 aiddir."
+      },
+      "data": {
+        "h": "11. M\u0259lumatlar\u0131n\u0131z v\u0259 h\u00fcquqlar\u0131n\u0131z",
+        "p1": "\u015e\u0259xsi m\u0259lumatlar\u0131n\u0131z Az\u0259rbaycan Respublikas\u0131n\u0131n \u00abF\u0259rdi m\u0259lumatlar haqq\u0131nda\u00bb Qanununun (2024-c\u00fc il d\u0259yi\u015fiklikl\u0259ri daxil olmaqla) t\u0259l\u0259bl\u0259rin\u0259 uy\u011fun emal olunur; Avropa \u0130qtisadi M\u0259kan\u0131nda \u00fczvl\u00fck ed\u0259n istifad\u0259\u00e7il\u0259r \u00fc\u00e7\u00fcn \u00dcmumi M\u0259lumat M\u00fchafiz\u0259si Qaydas\u0131 (GDPR) da t\u0259tbiq oluna bil\u0259r. Sa\u011flaml\u0131qla ba\u011fl\u0131 qeydl\u0259riniz (\u0259hval, g\u00fcnd\u0259lik, \u00e7\u0259ki tarix\u00e7\u0259si) x\u00fcsusi qay\u011f\u0131 t\u0259l\u0259b ed\u0259n kateqoriyad\u0131r v\u0259 yaln\u0131z t\u0259sdiql\u0259nmi\u015f hesab\u0131n\u0131zda g\u00f6r\u00fcn\u00fcr.",
+        "p2": "A\u015fa\u011f\u0131dak\u0131 h\u00fcquqlar\u0131n\u0131z var: m\u0259lumatlar\u0131n\u0131za \u00e7\u0131x\u0131\u015f, d\u0259yi\u015fdirilm\u0259si, silinm\u0259si, da\u015f\u0131na bil\u0259n formatda k\u00f6\u00e7\u00fcr\u00fclm\u0259si v\u0259 emala etiraz. Bu h\u00fcquqlar\u0131 h\u0259yata ke\u00e7irm\u0259k \u00fc\u00e7\u00fcn hello@prelife.net \u00fcnvan\u0131na yaz\u0131n.",
+        "p3": "Giri\u015f (Google/Apple), e-po\u00e7t \u00e7atd\u0131r\u0131lmas\u0131 v\u0259 AI emal\u0131 \u00fc\u00e7\u00fcnc\u00fc t\u0259r\u0259b xidm\u0259tl\u0259rd\u0259n istifad\u0259 olunur; onlar\u0131n rolu v\u0259 qura\u015fd\u0131r\u0131lan cookie-l\u0259r Cookie siyas\u0259timizd\u0259 a\u00e7\u0131qlan\u0131r."
+      },
+      "changes": {
+        "h": "12. Xidm\u0259tin d\u0259yi\u015fm\u0259si",
+        "p1": "Platforma daim inki\u015faf edir: b\u00f6lm\u0259l\u0259r, imkanlar v\u0259 interfeys d\u0259yi\u015f\u0259 bil\u0259r. \u018fh\u0259miyy\u0259tli d\u0259yi\u015fiklikl\u0259r saytda v\u0259 e-po\u00e7tla bildirilir.",
+        "p2": "Yenil\u0259nmi\u015f \u015f\u0259rtl\u0259r d\u0259rc olunduqdan sonra xidm\u0259td\u0259n istifad\u0259ni davam etdirm\u0259k yenil\u0259nmi\u015f \u015f\u0259rtl\u0259rl\u0259 raz\u0131l\u0131q kimi qiym\u0259tl\u0259ndirilir. Raz\u0131 deyilsinizs\u0259, hesab\u0131n\u0131z\u0131 ba\u011flaya bil\u0259rsiniz."
+      },
+      "liability": {
+        "h": "13. M\u0259suliyy\u0259tin s\u0259rh\u0259dl\u0259ri",
+        "p1": "Xidm\u0259t \u00aboldu\u011fu kimi\u00bb t\u0259qdim olunur: fasil\u0259siz \u0259l\u00e7atanl\u0131q, x\u0259tas\u0131zl\u0131q v\u0259 x\u00fcsusi m\u0259qs\u0259d\u0259 uy\u011funluq \u00fczr\u0259 z\u0259man\u0259t verilmir. Planla\u015fd\u0131r\u0131lm\u0131\u015f v\u0259 g\u00f6zl\u0259nilm\u0259z fasil\u0259l\u0259r m\u00fcmk\u00fcnd\u00fcr.",
+        "p2": "Qanunun icaz\u0259 verdiyi h\u0259dd\u0259 Platforman\u0131n m\u0259suliyy\u0259ti son 12 ayda xidm\u0259t \u00fc\u00e7\u00fcn \u00f6d\u0259diyiniz m\u0259bl\u0259\u011fl\u0259 m\u0259hdudla\u015f\u0131r; dolay\u0131 z\u0259r\u0259rl\u0259r \u00fc\u00e7\u00fcn m\u0259suliyy\u0259t da\u015f\u0131y\u0131lm\u0131r.",
+        "p3": "Bu b\u0259nd qanunla m\u00fc\u0259yy\u0259n edilmi\u015f z\u0259ruri m\u0259suliyy\u0259ti v\u0259 istehlak\u00e7\u0131 h\u00fcquqlar\u0131n\u0131z\u0131 l\u0259\u011fv etmir."
+      },
+      "terminate": {
+        "h": "14. Hesab\u0131n ba\u011flanmas\u0131",
+        "p1": "Hesab\u0131n\u0131z\u0131 ba\u011flamaq ist\u0259yirsinizs\u0259, hello@prelife.net \u00fcnvan\u0131na yaz\u0131n \u2014 m\u0259lumatlar\u0131n\u0131z\u0131n silinm\u0259si bar\u0259d\u0259 t\u0259l\u0259biniz qanunvericiliy\u0259 uy\u011fun icra olunur.",
+        "p2": "Qaydalar\u0131n pozulmas\u0131, qanunsuz f\u0259aliyy\u0259t v\u0259 ya Platforman\u0131n t\u0259hl\u00fck\u0259sizliyin\u0259 qar\u015f\u0131 h\u0259r\u0259k\u0259tl\u0259r hesab\u0131 dayand\u0131rma\u011fa v\u0259 ya ba\u011flama\u011fa \u0259sas verir. Ba\u011flanma hal\u0131nda aktiv paket v\u0259 bronlar bar\u0259d\u0259 m\u0259lumat e-po\u00e7tla g\u00f6st\u0259rilir."
+      },
+      "law": {
+        "h": "15. T\u0259tbiq olunan qanun v\u0259 m\u00fcbahis\u0259l\u0259r",
+        "p1": "Bu \u015f\u0259rtl\u0259r Az\u0259rbaycan Respublikas\u0131n\u0131n qanunlar\u0131na \u0259sas\u0259n t\u0259tbiq olunur. M\u00fcbahis\u0259l\u0259r \u0259vv\u0259lc\u0259 s\u00fclh yolu il\u0259 \u2014 hello@prelife.net \u00fcnvan\u0131na m\u00fcraci\u0259t etm\u0259kl\u0259 \u2014 h\u0259ll edilir; n\u0259tic\u0259siz qald\u0131qda m\u0259s\u0259l\u0259 Az\u0259rbaycan Respublikas\u0131n\u0131n m\u0259hk\u0259m\u0259l\u0259rind\u0259 bax\u0131l\u0131r.",
+        "p2": "Ya\u015fad\u0131\u011f\u0131n\u0131z \u00f6lk\u0259nin m\u0259cburi istehlak\u00e7\u0131 qaydalar\u0131 saxlan\u0131l\u0131r. B\u0259zi \u00f6lk\u0259l\u0259rin qanunlar\u0131 (m\u0259s\u0259l\u0259n, m\u0259lumatlar\u0131n \u00f6lk\u0259 daxilind\u0259 saxlanmas\u0131 t\u0259l\u0259bi) Platforman\u0131n Az\u0259rbaycanda yerl\u0259\u015f\u0259n infrastrukturu il\u0259 uy\u011fun g\u0259lm\u0259y\u0259 bil\u0259r \u2014 bu halda h\u0259min \u00f6lk\u0259nin qanunlar\u0131na \u0259sas\u0259n xidm\u0259td\u0259n istifad\u0259 etm\u0259m\u0259lisiniz."
+      },
+      "contact": {
+        "h": "16. \u018flaq\u0259",
+        "p1": "Operator: PreLife. Sayt: prelife.net. Suallar, t\u0259klifl\u0259r v\u0259 h\u00fcquqi m\u00fcraci\u0259tl\u0259r \u00fc\u00e7\u00fcn: hello@prelife.net."
+      }
+    }
+  },
+  "cookiesPage": {
+    "title": "Cookie siyas\u0259ti",
+    "updated": "Son yenil\u0259m\u0259: 26 noyabr 2026",
+    "intro": "Bu siyas\u0259t prelife.net-in brauzerinizd\u0259 hans\u0131 cookie v\u0259 yerli yadda\u015fdan (localStorage) istifad\u0259 etdiyini, onlar\u0131n n\u0259 \u00fc\u00e7\u00fcn laz\u0131m oldu\u011funu v\u0259 raz\u0131l\u0131\u011f\u0131n\u0131z\u0131 nec\u0259 idar\u0259 ed\u0259 bil\u0259c\u0259yinizi izah edir. Biz yaln\u0131z a\u015fa\u011f\u0131da sadalananlara icaz\u0259 veririk \u2014 izl\u0259m\u0259, reklam v\u0259 profil yaratma cookie-l\u0259ri istifad\u0259 etmirik.",
+    "seeAlso": "Ox\u015far s\u0259n\u0259dl\u0259r",
+    "seeTerms": "\u0130stifad\u0259 \u015f\u0259rtl\u0259ri",
+    "tableHead": {
+      "name": "Ad",
+      "kind": "N\u00f6v",
+      "purpose": "M\u0259qs\u0259d",
+      "life": "M\u00fcdd\u0259t"
+    },
+    "cookies": {
+      "pl_session": {
+        "kind": "Z\u0259ruri",
+        "purpose": "Sizi daxil saxlamaq: giri\u015f seans\u0131n\u0131z\u0131 tan\u0131y\u0131r (\u00e7\u0131x\u0131\u015f zaman\u0131 silinir).",
+        "life": "365 g\u00fcn (aktivlik \u00fczr\u0259 uzan\u0131r)"
+      },
+      "pl_oauth": {
+        "kind": "Z\u0259ruri",
+        "purpose": "Yaln\u0131z Google/Apple il\u0259 daxil olma an\u0131nda: prosesi t\u0259hl\u00fck\u0259siz ba\u011flamaq \u00fc\u00e7\u00fcn texniki g\u00f6st\u0259rici.",
+        "life": "maksimum 10 d\u0259qiq\u0259"
+      },
+      "pl_cookies": {
+        "kind": "Raz\u0131l\u0131\u011f\u0131n\u0131z",
+        "purpose": "Cookie bar\u0131na verdiyiniz cavab\u0131 xat\u0131rlay\u0131r ki, h\u0259r s\u0259hif\u0259d\u0259 yenid\u0259n soru\u015fulmas\u0131n.",
+        "life": "1 il"
+      },
+      "NEXT_LOCALE": {
+        "kind": "Raz\u0131l\u0131\u011f\u0131n\u0131z",
+        "purpose": "Se\u00e7diyiniz dili (az/en/ru) xat\u0131rlay\u0131r.",
+        "life": "1 il"
+      },
+      "pl_theme": {
+        "kind": "Raz\u0131l\u0131\u011f\u0131n\u0131z \u2014 localStorage",
+        "purpose": "T\u00fcnd/i\u015f\u0131q tema se\u00e7iminizi xat\u0131rlay\u0131r.",
+        "life": "silm\u0259y\u0259n\u0259d\u0259k"
+      },
+      "pl_motion": {
+        "kind": "Raz\u0131l\u0131\u011f\u0131n\u0131z \u2014 localStorage",
+        "purpose": "\u00abH\u0259r\u0259k\u0259ti azalt\u00bb se\u00e7iminizi xat\u0131rlay\u0131r.",
+        "life": "silm\u0259y\u0259n\u0259d\u0259k"
+      },
+      "sw_cache": {
+        "kind": "Z\u0259ruri \u2014 Cache API",
+        "purpose": "\u0130nternet k\u0259sildiyi anda oflayn s\u0259hif\u0259sini g\u00f6st\u0259rm\u0259k \u00fc\u00e7\u00fcn \u00fc\u00e7 \u00fcmumi s\u0259hif\u0259nin sur\u0259ti (\u015f\u0259xsi m\u0259lumat yoxdur).",
+        "life": "brauzer t\u0259r\u0259find\u0259n idar\u0259 olunur"
+      }
+    },
+    "sections": {
+      "what": {
+        "h": "1. Cookie n\u0259dir",
+        "p1": "Cookie \u2014 brauzerinizin sayt \u00fc\u00e7\u00fcn saxlad\u0131\u011f\u0131 ki\u00e7ik m\u0259tn fayllar\u0131d\u0131r; onlar sizi tan\u0131ma\u011fa (m\u0259s\u0259l\u0259n, daxil olmu\u015f istifad\u0259\u00e7i kimi) v\u0259 se\u00e7iml\u0259rinizi xat\u0131rlama\u011fa imkan verir. Yerli yadda\u015f (localStorage) eyni m\u0259qs\u0259dl\u0259 brauzerin \u00f6l\u00e7\u00fcs\u00fc daha b\u00f6y\u00fck anbar\u0131d\u0131r. Biz h\u0259r ikisind\u0259n yaln\u0131z a\u015fa\u011f\u0131da g\u00f6st\u0259ril\u0259n miqdarda istifad\u0259 edirik."
+      },
+      "principle": {
+        "h": "2. Raz\u0131l\u0131qdan \u0259vv\u0259l \u2014 he\u00e7 n\u0259 yaz\u0131lm\u0131r",
+        "p1": "Sayta ilk d\u0259f\u0259 daxil olduqda cookie bar\u0131 g\u00f6st\u0259ril\u0259n\u0259 q\u0259d\u0259r brauzeriniz\u0259 he\u00e7 n\u0259 yaz\u0131lm\u0131r: dil se\u00e7iminiz \u00fcnvan\u0131n \u00f6z\u00fcnd\u0259 (az/en/ru), tema se\u00e7imi is\u0259 yaln\u0131z cari ziyar\u0259tin yadda\u015f\u0131nda saxlan\u0131l\u0131r. \u00abYaln\u0131z z\u0259ruri\u00bb d\u00fcym\u0259sini se\u00e7s\u0259niz, se\u00e7iml\u0259rinizl\u0259 ba\u011fl\u0131 he\u00e7 n\u0259 saxlan\u0131lmadan sad\u0259c\u0259 bar ba\u011flan\u0131r.",
+        "p2": "\u00abQ\u0259bul et\u00bb dedikd\u0259 is\u0259 cavab\u0131n\u0131z (pl_cookies) v\u0259 se\u00e7iml\u0259riniz \u2014 dil, tema, h\u0259r\u0259k\u0259t \u2014 xat\u0131rlan\u0131r ki, h\u0259r d\u0259f\u0259 yenid\u0259n soru\u015fulmas\u0131n. Giri\u015f seans\u0131 istisnad\u0131r: daxil olmu\u015f hesab\u0131n\u0131z\u0131 tan\u0131maq \u00fc\u00e7\u00fcn pl_session cookie-si h\u0259mi\u015f\u0259 laz\u0131md\u0131r \u2014 bu, raz\u0131l\u0131qdan as\u0131l\u0131 olmayan z\u0259ruri cookie-dir."
+      },
+      "table": {
+        "h": "3. \u0130stifad\u0259 etdiyimiz cookie v\u0259 yadda\u015f",
+        "p1": "Platforma yaln\u0131z a\u015fa\u011f\u0131dak\u0131 cookie v\u0259 yadda\u015f qeydl\u0259rind\u0259n istifad\u0259 edir \u2014 ba\u015fqa he\u00e7 n\u0259 yoxdur."
+      },
+      "thirdparty": {
+        "h": "4. \u00dc\u00e7\u00fcnc\u00fc t\u0259r\u0259f cookie-l\u0259r",
+        "p1": "Sayt\u0131n \u00f6z\u00fcnd\u0259 \u00fc\u00e7\u00fcnc\u00fc t\u0259r\u0259f \u2014 analitika, reklam v\u0259 ya izl\u0259m\u0259 \u2014 cookie-l\u0259ri qura\u015fd\u0131r\u0131lm\u0131r. Google v\u0259 ya Apple il\u0259 daxil olma se\u00e7ildikd\u0259 h\u0259min provayderl\u0259rin \u00f6z qaydalar\u0131 t\u0259tbiq olunur; e-po\u00e7t \u00e7atd\u0131r\u0131lmas\u0131 v\u0259 AI emal\u0131 \u00fc\u00e7\u00fcnc\u00fc t\u0259r\u0259b xidm\u0259tl\u0259r\u0259 h\u0259val\u0259 olunur, lakin onlar sayt s\u0259hif\u0259l\u0259rind\u0259 \u00f6z cookie-l\u0259rini qura\u015fd\u0131rm\u0131r.",
+        "p2": "G\u0259l\u0259c\u0259kd\u0259 yeni n\u00f6v yadda\u015fdan istifad\u0259 laz\u0131m g\u0259l\u0259rs\u0259, \u0259vv\u0259lc\u0259 raz\u0131l\u0131\u011f\u0131n\u0131z yenid\u0259n soru\u015fulacaq."
+      },
+      "control": {
+        "h": "5. Raz\u0131l\u0131\u011f\u0131n\u0131z\u0131 nec\u0259 idar\u0259 edirsiniz",
+        "p1": "Bar\u0131 yenid\u0259n g\u00f6rm\u0259k ist\u0259yirsinizs\u0259, brauzerinizd\u0259n prelife.net \u00fc\u00e7\u00fcn cookie-l\u0259ri silin \u2014 n\u00f6vb\u0259ti ziyar\u0259td\u0259 bar yenid\u0259n g\u00f6st\u0259ril\u0259c\u0259k. Se\u00e7iml\u0259rinizi d\u0259yi\u015fm\u0259k \u00fc\u00e7\u00fcn saytdak\u0131 dil v\u0259 tema d\u00fcym\u0259l\u0259rind\u0259n istifad\u0259 edin.",
+        "p2": "Brauzerinizin ayarlar\u0131ndan b\u00fct\u00fcn cookie v\u0259 yerli yadda\u015f\u0131 sil\u0259 bil\u0259rsiniz: bu, se\u00e7iml\u0259rinizi s\u0131f\u0131rlay\u0131r v\u0259 \u00e7\u0131x\u0131\u015f etm\u0259y\u0259 m\u0259cbur edir, lakin hesab\u0131n\u0131za v\u0259 platformadak\u0131 qeydl\u0259riniz\u0259 ziyan yetirmir."
+      },
+      "law": {
+        "h": "6. Qanuni \u0259sas",
+        "p1": "Giri\u015f seans\u0131 v\u0259 daxilolma prosesi kimi z\u0259ruri yadda\u015f qanunvericiliyin\u0259 \u0259sas\u0259n raz\u0131l\u0131q t\u0259l\u0259b etmir \u2014 xidm\u0259tin i\u015fl\u0259m\u0259si \u00fc\u00e7\u00fcn m\u00fctl\u0259q laz\u0131md\u0131r. Dil, tema v\u0259 h\u0259r\u0259k\u0259t se\u00e7iml\u0259ri is\u0259 yaln\u0131z a\u00e7\u0131q raz\u0131l\u0131\u011f\u0131n\u0131zla saxlan\u0131l\u0131r; raz\u0131l\u0131q ixtiyari verilir v\u0259 r\u0259dd etm\u0259k q\u0259bul etm\u0259kd\u0259n asan deyil \u2014 \u00abYaln\u0131z z\u0259ruri\u00bb d\u00fcym\u0259si tam s\u0131f\u0131r yaz\u0131 il\u0259 i\u015fl\u0259yir.",
+        "p2": "Bu siyas\u0259t Az\u0259rbaycan Respublikas\u0131n\u0131n \u00abF\u0259rdi m\u0259lumatlar haqq\u0131nda\u00bb Qanununun, el\u0259c\u0259 d\u0259 t\u0259tbiq olundu\u011fu halda Avropa \u0130ttifaq\u0131n\u0131n ePrivacy qaydalar\u0131n\u0131n v\u0259 GDPR-un \u015f\u0259ffafl\u0131q t\u0259l\u0259bl\u0259rin\u0259 uy\u011fun t\u0259rtib olunub."
+      },
+      "contact": {
+        "h": "7. \u018flaq\u0259",
+        "p1": "Bu siyas\u0259tl\u0259 ba\u011fl\u0131 suallar \u00fc\u00e7\u00fcn: hello@prelife.net."
+      }
+    }
   },
   "rulesPage": {
     "title": "Qaydalar",

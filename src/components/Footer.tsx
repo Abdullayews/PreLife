@@ -10,6 +10,7 @@ export async function Footer() {
         <strong>{t("brand")}</strong>
         <nav className="foot-links" aria-label={t("brand")}>
           <Link href="/terms">{ta("terms")}</Link>
+          <Link href="/cookies">{ta("cookies")}</Link>
           <Link href="/rules">{ta("rules")}</Link>
         </nav>
         <span>{t("tagline")}</span>

@@ -228,6 +228,9 @@ export function Nav({ user }: { user: MenuUser | null }) {
                   <Link href="/terms">{ta("terms")}</Link>
                 </li>
                 <li>
+                  <Link href="/cookies">{ta("cookies")}</Link>
+                </li>
+                <li>
                   <Link href="/rules">{ta("rules")}</Link>
                 </li>
               </ul>

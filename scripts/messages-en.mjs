@@ -378,7 +378,10 @@ export const en = {
       homeDescription: "Your everyday starting point in PreLife.",
       loginTitle: "Sign in",
       signupTitle: "Create account",
-      termsTitle: "Terms",
+      termsTitle: "Terms of Use",
+      termsDescription: "The rules for using the PreLife service — accounts, sessions, payments, and your rights.",
+      cookiesTitle: "Cookie Policy",
+      cookiesDescription: "Which cookies and storage PreLife uses, how consent works, and how to control it.",
       rulesTitle: "Rules",
       settingsTitle: "Settings",
       profileTitle: "Profile",
@@ -605,6 +608,7 @@ export const en = {
       settings: "Settings",
       help: "Help",
       terms: "Terms",
+      cookies: "Cookie Policy",
       rules: "Rules",
       signIn: "Sign in"
     },
@@ -616,8 +620,163 @@ export const en = {
     },
     underConstruction: {},
     termsPage: {
-      title: "Terms",
-      placeholder: "PreLife is provided for personal, non-commercial use. Your account is yours: keep your password safe and use the platform honestly — no account sharing, no scraping, no automated access without permission. Bookings and payments follow the flow shown at checkout; canceled requests are refunded according to the psychologist's policy shown before payment. We may update these terms as the platform grows — the current version always lives on this page. Questions? Write to support@prelife.app."
+      title: "Terms of Use",
+      updated: "Last updated: 26 November 2026",
+      intro: "This document sets the rules for using the prelife.net service (hereafter \"PreLife\" or \"the Platform\"). By creating an account, signing in, or using the Platform you agree to these terms; if you do not agree, do not use the service. The terms are drafted under the laws of the Republic of Azerbaijan and apply together with the mandatory rules of your country of residence.",
+      seeAlso: "Related documents",
+      seeCookies: "Cookie Policy",
+      seeRules: "Community Rules",
+      sections: {
+        accept: {
+          h: "1. Accepting these terms",
+          p1: "These terms cover everything offered at prelife.net — the pages, your account, subscriptions, and the Platform's other tools. By creating an account, signing in, or using the service you confirm you are bound by this document.",
+          p2: "This document is a public offer addressed to all users; creating an account or using the service counts as accepting the offer. If you do not agree with the terms, do not use the Platform."
+        },
+        service: {
+          h: "2. About the service",
+          p1: "PreLife is a unified platform for exercise, nutrition, psychology, and reading: personal workout plans, recipes and meal programs, meditation and breathing practices, online session booking with psychologists, book collections, and an AI assistant. The core features are free; Premium packages add extended capabilities — current tiers and what they include are always shown on the subscription page.",
+          p2: "The Platform operates at prelife.net. For questions and requests: hello@prelife.net."
+        },
+        account: {
+          h: "3. Account, age, and security",
+          p1: "You must be at least 18 years old to use the Platform. If the law of your country allows 16–17-year-olds to use online services with their own consent, such users may create an account only with a parent's or legal guardian's consent. Personal data of children under 13 is not accepted.",
+          p2: "Your account is yours: keep your password confidential, do not share the account with others, and notify us immediately of any unauthorized access to your account. You remain responsible for all activity carried out through your account.",
+          p3: "Do not provide false information, do not open an account in someone else's name, and do not use the Platform for unlawful purposes."
+        },
+        notmedical: {
+          h: "4. Not medical advice",
+          p1: "PreLife is a general information and guidance service on health topics; it is not a medical examination, diagnosis, treatment, or prescription. Programs, exercises, nutrition suggestions, and articles are general in nature and are not adapted to your personal condition.",
+          p2: "Before making any health decision — especially with a chronic condition, medication, pregnancy, or an injury — consult a physician or another qualified professional. Check your body's readiness before starting new exercise or diet routines.",
+          p3: "In an emergency, do not wait for help from the Platform: immediately call 112 (or your local emergency number) or go to the nearest medical facility."
+        },
+        ai: {
+          h: "5. The AI assistant",
+          p1: "The Platform's AI assistant is used to answer your questions and to build plans and suggestions. Its answers are informational, may be wrong, and are not a substitute for professional — medical, psychological, legal, or financial — advice.",
+          p2: "What you write to the AI is processed to prepare an answer; do not enter other people's personal data or secrets into the chat. See our Cookie Policy for how the processing works."
+        },
+        sessions: {
+          h: "6. Psychologist sessions",
+          p1: "The psychologists presented on the Platform are independent professionals: the quality, qualifications, and professional ethics of a session are their responsibility. The Platform provides the booking, the confirmation, and payment-status tracking.",
+          p2: "After you send a booking request, the psychologist confirms or declines it; a confirmed session can be canceled from your account before it starts. Once a session has started, cancellation is no longer possible.",
+          p3: "Be respectful during sessions and messaging — the Platform's community rules apply to these interactions as well."
+        },
+        payments: {
+          h: "7. Payments, subscriptions, and refunds",
+          p1: "Current Premium tiers, their contents, and durations are shown on the subscription page. Packages are activated by request: you send a request, the team confirms it, and the package becomes active in your account; payment instructions are shown at confirmation.",
+          p2: "The price and terms shown for a psychologist session are clarified at booking; the payment status is tracked in your account. If you cancel a session before it starts and a payment was taken, write to hello@prelife.net for a refund — refunds follow the rules shown at the time of payment.",
+          p3: "If the law of your country provides a withdrawal right for distance contracts (for example, 14 days in the European Economic Area), that right is preserved; where you give express consent to start a digital service immediately, it may be limited to the extent the law allows.",
+          p4: "This section does not limit your legally protected consumer rights — including consumer protection legislation of the Republic of Azerbaijan."
+        },
+        content: {
+          h: "8. Your content",
+          p1: "Your journal entries, notes, reviews, and other materials you enter into the Platform belong to you. You grant the Platform a limited license to store, secure, and display that material back to you; this license does not grant the right to sell or mass-distribute it.",
+          p2: "You are responsible for your content: do not post material that is unlawful, abusive, infringes others' rights, or violates the community rules."
+        },
+        fairuse: {
+          h: "9. Fair use",
+          p1: "To keep the Platform running steadily and safely, the following are prohibited:",
+          li1: "Sharing, selling, or renting out your account;",
+          li2: "Automated data collection, mass extraction, or use for third-party purposes;",
+          li3: "Unauthorized automated access, bots, and requests that disrupt normal operation;",
+          li4: "Security testing, scanning, or vulnerability hunting without written permission;",
+          li5: "Reverse engineering the service or circumventing technical limits;",
+          li6: "Using the AI assistant or psychologist messaging for spam, advertising, or unlawful purposes.",
+          p2: "Breaking these rules can lead to suspension or closure of the account."
+        },
+        ip: {
+          h: "10. Copyright",
+          p1: "The materials offered on the Platform — texts, programs, videos, images, and design — are protected by law and provided for personal, non-commercial use only.",
+          p2: "Reposting, reselling, or mass-copying paid material is prohibited. When you quote the Platform, cite the source.",
+          p3: "The \"PreLife\" name belongs to its owner; other names and marks belong to their respective owners."
+        },
+        data: {
+          h: "11. Your data and your rights",
+          p1: "Your personal data is processed in accordance with the Republic of Azerbaijan's Law on Personal Data (including the 2024 amendments); for users in the European Economic Area, the General Data Protection Regulation (GDPR) may also apply. Your health-related entries (mood, journal, weight history) are a category requiring special care and are visible only in your verified account.",
+          p2: "You have the following rights: access to your data, correction, deletion, transfer in a portable format, and objection to processing. To exercise these rights, write to hello@prelife.net.",
+          p3: "Sign-in (Google/Apple), email delivery, and AI processing use third-party services; their roles and the cookies they involve are explained in our Cookie Policy."
+        },
+        changes: {
+          h: "12. Changes to the service",
+          p1: "The Platform keeps evolving: sections, features, and the interface may change. Material changes are announced on the site and by email.",
+          p2: "Continuing to use the service after revised terms are published counts as agreement to the revised terms. If you disagree, you may close your account."
+        },
+        liability: {
+          h: "13. Limits of liability",
+          p1: "The service is provided \"as is\": no warranty is given for uninterrupted availability, error-freedom, or fitness for a particular purpose. Scheduled and unexpected outages are possible.",
+          p2: "To the extent the law allows, the Platform's liability is limited to the amount you paid for the service in the last 12 months; indirect damages are not covered.",
+          p3: "This section does not remove liability that the law makes mandatory, or your consumer rights."
+        },
+        terminate: {
+          h: "14. Closing your account",
+          p1: "If you want to close your account, write to hello@prelife.net — your request to delete your data is fulfilled in accordance with the law.",
+          p2: "Breaches of the rules, unlawful activity, or actions against the Platform's security are grounds for suspending or closing an account. In the event of closure, information about active packages and bookings is provided by email."
+        },
+        law: {
+          h: "15. Governing law and disputes",
+          p1: "These terms are governed by the laws of the Republic of Azerbaijan. Disputes are first resolved amicably — by writing to hello@prelife.net; failing that, the matter is heard by the courts of the Republic of Azerbaijan.",
+          p2: "The mandatory consumer rules of your country of residence are preserved. Some countries' laws (for example, data-localization requirements) may not align with the Platform's infrastructure located in Azerbaijan — in that case you should not use the service under that country's laws."
+        },
+        contact: {
+          h: "16. Contact",
+          p1: "Operator: PreLife. Website: prelife.net. For questions, suggestions, and legal requests: hello@prelife.net."
+        }
+      }
+    },
+    cookiesPage: {
+      title: "Cookie Policy",
+      updated: "Last updated: 26 November 2026",
+      intro: "This policy explains which cookies and local storage prelife.net uses in your browser, why they are needed, and how you can control your consent. We allow only what is listed below — we do not use tracking, advertising, or profiling cookies.",
+      seeAlso: "Related documents",
+      seeTerms: "Terms of Use",
+      tableHead: {
+        name: "Name",
+        kind: "Type",
+        purpose: "Purpose",
+        life: "Lifetime"
+      },
+      cookies: {
+        pl_session: { kind: "Necessary", purpose: "Keeps you signed in: recognizes your login session (deleted on sign-out).", life: "365 days (sliding)" },
+        pl_oauth: { kind: "Necessary", purpose: "Only during Google/Apple sign-in: a technical marker to secure the flow.", life: "10 minutes maximum" },
+        pl_cookies: { kind: "Your consent", purpose: "Remembers your answer to the cookie bar so it is not asked on every page.", life: "1 year" },
+        NEXT_LOCALE: { kind: "Your consent", purpose: "Remembers your chosen language (az/en/ru).", life: "1 year" },
+        pl_theme: { kind: "Your consent — localStorage", purpose: "Remembers your dark/light theme choice.", life: "until deleted" },
+        pl_motion: { kind: "Your consent — localStorage", purpose: "Remembers your reduced-motion choice.", life: "until deleted" },
+        sw_cache: { kind: "Necessary — Cache API", purpose: "A copy of three generic pages to show when the internet is cut (no personal data).", life: "managed by the browser" }
+      },
+      sections: {
+        what: {
+          h: "1. What a cookie is",
+          p1: "Cookies are small text files your browser keeps for a site; they let the site recognize you (for example, as a signed-in user) and remember your choices. Local storage (localStorage) is a larger browser store used for the same purpose. We use both only to the extent shown below."
+        },
+        principle: {
+          h: "2. Before consent — nothing is written",
+          p1: "On your first visit, nothing is written to your browser until the cookie bar is answered: your language choice lives in the address itself (az/en/ru), and your theme choice lives only in the current visit's memory. If you choose \"Necessary only\", nothing about your choices is stored and the bar simply closes.",
+          p2: "When you choose \"Accept\", your answer (pl_cookies) and your choices — language, theme, motion — are remembered so you are not asked again. The login session is the exception: the pl_session cookie is always needed to recognize your signed-in account — it is a strictly necessary cookie that does not depend on consent."
+        },
+        table: {
+          h: "3. The cookies and storage we use",
+          p1: "The Platform uses only the cookie and storage entries below — nothing else."
+        },
+        thirdparty: {
+          h: "4. Third-party cookies",
+          p1: "The site itself sets no third-party — analytics, advertising, or tracking — cookies. When you choose to sign in with Google or Apple, those providers' own rules apply; email delivery and AI processing are entrusted to third-party services, but they do not install their own cookies on the site's pages.",
+          p2: "If a new kind of storage becomes necessary in the future, your consent will be asked for first."
+        },
+        control: {
+          h: "5. How to control your consent",
+          p1: "To see the bar again, delete the prelife.net cookies in your browser — the bar will reappear on your next visit. To change your choices, use the language and theme controls on the site.",
+          p2: "You can delete all cookies and local storage from your browser settings: this resets your choices and signs you out, but does not harm your account or your entries on the platform."
+        },
+        law: {
+          h: "6. Legal basis",
+          p1: "Storage that is strictly necessary — the login session and the sign-in flow — does not require consent under the law, because the service cannot work without it. Language, theme, and motion choices are stored only with your explicit consent; consent is freely given, and refusing is no harder than accepting — the \"Necessary only\" button works with strictly zero writes.",
+          p2: "This policy is drafted in line with the Republic of Azerbaijan's Law on Personal Data, and — where applicable — the European Union's ePrivacy rules and the GDPR's transparency requirements."
+        },
+        contact: {
+          h: "7. Contact",
+          p1: "Questions about this policy: hello@prelife.net."
+        }
+      }
     },
     rulesPage: {
       title: "Rules",

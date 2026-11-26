@@ -600,6 +600,48 @@ html.dark .panel-logout:hover { background: color-mix(in srgb, #e58c86 15%, tran
 .uc { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: center; gap: 1.1rem; text-align: center; padding-block: 2rem; }
 .legal-body { color: var(--muted); font-size: 1.05rem; max-width: 40rem; }
 
+/* ── Legal documents (terms / cookie policy) ────────────────────────────── */
+.legal { max-width: 44rem; display: grid; gap: 1.6rem; }
+.legal-updated { color: var(--muted); font-size: .8125rem; text-transform: uppercase; letter-spacing: .06em; }
+.legal-intro { color: var(--ink); font-size: 1.05rem; line-height: 1.65; text-wrap: pretty; }
+.legal section { display: grid; gap: .6rem; }
+.legal h2 { font: 600 1.0625rem/1.3 var(--font-display); letter-spacing: -.01em; color: var(--ink); scroll-margin-top: calc(var(--nav-h, 4rem) + 1.25rem); text-wrap: balance; }
+.legal p { color: var(--muted); font-size: .9375rem; line-height: 1.65; text-wrap: pretty; }
+.legal ul { display: grid; gap: .4rem; margin: 0; padding-left: 1.15rem; list-style: disc; }
+.legal ul li { color: var(--muted); font-size: .9375rem; line-height: 1.6; }
+.legal ul li::marker { color: var(--line-strong); }
+.legal-table-wrap { overflow-x: auto; margin-block: .3rem; }
+.legal-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+.legal-table th {
+  text-align: left; font-size: .6875rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .07em; color: var(--muted); padding: .5rem .65rem;
+  border-bottom: 1px solid var(--line-strong); white-space: nowrap;
+}
+.legal-table td { padding: .6rem .65rem; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--muted); line-height: 1.5; }
+.legal-table td:first-child { color: var(--ink); }
+.legal-table td code {
+  font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  font-size: .8125rem; white-space: nowrap;
+}
+.legal-related { display: grid; gap: .55rem; padding: 1rem 1.15rem; border: 1px dashed var(--line-strong); border-radius: var(--r-sm); background: var(--tint); }
+.legal-related p { font-size: .6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.legal-related nav { display: flex; flex-wrap: wrap; gap: .4rem 1.1rem; }
+.legal-related-link a { font-size: .875rem; font-weight: 600; color: var(--ink); text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: .2em; }
+.legal-related-link a:hover { text-decoration-color: var(--ink); }
+/* Phones: the inventory table becomes stacked rows with data-label captions. */
+@media (max-width: 40rem) {
+  .legal-table, .legal-table tbody, .legal-table tr, .legal-table td, .legal-table th { display: block; width: 100%; }
+  .legal-table thead { display: none; }
+  .legal-table tr { padding-block: .7rem; border-bottom: 1px solid var(--line); }
+  .legal-table tr:last-child { border-bottom: 0; }
+  .legal-table td { border: 0; padding: .15rem 0; }
+  .legal-table td::before {
+    content: attr(data-label); display: block; font-size: .6875rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+  }
+  .legal-table td:first-child::before { display: none; }
+}
+
 /* ── Settings / profile / help (account pages) ────────────────────────── */
 /* Settings shell: categories LEFT, content RIGHT — one column on
    phones, where the category rail becomes a horizontal chip row. */

@@ -80,7 +80,7 @@ export function CookieConsent({ initialAccepted }: { initialAccepted: boolean })
     <section ref={barRef} className="cookie-bar" aria-label={t("text")}>
       <div className="cookie-in">
         <p>
-          {t("text")} <Link href="/terms">{t("learnMore")}</Link>
+          {t("text")} <Link href="/cookies">{t("learnMore")}</Link>
         </p>
         <div className="cookie-actions">
           <button type="button" className="btn btn-sm" onClick={accept}>

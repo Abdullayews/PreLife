@@ -378,7 +378,10 @@ export const az = {
       homeDescription: "PreLife-da hər gün başladığınız yer.",
       loginTitle: "Daxil ol",
       signupTitle: "Hesab yarat",
-      termsTitle: "Şərtlər",
+      termsTitle: "İstifadə şərtləri",
+      termsDescription: "PreLife xidmətindən istifadə qaydaları — hesab, seanslar, ödənişlər və hüquqlarınız.",
+      cookiesTitle: "Cookie siyasəti",
+      cookiesDescription: "PreLife-ın hansı cookie və yaddaşdan istifadə etdiyi, razılıq prinsipi və idarəetmə üsulları.",
       rulesTitle: "Qaydalar",
       settingsTitle: "Ayarlar",
       profileTitle: "Profil",
@@ -605,6 +608,7 @@ export const az = {
       settings: "Ayarlar",
       help: "Kömək",
       terms: "Şərtlər",
+      cookies: "Cookie siyasəti",
       rules: "Qaydalar",
       signIn: "Daxil ol"
     },
@@ -616,8 +620,163 @@ export const az = {
     },
     underConstruction: {},
     termsPage: {
-      title: "Şərtlər",
-      placeholder: "PreLife şəxsi, kommersiya olmayan istifadə üçün təqdim olunur. Hesabınız sizindir: şifrənizi qoruyun və platformadan dürüst istifadə edin — hesab paylaşmaq, məlumat çıxarmaq və icazəsiz avtomatik giriş qadağandır. Bronlar və ödənişlər ödəniş zamanı göstərilən qaydada aparılır; ləğv olunan sorğular ödənişdən əvvəl göstərilən psixoloq siyasətinə uyğun geri qaytarılır. Platforma böyüdükcə bu şərtlər yenilənə bilər — cari versiya hər zaman bu səhifədədir. Suallarınız üçün: support@prelife.app."
+      title: "İstifadə şərtləri",
+      updated: "Son yeniləmə: 26 noyabr 2026",
+      intro: "Bu sənəd prelife.net xidmətini (bundan sonra «PreLife» və ya «Platforma») istifadə qaydalarını müəyyən edir. Hesab yaratmaqla, daxil olmaqla və ya Platformadan istifadə etməklə bu şərtlərlə razılaşırsınız; razı deyilsinizsə, xidmətdən istifadə etməyin. Şərtlər Azərbaycan Respublikasının qanunvericiliyinə uyğun tərtib olunub və sizin yaşadığınız ölkənin məcburi qaydaları ilə birlikdə tətbiq olunur.",
+      seeAlso: "Oxşar sənədlər",
+      seeCookies: "Cookie siyasəti",
+      seeRules: "İcma qaydaları",
+      sections: {
+        accept: {
+          h: "1. Şərtlərin qəbulu",
+          p1: "Bu şərtlər prelife.net ünvanında təqdim olunan bütün xidmətlərə — səhifələrə, hesabınıza, abunəliklərə və Platformanın digər alətlərinə — şamil olunur. Hesab yaratmaqla, daxil olmaqla və ya xidmətdən istifadə etməklə bu sənədlə bağlı olduğunuzu təsdiqləyirsiniz.",
+          p2: "Bu sənəd bütün istifadəçilərə ünvanlanmış açıq təklifdir; hesabın yaradılması və ya xidmətdən istifadə təklifin qəbulu kimi qiymətləndirilir. Şərtlərlə razı deyilsinizsə, Platformadan istifadə etməyin."
+        },
+        service: {
+          h: "2. Xidmət haqqında",
+          p1: "PreLife — idman, qidalanma, psixologiya və oxu üçün vahid platformadır: şəxsi məşq planları, reseptlər və qida proqramları, meditasiya və nəfəs praktikaları, psixoloqlarla onlayn seans bronu, kitab kolleksiyaları və AI köməkçisi. Əsas funksiyalar pulsuzdur; genişlənmiş imkanlar üçün Premium paketlər təklif olunur — cari tariflər və daxil olanlar həmişə abunəlik səhifəsində göstərilir.",
+          p2: "Platforma prelife.net ünvanında işlədilir. Suallarınız və müraciətləriniz üçün: hello@prelife.net."
+        },
+        account: {
+          h: "3. Hesab, yaş və təhlükəsizlik",
+          p1: "Platformadan istifadə etmək üçün 18 yaşınız tam olmalıdır. Yaşadığınız ölkənin qanunu 16–17 yaşlı şəxslərin öz razılığı ilə onlayn xidmətlərdən istifadəsinə icazə verirsə, belə istifadəçilər yalnız valideyn və ya qanuni nümayəndəsinin razılığı ilə hesab yarada bilər. 13 yaşdan kiçik uşaqların şəxsi məlumatları qəbul edilmir.",
+          p2: "Hesabınız sizə aiddir: şifrənizi məxfi saxlayın, hesabı başqaları ilə paylaşmayın və hesabınıza qeyri-qanuni girişi dərhal bizə bildirin. Hesabınızla aparılan bütün əməliyyatların məsuliyyəti sizdə qalır.",
+          p3: "Yalnış məlumat verməyin, başqasının adına hesab açmayın və Platformanı qanunsuz məqsədlər üçün istifadə etməyin."
+        },
+        notmedical: {
+          h: "4. Platforma tibbi məsləhət deyil",
+          p1: "PreLife — sağlamlıq mövzusunda ümumi məlumat və rəhbərlik xidmətidir; tibbi müayinə, diaqnoz, müalicə və ya resept əvəzi deyil. Proqramlar, məşqlər, qida tövsiyələri və məqalələr ümumi xarakter daşıyır və şəxsi vəziyyətinizə uyğunlaşdırılmayıb.",
+          p2: "Hər hansı sağlamlıq qərarı verməzdən əvvəl — xüsusən xroniki xəstəlik, dərman qəbulu, hamiləlik və ya zədə halında — həkim və ya digər ixtisaslı mütəxəssislə məsləhətləşin. Yeni məşq və pəhrizə başlamazdan əvvəl bədəninizin hazırlığını yoxlayın.",
+          p3: "Fövqəladə hal yarandıqda Platformadan kömək gözləməyin: dərhal 112 (və ya ölkənizin təcili xidmət nömrəsi) ilə əlaqə saxlayın və ya yaxın tibbi müəssisəyə müraciət edin."
+        },
+        ai: {
+          h: "5. AI köməkçisi",
+          p1: "Platformadakı AI köməkçisi suallarınıza cavab vermək, planlar və tövsiyələr hazırlamaq üçün işlədilir. Cavabları məlumat xarakterlidir, səhv ola bilər və peşəkar — tibbi, psixoloji, hüquqi və ya maliyyə — məsləhətin əvəzi deyil.",
+          p2: "AI-ya yazdıqlarınız cavab hazırlamaq üçün emal olunur; başqalarının şəxsi məlumatlarını və sirrini söhbətə daxil etməyin. Emalın mahiyyəti ilə Cookie siyasətimizdə tanış ola bilərsiniz."
+        },
+        sessions: {
+          h: "6. Psixoloq seansları",
+          p1: "Platformada təqdim olunan psixoloqlar müstəqil peşəkarlardır: seansın keyfiyyəti, ixtisası və peşəkar etikası onların məsuliyyətidir. Platforma bronu, təsdiqi və ödəniş statuslarının izlənməsini təmin edir.",
+          p2: "Bron sorğusu göndərildikdən sonra psixoloq onu təsdiqləyir və ya rədd edir; təsdiqlənmiş seansı başlamamışdan əvvəl hesabınızdan ləğv edə bilərsiniz. Seans başladıqdan sonra ləğv mümkün deyil.",
+          p3: "Seans zamanı və mesajlaşmada hörmətli olun — Platformanın icma qaydaları bu münasibətlərə də şamil olunur."
+        },
+        payments: {
+          h: "7. Ödənişlər, abunəlik və geri qaytarma",
+          p1: "Premium paketlərin cari tarifləri, tərkibi və müddəti abunəlik səhifəsində göstərilir. Paketlər platformada sorğu ilə aktivləşir: tələbiniz göndərilir, komanda təsdiqləyir və paket hesabınızda aktivləşir; ödəniş təlimatları təsdiq zamanı göstərilir.",
+          p2: "Psixoloq seansı üçün göstərilən qiymət və şərtlər bron zamanı aydınlaşdırılır; ödəniş statusu hesabınızda izlənilir. Seansı başlamamış ləğv etdikdə alınmış ödənişlərin geri qaytarılması üçün hello@prelife.net ünvanına müraciət edin — geri qaytarma ödəniş zamanı göstərilən qaydalara uyğun aparılır.",
+          p3: "Yaşadığınız ölkənin qanunvericiliyi uzaqdan müqavilələr üçün imtina hüququ (məsələn, Avropa İqtisadi Məkanında 14 gün) nəzərdə tutursa, bu hüquq saxlanılır; rəqəmsal xidmətə dərhal başlamağa açıq razılıq verdiyiniz halda qanunun icazə verdiyi həddə məhdudlaşa bilər.",
+          p4: "Bu bənd qanunla qorunan istehlakçı hüquqlarınızı — o cümlədən Azərbaycan Respublikasında istehlakçı hüquqlarının qorunması qanunvericiliyini — məhdudlaşdırmır."
+        },
+        content: {
+          h: "8. Sizin məzmununuz",
+          p1: "Gündəlik yazıları, qeydləriniz, rəyləriniz və Platformaya daxil etdiyiniz digər materiallar sizə məxsusdur. Bu materialları sizə göstərmək, saxlamaq və təhlükəsizliyini təmin etmək üçün Platformaya məhdud lisenziya verirsiniz; bu lisenziya materialı satmaq və ya kütləvi yaymaq hüququ vermir.",
+          p2: "Məzmununuza görə məsuliyyət sizdədir: qanunsuz, təhqiramiz, başqalarının hüquqlarını pozan və ya icma qaydalarına zidd material yerləşdirməyin."
+        },
+        fairuse: {
+          h: "9. Dürüst istifadə",
+          p1: "Platformanın davamlı və təhlükəsiz işləməsi üçün aşağıdakılar qadağandır:",
+          li1: "Hesabı başqaları ilə paylaşmaq, satmaq və ya icarəyə vermək;",
+          li2: "Məlumatları avtomatik toplamaq, kütləvi surətdə çıxarmaq və üçüncü tərəf məqsədləri ilə istifadə etmək;",
+          li3: "İcazəsiz avtomatik giriş, botlar və Platformanın normal işinə mane olan sorğular;",
+          li4: "Yazılı icazə olmadan təhlükəsizlik testləri, skanerləmə və açıqların axtarılması;",
+          li5: "Xidməti tərsinə mühəndislik etmək və texniki məhdudiyyətləri keçmək;",
+          li6: "AI köməkçisini və psixoloqlarla mesajlaşmanı spam, reklam və ya qanunsuz məqsədlərlə istifadə etmək.",
+          p2: "Bu qaydaların pozulması hesabın dayandırılmasına və ya bağlanmasına səbəb ola bilər."
+        },
+        ip: {
+          h: "10. Müəllif hüququ",
+          p1: "Platformada təqdim olunan materiallar — mətnlər, proqramlar, videolar, şəkillər və dizayn — qanunla qorunur və yalnız şəxsi, kommersiya olmayan istifadə üçün təqdim olunur.",
+          p2: "Ödənişli materialları yenidən yaymaq, satışa çıxarmaq və ya kütləvi surətdə çoxaltmaq qadağandır. Platformadan istifadə edərkən mənbəyə istinad edin.",
+          p3: "«PreLife» adı sahibinə məxsusdur; başqa adlar və nişanlar öz sahiblərinə aiddir."
+        },
+        data: {
+          h: "11. Məlumatlarınız və hüquqlarınız",
+          p1: "Şəxsi məlumatlarınız Azərbaycan Respublikasının «Fərdi məlumatlar haqqında» Qanununun (2024-cü il dəyişiklikləri daxil olmaqla) tələblərinə uyğun emal olunur; Avropa İqtisadi Məkanında üzvlük edən istifadəçilər üçün Ümumi Məlumat Mühafizəsi Qaydası (GDPR) da tətbiq oluna bilər. Sağlamlıqla bağlı qeydləriniz (əhval, gündəlik, çəki tarixçəsi) xüsusi qayğı tələb edən kateqoriyadır və yalnız təsdiqlənmiş hesabınızda görünür.",
+          p2: "Aşağıdakı hüquqlarınız var: məlumatlarınıza çıxış, dəyişdirilməsi, silinməsi, daşına bilən formatda köçürülməsi və emala etiraz. Bu hüquqları həyata keçirmək üçün hello@prelife.net ünvanına yazın.",
+          p3: "Giriş (Google/Apple), e-poçt çatdırılması və AI emalı üçüncü tərəb xidmətlərdən istifadə olunur; onların rolu və quraşdırılan cookie-lər Cookie siyasətimizdə açıqlanır."
+        },
+        changes: {
+          h: "12. Xidmətin dəyişməsi",
+          p1: "Platforma daim inkişaf edir: bölmələr, imkanlar və interfeys dəyişə bilər. Əhəmiyyətli dəyişikliklər saytda və e-poçtla bildirilir.",
+          p2: "Yenilənmiş şərtlər dərc olunduqdan sonra xidmətdən istifadəni davam etdirmək yenilənmiş şərtlərlə razılıq kimi qiymətləndirilir. Razı deyilsinizsə, hesabınızı bağlaya bilərsiniz."
+        },
+        liability: {
+          h: "13. Məsuliyyətin sərhədləri",
+          p1: "Xidmət «olduğu kimi» təqdim olunur: fasiləsiz əlçatanlıq, xətasızlıq və xüsusi məqsədə uyğunluq üzrə zəmanət verilmir. Planlaşdırılmış və gözlənilməz fasilələr mümkündür.",
+          p2: "Qanunun icazə verdiyi həddə Platformanın məsuliyyəti son 12 ayda xidmət üçün ödədiyiniz məbləğlə məhdudlaşır; dolayı zərərlər üçün məsuliyyət daşıyılmır.",
+          p3: "Bu bənd qanunla müəyyən edilmiş zəruri məsuliyyəti və istehlakçı hüquqlarınızı ləğv etmir."
+        },
+        terminate: {
+          h: "14. Hesabın bağlanması",
+          p1: "Hesabınızı bağlamaq istəyirsinizsə, hello@prelife.net ünvanına yazın — məlumatlarınızın silinməsi barədə tələbiniz qanunvericiliyə uyğun icra olunur.",
+          p2: "Qaydaların pozulması, qanunsuz fəaliyyət və ya Platformanın təhlükəsizliyinə qarşı hərəkətlər hesabı dayandırmağa və ya bağlamağa əsas verir. Bağlanma halında aktiv paket və bronlar barədə məlumat e-poçtla göstərilir."
+        },
+        law: {
+          h: "15. Tətbiq olunan qanun və mübahisələr",
+          p1: "Bu şərtlər Azərbaycan Respublikasının qanunlarına əsasən tətbiq olunur. Mübahisələr əvvəlcə sülh yolu ilə — hello@prelife.net ünvanına müraciət etməklə — həll edilir; nəticəsiz qaldıqda məsələ Azərbaycan Respublikasının məhkəmələrində baxılır.",
+          p2: "Yaşadığınız ölkənin məcburi istehlakçı qaydaları saxlanılır. Bəzi ölkələrin qanunları (məsələn, məlumatların ölkə daxilində saxlanması tələbi) Platformanın Azərbaycanda yerləşən infrastrukturu ilə uyğun gəlməyə bilər — bu halda həmin ölkənin qanunlarına əsasən xidmətdən istifadə etməməlisiniz."
+        },
+        contact: {
+          h: "16. Əlaqə",
+          p1: "Operator: PreLife. Sayt: prelife.net. Suallar, təkliflər və hüquqi müraciətlər üçün: hello@prelife.net."
+        }
+      }
+    },
+    cookiesPage: {
+      title: "Cookie siyasəti",
+      updated: "Son yeniləmə: 26 noyabr 2026",
+      intro: "Bu siyasət prelife.net-in brauzerinizdə hansı cookie və yerli yaddaşdan (localStorage) istifadə etdiyini, onların nə üçün lazım olduğunu və razılığınızı necə idarə edə biləcəyinizi izah edir. Biz yalnız aşağıda sadalananlara icazə veririk — izləmə, reklam və profil yaratma cookie-ləri istifadə etmirik.",
+      seeAlso: "Oxşar sənədlər",
+      seeTerms: "İstifadə şərtləri",
+      tableHead: {
+        name: "Ad",
+        kind: "Növ",
+        purpose: "Məqsəd",
+        life: "Müddət"
+      },
+      cookies: {
+        pl_session: { kind: "Zəruri", purpose: "Sizi daxil saxlamaq: giriş seansınızı tanıyır (çıxış zamanı silinir).", life: "365 gün (aktivlik üzrə uzanır)" },
+        pl_oauth: { kind: "Zəruri", purpose: "Yalnız Google/Apple ilə daxil olma anında: prosesi təhlükəsiz bağlamaq üçün texniki göstərici.", life: "maksimum 10 dəqiqə" },
+        pl_cookies: { kind: "Razılığınız", purpose: "Cookie barına verdiyiniz cavabı xatırlayır ki, hər səhifədə yenidən soruşulmasın.", life: "1 il" },
+        NEXT_LOCALE: { kind: "Razılığınız", purpose: "Seçdiyiniz dili (az/en/ru) xatırlayır.", life: "1 il" },
+        pl_theme: { kind: "Razılığınız — localStorage", purpose: "Tünd/işıq tema seçiminizi xatırlayır.", life: "silməyənədək" },
+        pl_motion: { kind: "Razılığınız — localStorage", purpose: "«Hərəkəti azalt» seçiminizi xatırlayır.", life: "silməyənədək" },
+        sw_cache: { kind: "Zəruri — Cache API", purpose: "İnternet kəsildiyi anda oflayn səhifəsini göstərmək üçün üç ümumi səhifənin surəti (şəxsi məlumat yoxdur).", life: "brauzer tərəfindən idarə olunur" }
+      },
+      sections: {
+        what: {
+          h: "1. Cookie nədir",
+          p1: "Cookie — brauzerinizin sayt üçün saxladığı kiçik mətn fayllarıdır; onlar sizi tanımağa (məsələn, daxil olmuş istifadəçi kimi) və seçimlərinizi xatırlamağa imkan verir. Yerli yaddaş (localStorage) eyni məqsədlə brauzerin ölçüsü daha böyük anbarıdır. Biz hər ikisindən yalnız aşağıda göstərilən miqdarda istifadə edirik."
+        },
+        principle: {
+          h: "2. Razılıqdan əvvəl — heç nə yazılmır",
+          p1: "Sayta ilk dəfə daxil olduqda cookie barı göstərilənə qədər brauzerinizə heç nə yazılmır: dil seçiminiz ünvanın özündə (az/en/ru), tema seçimi isə yalnız cari ziyarətin yaddaşında saxlanılır. «Yalnız zəruri» düyməsini seçsəniz, seçimlərinizlə bağlı heç nə saxlanılmadan sadəcə bar bağlanır.",
+          p2: "«Qəbul et» dedikdə isə cavabınız (pl_cookies) və seçimləriniz — dil, tema, hərəkət — xatırlanır ki, hər dəfə yenidən soruşulmasın. Giriş seansı istisnadır: daxil olmuş hesabınızı tanımaq üçün pl_session cookie-si həmişə lazımdır — bu, razılıqdan asılı olmayan zəruri cookie-dir."
+        },
+        table: {
+          h: "3. İstifadə etdiyimiz cookie və yaddaş",
+          p1: "Platforma yalnız aşağıdakı cookie və yaddaş qeydlərindən istifadə edir — başqa heç nə yoxdur."
+        },
+        thirdparty: {
+          h: "4. Üçüncü tərəf cookie-lər",
+          p1: "Saytın özündə üçüncü tərəf — analitika, reklam və ya izləmə — cookie-ləri quraşdırılmır. Google və ya Apple ilə daxil olma seçildikdə həmin provayderlərin öz qaydaları tətbiq olunur; e-poçt çatdırılması və AI emalı üçüncü tərəb xidmətlərə həvalə olunur, lakin onlar sayt səhifələrində öz cookie-lərini quraşdırmır.",
+          p2: "Gələcəkdə yeni növ yaddaşdan istifadə lazım gələrsə, əvvəlcə razılığınız yenidən soruşulacaq."
+        },
+        control: {
+          h: "5. Razılığınızı necə idarə edirsiniz",
+          p1: "Barı yenidən görmək istəyirsinizsə, brauzerinizdən prelife.net üçün cookie-ləri silin — növbəti ziyarətdə bar yenidən göstəriləcək. Seçimlərinizi dəyişmək üçün saytdakı dil və tema düymələrindən istifadə edin.",
+          p2: "Brauzerinizin ayarlarından bütün cookie və yerli yaddaşı silə bilərsiniz: bu, seçimlərinizi sıfırlayır və çıxış etməyə məcbur edir, lakin hesabınıza və platformadakı qeydlərinizə ziyan yetirmir."
+        },
+        law: {
+          h: "6. Qanuni əsas",
+          p1: "Giriş seansı və daxilolma prosesi kimi zəruri yaddaş qanunvericiliyinə əsasən razılıq tələb etmir — xidmətin işləməsi üçün mütləq lazımdır. Dil, tema və hərəkət seçimləri isə yalnız açıq razılığınızla saxlanılır; razılıq ixtiyari verilir və rədd etmək qəbul etməkdən asan deyil — «Yalnız zəruri» düyməsi tam sıfır yazı ilə işləyir.",
+          p2: "Bu siyasət Azərbaycan Respublikasının «Fərdi məlumatlar haqqında» Qanununun, eləcə də tətbiq olunduğu halda Avropa İttifaqının ePrivacy qaydalarının və GDPR-un şəffaflıq tələblərinə uyğun tərtib olunub."
+        },
+        contact: {
+          h: "7. Əlaqə",
+          p1: "Bu siyasətlə bağlı suallar üçün: hello@prelife.net."
+        }
+      }
     },
     rulesPage: {
       title: "Qaydalar",
