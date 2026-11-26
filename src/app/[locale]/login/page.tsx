@@ -29,14 +29,11 @@ export default async function LoginPage({ params, searchParams }: Props) {
   // /api/auth/callback redirects here with ?error=oauth when the Google /
   // Apple flow fails (provider not configured in Supabase, denied consent…).
   const oauthError = sp.error === "oauth";
-  // v4.6: it redirects here with ?email=…&notice=mail_sent when a
-  // Google/Apple LOGIN found no account — the callback already created
-  // the pending registration and sent the confirmation mail, so the
-  // form is replaced by the "check your inbox" card (the dev sandbox
-  // also carries &devlink=… — no real mail there, the link itself is
-  // surfaced instead). ?notice=oauth_new is the rare fallback when the
-  // automatic send failed; ?notice=unconfirmed (v4.5) when a provider
-  // login hit an existing but still-unconfirmed e-mail account.
+  // v5.5: the provider callback now OPENS accounts (existing — including
+  // pending mail registrations — confirmed on the spot; brand-new
+  // identities provisioned directly), so it no longer redirects here with
+  // a notice. The ?email=…&notice=mail_sent / oauth_new / unconfirmed
+  // shapes below are legacy links from older deployments only.
   const prefillRaw = Array.isArray(sp.email) ? sp.email[0] : sp.email;
   const prefillEmail = typeof prefillRaw === "string" ? prefillRaw.trim().slice(0, 120) : "";
   const notice =

@@ -156,7 +156,7 @@ fn consent_page(st: &St, origin: &str, provider: &str, redirect_to: &str, challe
     <label for="email">{title} e-poçtu</label>
     <input id="email" name="email" type="email" value="{identity_email}" required autocomplete="off">
     <button type="submit">Davam et</button>
-    <p class="hint">Qeydiyyatda basanda hesab dərhal yaranır; girişdə basanda e-poçt yoxdursa mail axınına keçirsiniz.</p>
+    <p class="hint">Hesab varsa dərhal açılır; yoxdursa bu razılıq onu dərhal yaradır — təsdiq maili göndərilmir.</p>
   </form>
 </main>
 </body>

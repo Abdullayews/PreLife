@@ -1,5 +1,14 @@
 //! The auth routes — ports of src/app/api/auth/* (the v4.3–v4.7
 //! account-first decision trees, the OAuth PKCE dance, verification).
+//!
+//! v5.5 (Google-login round, user report): the provider callback CHECKS
+//! whether an account for the returned identity already exists and opens
+//! it — a still-unconfirmed mail registration is confirmed on the spot
+//! (the provider verified the very address that pending row belongs
+//! to), and a brand-new identity is provisioned directly, exactly like
+//! the signup button always did. The v4.6 login-mode mail hand-off and
+//! the v4.5 "unconfirmed" bounce are gone: the provider path never
+//! sends another mail.
 
 use super::{json_ok, json_status, read_json};
 use crate::error::{ApiError, DomainError};
@@ -576,7 +585,6 @@ pub async fn verify(State(st): State<St>, headers: HeaderMap, RawQuery(raw): Raw
 
 /* ── GET /api/auth/callback ───────────────────────────────────────────── */
 
-const OAUTH_NEW_WINDOW_MS: i64 = 5 * 60 * 1000;
 const OAUTH_SKEW_MS: i64 = 15 * 1000;
 
 fn fail(st: &St, headers: &HeaderMap) -> Response {
@@ -630,96 +638,84 @@ pub async fn callback(
     let origin = origin_from(&st, &headers);
     let user = json!({ "id": user_id, "email": user_email, "name": user_name });
 
-    // Brand-new OAuth-only row?
-    let app_meta = raw.get("app_metadata").cloned().unwrap_or(json!({}));
-    let providers: Vec<String> = app_meta
-        .get("providers")
-        .and_then(|p| p.as_array())
-        .map(|a| a.iter().filter_map(|v| v.as_str().map(String::from)).collect())
-        .unwrap_or_default();
+    // v5.5 (Google-login round, user report): pressing the Google/Apple
+    // button must CHECK whether an account for this identity already
+    // exists — and open it. Never delete it, never send another mail:
+    //   • the account predates this dance (a provider signup from minutes
+    //     ago, a pending mail registration, a confirmed e-mail account) →
+    //     it is the visitor's real account: open it. A still-unconfirmed
+    //     mail registration is confirmed on the spot — the provider has
+    //     verified the very address that pending row belongs to.
+    //   • the row was auto-provisioned DURING this dance (GoTrue / the
+    //     emulator created it at the consent screen because none existed)
+    //     → the provider vouches for the address: open it as a new
+    //     account — the same rule the signup button always followed.
+    //   • the timing is unknowable (legacy cookie shape, no mint stamp)
+    //     → assume a real account. The safe direction: a phantom merely
+    //     gets opened; a real account is never destroyed.
+    // The old v4.6 login-mode hand-off (delete the fresh row + re-send
+    // the registration mail) mailed the visitor on every first provider
+    // login and could destroy a just-created real account through its
+    // 5-minute fallback window; the v4.5 "unconfirmed" bounce blocked
+    // the owner from opening their own pending registration with the
+    // provider button.
     let created_ms = raw
         .get("created_at")
         .and_then(|c| c.as_str())
         .and_then(parse_iso_ms);
-    let fresh = match created_ms {
-        Some(created) if parsed.minted > 0 => created >= parsed.minted - OAUTH_SKEW_MS,
-        Some(created) => now_ms() - created < OAUTH_NEW_WINDOW_MS,
-        None => false,
+    let preexisting = match created_ms {
+        Some(created) if parsed.minted > 0 => created < parsed.minted - OAUTH_SKEW_MS,
+        _ => true,
     };
-    if fresh && !providers.iter().any(|p| p == "email") {
-        if parsed.mode == "signup" {
-            if parsed.locale != "en" {
-                let _ = st
-                    .supa
-                    .update("profiles", &vec![("id".into(), format!("eq.{user_id}"))], &json!({ "lang": parsed.locale }))
-                    .await;
-            }
-            let (token, _) = session::create_session(&st, &user, headers.get("user-agent").and_then(|v| v.to_str().ok()))
-                .await
-                .map_err(|e| {
-                    eprintln!("[auth:callback session] {e}");
-                    e
-                })?;
-            return Ok(redirect_with_cookies(
-                &format!("{origin}/home"),
-                StatusCode::FOUND,
-                &[session::session_cookie(&token, secure), session::cleared_oauth_cookie(secure)],
-            ));
-        }
 
-        // Login rules (v4.6): the hand-off is AUTOMATIC.
-        if let Err(e) = st.supa.admin_delete_user(&user_id).await {
-            eprintln!("[auth:callback] phantom delete failed {e}");
-        }
-        match vf::start_mail_registration(&st, &user_email, &parsed.locale, &origin).await {
-            Ok((_uid, dev_link)) => {
-                let mut qs_pairs = vec![("email".to_string(), user_email.clone()), ("notice".to_string(), "mail_sent".into())];
-                let mut qs = build_query(&qs_pairs);
-                if let Some(dl) = dev_link {
-                    qs_pairs.push(("devlink".into(), dl));
-                    qs = build_query(&qs_pairs);
-                }
-                return Ok(redirect_with_cookies(
-                    &format!("{origin}/{}/login?{qs}", parsed.locale),
-                    StatusCode::FOUND,
-                    &[session::cleared_oauth_cookie(secure)],
-                ));
-            }
-            Err(e) => {
-                eprintln!("[auth:callback mail hand-off] {e}");
-                return Ok(redirect_with_cookies(
-                    &format!(
-                        "{origin}/{}/login?email={}&notice=oauth_new",
-                        parsed.locale,
-                        uri_encode(&user_email)
-                    ),
-                    StatusCode::FOUND,
-                    &[session::cleared_oauth_cookie(secure)],
-                ));
-            }
-        }
-    }
-
-    // An e-mail account behind the provider button must be CONFIRMED.
-    if providers.iter().any(|p| p == "email") {
+    if preexisting {
+        // Open the existing account — one authoritative lookup carries
+        // both flags (confirmed / needs_completion).
         let account = st.supa.admin_find_user_by_email(&user_email).await;
-        let confirmed = match account {
-            Some(acc) => Supa::is_confirmed_user(&Value::Object(acc)),
-            None => Supa::is_confirmed_user(&raw),
-        };
-        if !confirmed {
-            return Ok(redirect_with_cookies(
-                &format!(
-                    "{origin}/{}/login?email={}&notice=unconfirmed",
-                    parsed.locale,
-                    uri_encode(&user_email)
-                ),
-                StatusCode::FOUND,
-                &[session::cleared_oauth_cookie(secure)],
-            ));
+        let authoritative = account
+            .as_ref()
+            .map(|acc| Value::Object(acc.clone()))
+            .unwrap_or_else(|| raw.clone());
+        let needs_completion = authoritative.pointer("/user_metadata/needs_completion") == Some(&json!(true));
+
+        if !Supa::is_confirmed_user(&authoritative) {
+            // The provider verified this e-mail address — finish the
+            // pending registration right here (no mail, no bounce).
+            if let Err(e) = st.supa.admin_update_user(&user_id, &json!({ "email_confirm": true })).await {
+                eprintln!("[auth:callback confirm] {e}");
+                return Ok(fail(&st, &headers));
+            }
         }
+
+        let (token, _) = session::create_session(&st, &user, headers.get("user-agent").and_then(|v| v.to_str().ok()))
+            .await
+            .map_err(|e| {
+                eprintln!("[auth:callback session] {e}");
+                e
+            })?;
+        // A pending registration lands on the same completion form the
+        // mail-link verify serves (name + password); everyone else on /home.
+        let dest = if needs_completion {
+            format!("{origin}/{}/verify?status=ok&complete=1", parsed.locale)
+        } else {
+            format!("{origin}/home")
+        };
+        return Ok(redirect_with_cookies(
+            &dest,
+            StatusCode::FOUND,
+            &[session::session_cookie(&token, secure), session::cleared_oauth_cookie(secure)],
+        ));
     }
 
+    // A brand-new identity (the row was created at the consent screen of
+    // this dance): the signup AND the login button open it directly — the
+    // provider vouches for the e-mail, the account is created confirmed.
+    if parsed.locale != "en" {
+        let _ = st
+            .supa
+            .update("profiles", &vec![("id".into(), format!("eq.{user_id}"))], &json!({ "lang": parsed.locale }))
+            .await;
+    }
     let (token, _) = session::create_session(&st, &user, headers.get("user-agent").and_then(|v| v.to_str().ok()))
         .await
         .map_err(|e| {

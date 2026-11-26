@@ -437,10 +437,13 @@ pub fn oauth_verifier_from_cookies(cookies: &[(String, String)]) -> Option<Strin
     Some(v.to_string())
 }
 
-/// The full parsed pl_oauth cookie (callback route).
+/// The full parsed pl_oauth cookie (callback route). v5.5: the signup /
+/// login distinction is gone — both buttons open accounts — so only the
+/// locale, the mint stamp and the verifier are carried (the cookie keeps
+/// its "locale.mode.minted.verifier" shape; the mode segment is parsed
+/// positionally and ignored).
 pub struct ParsedOauthCookie {
     pub locale: String,
-    pub mode: String,
     pub minted: i64,
     pub verifier: Option<String>,
 }
@@ -448,7 +451,7 @@ pub struct ParsedOauthCookie {
 pub fn parse_oauth_cookie(cookies: &[(String, String)]) -> ParsedOauthCookie {
     let locale_of = |s: &str| if s == "en" || s == "ru" { s.to_string() } else { "az".to_string() };
     let Some(raw) = cookie_get(cookies, OAUTH_COOKIE) else {
-        return ParsedOauthCookie { locale: "az".into(), mode: "login".into(), minted: 0, verifier: None };
+        return ParsedOauthCookie { locale: "az".into(), minted: 0, verifier: None };
     };
     let parts: Vec<&str> = raw.split('.').collect();
     if parts.len() >= 4
@@ -458,7 +461,6 @@ pub fn parse_oauth_cookie(cookies: &[(String, String)]) -> ParsedOauthCookie {
     {
         return ParsedOauthCookie {
             locale: locale_of(parts[0]),
-            mode: parts[1].to_string(),
             minted: parts[2].parse().unwrap_or(0),
             verifier: Some(parts[3..].join(".")),
         };
@@ -466,15 +468,14 @@ pub fn parse_oauth_cookie(cookies: &[(String, String)]) -> ParsedOauthCookie {
     if parts.len() >= 3 && (parts[1] == "login" || parts[1] == "signup") {
         return ParsedOauthCookie {
             locale: locale_of(parts[0]),
-            mode: parts[1].to_string(),
             minted: 0,
             verifier: Some(parts[2..].join(".")),
         };
     }
     if parts.len() >= 2 && parts[0].len() == 2 && parts[0].chars().all(|c| c.is_ascii_lowercase()) {
-        return ParsedOauthCookie { locale: locale_of(parts[0]), mode: "login".into(), minted: 0, verifier: Some(parts[1..].join(".")) };
+        return ParsedOauthCookie { locale: locale_of(parts[0]), minted: 0, verifier: Some(parts[1..].join(".")) };
     }
-    ParsedOauthCookie { locale: "az".into(), mode: "login".into(), minted: 0, verifier: Some(raw.to_string()) }
+    ParsedOauthCookie { locale: "az".into(), minted: 0, verifier: Some(raw.to_string()) }
 }
 
 /* ── origin resolution (v4.7 hardened) ─────────────────────────────────── */

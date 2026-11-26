@@ -42,9 +42,8 @@ function DevLinkBox({ note, open, href }: { note: string; open: string; href: st
 }
 
 /** The banner shown when a visitor arrives back on the LOGIN page
- * from a Google/Apple login that found no account (the manual
- * fallback of the v4.6 automatic hand-off — the callback's mail send
- * failed, so Continue re-runs the registration). */
+ * from a Google/Apple flow with a legacy link (?notice=… from an older
+ * deployment — the v5.5 callback no longer produces these). */
 function NoticeBox({ text }: { text: string }) {
   return <output className="set-note">{text}</output>;
 }
@@ -65,21 +64,19 @@ function NoticeBox({ text }: { text: string }) {
  *     visitor to /signup with both fields auto-filled (the password
  *     travels via sessionStorage, never the URL).
  *
- * v4.4 provider rules (the origin page rides through the OAuth flow):
- *   • A Google/Apple SIGNUP with no account registers right there —
- *     the provider vouches for the e-mail, the account is created and
- *     the visitor lands in the app. The provider button on /signup is
- *     a registration, never a bounce to the e-mail form.
- *   • A Google/Apple LOGIN with no account hands off to the mail
- *     registration AUTOMATICALLY (v4.6): the callback creates the
- *     pending account and sends the confirmation e-mail itself, then
- *     lands the visitor here straight on the "check your inbox" card
- *     (notice="mail_sent") — no Continue press, nothing to type. The
- *     notice="oauth_new" banner is only the rare fallback for when
- *     that automatic send failed.
- *   • A Google/Apple login onto an UNCONFIRMED e-mail account also
- *     lands here (v4.5): the first sign-in is the mail link, always —
- *     the notice tells the visitor to confirm the account first.
+ * v4.4 → v5.5 provider rules (the origin page rides through the OAuth flow):
+ *   • A Google/Apple button press — signup OR login — opens the account.
+ *     The callback CHECKS whether an account for the returned identity
+ *     already exists: an existing account (including a still-unconfirmed
+ *     mail registration) is opened right there — the provider verified
+ *     the address, so the pending registration is confirmed on the spot,
+ *     and NO new mail is ever sent.
+ *   • A brand-new identity (no account existed at the button press) is
+ *     provisioned directly by the provider consent — the account is
+ *     created confirmed, exactly like the signup button always did.
+ *   • The old v4.6 login-mode mail hand-off (delete + re-send the
+ *     registration mail) and the v4.5 "unconfirmed" bounce are gone:
+ *     the provider path never sends mail.
  */
 export function AuthForm({
   mode,
@@ -243,9 +240,10 @@ export function AuthForm({
   const otherHref = (mode === "login" ? "/signup" : "/login") + (next ? `?next=${encodeURIComponent(next)}` : "");
 
   // Full page navigation — the OAuth redirect chain cannot run in fetch.
-  // v4.4: the mode rides along so the callback knows whether a brand-new
-  // provider account completes the registration (signup) or comes back
-  // here for the mail flow (login).
+  // v5.5: the mode still rides along in the cookie, but the callback opens
+  // accounts in both shapes — existing ones are looked up and opened (a
+  // pending mail registration is confirmed by the provider on the spot),
+  // brand-new identities are provisioned directly.
   const startOauth = (provider: "google" | "apple") => {
     window.location.href = apiUrl(`/api/auth/oauth/${provider}?locale=${locale}&mode=${mode}`);
   };
