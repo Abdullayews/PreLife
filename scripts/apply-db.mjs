@@ -123,6 +123,14 @@ if (mode === "v3.7") {
   process.exit(0);
 }
 
+/* v3.8: notification channel preferences (profiles.notify_*) — the account
+   tier for the Settings notification toggles. See db/schema-v3.8.sql. */
+if (mode === "v3.8") {
+  await run(readFileSync(new URL("db/schema-v3.8.sql", root), "utf8"), "schema-v3.8.sql");
+  console.log("done.");
+  process.exit(0);
+}
+
 if (mode === "all" || mode === "schema") {
   await run(readFileSync(new URL("db/schema.sql", root), "utf8"), "schema.sql");
 }

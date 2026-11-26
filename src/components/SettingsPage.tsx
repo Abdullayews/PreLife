@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { apiUrl } from "@/lib/api-url";
 import {
-  Bell, Briefcase, Check, Download, Gamepad2, Globe, Headphones, Home, Info, Languages, Laptop,
+  Bell, BellRing, Briefcase, Check, Download, Gamepad2, Globe, Headphones, Home, Info, Languages, Laptop,
   LoaderCircle, LogOut, MapPin, Monitor, Moon, Palette, Pencil, ShieldCheck, Smartphone, Sun, Tablet, Trash2, Tv,
   UserRound, Watch, X, type LucideIcon,
 } from "lucide-react";
@@ -13,6 +13,7 @@ import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 import { hasConsent, persistLocale, setThemeChoice } from "@/lib/consent";
 import { saveUserPref } from "@/lib/user-prefs";
+import { notifPermission, requestNotifPermission, showNotif, type NotifPermission } from "@/lib/notifications";
 import { DEVICE_ICON_KEYS } from "@/lib/devices";
 import { fetchConsents, setConsent, type ConsentMap, type DataScope } from "@/lib/data-consent";
 import { toast } from "@/components/Toaster";
@@ -27,8 +28,9 @@ import type { AccountRole } from "@/lib/auth";
  * Base settings: account info (read-only + log out), devices (active
  * sessions with per-device name + icon), theme (light/dark,
  * consent-aware persistence), interface language (az/en/ru), content
- * location (global / Azerbaijan only — v3.4) and three notification
- * toggles.
+ * location (global / Azerbaijan only — v3.4) and notifications — the
+ * browser permission (Notifications API) plus the account-tier channel
+ * opt-ins (v3.8).
  */
 
 const CATS = [
@@ -43,12 +45,17 @@ const CATS = [
 
 type CatId = (typeof CATS)[number]["id"];
 
-/** localStorage tier for the temporary notification toggles — written
- *  only after cookie consent, mirroring the theme policy. */
-const NOTIFY_KEY = "pl-notify";
+/** The account-tier notification channels (v3.8) — profiles.notify_*.
+ *  The browser permission itself is a separate device-level gate (see
+ *  lib/notifications.ts); these are the member's channel opt-ins. */
 type NotifyKey = "reminders" | "digest" | "news";
 type NotifyState = Record<NotifyKey, boolean>;
-const DEFAULT_NOTIFY: NotifyState = { reminders: true, digest: true, news: false };
+const NOTIFY_DEFAULTS: NotifyState = { reminders: true, digest: true, news: false };
+const NOTIFY_FIELD: Record<NotifyKey, string> = {
+  reminders: "notifyReminders",
+  digest: "notifyDigest",
+  news: "notifyNews",
+};
 
 export type SettingsUser = { name: string | null; email: string; role: AccountRole };
 
@@ -556,6 +563,172 @@ function LocationPanel() {
   );
 }
 
+/* ── Notifications (Settings → Notifications) ─────────────────────────── */
+
+/** The notification panel — two layers, one screen:
+ *  1. The BROWSER PERMISSION (Notifications API): a status row with the
+ *     Ask / Test button. Asking only ever happens from a click (the
+ *     request needs the user gesture); a denied answer can only be lifted
+ *     from the browser's own site settings, so that state shows the
+ *     unblock instructions instead of re-prompting.
+ *  2. The CHANNEL OPT-INS (v3.8 — profiles.notify_*): the three account
+ *     toggles, synced through /api/me/preferences so they follow the
+ *     member across devices. Turning a channel ON while the browser has
+ *     not been asked yet asks for the permission first — the opt-in only
+ *     lands when notifications can actually appear. */
+function NotificationsPanel() {
+  const tn = useTranslations("settingsPage.notifications");
+
+  // null until the profile row loads — the switches stay inert for that
+  // first beat (no wrong checked state can flash).
+  const [notify, setNotify] = useState<NotifyState | null>(null);
+  // null until mount — the permission status renders client-side only.
+  const [perm, setPerm] = useState<NotifPermission | null>(null);
+  const [busy, setBusy] = useState<NotifyKey | "ask" | null>(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setPerm(notifPermission());
+    let alive = true;
+    (async () => {
+      try {
+        const res = await fetch(apiUrl("/api/me/preferences"), { cache: "no-store" });
+        if (!res.ok) throw new Error();
+        const body = (await res.json()) as {
+          notifyReminders?: boolean;
+          notifyDigest?: boolean;
+          notifyNews?: boolean;
+        };
+        if (alive) {
+          setNotify({
+            reminders: body.notifyReminders ?? true,
+            digest: body.notifyDigest ?? true,
+            news: body.notifyNews ?? false,
+          });
+        }
+      } catch {
+        // Offline / signed out — the DB defaults apply.
+        if (alive) setNotify(NOTIFY_DEFAULTS);
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
+
+  const persist = async (key: NotifyKey, next: boolean): Promise<boolean> => {
+    try {
+      const res = await fetch(apiUrl("/api/me/preferences"), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [NOTIFY_FIELD[key]]: next }),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  };
+
+  const toggle = async (key: NotifyKey) => {
+    if (notify === null || busy !== null) return;
+    const next = !notify[key];
+    // Turning a channel ON needs the browser to actually be able to show
+    // notifications — ask while the click gesture is still warm. A "denied"
+    // answer leaves the switch off (the channel could never fire).
+    if (next && perm === "default") {
+      setBusy("ask");
+      const result = await requestNotifPermission();
+      setPerm(result);
+      setBusy(null);
+      if (result !== "granted") {
+        toast(result === "denied" ? tn("permission.deniedToast") : tn("permission.dismissedToast"), "error");
+        return;
+      }
+    }
+    setBusy(key);
+    setError(false);
+    const ok = await persist(key, next);
+    setBusy(null);
+    if (!ok) {
+      setError(true);
+      return;
+    }
+    setNotify((prev) => (prev ? { ...prev, [key]: next } : prev));
+    if (next && perm === "denied") toast(tn("permission.deniedToast"), "error");
+  };
+
+  const ask = async () => {
+    if (busy !== null) return;
+    setBusy("ask");
+    const result = await requestNotifPermission();
+    setPerm(result);
+    setBusy(null);
+    if (result === "granted") toast(tn("permission.grantedToast"));
+    else if (result === "denied") toast(tn("permission.deniedToast"), "error");
+  };
+
+  const test = () => {
+    if (showNotif(tn("permission.testTitle"), tn("permission.testBody")) === "failed") {
+      toast(tn("permission.testFail"), "error");
+    }
+  };
+
+  const note =
+    perm === "denied" ? tn("permission.deniedHint")
+    : perm === "unsupported" ? tn("permission.unsupportedHint")
+    : perm === "default" ? tn("permission.defaultHint")
+    : tn("note");
+
+  return (
+    <section className="set-panel" aria-label={tn("title")}>
+      <div className="set-head">
+        <h2 className="h3">{tn("title")}</h2>
+        <p>{tn("subtitle")}</p>
+      </div>
+
+      {error && <p className="field-error" role="alert">{tn("saveFail")}</p>}
+
+      <div className="set-rows">
+        <div className="set-row">
+          <span className="set-info">
+            <b>{tn("permission.title")}</b>
+            <span>{perm === null ? tn("permission.checking") : tn(`permission.status.${perm}`)}</span>
+          </span>
+          {perm === "default" && (
+            <button type="button" className="btn btn-sm" onClick={() => void ask()} disabled={busy !== null}>
+              {busy === "ask" ? <LoaderCircle size={14} className="spin" aria-hidden /> : <BellRing size={14} aria-hidden />}
+              {tn("permission.allow")}
+            </button>
+          )}
+          {perm === "granted" && (
+            <button type="button" className="btn btn-sm" onClick={test}>
+              {tn("permission.test")}
+            </button>
+          )}
+        </div>
+
+        {(Object.keys(NOTIFY_FIELD) as NotifyKey[]).map((key) => (
+          <div className="set-row" key={key}>
+            <span className="set-info">
+              <b>{tn(key)}</b>
+              <span>{tn(`${key}Hint`)}</span>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={notify?.[key] ?? false}
+              aria-label={tn(key)}
+              className="switch"
+              onClick={() => void toggle(key)}
+              disabled={notify === null || busy !== null}
+            />
+          </div>
+        ))}
+      </div>
+
+      <p className="set-note"><Info size={15} aria-hidden />{note}</p>
+    </section>
+  );
+}
+
 /* ── The settings shell ────────────────────────────────────────────────── */
 
 export function SettingsPage({ user }: { user: SettingsUser }) {
@@ -569,15 +742,10 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
   // null until mount — avoids a hydration mismatch on the pressed state.
   const [dark, setDark] = useState<boolean | null>(null);
   const [motion, setMotion] = useState(false);
-  const [notify, setNotify] = useState<NotifyState>(DEFAULT_NOTIFY);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     setDark(document.documentElement.classList.contains("dark"));
-    try {
-      const raw = localStorage.getItem(NOTIFY_KEY);
-      if (raw) setNotify({ ...DEFAULT_NOTIFY, ...(JSON.parse(raw) as Partial<NotifyState>) });
-    } catch { /* storage unavailable */ }
   }, []);
 
   useEffect(() => {
@@ -615,16 +783,6 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
     if (hasConsent()) persistLocale(next);
     // Account tier (v3.2) — Settings is signed-in only.
     saveUserPref({ locale: next });
-  };
-
-  const toggleNotify = (key: NotifyKey) => {
-    setNotify((prev) => {
-      const next = { ...prev, [key]: !prev[key] };
-      if (hasConsent()) {
-        try { localStorage.setItem(NOTIFY_KEY, JSON.stringify(next)); } catch { /* unavailable */ }
-      }
-      return next;
-    });
   };
 
   /* Log out — lives HERE since the rail dropped it (v6): ends this
@@ -790,33 +948,7 @@ export function SettingsPage({ user }: { user: SettingsUser }) {
 
           {cat === "location" && <LocationPanel />}
 
-          {cat === "notifications" && (
-            <section className="set-panel" aria-label={t("notifications.title")}>
-              <div className="set-head">
-                <h2 className="h3">{t("notifications.title")}</h2>
-                <p>{t("notifications.subtitle")}</p>
-              </div>
-              <div className="set-rows">
-                {(["reminders", "digest", "news"] as const).map((key) => (
-                  <div className="set-row" key={key}>
-                    <span className="set-info">
-                      <b>{t(`notifications.${key}`)}</b>
-                      <span>{t(`notifications.${key}Hint`)}</span>
-                    </span>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={notify[key]}
-                      aria-label={t(`notifications.${key}`)}
-                      className="switch"
-                      onClick={() => toggleNotify(key)}
-                    />
-                  </div>
-                ))}
-              </div>
-              <p className="set-note"><Info size={15} aria-hidden />{t("notifications.note")}</p>
-            </section>
-          )}
+          {cat === "notifications" && <NotificationsPanel />}
         </div>
       </div>
     </div>

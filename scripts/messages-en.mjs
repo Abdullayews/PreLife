@@ -872,13 +872,35 @@ export const en = {
       notifications: {
         title: "Notifications",
         subtitle: "Choose what PreLife may notify you about.",
+        saveFail: "The choice was not saved. Try again.",
+        permission: {
+          title: "Browser permission",
+          checking: "Checking…",
+          status: {
+            default: "Not asked yet — allow notifications in the browser.",
+            granted: "Granted — this browser can show notifications.",
+            denied: "Blocked — notifications are turned off for this site.",
+            unsupported: "This browser does not support web notifications."
+          },
+          allow: "Allow notifications",
+          test: "Send a test notification",
+          testTitle: "PreLife",
+          testBody: "Notifications work — this was just a test.",
+          grantedToast: "Notifications allowed.",
+          deniedToast: "Not allowed — notifications are blocked in the browser.",
+          dismissedToast: "The prompt was closed — permission not given.",
+          testFail: "The test notification could not be shown.",
+          defaultHint: "Channels you turn on appear only after the browser is allowed to notify you — the \"Allow notifications\" button will ask.",
+          deniedHint: "To undo: click the site/lock icon in the address bar → Notifications → Allow, then reload the page.",
+          unsupportedHint: "Your choices are saved to your account — they will apply in a browser that supports notifications."
+        },
         reminders: "Workout reminders",
         remindersHint: "A nudge when a planned session is near.",
         digest: "Weekly digest",
         digestHint: "One summary of your week, every Sunday.",
         news: "Product news",
         newsHint: "New sections and features, about once a month.",
-        note: "Temporary toggles — they will start persisting with the full notification system."
+        note: "Your choices are saved to your account and apply on all your devices."
       },
       privacy: {
         consentsTitle: "Health-data consents",

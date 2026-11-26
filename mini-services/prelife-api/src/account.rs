@@ -12,6 +12,16 @@ fn v(row: &Row) -> Value {
     Value::Object(row.clone())
 }
 
+/// Boolean read with the documented column default for missing/NULL —
+/// pre-v3.8 emulator rows and NULLs fall back to the default instead of
+/// a hard false (is_true can't tell "false" from "not there yet").
+fn flag_or(row: Option<&Row>, key: &str, default: bool) -> bool {
+    match row.and_then(|r| r.get(key)) {
+        Some(Json::Bool(b)) => *b,
+        _ => default,
+    }
+}
+
 /* ── Preferences ──────────────────────────────────────────────────────── */
 
 fn prefs_view(row: Option<&Row>) -> Value {
@@ -23,6 +33,9 @@ fn prefs_view(row: Option<&Row>) -> Value {
         "railFolded": row.map(|r| is_true(&v(r), "rail_folded")).unwrap_or(false),
         "contentLocation": if row.map(|r| s(&v(r), "content_location")).as_deref() == Some("az") { "az" } else { "global" },
         "reduceMotion": row.map(|r| is_true(&v(r), "reduce_motion")).unwrap_or(false),
+        "notifyReminders": flag_or(row, "notify_reminders", true),
+        "notifyDigest": flag_or(row, "notify_digest", true),
+        "notifyNews": flag_or(row, "notify_news", false),
     })
 }
 
@@ -36,7 +49,7 @@ pub async fn preferences_get(st: &St, user_id: &str) -> Res<Value> {
         .supa
         .select_one(
             "profiles",
-            &[("select", "lang,theme,rail_folded,content_location,reduce_motion"), ("id", &format!("eq.{user_id}"))],
+            &[("select", "lang,theme,rail_folded,content_location,reduce_motion,notify_reminders,notify_digest,notify_news"), ("id", &format!("eq.{user_id}"))],
         )
         .await
         .map_err(DomainError::from_supa)?;
@@ -80,6 +93,20 @@ pub async fn preferences_update(st: &St, user_id: &str, body: &Value) -> Res<Val
             Value::Bool(b) => patch.insert("reduce_motion".into(), json!(b)),
             _ => return Err(DomainError::Api(ApiError::bad_request())),
         };
+    }
+    // v3.8 — the notification channel choices (the browser permission
+    // itself is a device-level gate; these are the member's opt-ins).
+    for (field, col) in [
+        ("notifyReminders", "notify_reminders"),
+        ("notifyDigest", "notify_digest"),
+        ("notifyNews", "notify_news"),
+    ] {
+        if let Some(n) = body.get(field) {
+            match n {
+                Value::Bool(b) => patch.insert(col.into(), json!(b)),
+                _ => return Err(DomainError::Api(ApiError::bad_request())),
+            };
+        }
     }
     if patch.is_empty() {
         return Err(DomainError::Api(ApiError::new(axum::http::StatusCode::BAD_REQUEST, "nothing_to_update")));

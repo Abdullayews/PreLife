@@ -898,13 +898,35 @@
     "notifications": {
       "title": "Bildiri\u015fl\u0259r",
       "subtitle": "PreLife-un siz\u0259 n\u0259 bar\u0259d\u0259 x\u0259b\u0259r ver\u0259 bil\u0259c\u0259yini se\u00e7in.",
+      "saveFail": "Se\u00e7im yadda saxlan\u0131lmad\u0131. Yenid\u0259n c\u0259hd edin.",
+      "permission": {
+        "title": "Brauzer icaz\u0259si",
+        "checking": "Yoxlan\u0131l\u0131r\u2026",
+        "status": {
+          "default": "H\u0259l\u0259 soru\u015fulmay\u0131b \u2014 brauzerd\u0259 bildiri\u015fl\u0259r\u0259 icaz\u0259 verin.",
+          "granted": "Verilib \u2014 bu brauzer bildiri\u015fl\u0259ri g\u00f6st\u0259r\u0259 bil\u0259r.",
+          "denied": "Bloklan\u0131b \u2014 bu sayt \u00fc\u00e7\u00fcn bildiri\u015fl\u0259r s\u00f6nd\u00fcr\u00fcl\u00fcb.",
+          "unsupported": "Bu brauzer veb-bildiri\u015fl\u0259ri d\u0259st\u0259kl\u0259mir."
+        },
+        "allow": "Bildiri\u015fl\u0259r\u0259 icaz\u0259 ver",
+        "test": "Test bildiri\u015fi g\u00f6nd\u0259r",
+        "testTitle": "PreLife",
+        "testBody": "Bildiri\u015fl\u0259r i\u015fl\u0259yir \u2014 bu, t\u0259kc\u0259 bir test idi.",
+        "grantedToast": "Bildiri\u015fl\u0259r\u0259 icaz\u0259 verildi.",
+        "deniedToast": "\u0130caz\u0259 verilm\u0259di \u2014 bildiri\u015fl\u0259r brauzerd\u0259 bloklan\u0131b.",
+        "dismissedToast": "Soru\u015f ba\u011fland\u0131 \u2014 icaz\u0259 verilm\u0259di.",
+        "testFail": "Test bildiri\u015fi g\u00f6st\u0259ril\u0259 bilm\u0259di.",
+        "defaultHint": "Yand\u0131rd\u0131\u011f\u0131n\u0131z kanallar yaln\u0131z brauzer\u0259 icaz\u0259 verdikd\u0259n sonra g\u00f6r\u00fcn\u00fcr \u2014 \u00abBildiri\u015fl\u0259r\u0259 icaz\u0259 ver\u00bb d\u00fcym\u0259si soru\u015facaq.",
+        "deniedHint": "Geri qaytarmaq \u00fc\u00e7\u00fcn: \u00fcnvan zola\u011f\u0131ndak\u0131 sayt/kilid ikonuna klik edin \u2192 Bildiri\u015fl\u0259r \u2192 \u0130caz\u0259 ver, sonra s\u0259hif\u0259ni yenil\u0259yin.",
+        "unsupportedHint": "Se\u00e7iml\u0259r hesab\u0131n\u0131zda saxlan\u0131l\u0131r \u2014 bildiri\u015fl\u0259ri d\u0259st\u0259kl\u0259y\u0259n brauzerd\u0259 i\u015f\u0259 d\u00fc\u015f\u0259c\u0259k."
+      },
       "reminders": "M\u0259\u015fq xat\u0131rlatmalar\u0131",
       "remindersHint": "Planla\u015fd\u0131r\u0131lm\u0131\u015f m\u0259\u015fq yax\u0131nla\u015fanda ki\u00e7ik bir x\u0259b\u0259rdarl\u0131q.",
       "digest": "H\u0259ft\u0259lik icmal",
       "digestHint": "H\u0259ft\u0259nizin bir icmal\u0131, h\u0259r bazar g\u00fcn\u00fc.",
       "news": "M\u0259hsul x\u0259b\u0259rl\u0259ri",
       "newsHint": "Yeni b\u00f6lm\u0259l\u0259r v\u0259 \u00f6z\u0259llikl\u0259r, t\u0259xmin\u0259n ayda bir d\u0259f\u0259.",
-      "note": "M\u00fcv\u0259qq\u0259ti d\u00fcym\u0259l\u0259r \u2014 tam bildiri\u015f sistemi il\u0259 yadda saxlanma\u011fa ba\u015flayacaqlar."
+      "note": "Se\u00e7iml\u0259r hesab\u0131n\u0131zda saxlan\u0131l\u0131r v\u0259 b\u00fct\u00fcn cihazlar\u0131n\u0131zda i\u015fl\u0259yir."
     },
     "privacy": {
       "consentsTitle": "Sa\u011flaml\u0131q datas\u0131 icaz\u0259l\u0259ri",

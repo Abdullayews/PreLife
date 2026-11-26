@@ -351,6 +351,7 @@ impl EmuStore {
         for (k, v) in [
             ("username", Value::Null), ("avatar_url", Value::Null), ("lang", json!("en")),
             ("theme", json!("light")), ("rail_folded", json!(false)),
+            ("notify_reminders", json!(true)), ("notify_digest", json!(true)), ("notify_news", json!(false)),
             ("plan_onboarding_done", json!(false)), ("fitness_level", Value::Null),
             ("workouts_per_week", Value::Null), ("reading_goal_books_per_year", Value::Null),
             ("gender", Value::Null), ("birth_year", Value::Null), ("height_cm", Value::Null),
@@ -563,6 +564,7 @@ impl EmuStore {
         for (k, v) in [
             ("username", Value::Null), ("avatar_url", Value::Null), ("lang", json!("en")),
             ("theme", json!("light")), ("rail_folded", json!(false)),
+            ("notify_reminders", json!(true)), ("notify_digest", json!(true)), ("notify_news", json!(false)),
             ("plan_onboarding_done", json!(false)), ("fitness_level", Value::Null),
             ("workouts_per_week", Value::Null), ("reading_goal_books_per_year", Value::Null),
             ("gender", Value::Null), ("birth_year", Value::Null), ("height_cm", Value::Null),

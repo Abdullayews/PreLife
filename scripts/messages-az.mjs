@@ -872,13 +872,35 @@ export const az = {
       notifications: {
         title: "Bildirişlər",
         subtitle: "PreLife-un sizə nə barədə xəbər verə biləcəyini seçin.",
+        saveFail: "Seçim yadda saxlanılmadı. Yenidən cəhd edin.",
+        permission: {
+          title: "Brauzer icazəsi",
+          checking: "Yoxlanılır…",
+          status: {
+            default: "Hələ soruşulmayıb — brauzerdə bildirişlərə icazə verin.",
+            granted: "Verilib — bu brauzer bildirişləri göstərə bilər.",
+            denied: "Bloklanıb — bu sayt üçün bildirişlər söndürülüb.",
+            unsupported: "Bu brauzer veb-bildirişləri dəstəkləmir."
+          },
+          allow: "Bildirişlərə icazə ver",
+          test: "Test bildirişi göndər",
+          testTitle: "PreLife",
+          testBody: "Bildirişlər işləyir — bu, təkcə bir test idi.",
+          grantedToast: "Bildirişlərə icazə verildi.",
+          deniedToast: "İcazə verilmədi — bildirişlər brauzerdə bloklanıb.",
+          dismissedToast: "Soruş bağlandı — icazə verilmədi.",
+          testFail: "Test bildirişi göstərilə bilmədi.",
+          defaultHint: "Yandırdığınız kanallar yalnız brauzerə icazə verdikdən sonra görünür — «Bildirişlərə icazə ver» düyməsi soruşacaq.",
+          deniedHint: "Geri qaytarmaq üçün: ünvan zolağındakı sayt/kilid ikonuna klik edin → Bildirişlər → İcazə ver, sonra səhifəni yeniləyin.",
+          unsupportedHint: "Seçimlər hesabınızda saxlanılır — bildirişləri dəstəkləyən brauzerdə işə düşəcək."
+        },
         reminders: "Məşq xatırlatmaları",
         remindersHint: "Planlaşdırılmış məşq yaxınlaşanda kiçik bir xəbərdarlıq.",
         digest: "Həftəlik icmal",
         digestHint: "Həftənizin bir icmalı, hər bazar günü.",
         news: "Məhsul xəbərləri",
         newsHint: "Yeni bölmələr və özəlliklər, təxminən ayda bir dəfə.",
-        note: "Müvəqqəti düymələr — tam bildiriş sistemi ilə yadda saxlanmağa başlayacaqlar."
+        note: "Seçimlər hesabınızda saxlanılır və bütün cihazlarınızda işləyir."
       },
       privacy: {
         consentsTitle: "Sağlamlıq datası icazələri",
