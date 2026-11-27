@@ -358,8 +358,9 @@ export function AppShell({
       <nav className="app-rail" aria-label={user ? t("navLabel") : ui.label}>
         <div className="rail-top">
           <Link href={user ? "/home" : "/welcome"} aria-label={tm("navHome")} className="rail-brand">
-            <span className="rail-brand-ic" aria-hidden><Dumbbell size={19} strokeWidth={2.2} /></span>
-            {expanded && <span className="rail-brand-txt">Pre<em>Life</em></span>}
+            {expanded
+              ? <span className="rail-brand-txt">Pre<em>Life</em></span>
+              : <span className="rail-brand-mono" aria-hidden>P</span>}
           </Link>
           <button
             type="button"

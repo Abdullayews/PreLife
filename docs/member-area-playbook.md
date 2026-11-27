@@ -1,6 +1,8 @@
 # PreLife — Member-area playbook (qeydiyyatlı istifadəçi frontend sahəsi)
 
-> **STATUS (2026-11-27, kod bazası `d58c239`): canlı sənəd.**
+> **STATUS (2026-11-27): canlı sənəd. Son dəyişiklik (bu commit): hər iki
+> user sol panelində (AppShell rail + İdman inav) PreLife brendi
+> logosuz — yalnız mətn; yığılmış halda "P" monoqramı.**
 > İstifadəçi planlaşdırır: "frontendin qeydiyyatlı userlər üçün sahəsi
 > dəyişəcək". Konkret dəyişiklik gələndə explorasiya yerinə BURADAN başla.
 > Hər member-area dəyişikliyindən sonra bu sənədi güncəllə (STATUS xətti +

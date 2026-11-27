@@ -1341,8 +1341,9 @@ export function IdmanApp({
       <aside className="inav" aria-label={t("nav.railLabel")} data-open={expanded ? "open" : "closed"}>
         <div className="inav-top">
           <a className="inav-brand" href={links?.home ?? "#"} aria-label="PreLife">
-            <span className="inav-brand-ic" aria-hidden><Dumbbell size={19} strokeWidth={2.2} /></span>
-            {expanded && <span className="inav-brand-txt">Pre<em>Life</em></span>}
+            {expanded
+              ? <span className="inav-brand-txt">Pre<em>Life</em></span>
+              : <span className="inav-brand-mono" aria-hidden>P</span>}
           </a>
           <button
             type="button"
