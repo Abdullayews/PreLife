@@ -15,7 +15,7 @@
  * failed backend build fails the whole deploy, loudly.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -26,6 +26,23 @@ const API = path.join(ROOT, "mini-services/prelife-api");
 const OUT = path.join(API, "target/release/prelife-api");
 
 const log = (m) => console.log(`[build-backend] ${m}`);
+
+/* Render's native build cache keeps $HOME/.cargo between builds (the
+ * cargo binary and the crates.io registry already come from it — the
+ * logs show no rustup bootstrap and no crate downloads). The repo
+ * checkout, though, is fresh every build, so an in-repo target/ dir
+ * recompiles every dependency on every deploy (~100 "Compiling"
+ * lines, ~1m17s). Redirect the cargo target dir into the cached
+ * cargo home on Render: only the changed crates recompile, then copy
+ * the binary to the repo path start-production.mjs expects. Off
+ * Render (local) nothing changes. */
+const onRender =
+  process.env.RENDER === "true" || existsSync("/opt/render/project/src");
+const cargoHome = process.env.CARGO_HOME ?? path.join(os.homedir(), ".cargo");
+const cacheTarget = path.join(cargoHome, "prelife-target");
+const env = onRender
+  ? { ...process.env, CARGO_TARGET_DIR: cacheTarget }
+  : process.env;
 
 let cargo = process.env.CARGO ?? path.join(os.homedir(), ".cargo/bin/cargo");
 if (!existsSync(cargo)) {
@@ -51,11 +68,22 @@ if (!existsSync(cargo)) {
 
 const built = spawnSync(cargo, ["build", "--release", "--locked"], {
   cwd: API,
+  env,
   stdio: "inherit",
 });
 if (built.status !== 0) {
   log("cargo build --release FAILED");
   process.exit(1);
+}
+if (onRender) {
+  const from = path.join(cacheTarget, "release", "prelife-api");
+  if (!existsSync(from)) {
+    log(`expected the binary at ${from} — missing after build`);
+    process.exit(1);
+  }
+  mkdirSync(path.dirname(OUT), { recursive: true });
+  copyFileSync(from, OUT);
+  log(`binary copied from the cached target dir → ${path.relative(ROOT, OUT)}`);
 }
 if (!existsSync(OUT)) {
   log(`build reported success but ${OUT} is missing`);
