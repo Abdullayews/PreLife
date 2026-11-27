@@ -71,7 +71,7 @@ pub async fn create_verification(
 }
 
 pub enum ConsumeResult {
-    Ok { user_id: String, email: String, locale: String },
+    Ok { user_id: String, email: String },
     Expired { user_id: String, email: String },
     Invalid,
 }
@@ -120,7 +120,7 @@ pub async fn consume_verification(st: &St, token: &str) -> Result<ConsumeResult,
     if claimed.is_empty() {
         return Ok(ConsumeResult::Invalid);
     }
-    Ok(ConsumeResult::Ok { user_id, email, locale: norm_locale(s_opt(&v, "locale").as_deref()) })
+    Ok(ConsumeResult::Ok { user_id, email })
 }
 
 /// v4.6: the shared "start a mail registration" step — creates the

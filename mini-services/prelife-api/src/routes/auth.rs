@@ -543,7 +543,7 @@ pub async fn verify(State(st): State<St>, headers: HeaderMap, RawQuery(raw): Raw
                 uri_encode(&email)
             )));
         }
-        vf::ConsumeResult::Ok { user_id, email, locale: _ } => (user_id, email),
+        vf::ConsumeResult::Ok { user_id, email } => (user_id, email),
     };
 
     if let Err(e) = st.supa.admin_update_user(&user_id, &json!({ "email_confirm": true })).await {

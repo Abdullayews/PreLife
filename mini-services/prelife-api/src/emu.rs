@@ -427,7 +427,6 @@ impl EmuStore {
         }
         user.insert("updated_at".into(), json!(now_iso()));
         let out = gotrue_user(user);
-        drop(user);
         if let Some(name) = full_name_to_apply {
             if let Some(profiles) = data.tables.get_mut("profiles") {
                 if let Some(p) = profiles.iter_mut().find(|p| s(&row_v(p), "id") == id) {

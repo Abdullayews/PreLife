@@ -276,7 +276,7 @@ pub fn char_take(s: &str, n: usize) -> String {
     s.chars().take(n).collect()
 }
 
-/* ── message trees (gym.ts msgPath / fillMsg) ──────────────────────────── */
+/* ── message trees (gym.ts msgPath) ───────────────────────────── */
 
 /// Read "a.b.c" out of a nested message tree.
 pub fn msg_path<'a>(tree: &'a Json, path: &str) -> Option<&'a str> {
@@ -285,28 +285,6 @@ pub fn msg_path<'a>(tree: &'a Json, path: &str) -> Option<&'a str> {
         cur = cur.as_object().and_then(|o| o.get(part))?;
     }
     cur.as_str()
-}
-
-/// {count}/{from}/{to} template fill (gym.ts fillMsg).
-pub fn fill_msg(tpl: &str, params: &serde_json::Map<String, Json>) -> String {
-    let mut out = tpl.to_string();
-    for (k, v) in params {
-        let sv = match v {
-            Json::String(s) => s.clone(),
-            Json::Number(n) => {
-                if n.as_i64().is_some() && n.as_i64() != Some(0) && n.as_f64() == Some(n.as_f64().unwrap().trunc()) {
-                    n.as_i64().unwrap().to_string()
-                } else if let Some(f) = n.as_f64() {
-                    format!("{f}")
-                } else {
-                    String::new()
-                }
-            }
-            _ => continue,
-        };
-        out = out.replace(&format!("{{{k}}}"), &sv);
-    }
-    out
 }
 
 /* ── query strings & cookies ───────────────────────────────────────────── */
